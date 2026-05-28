@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="620" viewBox="0 0 960 620" role="img" aria-labelledby="title desc">
+  <title id="title">微信公众平台开发配置示意图</title>
+  <desc id="desc">示意用户在微信公众平台选择公众号、获取 AppId 和 AppSecret，并把 43.167.247.143 加入 API IP 白名单。</desc>
+  <rect width="960" height="620" fill="#f7fbf8"/>
+  <rect x="52" y="54" width="856" height="512" rx="24" fill="#ffffff" stroke="#d8e5dd"/>
+  <rect x="52" y="54" width="856" height="74" rx="24" fill="#111411"/>
+  <path d="M52 104h856v24H52z" fill="#111411"/>
+  <circle cx="91" cy="91" r="9" fill="#18b66a"/>
+  <circle cx="122" cy="91" r="9" fill="#ffbe4d"/>
+  <circle cx="153" cy="91" r="9" fill="#dfe7e2"/>
+  <text x="205" y="99" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="760">微信公众平台开发者控制台</text>
+
+  <rect x="84" y="160" width="190" height="360" rx="16" fill="#f0f7f3" stroke="#d8e5dd"/>
+  <rect x="110" y="190" width="138" height="36" rx="10" fill="#ffffff" stroke="#cfe1d7"/>
+  <text x="129" y="214" fill="#08764b" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="760">选择公众号</text>
+  <rect x="110" y="254" width="138" height="18" rx="9" fill="#d9e8df"/>
+  <rect x="110" y="292" width="110" height="18" rx="9" fill="#d9e8df"/>
+  <rect x="110" y="330" width="126" height="18" rx="9" fill="#d9e8df"/>
+  <rect x="110" y="368" width="96" height="18" rx="9" fill="#d9e8df"/>
+
+  <rect x="318" y="160" width="556" height="128" rx="18" fill="#ffffff" stroke="#d8e5dd"/>
+  <circle cx="360" cy="205" r="18" fill="#eaf9f1"/>
+  <path d="M352 205h16M360 197v16" stroke="#08764b" stroke-width="4" stroke-linecap="round"/>
+  <text x="396" y="200" fill="#111411" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="780">获取 AppId / AppSecret</text>
+  <text x="396" y="236" fill="#5f6862" font-family="Inter, Arial, sans-serif" font-size="17">开发配置中复制账号凭据，填入工具的公众号配置。</text>
+  <rect x="690" y="190" width="130" height="44" rx="12" fill="#eefaf4" stroke="#bfe8d0"/>
+  <text x="718" y="218" fill="#08764b" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="760">复制凭据</text>
+
+  <rect x="318" y="324" width="556" height="148" rx="18" fill="#fffdf8" stroke="#eadfc7"/>
+  <circle cx="360" cy="373" r="18" fill="#fff4dd"/>
+  <path d="M360 360l13 8v17l-13 8-13-8v-17z" fill="none" stroke="#a86c00" stroke-width="3" stroke-linejoin="round"/>
+  <text x="396" y="368" fill="#111411" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="780">配置 API IP 白名单</text>
+  <text x="396" y="404" fill="#5f6862" font-family="Inter, Arial, sans-serif" font-size="17">将服务器出口 IP 加入白名单后，接口调用才能通过。</text>
+  <rect x="396" y="427" width="212" height="40" rx="12" fill="#111411"/>
+  <text x="418" y="453" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="760">43.167.247.143</text>
+  <path d="M598 446h116" stroke="#18b66a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M704 434l14 12-14 12" fill="none" stroke="#18b66a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="730" y="425" width="94" height="44" rx="12" fill="#18b66a"/>
+  <text x="761" y="453" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="780">保存</text>
+
+  <rect x="84" y="535" width="790" height="1" fill="#dfe7e2"/>
+  <text x="84" y="552" fill="#718079" font-family="Inter, Arial, sans-serif" font-size="13">提示：AppSecret 只展示一次，请妥善保存；如遗失需要在微信公众平台重置。</text>
+</svg>
