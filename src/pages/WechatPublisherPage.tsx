@@ -189,6 +189,14 @@ export function WechatPublisherPage() {
     setForm((current) => ({ ...current, [key]: value }));
   }
 
+  function updateCoverImageType(type: ImageType) {
+    setForm((current) => ({
+      ...current,
+      imageCoverType: type,
+      imageCoverValue: current.imageCoverType === type ? current.imageCoverValue : "",
+    }));
+  }
+
   function validate() {
     const nextErrors = getValidationErrors(form);
     setErrors(nextErrors);
@@ -446,7 +454,7 @@ export function WechatPublisherPage() {
                       <input
                         type="radio"
                         checked={form.imageCoverType === option.value}
-                        onChange={() => updateField("imageCoverType", option.value)}
+                        onChange={() => updateCoverImageType(option.value)}
                       />
                       {option.label}
                     </label>

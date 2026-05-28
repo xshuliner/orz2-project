@@ -12,9 +12,15 @@ test("wechat publisher form persists, imports, exports, generates, and resets", 
   await page.getByPlaceholder("请输入公众号 appSecret").fill("wx-test-secret");
   await page.getByPlaceholder("描述希望生成的封面图").fill("一张明亮科技风公众号封面图");
   await expect(page.locator(".summary-score")).toContainText("4/4");
+  await page.getByLabel("图片 URL").check();
+  await expect(page.getByPlaceholder("https://example.com/cover.png")).toHaveValue("");
+  await page.getByPlaceholder("https://example.com/cover.png").fill("https://example.com/cover.png");
 
   await page.getByRole("button", { name: "增加图片" }).click();
   await expect(page.locator(".summary-score")).toContainText("3/4");
+  await page.getByPlaceholder("描述这张内嵌图").fill("一张内嵌配图");
+  await page.locator(".inline-image-item").getByLabel("图片 URL").check();
+  await expect(page.getByPlaceholder("https://example.com/inline.png")).toHaveValue("");
 
   let saved = await page.evaluate(() => JSON.parse(localStorage.getItem("orz2:wechat-auto-publisher-form") || "{}"));
   expect(saved.appId).toBe("wx-test-app-id");
