@@ -1,6 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 
 const siteUrl = "https://orz2.com";
+const routeUrl = (path) => (path === "/" ? `${siteUrl}/` : `${siteUrl}${path}`);
 const pages = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
   { path: "/products", changefreq: "weekly", priority: "0.9" },
@@ -24,7 +25,7 @@ const xml = `<?xml version="1.0" encoding="UTF-8"?>
 ${urls
   .map(
     (url) => `  <url>
-    <loc>${siteUrl}${url.path}</loc>
+    <loc>${routeUrl(url.path)}</loc>
     <changefreq>${url.changefreq}</changefreq>
     <priority>${url.priority}</priority>
   </url>`,

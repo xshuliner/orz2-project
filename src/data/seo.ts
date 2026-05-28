@@ -5,6 +5,10 @@ export const siteUrl = "https://orz2.com";
 export const siteName = "ORZ2";
 export const defaultOgImage = "/assets/logo-light.png";
 
+export function routeUrl(path: string) {
+  return path === "/" ? `${siteUrl}/` : `${siteUrl}${path}`;
+}
+
 export const pageSeo: Record<string, SeoConfig> = {
   home: {
     title: "ORZ2 - 在线 AI 工具与效率工具平台",
@@ -16,7 +20,7 @@ export const pageSeo: Record<string, SeoConfig> = {
         "@context": "https://schema.org",
         "@type": "Organization",
         name: siteName,
-        url: siteUrl,
+        url: routeUrl("/"),
         logo: `${siteUrl}/assets/logo-light.png`,
         contactPoint: {
           "@type": "ContactPoint",
@@ -28,10 +32,10 @@ export const pageSeo: Record<string, SeoConfig> = {
         "@context": "https://schema.org",
         "@type": "WebSite",
         name: siteName,
-        url: siteUrl,
+        url: routeUrl("/"),
         potentialAction: {
           "@type": "SearchAction",
-          target: `${siteUrl}/products?q={search_term_string}`,
+          target: `${routeUrl("/products")}?q={search_term_string}`,
           "query-input": "required name=search_term_string",
         },
       },
@@ -50,7 +54,7 @@ export const pageSeo: Record<string, SeoConfig> = {
         itemListElement: productTools.map((tool, index) => ({
           "@type": "ListItem",
           position: index + 1,
-          url: `${siteUrl}${tool.href}`,
+          url: routeUrl(tool.href),
           name: tool.name,
         })),
       },
@@ -66,7 +70,7 @@ export const pageSeo: Record<string, SeoConfig> = {
         "@context": "https://schema.org",
         "@type": "AboutPage",
         name: "ORZ2 团队",
-        url: `${siteUrl}/team`,
+        url: routeUrl("/team"),
       },
     ],
   },
@@ -94,7 +98,7 @@ export const toolSeo = Object.fromEntries(
           name: tool.name,
           applicationCategory: tool.category,
           operatingSystem: "Web",
-          url: `${siteUrl}${tool.href}`,
+          url: routeUrl(tool.href),
           description: tool.seoDescription,
           offers: {
             "@type": "Offer",
