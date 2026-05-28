@@ -21,7 +21,6 @@ export function Header() {
     <header className="site-header">
       <Link to="/" className="brand-link" aria-label="ORZ2 首页">
         <img src="/assets/logo-light.png" alt="ORZ2" className="brand-logo" />
-        <span>ORZ2</span>
       </Link>
       <nav className="desktop-nav" aria-label="主导航">
         {navItems.map((item) => (

@@ -1,4 +1,5 @@
 import { ArrowUpRight, Mail, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function ContactSection() {
   return (
@@ -18,10 +19,10 @@ export function ContactSection() {
           <Mail size={18} aria-hidden="true" />
           hello@orz2.com
         </a>
-        <a className="button ghost" href="/products">
+        <Link className="button ghost" to="/products">
           查看可扩展入口
           <ArrowUpRight size={16} aria-hidden="true" />
-        </a>
+        </Link>
       </div>
     </section>
   );

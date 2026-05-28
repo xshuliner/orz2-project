@@ -3,10 +3,15 @@ import { Link, useParams } from "react-router-dom";
 import { Seo } from "../components/Seo";
 import { pageSeo, toolSeo } from "../data/seo";
 import { productTools } from "../data/site";
+import { WechatPublisherPage } from "./WechatPublisherPage";
 
 export function ToolPage() {
   const { slug = "" } = useParams();
   const tool = productTools.find((item) => item.slug === slug);
+
+  if (slug === "wechat-auto-publisher") {
+    return <WechatPublisherPage />;
+  }
 
   if (!tool) {
     return (
