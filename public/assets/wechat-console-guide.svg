@@ -11,6 +11,9 @@
     <marker id="arrow-amber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
       <path d="M0 0l10 5-10 5z" fill="#c56a00"/>
     </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+      <path d="M0 0l10 5-10 5z" fill="#2f6fed"/>
+    </marker>
   </defs>
 
   <rect width="960" height="620" fill="#f4f6f5"/>
@@ -85,9 +88,9 @@
   <text x="570" y="502" fill="#fff4dc" font-family="Inter, Arial, sans-serif" font-size="13">点击重置后保存密钥</text>
   <path d="M548 492C494 510 427 522 354 529" fill="none" stroke="#c56a00" stroke-width="2.5" marker-end="url(#arrow-amber)"/>
 
-  <rect x="112" y="548" width="550" height="34" rx="9" fill="none" stroke="#0c8b5a" stroke-width="3"/>
-  <rect x="620" y="528" width="214" height="56" rx="14" fill="#0c8b5a"/>
+  <rect x="112" y="548" width="326" height="34" rx="9" fill="none" stroke="#2f6fed" stroke-width="3"/>
+  <rect x="620" y="528" width="254" height="56" rx="14" fill="#2f6fed"/>
   <text x="640" y="552" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="780">3. IP 白名单</text>
-  <text x="640" y="573" fill="#ddf7e9" font-family="Inter, Arial, sans-serif" font-size="13">编辑后加入 IP</text>
-  <path d="M674 584C676 592 668 594 660 584" fill="none" stroke="#0c8b5a" stroke-width="2.5" marker-end="url(#arrow-green)"/>
+  <text x="640" y="573" fill="#e8f0ff" font-family="Inter, Arial, sans-serif" font-size="13">编辑后加入 IP 43.167.247.143</text>
+  <path d="M620 558C565 556 506 558 440 565" fill="none" stroke="#2f6fed" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
 </svg>
