@@ -52,7 +52,7 @@ export function ProductDirectory({ compact = false }: ProductDirectoryProps) {
         </label>
         <div className="category-tabs" role="list" aria-label="工具分类">
           {productCategories.map((item) => (
-            <button key={item} className={item === category ? "active" : ""} type="button" onClick={() => updateFilters(query, item)}>
+            <button key={item} className={item === category ? "active interactive" : "interactive"} type="button" onClick={() => updateFilters(query, item)}>
               {item}
             </button>
           ))}
@@ -72,7 +72,7 @@ export function ProductDirectory({ compact = false }: ProductDirectoryProps) {
                 <span key={tag}>{tag}</span>
               ))}
             </div>
-            <Link className="card-link" to={tool.href} aria-label={`打开 ${tool.name}`}>
+            <Link className="card-link interactive" to={tool.href} aria-label={`打开 ${tool.name}`}>
               进入工具
               <ArrowUpRight size={16} aria-hidden="true" />
             </Link>
@@ -82,7 +82,7 @@ export function ProductDirectory({ compact = false }: ProductDirectoryProps) {
       {!tools.length ? <p className="empty-state">暂时没有匹配的工具，换个关键词试试。</p> : null}
       {compact ? (
         <div className="section-action">
-          <Link className="button primary" to="/products">
+          <Link className="button primary interactive" to="/products">
             查看全部工具
           </Link>
         </div>

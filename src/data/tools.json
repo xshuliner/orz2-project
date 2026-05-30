@@ -10,8 +10,13 @@
     "tags": ["公众号", "自动发布", "LLM", "内容运营"],
     "seoTitle": "公众号自动发布工具 - ORZ2 内容运营工具",
     "seoDescription": "使用 ORZ2 公众号自动发布工具配置 appId、appSecret、文章提示词、封面图和图片素材，准备自动化发布任务。",
-    "keywords": ["公众号自动发布", "微信公众号工具", "AI文章生成", "内容运营工具"],
-    "ogImage": "/assets/logo-light.png",
+    "keywords": [
+      "公众号自动发布",
+      "微信公众号工具",
+      "AI文章生成",
+      "内容运营工具"
+    ],
+    "ogImage": "https://cos.xshuliner.online/Orz2/Logo/logo_dark_320x320.webp",
     "schemaType": "SoftwareApplication"
   },
   {
@@ -26,7 +31,7 @@
     "seoTitle": "AI 文案助手 - ORZ2 在线工具",
     "seoDescription": "使用 ORZ2 AI 文案助手快速生成标题、产品说明、广告文案和运营内容草稿。",
     "keywords": ["AI文案", "在线写作工具", "营销文案"],
-    "ogImage": "/assets/logo-light.png",
+    "ogImage": "https://cos.xshuliner.online/Orz2/Logo/logo_dark_320x320.webp",
     "schemaType": "SoftwareApplication"
   },
   {
@@ -41,7 +46,7 @@
     "seoTitle": "智能图片压缩 - ORZ2 在线图片工具",
     "seoDescription": "ORZ2 智能图片压缩工具帮助网页、博客和社媒素材降低体积并保持视觉质量。",
     "keywords": ["图片压缩", "在线图片工具", "网页性能"],
-    "ogImage": "/assets/logo-light.png",
+    "ogImage": "https://cos.xshuliner.online/Orz2/Logo/logo_dark_320x320.webp",
     "schemaType": "SoftwareApplication"
   },
   {
@@ -56,7 +61,7 @@
     "seoTitle": "JSON 格式化工具 - ORZ2 开发者工具",
     "seoDescription": "使用 ORZ2 JSON 格式化工具在线整理、校验和查看 JSON 数据。",
     "keywords": ["JSON格式化", "开发者工具", "JSON校验"],
-    "ogImage": "/assets/logo-light.png",
+    "ogImage": "https://cos.xshuliner.online/Orz2/Logo/logo_dark_320x320.webp",
     "schemaType": "SoftwareApplication"
   },
   {
@@ -71,7 +76,7 @@
     "seoTitle": "会议纪要整理工具 - ORZ2 办公效率工具",
     "seoDescription": "ORZ2 会议纪要整理工具用于将会议记录转成清晰的决议、待办和负责人列表。",
     "keywords": ["会议纪要", "办公工具", "待办整理"],
-    "ogImage": "/assets/logo-light.png",
+    "ogImage": "https://cos.xshuliner.online/Orz2/Logo/logo_dark_320x320.webp",
     "schemaType": "SoftwareApplication"
   },
   {
@@ -86,7 +91,7 @@
     "seoTitle": "配色实验室 - ORZ2 在线设计工具",
     "seoDescription": "ORZ2 配色实验室帮助设计师和开发者生成品牌色、检查对比度并导出色值。",
     "keywords": ["在线配色", "设计工具", "颜色对比度"],
-    "ogImage": "/assets/logo-light.png",
+    "ogImage": "https://cos.xshuliner.online/Orz2/Logo/logo_dark_320x320.webp",
     "schemaType": "SoftwareApplication"
   },
   {
@@ -101,7 +106,7 @@
     "seoTitle": "UTM 链接生成器 - ORZ2 营销工具",
     "seoDescription": "使用 ORZ2 UTM 链接生成器为广告投放、邮件和活动创建规范追踪链接。",
     "keywords": ["UTM生成器", "营销工具", "链接追踪"],
-    "ogImage": "/assets/logo-light.png",
+    "ogImage": "https://cos.xshuliner.online/Orz2/Logo/logo_dark_320x320.webp",
     "schemaType": "SoftwareApplication"
   }
 ]

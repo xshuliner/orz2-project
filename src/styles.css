@@ -36,6 +36,31 @@ a {
   text-decoration: none;
 }
 
+.interactive,
+:where(a[href], button, [role="button"]) {
+  cursor: pointer;
+}
+
+.interactive {
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.interactive:focus-visible {
+  outline: 3px solid rgba(24, 182, 106, 0.28);
+  outline-offset: 3px;
+}
+
+.interactive:disabled,
+.interactive[aria-disabled="true"],
+:where(button:disabled, [role="button"][aria-disabled="true"]) {
+  cursor: not-allowed;
+}
+
 button,
 input {
   font: inherit;
@@ -112,6 +137,14 @@ main {
   object-fit: contain;
   overflow: hidden;
   border-radius: 8px;
+  transition:
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.brand-link:hover .brand-logo {
+  box-shadow: 0 10px 24px rgba(17, 20, 17, 0.12);
+  transform: translateY(-1px);
 }
 
 .desktop-nav {
@@ -236,7 +269,6 @@ main {
 
 .button:disabled,
 .icon-button:disabled {
-  cursor: not-allowed;
   opacity: 0.56;
   transform: none;
 }
@@ -286,7 +318,6 @@ main {
   color: #46534b;
   font-size: 14px;
   font-weight: 720;
-  cursor: pointer;
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -344,7 +375,6 @@ main {
   border-radius: 8px;
   color: #516057;
   background: transparent;
-  cursor: pointer;
 }
 
 .nav-logout:hover {
@@ -633,7 +663,6 @@ main {
   border-radius: 8px;
   color: #4a554f;
   background: #ffffff;
-  cursor: pointer;
 }
 
 .category-tabs button.active,
@@ -811,6 +840,65 @@ main {
 
 .testimonial-section {
   padding: 38px 0 86px;
+}
+
+.danmaku-container {
+  position: relative;
+  height: 320px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(24, 182, 106, 0.03), rgba(24, 182, 106, 0.06));
+}
+
+.danmaku-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40px;
+  will-change: transform;
+}
+
+.danmaku-row {
+  position: relative;
+  width: 100%;
+  height: 40px;
+  overflow: hidden;
+}
+
+.danmaku-item {
+  position: absolute;
+  left: 0;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(24, 182, 106, 0.22);
+  box-shadow: 0 4px 20px rgba(17, 20, 17, 0.08);
+  white-space: nowrap;
+  cursor: default;
+  will-change: transform, opacity;
+  backdrop-filter: blur(8px);
+  transition: box-shadow 0.2s ease;
+}
+
+.danmaku-item:hover {
+  box-shadow: 0 8px 32px rgba(24, 182, 106, 0.18);
+}
+
+.danmaku-text {
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.danmaku-author {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 620;
 }
 
 .testimonial-card {
@@ -991,6 +1079,12 @@ main {
   font-weight: 720;
 }
 
+.privacy-article a:hover {
+  color: #073c27;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .tool-placeholder {
   min-height: 64vh;
   padding: 82px 0 96px;
@@ -1094,23 +1188,70 @@ main {
     linear-gradient(135deg, rgba(255, 190, 77, 0.13), rgba(255, 255, 255, 0) 46%),
     #fffdf8;
   box-shadow: 0 10px 28px rgba(120, 92, 35, 0.06);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .wechat-setup-visual {
-  overflow: hidden;
+  position: relative;
+  overflow: visible;
   align-self: stretch;
   border: 1px solid rgba(226, 190, 116, 0.34);
   border-radius: 8px;
   background: #ffffff;
+  cursor: zoom-in;
+  outline: none;
+  z-index: 3;
 }
 
-.wechat-setup-visual img {
+.wechat-setup-visual:focus-visible {
+  box-shadow: 0 0 0 3px rgba(24, 182, 106, 0.28);
+}
+
+.wechat-setup-visual > img {
   width: 100%;
   height: 100%;
   min-height: 112px;
+  border-radius: 8px;
   object-fit: cover;
   transform: scale(1.01);
+}
+
+.wechat-setup-preview {
+  position: absolute;
+  left: 0;
+  top: calc(100% + 12px);
+  width: min(680px, calc(100vw - 72px));
+  padding: 10px;
+  border: 1px solid rgba(20, 35, 27, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 22px 58px rgba(20, 35, 27, 0.24);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px) scale(0.98);
+  transform-origin: top left;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+  z-index: 20;
+}
+
+.wechat-setup-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  border-radius: 6px;
+  object-fit: contain;
+  transform: none;
+}
+
+.wechat-setup-visual:hover .wechat-setup-preview,
+.wechat-setup-visual:focus-within .wechat-setup-preview,
+.wechat-setup-visual:focus .wechat-setup-preview {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
 }
 
 .wechat-setup-content {
@@ -1367,7 +1508,6 @@ main {
   background: #ffffff;
   font-size: 14px;
   font-weight: 640;
-  cursor: pointer;
   transition:
     border-color 160ms ease,
     background 160ms ease,
@@ -1657,6 +1797,16 @@ main {
   color: #b8c9c0;
   line-height: 1.7;
   font-size: 14px;
+}
+
+.footer-grid a {
+  width: fit-content;
+}
+
+.footer-grid a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .footer-grid nav,

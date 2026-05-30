@@ -129,10 +129,10 @@ function LoginModal({ isOpen, onClose, onLogin }: { isOpen: boolean; onClose: ()
           <p>这里是临时登录弹窗文案，占位用于后续接入真实账号体系。</p>
         </div>
         <div className="login-modal-actions">
-          <button className="button secondary" type="button" onClick={onClose}>
+          <button className="button secondary interactive" type="button" onClick={onClose}>
             取消
           </button>
-          <button className="button primary" type="button" onClick={onLogin}>
+          <button className="button primary interactive" type="button" onClick={onLogin}>
             模拟登录
           </button>
         </div>

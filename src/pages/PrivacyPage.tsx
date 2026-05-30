@@ -23,7 +23,7 @@ export function PrivacyPage() {
       <section className="privacy-layout">
         <aside className="privacy-toc" aria-label="隐私协议目录">
           {sections.map((section) => (
-            <a href={`#${section.id}`} key={section.id}>
+            <a className="interactive" href={`#${section.id}`} key={section.id}>
               {section.title}
             </a>
           ))}
@@ -69,7 +69,7 @@ export function PrivacyPage() {
             <h2>联系我们</h2>
             <p>
               如对本协议或数据处理方式有疑问，请联系{" "}
-              <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>
+              <a className="interactive" href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>
               。正式上线前，请将该邮箱替换为真实运营主体的联系渠道。
             </p>
           </section>

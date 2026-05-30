@@ -21,19 +21,19 @@ export function Header() {
 
   return (
     <header className="site-header">
-      <Link to="/" className="brand-link" aria-label="ORZ2 首页">
-        <img src="/assets/logo-light.png" alt="ORZ2" className="brand-logo" />
+      <Link to="/" className="brand-link interactive" aria-label="ORZ2 首页">
+        <img src="https://cos.xshuliner.online/Orz2/Logo/logo_light_320x320.webp" alt="ORZ2" className="brand-logo" />
       </Link>
       <nav className="desktop-nav" aria-label="主导航">
         {navItems.map((item) => (
-          <NavLink key={item.to} to={item.to} className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
+          <NavLink key={item.to} to={item.to} className={({ isActive }) => (isActive ? "nav-link active interactive" : "nav-link interactive")}>
             {item.label}
           </NavLink>
         ))}
       </nav>
       <UserInfoModule isAuthenticated={isAuthenticated} onLogin={openLogin} onLogout={logout} userName={user?.name} variant="desktop" />
       <button
-        className="icon-button mobile-menu-button"
+        className="icon-button mobile-menu-button interactive"
         type="button"
         aria-label={isOpen ? "关闭导航" : "打开导航"}
         aria-expanded={isOpen}
@@ -43,7 +43,7 @@ export function Header() {
       </button>
       <div className={isOpen ? "mobile-nav open" : "mobile-nav"}>
         {navItems.map((item) => (
-          <NavLink key={item.to} to={item.to} className={({ isActive }) => (isActive ? "nav-link active" : "nav-link")}>
+          <NavLink key={item.to} to={item.to} className={({ isActive }) => (isActive ? "nav-link active interactive" : "nav-link interactive")}>
             {item.label}
           </NavLink>
         ))}
@@ -70,7 +70,7 @@ function UserInfoModule({
 
   if (!isAuthenticated) {
     return (
-      <button className={`${className} logged-out`} type="button" onClick={onLogin}>
+      <button className={`${className} logged-out interactive`} type="button" onClick={onLogin}>
         <UserCircle size={20} aria-hidden="true" />
         <span>未登录</span>
       </button>
@@ -86,7 +86,7 @@ function UserInfoModule({
         <strong>{userName || "测试用户"}</strong>
         <small>已登录</small>
       </span>
-      <button className="nav-logout" type="button" aria-label="退出登录" onClick={onLogout}>
+      <button className="nav-logout interactive" type="button" aria-label="退出登录" onClick={onLogout}>
         <LogOut size={16} aria-hidden="true" />
       </button>
     </div>

@@ -16,11 +16,11 @@ export function ContactSection() {
           <Sparkles size={20} aria-hidden="true" />
           <span>工具目录设计、AI 流程接入、企业落地页、隐私合规模块</span>
         </div>
-        <a className="button primary" href={`mailto:${siteConfig.contactEmail}`}>
+        <a className="button primary interactive" href={`mailto:${siteConfig.contactEmail}`}>
           <Mail size={18} aria-hidden="true" />
           {siteConfig.contactEmail}
         </a>
-        <Link className="button ghost" to="/products">
+        <Link className="button ghost interactive" to="/products">
           查看可扩展入口
           <ArrowUpRight size={16} aria-hidden="true" />
         </Link>

@@ -1,13 +1,13 @@
 import { Helmet } from "react-helmet-async";
 import { useEffect } from "react";
-import { defaultOgImage, routeUrl, siteName, siteUrl } from "../data/seo";
+import { defaultImageOg, routeUrl, siteName, siteUrl } from "../data/seo";
 import type { SeoConfig } from "../types";
 
 interface SeoProps {
   config: SeoConfig;
 }
 
-function absoluteUrl(path = defaultOgImage) {
+function absoluteUrl(path = defaultImageOg) {
   if (path.startsWith("http")) return path;
   return `${siteUrl}${path.startsWith("/") ? path : `/${path}`}`;
 }

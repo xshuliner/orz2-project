@@ -318,7 +318,7 @@ export function WechatPublisherPage() {
     <>
       <Seo config={toolSeo["wechat-auto-publisher"]} />
       <section className="tool-form-page">
-        <Link className="back-link" to="/products">
+        <Link className="back-link interactive" to="/products">
           <ArrowLeft size={16} aria-hidden="true" />
           产品目录
         </Link>
@@ -328,11 +328,11 @@ export function WechatPublisherPage() {
             <p>把账号、提示词、图片素材和发布元信息整理成一张清晰的任务单，发布前的关键信息一眼可查。</p>
           </div>
           <div className="json-actions" aria-label="JSON 配置操作">
-            <button className="button ghost" type="button" onClick={() => importInputRef.current?.click()}>
+            <button className="button ghost interactive" type="button" onClick={() => importInputRef.current?.click()}>
               <Upload size={17} aria-hidden="true" />
               导入 JSON
             </button>
-            <button className="button secondary" type="button" onClick={handleExport}>
+            <button className="button secondary interactive" type="button" onClick={handleExport}>
               <Download size={17} aria-hidden="true" />
               导出 JSON
             </button>
@@ -341,8 +341,11 @@ export function WechatPublisherPage() {
         </div>
 
         <section className="wechat-setup-card" aria-labelledby="wechat-setup-title">
-          <div className="wechat-setup-visual">
+          <div className="wechat-setup-visual interactive" tabIndex={0} aria-label="查看微信公众平台配置示意大图">
             <img src="/assets/wechat-console-guide.svg" alt="微信公众平台配置 AppId、AppSecret 和 API IP 白名单示意图" />
+            <div className="wechat-setup-preview" aria-hidden="true">
+              <img src="/assets/wechat-console-guide.svg" alt="" />
+            </div>
           </div>
           <div className="wechat-setup-content">
             <h2 id="wechat-setup-title">先完成公众号开发配置</h2>
@@ -354,11 +357,11 @@ export function WechatPublisherPage() {
               </li>
             </ol>
             <div className="setup-actions">
-              <a className="button primary" href={wechatConsoleUrl} target="_blank" rel="noreferrer">
+              <a className="button primary interactive" href={wechatConsoleUrl} target="_blank" rel="noreferrer">
                 <ExternalLink size={17} aria-hidden="true" />
                 打开微信公众平台
               </a>
-              <button className="button secondary" type="button" onClick={handleCopyIp}>
+              <button className="button secondary interactive" type="button" onClick={handleCopyIp}>
                 <Clipboard size={17} aria-hidden="true" />
                 {copiedIp ? "已复制 IP" : "复制白名单 IP"}
               </button>
@@ -397,11 +400,11 @@ export function WechatPublisherPage() {
                 </div>
                 <fieldset className="choice-field">
                   <legend>草稿类型 *</legend>
-                  <label>
+                  <label className="interactive">
                     <input type="radio" checked={form.articleType === "news"} onChange={() => updateField("articleType", "news")} />
                     news 图文消息
                   </label>
-                  <label>
+                  <label className="interactive">
                     <input type="radio" checked={form.articleType === "newspic"} onChange={() => updateField("articleType", "newspic")} />
                     newspic 贴图/图片消息
                   </label>
@@ -429,7 +432,7 @@ export function WechatPublisherPage() {
                 <fieldset className="choice-field">
                   <legend>参考信息</legend>
                   {referenceOptions.map((option) => (
-                    <label key={option.value}>
+                    <label className="interactive" key={option.value}>
                       <input type="checkbox" checked={form.promptReferences.includes(option.value)} onChange={() => toggleReference(option.value)} />
                       {option.label}
                     </label>
@@ -450,7 +453,7 @@ export function WechatPublisherPage() {
                 <fieldset className="choice-field">
                   <legend>封面图生成类型 *</legend>
                   {imageTypeOptions.map((option) => (
-                    <label key={option.value}>
+                    <label className="interactive" key={option.value}>
                       <input
                         type="radio"
                         checked={form.imageCoverType === option.value}
@@ -483,7 +486,7 @@ export function WechatPublisherPage() {
                     <h3>内嵌文章图</h3>
                     <p>{form.imagesInlineList.length ? `已添加 ${form.imagesInlineList.length} / 9 张` : "正文插图可稍后补充"}</p>
                   </div>
-                  <button className="button ghost" type="button" onClick={addInlineImage} disabled={form.imagesInlineList.length >= 9}>
+                  <button className="button ghost interactive" type="button" onClick={addInlineImage} disabled={form.imagesInlineList.length >= 9}>
                     <Plus size={17} aria-hidden="true" />
                     增加图片
                   </button>
@@ -493,14 +496,14 @@ export function WechatPublisherPage() {
                     <article className="inline-image-item" key={index}>
                       <div className="inline-image-title">
                         <strong>内嵌图片 {index + 1}</strong>
-                        <button className="icon-button" type="button" aria-label={`删除内嵌图片 ${index + 1}`} onClick={() => removeInlineImage(index)}>
+                        <button className="icon-button interactive" type="button" aria-label={`删除内嵌图片 ${index + 1}`} onClick={() => removeInlineImage(index)}>
                           <Trash2 size={17} />
                         </button>
                       </div>
                       <fieldset className="choice-field compact">
                         <legend>图片类型</legend>
                         {imageTypeOptions.map((option) => (
-                          <label key={option.value}>
+                          <label className="interactive" key={option.value}>
                             <input type="radio" checked={item.type === option.value} onChange={() => updateInlineImage(index, { type: option.value, value: "" })} />
                             {option.label}
                           </label>
@@ -553,11 +556,11 @@ export function WechatPublisherPage() {
                 </label>
                 <fieldset className="choice-field">
                   <legend>评论配置 *</legend>
-                  <label>
+                  <label className="interactive">
                     <input type="radio" checked={form.comment === "open"} onChange={() => updateField("comment", "open")} />
                     open 开放评论
                   </label>
-                  <label>
+                  <label className="interactive">
                     <input type="radio" checked={form.comment === "fansOnly"} onChange={() => updateField("comment", "fansOnly")} />
                     fansOnly 仅粉丝评论
                   </label>
@@ -620,11 +623,11 @@ export function WechatPublisherPage() {
                   <span>{statusText}</span>
                 </div>
                 <div className="form-actions">
-                  <button className="button ghost" type="button" onClick={handleReset}>
+                  <button className="button ghost interactive" type="button" onClick={handleReset}>
                     <RotateCcw size={17} aria-hidden="true" />
                     重置
                   </button>
-                  <button className="button primary publish-submit" type="submit" disabled={isGenerating}>
+                  <button className="button primary publish-submit interactive" type="submit" disabled={isGenerating}>
                     {isGenerating ? <Loader2 className="spin" size={17} aria-hidden="true" /> : <Sparkles size={17} aria-hidden="true" />}
                     {isGenerating ? "生成中..." : "生成发布任务"}
                   </button>

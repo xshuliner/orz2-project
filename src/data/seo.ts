@@ -4,7 +4,10 @@ import { productTools } from "./site";
 
 export const siteUrl = "https://orz2.com";
 export const siteName = "ORZ2";
-export const defaultOgImage = "/assets/logo-light.png";
+export const defaultImageOg =
+  "https://cos.xshuliner.online/Orz2/Logo/logo_light_320x320.webp";
+export const defaultImageLogo =
+  "https://cos.xshuliner.online/Orz2/Logo/logo_light_320x320.webp";
 
 export function routeUrl(path: string) {
   return path === "/" ? `${siteUrl}/` : `${siteUrl}${path}`;
@@ -13,16 +16,17 @@ export function routeUrl(path: string) {
 export const pageSeo: Record<string, SeoConfig> = {
   home: {
     title: "ORZ2 - 在线 AI 工具与效率工具平台",
-    description: "ORZ2 汇集 AI 写作、图片处理、开发调试、营销和办公效率工具，并提供可定制的商业化工具站方案。",
+    description:
+      "ORZ2 汇集 AI 写作、图片处理、开发调试、营销和办公效率工具，并提供可定制的商业化工具站方案。",
     canonicalPath: "/",
-    ogImage: defaultOgImage,
+    ogImage: defaultImageOg,
     jsonLd: [
       {
         "@context": "https://schema.org",
         "@type": "Organization",
         name: siteName,
         url: routeUrl("/"),
-        logo: `${siteUrl}/assets/logo-light.png`,
+        logo: defaultImageLogo,
         contactPoint: {
           "@type": "ContactPoint",
           email: siteConfig.contactEmail,
@@ -44,9 +48,10 @@ export const pageSeo: Record<string, SeoConfig> = {
   },
   products: {
     title: "产品与在线工具 - ORZ2",
-    description: "浏览 ORZ2 在线工具目录，查找 AI 效率、图片处理、开发调试、设计、营销和办公工具。",
+    description:
+      "浏览 ORZ2 在线工具目录，查找 AI 效率、图片处理、开发调试、设计、营销和办公工具。",
     canonicalPath: "/products",
-    ogImage: defaultOgImage,
+    ogImage: defaultImageOg,
     jsonLd: [
       {
         "@context": "https://schema.org",
@@ -63,9 +68,10 @@ export const pageSeo: Record<string, SeoConfig> = {
   },
   team: {
     title: "团队 - ORZ2",
-    description: "认识 ORZ2 团队：项目、研发、产品、设计、财务和 HR 一起打造稳定、合规、可扩展的在线工具平台。",
+    description:
+      "认识 ORZ2 团队：项目、研发、产品、设计、财务和 HR 一起打造稳定、合规、可扩展的在线工具平台。",
     canonicalPath: "/team",
-    ogImage: defaultOgImage,
+    ogImage: defaultImageOg,
     jsonLd: [
       {
         "@context": "https://schema.org",
@@ -77,9 +83,10 @@ export const pageSeo: Record<string, SeoConfig> = {
   },
   privacy: {
     title: "隐私协议 - ORZ2",
-    description: "了解 ORZ2 如何处理必要信息、Cookie、第三方服务、广告合规和用户隐私权利。",
+    description:
+      "了解 ORZ2 如何处理必要信息、Cookie、第三方服务、广告合规和用户隐私权利。",
     canonicalPath: "/privacy",
-    ogImage: defaultOgImage,
+    ogImage: defaultImageOg,
   },
 };
 
