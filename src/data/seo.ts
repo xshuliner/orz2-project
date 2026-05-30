@@ -1,4 +1,5 @@
 import type { SeoConfig } from "../types";
+import { siteConfig } from "../config";
 import { productTools } from "./site";
 
 export const siteUrl = "https://orz2.com";
@@ -24,7 +25,7 @@ export const pageSeo: Record<string, SeoConfig> = {
         logo: `${siteUrl}/assets/logo-light.png`,
         contactPoint: {
           "@type": "ContactPoint",
-          email: "hello@orz2.com",
+          email: siteConfig.contactEmail,
           contactType: "customer support",
         },
       },

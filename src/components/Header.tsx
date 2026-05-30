@@ -1,6 +1,7 @@
-import { Menu, X } from "lucide-react";
+import { LogOut, Menu, UserCircle, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
 
 const navItems = [
   { label: "首页", to: "/" },
@@ -12,6 +13,7 @@ const navItems = [
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { isAuthenticated, openLogin, logout, user } = useAuth();
 
   useEffect(() => {
     setIsOpen(false);
@@ -29,9 +31,7 @@ export function Header() {
           </NavLink>
         ))}
       </nav>
-      <Link className="nav-cta desktop-only" to="/products">
-        打开工具
-      </Link>
+      <UserInfoModule isAuthenticated={isAuthenticated} onLogin={openLogin} onLogout={logout} userName={user?.name} variant="desktop" />
       <button
         className="icon-button mobile-menu-button"
         type="button"
@@ -47,10 +47,48 @@ export function Header() {
             {item.label}
           </NavLink>
         ))}
-        <Link className="nav-cta" to="/products">
-          打开工具
-        </Link>
+        <UserInfoModule isAuthenticated={isAuthenticated} onLogin={openLogin} onLogout={logout} userName={user?.name} variant="mobile" />
       </div>
     </header>
+  );
+}
+
+function UserInfoModule({
+  isAuthenticated,
+  onLogin,
+  onLogout,
+  userName,
+  variant,
+}: {
+  isAuthenticated: boolean;
+  onLogin: () => void;
+  onLogout: () => void;
+  userName?: string;
+  variant: "desktop" | "mobile";
+}) {
+  const className = variant === "desktop" ? "nav-user desktop-only" : "nav-user";
+
+  if (!isAuthenticated) {
+    return (
+      <button className={`${className} logged-out`} type="button" onClick={onLogin}>
+        <UserCircle size={20} aria-hidden="true" />
+        <span>未登录</span>
+      </button>
+    );
+  }
+
+  return (
+    <div className={`${className} logged-in`}>
+      <span className="nav-user-avatar" aria-hidden="true">
+        {userName?.slice(0, 1) || "测"}
+      </span>
+      <span className="nav-user-copy">
+        <strong>{userName || "测试用户"}</strong>
+        <small>已登录</small>
+      </span>
+      <button className="nav-logout" type="button" aria-label="退出登录" onClick={onLogout}>
+        <LogOut size={16} aria-hidden="true" />
+      </button>
+    </div>
   );
 }

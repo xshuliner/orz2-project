@@ -42,7 +42,7 @@ export function ProductDirectory({ compact = false }: ProductDirectoryProps) {
     <section className={compact ? "tool-directory compact" : "tool-directory"} aria-labelledby="tool-directory-title">
       <div className="section-heading">
         <h2 id="tool-directory-title">{compact ? "从常用工具开始" : "在线工具目录"}</h2>
-        <p>{compact ? "先把高频任务变快，再逐步接入你的团队流程。" : "按场景搜索、筛选和进入工具。后续新增工具时，SEO 信息会随数据一起扩展。"}</p>
+        <p>{compact ? "先把高频任务变快，再逐步接入你的团队流程。" : "按场景搜索、筛选和进入工具。后续新增工具时，页面信息会随数据一起扩展。"}</p>
       </div>
       <div className="directory-controls">
         <label className="search-box">

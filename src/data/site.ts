@@ -59,7 +59,7 @@ export const testimonials: Testimonial[] = [
   },
   {
     id: "dev",
-    quote: "SEO 和合规信息摆得很清楚，对准备商业化的工具站来说很省心。",
+    quote: "页面信息和合规内容摆得很清楚，对准备商业化的工具站来说很省心。",
     name: "周远",
     title: "全栈开发者",
   },
@@ -72,7 +72,7 @@ export const teamMembers: TeamMember[] = [
     role: "项目经理",
     color: "#3b82f6",
     bio: "负责项目节奏、需求拆解和交付质量，让想法稳定变成可上线产品。",
-    avatarPosition: "0% 0%",
+    avatarUrl: "https://cos.xshuliner.online/Xshuliner/TeamWebsite/Assets/Hero/hero_poster_shuxiaolan.jpg",
   },
   {
     id: "lv",
@@ -80,7 +80,7 @@ export const teamMembers: TeamMember[] = [
     role: "全栈开发",
     color: "#16a34a",
     bio: "打通前端、服务端与部署链路，关注性能、可维护性和工程扩展。",
-    avatarPosition: "50% 0%",
+    avatarUrl: "https://cos.xshuliner.online/Xshuliner/TeamWebsite/Assets/Hero/hero_poster_shuxiaolv.jpg",
   },
   {
     id: "zi",
@@ -88,7 +88,7 @@ export const teamMembers: TeamMember[] = [
     role: "产品经理",
     color: "#8b5cf6",
     bio: "把用户场景翻译成清晰功能，平衡商业目标、体验和上线成本。",
-    avatarPosition: "100% 0%",
+    avatarUrl: "https://cos.xshuliner.online/Xshuliner/TeamWebsite/Assets/Hero/hero_poster_shuxiaozi.jpg",
   },
   {
     id: "hong",
@@ -96,7 +96,7 @@ export const teamMembers: TeamMember[] = [
     role: "UI设计师",
     color: "#ef4444",
     bio: "建立一致的界面语言，让工具网站既专业、易用，也有品牌记忆点。",
-    avatarPosition: "0% 100%",
+    avatarUrl: "https://cos.xshuliner.online/Xshuliner/TeamWebsite/Assets/Hero/hero_poster_shuxiaohong.jpg",
   },
   {
     id: "huang",
@@ -104,7 +104,7 @@ export const teamMembers: TeamMember[] = [
     role: "财务",
     color: "#eab308",
     bio: "关注成本、收入与商业化指标，帮助产品走向长期健康运营。",
-    avatarPosition: "50% 100%",
+    avatarUrl: "https://cos.xshuliner.online/Xshuliner/TeamWebsite/Assets/Hero/hero_poster_shuxiaohuang.jpg",
   },
   {
     id: "cheng",
@@ -112,7 +112,7 @@ export const teamMembers: TeamMember[] = [
     role: "HR",
     color: "#f97316",
     bio: "维护团队协作、人才成长和文化建设，让每个人在合适的位置发光。",
-    avatarPosition: "100% 100%",
+    avatarUrl: "https://cos.xshuliner.online/Xshuliner/TeamWebsite/Assets/Hero/hero_poster_shuxiaocheng.jpg",
   },
 ];
 

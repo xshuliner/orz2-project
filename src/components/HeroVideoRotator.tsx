@@ -6,6 +6,10 @@ interface HeroVideoRotatorProps {
   media: HeroMedia[];
 }
 
+const CROSSFADE_MS = 1400;
+const SWITCH_LEAD_SECONDS = 2.2;
+const READY_WAIT_MS = 700;
+
 function randomIndex(length: number, except?: number) {
   if (length <= 1) return 0;
   let next = Math.floor(Math.random() * length);
@@ -15,51 +19,131 @@ function randomIndex(length: number, except?: number) {
   return next;
 }
 
+function waitForVideoReady(video: HTMLVideoElement) {
+  if (video.readyState >= 2) return Promise.resolve();
+
+  return new Promise<void>((resolve) => {
+    let timeout: number | null = null;
+
+    const finish = () => {
+      video.removeEventListener("loadeddata", finish);
+      video.removeEventListener("canplay", finish);
+      if (timeout !== null) window.clearTimeout(timeout);
+      resolve();
+    };
+
+    video.addEventListener("loadeddata", finish, { once: true });
+    video.addEventListener("canplay", finish, { once: true });
+    timeout = window.setTimeout(finish, READY_WAIT_MS);
+    video.load();
+  });
+}
+
 export function HeroVideoRotator({ media }: HeroVideoRotatorProps) {
   const initialIndex = useMemo(() => randomIndex(media.length), [media.length]);
   const [reducedMotion, setReducedMotion] = useState(false);
   const [activeLayer, setActiveLayer] = useState(0);
   const [layers, setLayers] = useState([initialIndex, randomIndex(media.length, initialIndex)]);
-  const [phase, setPhase] = useState<"fadeIn" | "visible" | "fadeOut">("fadeIn");
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
+  const activeLayerRef = useRef(activeLayer);
   const switchingRef = useRef(false);
   const timeoutRef = useRef<number | null>(null);
+  const mountedRef = useRef(true);
+  const activeMediaIndex = layers[activeLayer] ?? 0;
 
   useEffect(() => {
     setReducedMotion(prefersReducedMotion());
   }, []);
 
   useEffect(() => {
-    if (reducedMotion) return;
-    const timer = window.setTimeout(() => setPhase("visible"), 1000);
-    return () => window.clearTimeout(timer);
-  }, [activeLayer, reducedMotion]);
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    activeLayerRef.current = activeLayer;
+  }, [activeLayer]);
+
+  const switchToNext = useCallback(async () => {
+    if (switchingRef.current || reducedMotion || media.length <= 1) return;
+    switchingRef.current = true;
+
+    const previousLayer = activeLayerRef.current;
+    const nextLayer = previousLayer === 0 ? 1 : 0;
+    const nextVideo = videoRefs.current[nextLayer];
+
+    if (!nextVideo) {
+      switchingRef.current = false;
+      return;
+    }
+
+    nextVideo.currentTime = 0;
+
+    await Promise.race([waitForVideoReady(nextVideo), new Promise((resolve) => window.setTimeout(resolve, READY_WAIT_MS))]);
+
+    if (!mountedRef.current) {
+      switchingRef.current = false;
+      return;
+    }
+
+    nextVideo.play().catch(() => undefined);
+
+    setActiveLayer(nextLayer);
+    if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+    timeoutRef.current = window.setTimeout(() => {
+      setLayers((current) => {
+        const updated = [...current];
+        updated[previousLayer] = randomIndex(media.length, current[nextLayer]);
+        return updated;
+      });
+      switchingRef.current = false;
+    }, CROSSFADE_MS);
+  }, [media.length, reducedMotion]);
 
   useEffect(() => {
     if (reducedMotion) return;
-    const video = videoRefs.current[activeLayer];
-    if (!video) return;
-    video.currentTime = 0;
-    video.play().catch(() => undefined);
-  }, [activeLayer, layers, reducedMotion]);
 
-  const switchToNext = useCallback(() => {
-    if (switchingRef.current || reducedMotion) return;
-    switchingRef.current = true;
-    setPhase("fadeOut");
-    timeoutRef.current = window.setTimeout(() => {
-      setLayers((current) => {
-        const nextLayer = activeLayer === 0 ? 1 : 0;
-        const nextMedia = randomIndex(media.length, current[activeLayer]);
-        const updated = [...current];
-        updated[nextLayer] = nextMedia;
-        return updated;
-      });
-      setActiveLayer((layer) => (layer === 0 ? 1 : 0));
-      setPhase("fadeIn");
-      switchingRef.current = false;
-    }, 1000);
-  }, [activeLayer, media.length, reducedMotion]);
+    const activeVideo = videoRefs.current[activeLayer];
+    if (!activeVideo) return;
+
+    const playActiveVideo = () => activeVideo.play().catch(() => undefined);
+    const shouldSwitch = () => {
+      if (switchingRef.current) return false;
+      if (activeVideo.ended) return true;
+      if (!Number.isFinite(activeVideo.duration)) return false;
+      return activeVideo.duration - activeVideo.currentTime <= SWITCH_LEAD_SECONDS;
+    };
+    const handleProgress = () => {
+      if (shouldSwitch()) switchToNext();
+    };
+
+    activeVideo.currentTime = 0;
+    playActiveVideo();
+
+    activeVideo.addEventListener("timeupdate", handleProgress);
+    activeVideo.addEventListener("ended", handleProgress);
+    activeVideo.addEventListener("pause", handleProgress);
+
+    const progressTimer = window.setInterval(handleProgress, 500);
+
+    return () => {
+      activeVideo.removeEventListener("timeupdate", handleProgress);
+      activeVideo.removeEventListener("ended", handleProgress);
+      activeVideo.removeEventListener("pause", handleProgress);
+      window.clearInterval(progressTimer);
+    };
+  }, [activeLayer, activeMediaIndex, reducedMotion, switchToNext]);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const currentActiveLayer = activeLayerRef.current;
+    videoRefs.current.forEach((video, layerIndex) => {
+      if (!video || layerIndex === currentActiveLayer) return;
+      video.load();
+    });
+  }, [layers, reducedMotion]);
 
   useEffect(() => {
     return () => {
@@ -78,11 +162,11 @@ export function HeroVideoRotator({ media }: HeroVideoRotatorProps) {
 
   return (
     <figure className="hero-video-frame" aria-label="ORZ2 自动随机视频展示">
-      <img className="hero-poster-fallback" src={media[layers[activeLayer]].posterSrc} alt="" aria-hidden="true" />
+      <img className="hero-poster-fallback" src={media[activeMediaIndex].posterSrc} alt="" aria-hidden="true" />
       {layers.map((mediaIndex, layerIndex) => {
         const item = media[mediaIndex];
         const isActive = layerIndex === activeLayer;
-        const className = ["hero-video-layer", isActive ? "active" : "", isActive ? phase : ""].filter(Boolean).join(" ");
+        const className = ["hero-video-layer", isActive ? "active" : ""].filter(Boolean).join(" ");
 
         return (
           <video
@@ -93,15 +177,10 @@ export function HeroVideoRotator({ media }: HeroVideoRotatorProps) {
             className={className}
             muted
             playsInline
-            preload="metadata"
+            autoPlay={isActive}
+            preload="auto"
             poster={item.posterSrc}
             aria-label={`${item.label} 背景视频`}
-            onTimeUpdate={(event) => {
-              const video = event.currentTarget;
-              if (!isActive || !Number.isFinite(video.duration)) return;
-              if (video.duration - video.currentTime <= 1) switchToNext();
-            }}
-            onEnded={switchToNext}
           >
             <source src={item.videoSrc} type="video/mp4" />
           </video>

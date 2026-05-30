@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { useLoginGate } from "../auth/AuthContext";
 import { Seo } from "../components/Seo";
 import { toolSeo } from "../data/seo";
 
@@ -167,6 +168,7 @@ export function WechatPublisherPage() {
   const [errors, setErrors] = useState<string[]>([]);
   const [copiedIp, setCopiedIp] = useState(false);
   const importInputRef = useRef<HTMLInputElement | null>(null);
+  const requireLogin = useLoginGate();
 
   useEffect(() => {
     window.localStorage.setItem(storageKey, JSON.stringify(form));
@@ -322,8 +324,7 @@ export function WechatPublisherPage() {
         </Link>
         <div className="tool-form-hero">
           <div>
-            <span className="tool-form-kicker">公众号工具</span>
-            <h1>公众号自动发布</h1>
+            <h1>公众号发布</h1>
             <p>把账号、提示词、图片素材和发布元信息整理成一张清晰的任务单，发布前的关键信息一眼可查。</p>
           </div>
           <div className="json-actions" aria-label="JSON 配置操作">
@@ -344,7 +345,6 @@ export function WechatPublisherPage() {
             <img src="/assets/wechat-console-guide.svg" alt="微信公众平台配置 AppId、AppSecret 和 API IP 白名单示意图" />
           </div>
           <div className="wechat-setup-content">
-            <span className="setup-label">首次使用前</span>
             <h2 id="wechat-setup-title">先完成公众号开发配置</h2>
             <ol className="setup-steps">
               <li>打开微信公众平台开发者控制台，选择要发布的公众号。</li>
@@ -366,7 +366,7 @@ export function WechatPublisherPage() {
           </div>
         </section>
 
-        <form className="publisher-form" onSubmit={handleGenerate}>
+        <form className="publisher-form" onSubmit={requireLogin(handleGenerate)}>
           <div className="publisher-workspace">
             <div className="publisher-main">
               <section className="form-panel">
@@ -610,6 +610,26 @@ export function WechatPublisherPage() {
                 </dl>
               </section>
 
+              <section className="publish-control-card" aria-label="发布控制">
+                <div className="summary-heading">
+                  <CheckCircle2 size={18} aria-hidden="true" />
+                  <h2>发布控制</h2>
+                </div>
+                <div className="generation-status" aria-live="polite">
+                  {isGenerating ? <Loader2 className="spin" size={18} aria-hidden="true" /> : null}
+                  <span>{statusText}</span>
+                </div>
+                <div className="form-actions">
+                  <button className="button ghost" type="button" onClick={handleReset}>
+                    <RotateCcw size={17} aria-hidden="true" />
+                    重置
+                  </button>
+                  <button className="button primary publish-submit" type="submit" disabled={isGenerating}>
+                    {isGenerating ? <Loader2 className="spin" size={17} aria-hidden="true" /> : <Sparkles size={17} aria-hidden="true" />}
+                    {isGenerating ? "生成中..." : "生成发布任务"}
+                  </button>
+                </div>
+              </section>
             </aside>
           </div>
 
@@ -620,22 +640,6 @@ export function WechatPublisherPage() {
               ))}
             </div>
           ) : null}
-
-          <div className="form-submit-bar">
-            <div className="generation-status" aria-live="polite">
-              {isGenerating ? <Loader2 className="spin" size={18} aria-hidden="true" /> : null}
-              <span>{statusText}</span>
-            </div>
-            <div className="form-actions">
-              <button className="button ghost" type="button" onClick={handleReset}>
-                <RotateCcw size={17} aria-hidden="true" />
-                重置
-              </button>
-              <button className="button primary" type="submit" disabled={isGenerating}>
-                {isGenerating ? "生成中..." : "生成"}
-              </button>
-            </div>
-          </div>
         </form>
       </section>
     </>

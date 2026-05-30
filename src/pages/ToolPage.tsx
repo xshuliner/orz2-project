@@ -18,7 +18,7 @@ export function ToolPage() {
       <>
         <Seo config={pageSeo.products} />
         <section className="page-hero compact-hero">
-          <h1>工具暂未找到</h1>
+          <h1>未找到</h1>
           <p>这个工具入口可能还在整理中，可以先返回产品目录查看已有工具。</p>
           <Link className="button primary" to="/products">
             <ArrowLeft size={18} aria-hidden="true" />
@@ -47,7 +47,7 @@ export function ToolPage() {
             ))}
           </div>
           <p className="placeholder-note">
-            首版保留工具详情页结构与独立 SEO，真实工具功能可在后续迭代中接入。
+            首版保留工具详情页结构与独立发布能力，真实工具功能可在后续迭代中接入。
           </p>
         </div>
       </section>

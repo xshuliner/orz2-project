@@ -1,4 +1,5 @@
 import { Seo } from "../components/Seo";
+import { siteConfig } from "../config";
 import { pageSeo } from "../data/seo";
 
 const sections = [
@@ -67,7 +68,9 @@ export function PrivacyPage() {
           <section id="contact">
             <h2>联系我们</h2>
             <p>
-              如对本协议或数据处理方式有疑问，请联系 <a href="mailto:hello@orz2.com">hello@orz2.com</a>。正式上线前，请将该邮箱替换为真实运营主体的联系渠道。
+              如对本协议或数据处理方式有疑问，请联系{" "}
+              <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>
+              。正式上线前，请将该邮箱替换为真实运营主体的联系渠道。
             </p>
           </section>
         </article>

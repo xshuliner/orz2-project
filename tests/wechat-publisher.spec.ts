@@ -56,7 +56,11 @@ test("wechat publisher form persists, imports, exports, generates, and resets", 
   await expect((await downloadPromise).suggestedFilename()).toBe("orz2-wechat-publisher-config.json");
 
   page.on("dialog", async (dialog) => dialog.accept());
-  await page.getByRole("button", { name: "生成", exact: true }).click();
+  await page.getByRole("button", { name: "生成发布任务", exact: true }).click();
+  await expect(page.getByRole("dialog", { name: "需要先登录" })).toBeVisible();
+  await page.getByRole("button", { name: "模拟登录" }).click();
+  await expect(page.locator(".site-header > .nav-user.logged-in.desktop-only")).toContainText("测试用户");
+  await page.getByRole("button", { name: "生成发布任务", exact: true }).click();
   await expect(page.locator(".generation-status")).toContainText("已完成任务配置校验", { timeout: 7000 });
 
   await page.getByRole("button", { name: "重置" }).click();

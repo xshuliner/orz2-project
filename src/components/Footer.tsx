@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { siteConfig } from "../config";
 
 export function Footer() {
   return (
@@ -17,7 +18,7 @@ export function Footer() {
         </nav>
         <div>
           <h2>联系</h2>
-          <a href="mailto:hello@orz2.com">hello@orz2.com</a>
+          <a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a>
           <p>支持工具定制、商业化落地与效率工作流搭建。</p>
         </div>
         <div>
