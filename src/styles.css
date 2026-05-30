@@ -77,7 +77,8 @@ video {
 }
 
 main {
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .sr-only {
@@ -1332,10 +1333,16 @@ main {
 }
 
 .publisher-aside {
+  --publisher-sticky-top: 92px;
   position: sticky;
-  top: 86px;
+  top: var(--publisher-sticky-top);
+  align-self: start;
   display: grid;
   gap: 12px;
+  max-height: calc(100vh - var(--publisher-sticky-top) - 18px);
+  overflow-y: auto;
+  padding-bottom: 2px;
+  scrollbar-gutter: stable;
 }
 
 .form-panel {
@@ -1598,6 +1605,12 @@ main {
   background: #ffffff;
   box-shadow: 0 12px 32px rgba(17, 20, 17, 0.045);
   overflow: hidden;
+}
+
+.publisher-aside .publish-control-card {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
 }
 
 .summary-score {
@@ -1921,6 +1934,14 @@ main {
   .publisher-aside {
     position: static;
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-height: none;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .publisher-aside .publish-control-card {
+    position: relative;
+    bottom: auto;
   }
 
   .hero-section {
