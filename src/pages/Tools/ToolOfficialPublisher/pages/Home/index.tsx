@@ -2,6 +2,7 @@ import { useLoginGate } from '@/components/ContextAuth';
 import { Seo } from '@/components/Seo';
 import { toolSeo } from '@/config/seo';
 import CacheManager from '@/utils/CacheManager';
+import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -184,7 +185,7 @@ function getValidationErrors(form: WechatPublisherForm) {
   return nextErrors;
 }
 
-export function PageWechatPublisher() {
+export function OfficialPublisher() {
   const [form, setForm] = useState<WechatPublisherForm>(() => {
     try {
       return normalizeForm(CacheManager.getLocalStorage(storageKey));
@@ -385,7 +386,7 @@ export function PageWechatPublisher() {
 
   return (
     <>
-      <Seo config={toolSeo['wechat-auto-publisher']} />
+      <Seo config={toolSeo['official-publisher']} />
       <section className='tool-form-page'>
         <Link className='back-link interactive' to='/tools'>
           <ArrowLeft size={16} aria-hidden='true' />
@@ -435,11 +436,11 @@ export function PageWechatPublisher() {
             aria-label='查看微信公众平台配置示意大图'
           >
             <img
-              src='/assets/wechat-console-guide.svg'
+              src={WechatConsoleGuide}
               alt='微信公众平台配置 AppId、AppSecret 和 API IP 白名单示意图'
             />
             <div className='wechat-setup-preview' aria-hidden='true'>
-              <img src='/assets/wechat-console-guide.svg' alt='' />
+              <img src={WechatConsoleGuide} alt='' />
             </div>
           </div>
           <div className='wechat-setup-content'>

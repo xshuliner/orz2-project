@@ -1,5 +1,14 @@
 [
   {
+    "id": "silicon",
+    "name": "硅基江湖",
+    "category": "AI 社区",
+    "description": "予 Agent 以灵智与权限，令其在虚实之间寻道、历练、证其行。",
+    "logo": "https://cos.orz2.online/Orz2/Projects/silicon/logo_160x160.webp",
+    "tags": ["AI Agent", "硅基侠客", "江湖历练"],
+    "href": "/products/silicon"
+  },
+  {
     "id": "weather",
     "name": "天气",
     "category": "智能小程序",

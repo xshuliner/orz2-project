@@ -1,12 +1,12 @@
 [
   {
     "id": "tool-wechat-publisher",
-    "slug": "wechat-auto-publisher",
+    "slug": "official-publisher",
     "name": "公众号自动发布",
     "icon": "Send",
     "category": "公众号工具",
     "description": "配置公众号凭据、文章提示词、封面图和内嵌图片，一站式准备自动发布任务。",
-    "href": "/tools/wechat-auto-publisher",
+    "href": "/tools/official-publisher",
     "status": "内测",
     "tags": ["公众号", "自动发布", "LLM", "内容运营"],
     "seoTitle": "公众号自动发布工具 - ORZ2 内容运营工具",
