@@ -1,5 +1,5 @@
 .site-header {
-  --header-page-gutter: max(20px, calc((100% - var(--max)) / 2));
+  --header-page-gutter: max(20px, calc((100% - var(--page-max-width)) / 2));
   position: sticky;
   top: 0;
   z-index: 20;
@@ -10,8 +10,8 @@
   height: 76px;
   margin: 0;
   padding-inline: var(--header-page-gutter);
-  background: rgba(255, 255, 255, 0.88);
-  border-bottom: 1px solid rgba(223, 231, 226, 0.8);
+  background: color-mix(in srgb, var(--color-panel) 88%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-line) 80%, transparent);
   backdrop-filter: blur(18px);
   transition:
     height 260ms ease,
@@ -22,9 +22,9 @@
 
 .site-header.is-scrolled {
   height: 64px;
-  background: rgba(255, 255, 255, 0.94);
-  border-color: rgba(210, 224, 216, 0.95);
-  box-shadow: 0 14px 44px rgba(17, 20, 17, 0.08);
+  background: color-mix(in srgb, var(--color-panel) 94%, transparent);
+  border-color: color-mix(in srgb, var(--color-line-card) 95%, transparent);
+  box-shadow: 0 14px 44px color-mix(in srgb, var(--color-ink) 8%, transparent);
 }
 
 .brand-link {
@@ -49,7 +49,7 @@
 }
 
 .brand-link:hover .brand-logo {
-  box-shadow: 0 10px 24px rgba(17, 20, 17, 0.12);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--color-ink) 12%, transparent);
   transform: translateY(-1px);
 }
 
@@ -68,7 +68,7 @@
   min-height: 40px;
   padding: 0 14px;
   border-radius: 8px;
-  color: #47524b;
+  color: var(--color-text-nav);
   font-size: 14px;
   font-weight: 620;
   overflow: hidden;
@@ -87,9 +87,9 @@
   border-radius: 999px;
   background: linear-gradient(
     90deg,
-    rgba(24, 182, 106, 0),
-    rgba(24, 182, 106, 0.9),
-    rgba(24, 182, 106, 0)
+    color-mix(in srgb, var(--color-green) calc(0 * 100%), transparent),
+    color-mix(in srgb, var(--color-green) 90%, transparent),
+    color-mix(in srgb, var(--color-green) calc(0 * 100%), transparent)
   );
   opacity: 0;
   transform: scaleX(0.3);
@@ -100,8 +100,8 @@
 
 .nav-link.active,
 .nav-link:hover {
-  color: var(--ink);
-  background: #f1f6f3;
+  color: var(--color-ink);
+  background: var(--color-green-soft-nav);
 }
 
 .nav-link.active::after,
@@ -120,16 +120,16 @@
   align-items: center;
   gap: 9px;
   min-height: 44px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 8px;
-  color: var(--ink);
-  background: #ffffff;
+  color: var(--color-ink);
+  background: var(--color-panel);
   white-space: nowrap;
 }
 
 .nav-user.logged-out {
   padding: 0 14px;
-  color: #46534b;
+  color: var(--color-text-button);
   font-size: 14px;
   font-weight: 720;
   transition:
@@ -141,14 +141,14 @@
 
 .nav-user.logged-out:hover {
   transform: translateY(-2px);
-  border-color: rgba(24, 182, 106, 0.32);
-  background: #f7fbf9;
-  box-shadow: 0 12px 28px rgba(17, 20, 17, 0.08);
+  border-color: color-mix(in srgb, var(--color-green) 32%, transparent);
+  background: var(--color-green-soft-button);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--color-ink) 8%, transparent);
 }
 
 .nav-user.logged-in {
   padding: 5px 6px 5px 8px;
-  background: #f7fbf9;
+  background: var(--color-green-soft-button);
 }
 
 .nav-user-avatar {
@@ -157,10 +157,10 @@
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  color: #ffffff;
+  color: var(--color-panel);
   font-size: 14px;
   font-weight: 820;
-  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  background: var(--gradient-brand);
 }
 
 .nav-user-copy {
@@ -175,7 +175,7 @@
 }
 
 .nav-user-copy small {
-  color: var(--muted);
+  color: var(--color-muted);
   font-size: 11px;
   line-height: 1.1;
 }
@@ -187,18 +187,18 @@
   height: 30px;
   border: 0;
   border-radius: 8px;
-  color: #516057;
+  color: var(--color-text-icon);
   background: transparent;
 }
 
 .nav-logout:hover {
-  color: var(--ink);
-  background: #eef7f2;
+  color: var(--color-ink);
+  background: var(--color-green-soft-logout);
 }
 
 @media (max-width: 960px) {
   .site-header {
-    --header-page-gutter: max(14px, calc((100% - var(--max)) / 2));
+    --header-page-gutter: max(14px, calc((100% - var(--page-max-width)) / 2));
   }
 
   .desktop-nav,
@@ -218,10 +218,10 @@
     right: var(--header-page-gutter);
     display: none;
     padding: 14px;
-    border: 1px solid var(--line);
+    border: 1px solid var(--color-line);
     border-radius: 8px;
-    background: #ffffff;
-    box-shadow: var(--shadow);
+    background: var(--color-panel);
+    box-shadow: var(--shadow-card);
   }
 
   .mobile-nav.open {

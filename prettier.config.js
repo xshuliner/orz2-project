@@ -54,7 +54,7 @@ export default {
     'prettier-plugin-tailwindcss',
   ],
 
-  tailwindStylesheet: './src/styles/index.css',
+  tailwindStylesheet: './src/styles/tailwind.css',
 
   // 文件类型特定配置
   overrides: [

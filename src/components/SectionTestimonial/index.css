@@ -5,8 +5,8 @@
   border-radius: 8px;
   background: linear-gradient(
     180deg,
-    rgba(24, 182, 106, 0.03),
-    rgba(24, 182, 106, 0.06)
+    color-mix(in srgb, var(--color-green) 3%, transparent),
+    color-mix(in srgb, var(--color-green) 6%, transparent)
   );
 }
 
@@ -34,9 +34,9 @@
   gap: 12px;
   padding: 8px 16px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(24, 182, 106, 0.22);
-  box-shadow: 0 4px 20px rgba(17, 20, 17, 0.08);
+  background: color-mix(in srgb, var(--color-panel) 88%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-green) 22%, transparent);
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--color-ink) 8%, transparent);
   white-space: nowrap;
   cursor: default;
   will-change: transform, opacity;
@@ -44,18 +44,18 @@
 }
 
 .danmaku-item:hover {
-  box-shadow: 0 8px 32px rgba(24, 182, 106, 0.18);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--color-green) 18%, transparent);
 }
 
 .danmaku-text {
-  color: var(--ink);
+  color: var(--color-ink);
   font-size: 14px;
   line-height: 1.4;
 }
 
 .danmaku-author {
   flex-shrink: 0;
-  color: var(--muted);
+  color: var(--color-muted);
   font-size: 12px;
   font-weight: 620;
 }
@@ -89,10 +89,10 @@
 }
 
 .testimonial-card strong {
-  color: var(--ink);
+  color: var(--color-ink);
 }
 
 .testimonial-card span {
-  color: var(--muted);
+  color: var(--color-muted);
   font-size: 13px;
 }

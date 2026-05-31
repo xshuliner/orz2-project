@@ -1,13 +1,13 @@
 import { siteConfig } from '@/config';
-import { productTools } from '@/config/site';
+import { productShowcases, productTools } from '@/config/site';
 import type { SeoConfig } from '@/types';
 
 export const siteUrl = 'https://orz2.com';
 export const siteName = 'ORZ2';
 export const defaultImageOg =
-  'https://cos.xshuliner.online/Orz2/Logo/logo_light_320x320.webp';
+  'https://cos.orz2.online/Orz2/Logo/logo_light_320x320.webp';
 export const defaultImageLogo =
-  'https://cos.xshuliner.online/Orz2/Logo/logo_light_320x320.webp';
+  'https://cos.orz2.online/Orz2/Logo/logo_light_320x320.webp';
 
 export function routeUrl(path: string) {
   return path === '/' ? `${siteUrl}/` : `${siteUrl}${path}`;
@@ -40,17 +40,36 @@ export const pageSeo: Record<string, SeoConfig> = {
         url: routeUrl('/'),
         potentialAction: {
           '@type': 'SearchAction',
-          target: `${routeUrl('/products')}?q={search_term_string}`,
+          target: `${routeUrl('/tools')}?q={search_term_string}`,
           'query-input': 'required name=search_term_string',
         },
       },
     ],
   },
   products: {
-    title: '产品与在线工具 - ORZ2',
+    title: '产品展示 - ORZ2',
     description:
-      '浏览 ORZ2 在线工具目录，查找 AI 效率、图片处理、开发调试、设计、营销和办公工具。',
+      '浏览 ORZ2 已落地的产品实践，包括智能小程序、浏览器与编辑器扩展和互动游戏。',
     canonicalPath: '/products',
+    ogImage: defaultImageOg,
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: 'ORZ2 产品展示',
+        itemListElement: productShowcases.map((product, index) => ({
+          '@type': 'ListItem',
+          position: index + 1,
+          name: product.name,
+        })),
+      },
+    ],
+  },
+  tools: {
+    title: '在线工具 - ORZ2',
+    description:
+      '浏览 ORZ2 在线工具目录，查找公众号自动发布、JSON 格式化、配色和图片压缩工具。',
+    canonicalPath: '/tools',
     ogImage: defaultImageOg,
     jsonLd: [
       {

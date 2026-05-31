@@ -51,13 +51,6 @@ export function PageHome() {
         className='testimonial-section'
         aria-labelledby='testimonials-title'
       >
-        <div className='section-heading'>
-          <h2 id='testimonials-title'>服务真实工作流，不只是收藏</h2>
-          <p>
-            工具站的价值在于稳定、清晰、可复用。ORZ2
-            的页面结构也围绕这件事展开。
-          </p>
-        </div>
         <SectionTestimonial />
       </section>
       <SectionContact />

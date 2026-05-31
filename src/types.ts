@@ -9,6 +9,7 @@ export interface ProductTool {
   id: string;
   slug: string;
   name: string;
+  icon: 'Braces' | 'ImageDown' | 'Palette' | 'Send';
   category: string;
   description: string;
   href: string;
@@ -19,6 +20,16 @@ export interface ProductTool {
   keywords: string[];
   ogImage: string;
   schemaType: 'SoftwareApplication';
+}
+
+export interface ProductShowcase {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  logo: string;
+  tags: string[];
+  href?: string;
 }
 
 export interface TeamMember {

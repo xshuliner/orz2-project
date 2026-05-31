@@ -162,7 +162,7 @@ export function EffectsMotion() {
       ).matches;
       const tiltCards = canUsePointerEffects
         ? gsap.utils.toArray<HTMLElement>(
-            ['.tool-card', '.team-card', '.contact-section'].join(',')
+            ['.catalog-card', '.team-card', '.contact-section'].join(',')
           )
         : [];
 

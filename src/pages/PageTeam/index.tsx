@@ -9,7 +9,7 @@ export function PageTeam() {
     <>
       <Seo config={pageSeo.team} />
       <section className='page-hero compact-hero'>
-        <h1>团队</h1>
+        <h1>核心团队</h1>
         <p>
           ORZ2
           团队横跨产品、研发、设计、商业和组织协作，让工具站从想法走到长期运营。

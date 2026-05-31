@@ -20,10 +20,10 @@ export function PageTool() {
         <Seo config={pageSeo.products} />
         <section className='page-hero compact-hero'>
           <h1>未找到</h1>
-          <p>这个工具入口可能还在整理中，可以先返回产品目录查看已有工具。</p>
-          <Link className='button primary interactive' to='/products'>
+          <p>这个工具入口可能还在整理中，可以先返回在线工具查看已有入口。</p>
+          <Link className='button primary interactive' to='/tools'>
             <ArrowLeft size={18} aria-hidden='true' />
-            返回产品
+            返回工具
           </Link>
         </section>
       </>
@@ -34,9 +34,9 @@ export function PageTool() {
     <>
       <Seo config={toolSeo[tool.slug]} />
       <section className='tool-placeholder'>
-        <Link className='back-link interactive' to='/products'>
+        <Link className='back-link interactive' to='/tools'>
           <ArrowLeft size={16} aria-hidden='true' />
-          产品目录
+          在线工具
         </Link>
         <div className='tool-placeholder-card'>
           <span className='font-bold text-green-dark'>{tool.category}</span>

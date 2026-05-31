@@ -4,18 +4,18 @@
   grid-template-columns: 1fr 0.82fr;
   gap: 28px;
   align-items: center;
-  width: min(var(--max), calc(100% - 40px));
+  width: min(var(--page-max-width), calc(100% - 40px));
   margin: 0 auto 96px;
   padding: 42px;
-  border: 1px solid rgba(24, 182, 106, 0.2);
+  border: 1px solid color-mix(in srgb, var(--color-green) 20%, transparent);
   border-radius: 8px;
   background:
     linear-gradient(
       135deg,
-      rgba(24, 182, 106, 0.08),
-      rgba(255, 255, 255, 0) 44%
+      color-mix(in srgb, var(--color-green) 8%, transparent),
+      color-mix(in srgb, var(--color-panel) calc(0 * 100%), transparent) 44%
     ),
-    #ffffff;
+    var(--color-panel);
   overflow: hidden;
   isolation: isolate;
   transform-style: preserve-3d;
@@ -26,7 +26,7 @@
 
 .contact-section h2 {
   margin: 0;
-  color: var(--ink);
+  color: var(--color-ink);
   font-size: clamp(30px, 4vw, 52px);
   line-height: 1.05;
   letter-spacing: 0;
@@ -34,7 +34,7 @@
 
 .contact-section p {
   margin: 14px 0 0;
-  color: var(--muted);
+  color: var(--color-muted);
   font-size: 17px;
   line-height: 1.72;
 }
@@ -49,7 +49,7 @@
   display: flex;
   gap: 10px;
   align-items: flex-start;
-  color: #345047;
+  color: var(--color-text-accent);
   line-height: 1.55;
 }
 

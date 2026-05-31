@@ -4,7 +4,7 @@
   grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
   gap: 44px;
   align-items: center;
-  width: min(var(--max), calc(100% - 40px));
+  width: min(var(--page-max-width), calc(100% - 40px));
   min-height: auto;
   margin: 0 auto;
   padding: 28px 0 26px;
@@ -19,9 +19,9 @@
   height: 1px;
   background: linear-gradient(
     90deg,
-    rgba(24, 182, 106, 0),
-    rgba(24, 182, 106, 0.55),
-    rgba(24, 182, 106, 0)
+    color-mix(in srgb, var(--color-green) calc(0 * 100%), transparent),
+    color-mix(in srgb, var(--color-green) 55%, transparent),
+    color-mix(in srgb, var(--color-green) calc(0 * 100%), transparent)
   );
 }
 
@@ -32,7 +32,7 @@
 
 .hero-copy h1 {
   margin: 0;
-  color: var(--ink);
+  color: var(--color-ink);
   font-size: clamp(46px, 7vw, 84px);
   line-height: 0.98;
   letter-spacing: 0;
@@ -43,7 +43,7 @@
 .hero-copy p {
   width: min(100%, 560px);
   margin: 24px 0 0;
-  color: var(--muted);
+  color: var(--color-muted);
   font-size: 18px;
   line-height: 1.72;
 }
@@ -66,13 +66,13 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #2d392f;
+  color: var(--color-text-feature);
   font-size: 14px;
   font-weight: 680;
 }
 
 .testimonial-section {
-  width: min(var(--max), calc(100% - 40px));
+  width: min(var(--page-max-width), calc(100% - 40px));
   margin: 0 auto;
   padding: 38px 0 86px;
 }

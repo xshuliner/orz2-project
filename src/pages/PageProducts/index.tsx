@@ -1,4 +1,4 @@
-import { SectionProduct } from '@/components/SectionProduct';
+import { SectionShowcase } from '@/components/SectionShowcase';
 import { Seo } from '@/components/Seo';
 import { pageSeo } from '@/config/seo';
 
@@ -7,10 +7,10 @@ export function PageProducts() {
     <>
       <Seo config={pageSeo.products} />
       <section className='page-hero compact-hero'>
-        <h1>工具目录</h1>
-        <p>把高频任务整理成可搜索、可扩展、可长期运营的工具入口。</p>
+        <h1>产品展示</h1>
+        <p>记录已经落地的产品实践，也保留每个项目独立而清晰的入口。</p>
       </section>
-      <SectionProduct />
+      <SectionShowcase />
     </>
   );
 }

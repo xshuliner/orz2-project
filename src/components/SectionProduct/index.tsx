@@ -1,5 +1,6 @@
+import { CatalogCard } from '@/components/CatalogCard';
 import { productCategories, productTools } from '@/config/site';
-import { ArrowUpRight, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import './index.css';
@@ -53,16 +54,6 @@ export function SectionProduct({ compact = false }: ProductDirectoryProps) {
       className={compact ? 'tool-directory compact' : 'tool-directory'}
       aria-labelledby='tool-directory-title'
     >
-      <div className='section-heading'>
-        <h2 id='tool-directory-title'>
-          {compact ? '从常用工具开始' : '在线工具目录'}
-        </h2>
-        <p>
-          {compact
-            ? '先把高频任务变快，再逐步接入你的团队流程。'
-            : '按场景搜索、筛选和进入工具。后续新增工具时，页面信息会随数据一起扩展。'}
-        </p>
-      </div>
       <div className='directory-controls'>
         <label className='search-box'>
           <Search size={18} aria-hidden='true' />
@@ -90,27 +81,7 @@ export function SectionProduct({ compact = false }: ProductDirectoryProps) {
       </div>
       <div className='tool-grid'>
         {tools.map(tool => (
-          <article className='tool-card reveal-on-scroll' key={tool.id}>
-            <div className='tool-card-top'>
-              <span>{tool.category}</span>
-              <strong>{tool.status}</strong>
-            </div>
-            <h3>{tool.name}</h3>
-            <p>{tool.description}</p>
-            <div className='tag-row'>
-              {tool.tags.map(tag => (
-                <span key={tag}>{tag}</span>
-              ))}
-            </div>
-            <Link
-              className='card-link interactive'
-              to={tool.href}
-              aria-label={`打开 ${tool.name}`}
-            >
-              进入工具
-              <ArrowUpRight size={16} aria-hidden='true' />
-            </Link>
-          </article>
+          <CatalogCard item={tool} key={tool.id} type='tool' />
         ))}
       </div>
       {!tools.length ? (
@@ -118,7 +89,7 @@ export function SectionProduct({ compact = false }: ProductDirectoryProps) {
       ) : null}
       {compact ? (
         <div className='section-action'>
-          <Link className='button primary interactive' to='/products'>
+          <Link className='button primary interactive' to='/tools'>
             查看全部工具
           </Link>
         </div>

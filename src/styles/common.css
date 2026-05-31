@@ -1,59 +1,19 @@
-@import 'tailwindcss';
-
-@theme {
-  --color-green: #18b66a;
-  --color-green-dark: #07935a;
-  --color-ink: #111411;
-  --color-muted: #5f6862;
-  --color-soft: #f5f8f6;
-  --color-line: #dfe7e2;
-  --color-panel: #ffffff;
-  --font-family-sans:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-    'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --max-width-max: 1180px;
-  --shadow-card: 0 20px 70px rgba(17, 20, 17, 0.09);
-  --shadow-card-sm: 0 10px 30px rgba(17, 20, 17, 0.04);
-  --shadow-card-hover: 0 24px 64px rgba(17, 20, 17, 0.1);
-  --shadow-button: 0 10px 28px rgba(24, 182, 106, 0.22);
-  --shadow-button-hover: 0 16px 34px rgba(17, 20, 17, 0.12);
-  --shadow-icon-hover: 0 12px 28px rgba(17, 20, 17, 0.08);
-  --radius-md: 8px;
-  --default-transition-duration: 180ms;
-}
-
 @layer base {
-  :root {
-    --green: #18b66a;
-    --green-dark: #07935a;
-    --ink: #111411;
-    --muted: #5f6862;
-    --soft: #f5f8f6;
-    --line: #dfe7e2;
-    --panel: #ffffff;
-    --shadow: 0 20px 70px rgba(17, 20, 17, 0.09);
-    --max: 1180px;
-  }
-
   html {
-    scroll-behavior: smooth;
+    @apply scroll-smooth;
   }
 
   body {
-    margin: 0;
-    min-width: 320px;
-    background: #ffffff;
+    @apply m-0 min-w-80 bg-panel font-sans;
   }
 
   a {
-    color: inherit;
-    text-decoration: none;
+    @apply text-inherit no-underline;
   }
 
   img,
   video {
-    max-width: 100%;
-    display: block;
+    @apply block max-w-full;
   }
 
   main {
@@ -64,7 +24,7 @@
 
 /* ---- interactive base ---- */
 .interactive {
-  cursor: pointer;
+  @apply cursor-pointer;
   transition:
     color 180ms ease,
     background 180ms ease,
@@ -74,31 +34,20 @@
 }
 
 .interactive:focus-visible {
-  outline: 3px solid rgba(24, 182, 106, 0.28);
+  outline: 3px solid color-mix(in srgb, var(--color-green) 28%, transparent);
   outline-offset: 3px;
 }
 
 .interactive:disabled,
 .interactive[aria-disabled='true'] {
-  cursor: not-allowed;
+  @apply cursor-not-allowed;
 }
 
 /* ---- buttons ---- */
 .nav-cta,
 .button {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 18px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  font-size: 14px;
+  @apply relative inline-flex min-h-11 items-center justify-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-line px-[18px] text-sm;
   font-weight: 720;
-  white-space: nowrap;
-  overflow: hidden;
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
@@ -115,7 +64,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.42),
+    color-mix(in srgb, var(--color-panel) 42%, transparent),
     transparent
   );
   transform: skewX(-18deg);
@@ -129,20 +78,17 @@
 
 .nav-cta,
 .button.primary {
-  color: #ffffff;
-  border-color: var(--green);
-  background: linear-gradient(135deg, var(--green), var(--green-dark));
-  box-shadow: 0 10px 28px rgba(24, 182, 106, 0.22);
+  @apply border-green text-panel;
+  background: var(--gradient-brand);
+  box-shadow: var(--shadow-button);
 }
 
 .button.secondary {
-  color: var(--ink);
-  background: #ffffff;
+  @apply bg-panel text-ink;
 }
 
 .button.ghost {
-  color: var(--ink);
-  background: #f6faf7;
+  @apply bg-green-soft-ghost text-ink;
 }
 
 .button:hover,
@@ -154,24 +100,17 @@
 
 .button:hover,
 .nav-cta:hover {
-  box-shadow: 0 16px 34px rgba(17, 20, 17, 0.12);
+  box-shadow: var(--shadow-button-hover);
 }
 
 .button:disabled {
-  opacity: 0.56;
+  @apply opacity-55;
   transform: none;
 }
 
 /* ---- icon button ---- */
 .icon-button {
-  display: inline-grid;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  color: var(--ink);
-  background: #ffffff;
+  @apply inline-grid size-[42px] place-items-center rounded-md border border-line bg-panel text-ink;
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -181,9 +120,9 @@
 
 .icon-button:hover {
   transform: translateY(-2px);
-  border-color: rgba(24, 182, 106, 0.32);
-  background: #f7fbf9;
-  box-shadow: 0 12px 28px rgba(17, 20, 17, 0.08);
+  border-color: color-mix(in srgb, var(--color-green) 32%, transparent);
+  @apply bg-green-soft-button;
+  box-shadow: var(--shadow-icon-hover);
 }
 
 .icon-button:disabled {
@@ -193,13 +132,7 @@
 
 /* ---- card link / back link ---- */
 .card-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  width: fit-content;
-  margin-top: 22px;
-  color: var(--ink);
-  font-size: 14px;
+  @apply mt-[22px] inline-flex w-fit items-center gap-1.5 text-sm text-ink;
   font-weight: 760;
   transition:
     color 180ms ease,
@@ -221,80 +154,43 @@
 }
 
 .back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #445149;
-  font-size: 14px;
+  @apply inline-flex items-center gap-1.5 text-sm text-text-link;
   font-weight: 720;
   transition: transform 180ms ease;
 }
 
 /* ---- tag row ---- */
 .tag-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: auto;
+  @apply mt-auto flex flex-wrap gap-2;
 }
 
 .tag-row span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 28px;
-  padding: 0 9px;
-  border-radius: 8px;
-  color: #345047;
-  font-size: 12px;
+  @apply inline-flex min-h-7 items-center rounded-md bg-green-soft-feature px-[9px] text-xs text-text-accent;
   font-weight: 680;
-  background: #f1f7f4;
+  background: var(--color-green-soft-feature);
   transition:
     transform 180ms ease,
     background 180ms ease;
 }
 
-/* ---- section heading ---- */
-.section-heading {
-  width: min(760px, 100%);
-  margin-bottom: 28px;
-}
-
-.section-heading h2 {
-  margin: 0;
-  color: var(--ink);
-  font-size: clamp(30px, 4vw, 52px);
-  line-height: 1.05;
-  letter-spacing: 0;
-}
-
-.section-heading p {
-  margin: 14px 0 0;
-  color: var(--muted);
-  font-size: 17px;
-  line-height: 1.72;
-}
-
 .section-action {
-  margin-top: 30px;
+  @apply mt-[30px];
 }
 
 .empty-state {
-  padding: 28px;
-  color: var(--muted);
-  border: 1px dashed var(--line);
-  border-radius: 8px;
+  @apply rounded-md border border-dashed border-line p-7 text-muted;
 }
 
 /* ---- page hero (shared) ---- */
 .page-hero {
-  width: min(var(--max), calc(100% - 40px));
+  width: min(var(--page-max-width), calc(100% - 40px));
   margin: 0 auto;
   padding: 92px 0 42px;
 }
 
 .page-hero h1 {
   margin: 0;
-  color: var(--ink);
+  color: var(--color-ink);
   font-size: clamp(46px, 7vw, 84px);
   line-height: 0.98;
   letter-spacing: 0;
@@ -304,7 +200,7 @@
 
 .page-hero p {
   margin: 14px 0 0;
-  color: var(--muted);
+  color: var(--color-muted);
   font-size: 17px;
   line-height: 1.72;
 }
@@ -321,15 +217,15 @@
 }
 
 /* ---- shared card base ---- */
-.tool-card,
+.catalog-card,
 .testimonial-card,
 .team-card {
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 8px;
-  background: var(--panel);
-  box-shadow: 0 10px 30px rgba(17, 20, 17, 0.04);
+  background: var(--color-panel);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--color-ink) 4%, transparent);
   isolation: isolate;
   transform-style: preserve-3d;
   transition:
@@ -338,7 +234,7 @@
     background 220ms ease;
 }
 
-.tool-card::after,
+.catalog-card::after,
 .testimonial-card::after,
 .team-card::after,
 .contact-section::after {
@@ -349,14 +245,14 @@
   pointer-events: none;
   background: radial-gradient(
     circle at var(--pointer-x, 50%) var(--pointer-y, 0%),
-    rgba(24, 182, 106, 0.18),
+    color-mix(in srgb, var(--color-green) 18%, transparent),
     transparent 38%
   );
   opacity: 0;
   transition: opacity 220ms ease;
 }
 
-.tool-card > *,
+.catalog-card > *,
 .testimonial-card > *,
 .team-card > *,
 .contact-section > * {
@@ -364,26 +260,26 @@
   z-index: 1;
 }
 
-.tool-card:hover,
+.catalog-card:hover,
 .testimonial-card:hover,
 .team-card:hover,
 .contact-section:hover {
-  border-color: rgba(24, 182, 106, 0.36);
-  box-shadow: 0 24px 64px rgba(17, 20, 17, 0.1);
+  border-color: color-mix(in srgb, var(--color-green) 36%, transparent);
+  box-shadow: 0 24px 64px color-mix(in srgb, var(--color-ink) 10%, transparent);
 }
 
-.tool-card:hover::after,
+.catalog-card:hover::after,
 .testimonial-card:hover::after,
 .team-card:hover::after,
 .contact-section:hover::after {
   opacity: 1;
 }
 
-.tool-card p,
+.catalog-card p,
 .testimonial-card blockquote,
 .team-card p,
 .tool-placeholder-card p {
-  color: var(--muted);
+  color: var(--color-muted);
   line-height: 1.7;
 }
 

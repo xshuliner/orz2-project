@@ -27,7 +27,7 @@ export function PagePrivacy() {
         <aside className='privacy-toc' aria-label='隐私协议目录'>
           {sections.map(section => (
             <a
-              className='interactive rounded-lg px-2 py-[10px] text-sm text-[#4d5a52] hover:bg-[#f3f8f5] hover:text-ink'
+              className='interactive rounded-lg px-2 py-[10px] text-sm text-text-toc hover:bg-green-soft-toc hover:text-ink'
               href={`#${section.id}`}
               key={section.id}
             >
@@ -81,7 +81,7 @@ export function PagePrivacy() {
             <p className='!m-0'>
               如对本协议或数据处理方式有疑问，请联系{' '}
               <a
-                className='interactive font-bold text-green-dark underline-offset-[3px] hover:text-[#073c27] hover:underline'
+                className='interactive font-bold text-green-dark underline-offset-[3px] hover:text-green-deep hover:underline'
                 href={`mailto:${siteConfig.contactEmail}`}
               >
                 {siteConfig.contactEmail}

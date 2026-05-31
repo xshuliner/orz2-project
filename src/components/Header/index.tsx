@@ -6,8 +6,9 @@ import './index.css';
 
 const navItems = [
   { label: '首页', to: '/' },
-  { label: '产品', to: '/products' },
-  { label: '团队', to: '/team' },
+  { label: '在线工具', to: '/tools' },
+  { label: '产品展示', to: '/products' },
+  { label: '核心团队', to: '/team' },
   { label: '隐私协议', to: '/privacy' },
 ];
 
@@ -24,7 +25,7 @@ export function Header() {
     <header className='site-header'>
       <Link to='/' className='brand-link interactive' aria-label='ORZ2 首页'>
         <img
-          src='https://cos.xshuliner.online/Orz2/Logo/logo_light_320x320.webp'
+          src='https://cos.orz2.online/Orz2/Logo/logo_light_320x320.webp'
           alt='ORZ2'
           className='brand-logo'
         />

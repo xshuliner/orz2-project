@@ -387,9 +387,9 @@ export function PageWechatPublisher() {
     <>
       <Seo config={toolSeo['wechat-auto-publisher']} />
       <section className='tool-form-page'>
-        <Link className='back-link interactive' to='/products'>
+        <Link className='back-link interactive' to='/tools'>
           <ArrowLeft size={16} aria-hidden='true' />
-          产品目录
+          在线工具
         </Link>
         <div className='tool-form-hero'>
           <div>

@@ -2,7 +2,7 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
-  width: min(var(--max), calc(100% - 40px));
+  width: min(var(--page-max-width), calc(100% - 40px));
   margin: 0 auto;
   padding: 34px 0 96px;
 }
@@ -30,7 +30,7 @@
   aspect-ratio: 1;
   border-radius: 8px;
   object-fit: cover;
-  box-shadow: inset 0 0 0 1px rgba(17, 20, 17, 0.08);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-ink) 8%, transparent);
 }
 
 @media (max-width: 960px) {

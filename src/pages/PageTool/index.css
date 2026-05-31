@@ -1,5 +1,5 @@
 .tool-placeholder {
-  width: min(var(--max), calc(100% - 40px));
+  width: min(var(--page-max-width), calc(100% - 40px));
   margin: 0 auto;
   min-height: 64vh;
   padding: 82px 0 96px;
@@ -9,12 +9,12 @@
   width: min(760px, 100%);
   margin-top: 24px;
   padding: 42px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 8px;
 }
 
 .tool-placeholder-card > span {
-  color: var(--green-dark);
+  color: var(--color-green-dark);
   font-weight: 760;
 }
 
@@ -28,7 +28,7 @@
 .placeholder-note {
   margin-top: 24px;
   padding-top: 20px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--color-line);
 }
 
 @media (max-width: 640px) {

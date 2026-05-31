@@ -1,0 +1,64 @@
+[
+  {
+    "id": "weather",
+    "name": "天气",
+    "category": "智能小程序",
+    "description": "轻量天气服务小程序，提供清晰直接的日常天气信息入口。",
+    "logo": "https://cos.orz2.online/Orz2/Projects/weather/logo_160x160.webp",
+    "tags": ["Taro", "React", "JavaScript", "Redux"],
+    "href": "https://www.orz2.online/portal/smart-app/weather/"
+  },
+  {
+    "id": "zero",
+    "name": "Zero",
+    "category": "智能小程序",
+    "description": "围绕日常使用场景打造的小程序产品，保持简单、稳定的体验。",
+    "logo": "https://cos.orz2.online/Orz2/Projects/zero/logo_160x160.webp",
+    "tags": ["Taro", "React", "JavaScript", "Redux"],
+    "href": "https://www.orz2.online/portal/smart-app/zero/"
+  },
+  {
+    "id": "carbon",
+    "name": "Carbon",
+    "category": "智能小程序",
+    "description": "面向移动场景的轻应用，以清爽界面承载完整产品能力。",
+    "logo": "https://cos.orz2.online/Orz2/Projects/carbon/logo_160x160.webp",
+    "tags": ["Taro", "React", "JavaScript", "Redux"],
+    "href": "https://www.orz2.online/portal/smart-app/carbon/"
+  },
+  {
+    "id": "code-maker",
+    "name": "Code Maker",
+    "category": "浏览器与编辑器扩展",
+    "description": "VS Code 开发辅助扩展，让重复编码操作更集中、更高效。",
+    "logo": "https://cos.orz2.online/Orz2/Projects/code-maker/logo_160x160.webp",
+    "tags": ["VS Code Extension"],
+    "href": "https://marketplace.visualstudio.com/items?itemName=gengjian1203.code-maker"
+  },
+  {
+    "id": "chrome-maker",
+    "name": "Chrome Maker",
+    "category": "浏览器与编辑器扩展",
+    "description": "为浏览器工作流准备的扩展项目，保持轻量并便于持续演进。",
+    "logo": "https://cos.orz2.online/Orz2/Projects/chrome-maker/logo_160x160.webp",
+    "tags": ["Chrome Extension"]
+  },
+  {
+    "id": "fiveball",
+    "name": "Fiveball",
+    "category": "互动游戏",
+    "description": "基于 Egret 构建的网页互动游戏，适合轻量休闲体验。",
+    "logo": "https://cos.orz2.online/Orz2/Projects/fiveball/logo_160x160.webp",
+    "tags": ["Egret", "TypeScript"],
+    "href": "https://www.orz2.online/portal/fiveball"
+  },
+  {
+    "id": "mathcookies",
+    "name": "Math Cookies",
+    "category": "互动游戏",
+    "description": "将数学元素融入互动玩法的网页游戏，兼顾趣味与节奏感。",
+    "logo": "https://cos.orz2.online/Orz2/Projects/mathcookies/logo_160x160.webp",
+    "tags": ["Egret", "TypeScript"],
+    "href": "https://www.orz2.online/portal/mathcookies"
+  }
+]

@@ -1,7 +1,14 @@
+import products from '@/config/products.json';
 import tools from '@/config/tools.json';
-import type { HeroMedia, ProductTool, TeamMember, Testimonial } from '@/types';
+import type {
+  HeroMedia,
+  ProductShowcase,
+  ProductTool,
+  TeamMember,
+  Testimonial,
+} from '@/types';
 
-const heroBase = 'https://cos.xshuliner.online/Orz2/Hero';
+const heroBase = 'https://cos.orz2.online/Orz2/Hero';
 
 export const heroMedia: HeroMedia[] = [
   {
@@ -43,6 +50,7 @@ export const heroMedia: HeroMedia[] = [
 ];
 
 export const productTools = tools as ProductTool[];
+export const productShowcases = products as ProductShowcase[];
 
 export const testimonials: Testimonial[] = [
   {

@@ -1,5 +1,5 @@
 .tool-directory {
-  width: min(var(--max), calc(100% - 40px));
+  width: min(var(--page-max-width), calc(100% - 40px));
   margin: 0 auto;
   padding: 86px 0;
 }
@@ -22,16 +22,16 @@
   gap: 10px;
   min-height: 48px;
   padding: 0 14px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--color-panel);
 }
 
 .search-box input {
   width: 100%;
   border: 0;
   outline: 0;
-  color: var(--ink);
+  color: var(--color-ink);
   background: transparent;
 }
 
@@ -45,17 +45,17 @@
 .category-tabs button {
   min-height: 38px;
   padding: 0 12px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--color-line);
   border-radius: 8px;
-  color: #4a554f;
-  background: #ffffff;
+  color: var(--color-text-tab);
+  background: var(--color-panel);
 }
 
 .category-tabs button.active,
 .category-tabs button:hover {
-  color: #083b25;
-  border-color: rgba(24, 182, 106, 0.35);
-  background: #eefbf4;
+  color: var(--color-green-tab);
+  border-color: color-mix(in srgb, var(--color-green) 35%, transparent);
+  background: var(--color-green-soft-tab);
 }
 
 .tool-grid {
@@ -64,35 +64,8 @@
   gap: 16px;
 }
 
-.tool-card {
-  display: flex;
-  flex-direction: column;
-  min-height: 288px;
-  padding: 22px;
-}
-
-.tool-card-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.tool-card-top strong {
-  color: var(--green-dark);
-  font-weight: 760;
-}
-
-.tool-card h3 {
-  margin: 30px 0 10px;
-  font-size: 24px;
-  line-height: 1.15;
-}
-
-.tool-card:hover .tag-row span {
-  background: #eaf8f1;
+.catalog-card:hover .tag-row span {
+  background: var(--color-green-soft-tag-hover);
   transform: translateY(-1px);
 }
 
