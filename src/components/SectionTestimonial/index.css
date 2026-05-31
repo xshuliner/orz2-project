@@ -40,7 +40,6 @@
   white-space: nowrap;
   cursor: default;
   will-change: transform, opacity;
-  backdrop-filter: blur(8px);
   transition: box-shadow 0.2s ease;
 }
 
@@ -59,6 +58,17 @@
   color: var(--muted);
   font-size: 12px;
   font-weight: 620;
+}
+
+@media (max-width: 640px) {
+  .danmaku-item {
+    gap: 8px;
+    padding: 7px 12px;
+  }
+
+  .danmaku-item:nth-child(n + 6) {
+    display: none;
+  }
 }
 
 .testimonial-card {

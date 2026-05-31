@@ -42,7 +42,7 @@ function waitForVideoReady(video: HTMLVideoElement) {
 
 export function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
   const initialIndex = useMemo(() => randomIndex(media.length), [media.length]);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(prefersReducedMotion);
   const [activeLayer, setActiveLayer] = useState(0);
   const [layers, setLayers] = useState([
     initialIndex,
@@ -56,7 +56,11 @@ export function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
   const activeMediaIndex = layers[activeLayer] ?? 0;
 
   useEffect(() => {
-    setReducedMotion(prefersReducedMotion());
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const syncMotionPreference = () => setReducedMotion(motionQuery.matches);
+    motionQuery.addEventListener('change', syncMotionPreference);
+    return () =>
+      motionQuery.removeEventListener('change', syncMotionPreference);
   }, []);
 
   useEffect(() => {
@@ -194,7 +198,7 @@ export function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
             muted
             playsInline
             autoPlay={isActive}
-            preload='auto'
+            preload={isActive ? 'auto' : 'metadata'}
             poster={item.posterSrc}
             aria-label={`${item.label} 背景视频`}
           >

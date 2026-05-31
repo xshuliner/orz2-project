@@ -19,7 +19,6 @@
   overflow: hidden;
   isolation: isolate;
   transform-style: preserve-3d;
-  will-change: transform;
   transition:
     border-color 220ms ease,
     box-shadow 220ms ease;

@@ -332,7 +332,6 @@
   box-shadow: 0 10px 30px rgba(17, 20, 17, 0.04);
   isolation: isolate;
   transform-style: preserve-3d;
-  will-change: transform;
   transition:
     border-color 220ms ease,
     box-shadow 220ms ease,
@@ -389,12 +388,12 @@
 }
 
 /* ---- reveal on scroll ---- */
-.reveal-on-scroll {
+.motion-enabled .reveal-on-scroll {
   opacity: 0;
   transform: translateY(24px);
 }
 
-.reveal-on-scroll.is-revealed {
+.motion-enabled .reveal-on-scroll.is-revealed {
   opacity: 1;
   transform: translateY(0);
 }

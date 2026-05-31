@@ -46,9 +46,13 @@ export function EffectsMotion() {
       }
 
       if (reduceMotion) {
-        ScrollTrigger.refresh();
         return;
       }
+
+      document.documentElement.classList.add('motion-enabled');
+      cleanupFns.push(() =>
+        document.documentElement.classList.remove('motion-enabled')
+      );
 
       const introTargets = gsap.utils.toArray<HTMLElement>(
         [
@@ -61,15 +65,14 @@ export function EffectsMotion() {
       );
       gsap.fromTo(
         introTargets,
-        { y: 26, opacity: 0, filter: 'blur(10px)' },
+        { y: 20, opacity: 0 },
         {
           y: 0,
           opacity: 1,
-          filter: 'blur(0px)',
-          duration: 0.95,
+          duration: 0.72,
           ease: 'power3.out',
           stagger: 0.08,
-          clearProps: 'transform,opacity,filter',
+          clearProps: 'transform,opacity',
         }
       );
 
@@ -81,7 +84,7 @@ export function EffectsMotion() {
           '.footer-grid > *',
         ].join(',')
       );
-      gsap.set(revealTargets, { y: 34, opacity: 0, filter: 'blur(12px)' });
+      gsap.set(revealTargets, { y: 26, opacity: 0 });
 
       ScrollTrigger.batch(revealTargets, {
         start: 'top 86%',
@@ -95,8 +98,7 @@ export function EffectsMotion() {
           gsap.to(batch, {
             y: 0,
             opacity: 1,
-            filter: 'blur(0px)',
-            duration: 0.85,
+            duration: 0.68,
             ease: 'power3.out',
             stagger: 0.09,
             onComplete: () => {
@@ -124,8 +126,7 @@ export function EffectsMotion() {
         gsap.to(visibleHiddenItems, {
           y: 0,
           opacity: 1,
-          filter: 'blur(0px)',
-          duration: 0.62,
+          duration: 0.58,
           ease: 'power3.out',
           stagger: 0.06,
           onComplete: () => {
@@ -137,49 +138,62 @@ export function EffectsMotion() {
         ScrollTrigger.refresh();
       };
 
+      let dynamicRevealFrame: number | null = null;
       const observerTarget = document.querySelector('main') ?? document.body;
       const dynamicRevealObserver = new MutationObserver(() => {
-        window.requestAnimationFrame(revealVisibleDynamicItems);
+        if (dynamicRevealFrame !== null) return;
+        dynamicRevealFrame = window.requestAnimationFrame(() => {
+          dynamicRevealFrame = null;
+          revealVisibleDynamicItems();
+        });
       });
       dynamicRevealObserver.observe(observerTarget, {
         childList: true,
         subtree: true,
       });
-      cleanupFns.push(() => dynamicRevealObserver.disconnect());
+      cleanupFns.push(() => {
+        dynamicRevealObserver.disconnect();
+        if (dynamicRevealFrame !== null)
+          window.cancelAnimationFrame(dynamicRevealFrame);
+      });
 
-      const tiltCards = gsap.utils.toArray<HTMLElement>(
-        [
-          '.tool-card',
-          '.testimonial-card',
-          '.team-card',
-          '.contact-section',
-        ].join(',')
-      );
+      const canUsePointerEffects = window.matchMedia(
+        '(hover: hover) and (pointer: fine)'
+      ).matches;
+      const tiltCards = canUsePointerEffects
+        ? gsap.utils.toArray<HTMLElement>(
+            ['.tool-card', '.team-card', '.contact-section'].join(',')
+          )
+        : [];
 
       tiltCards.forEach(card => {
+        gsap.set(card, { transformPerspective: 900 });
+        const rotateXTo = gsap.quickTo(card, 'rotationX', {
+          duration: 0.28,
+          ease: 'power3.out',
+        });
+        const rotateYTo = gsap.quickTo(card, 'rotationY', {
+          duration: 0.28,
+          ease: 'power3.out',
+        });
+        const yTo = gsap.quickTo(card, 'y', {
+          duration: 0.28,
+          ease: 'power3.out',
+        });
         const moveCard = (event: PointerEvent) => {
           const rect = card.getBoundingClientRect();
           const x = (event.clientX - rect.left) / rect.width;
           const y = (event.clientY - rect.top) / rect.height;
           card.style.setProperty('--pointer-x', `${x * 100}%`);
           card.style.setProperty('--pointer-y', `${y * 100}%`);
-          gsap.to(card, {
-            rotationX: (0.5 - y) * 5,
-            rotationY: (x - 0.5) * 5,
-            y: -5,
-            duration: 0.35,
-            ease: 'power3.out',
-            transformPerspective: 900,
-          });
+          rotateXTo((0.5 - y) * 4);
+          rotateYTo((x - 0.5) * 4);
+          yTo(-4);
         };
         const resetCard = () => {
-          gsap.to(card, {
-            rotationX: 0,
-            rotationY: 0,
-            y: 0,
-            duration: 0.45,
-            ease: 'power3.out',
-          });
+          rotateXTo(0);
+          rotateYTo(0);
+          yTo(0);
         };
         card.addEventListener('pointermove', moveCard);
         card.addEventListener('pointerleave', resetCard);

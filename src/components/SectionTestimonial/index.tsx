@@ -8,15 +8,11 @@ import './index.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const TOTAL_ITEMS = 24;
-const MAX_VISIBLE_ITEMS = 10;
-const INTRO_VISIBLE_TARGET = 8;
-const INTRO_INTERVAL_SECONDS = 1.15;
-const LONGEST_EXPECTED_VISIBLE_SECONDS = 33;
-const SPAWN_INTERVAL_SECONDS =
-  LONGEST_EXPECTED_VISIBLE_SECONDS / MAX_VISIBLE_ITEMS;
+const MAX_VISIBLE_ITEMS = 8;
+const MIN_CYCLE_DURATION_SECONDS = 12.5;
+const MAX_CYCLE_DURATION_SECONDS = 20;
 const TOP_BANDS = [
-  [4, 15],
+  [7, 15],
   [16, 27],
   [28, 39],
   [40, 48],
@@ -83,7 +79,6 @@ interface DanmakuItemProps {
   quote: string;
   name: string;
   title: string;
-  speed: number;
   delay: number;
   fontSize: number;
   opacity: number;
@@ -95,7 +90,6 @@ function DanmakuItem({
   quote,
   name,
   title,
-  speed,
   delay,
   fontSize,
   opacity,
@@ -116,24 +110,28 @@ function DanmakuItem({
         return;
       }
 
-      const containerWidth = window.innerWidth;
+      const containerWidth = container?.clientWidth ?? window.innerWidth;
       const itemWidth = el.scrollWidth;
-      const totalDistance = containerWidth + itemWidth + 300;
-      const duration = totalDistance / speed;
-      const cycleDuration = TOTAL_ITEMS * SPAWN_INTERVAL_SECONDS;
-      const startX = containerWidth + 40;
+      const cycleDuration = Math.min(
+        MAX_CYCLE_DURATION_SECONDS,
+        Math.max(MIN_CYCLE_DURATION_SECONDS, containerWidth / 75 + 5)
+      );
+      const startX = containerWidth - 8;
       const endX = -itemWidth - 40;
+      let startCall: gsap.core.Tween | null = null;
 
       gsap.set(el, { x: startX, yPercent: -50, opacity: 0, zIndex: 1 });
 
       const tween = gsap.to(el, {
         id: 'danmaku-tween-' + index,
         x: endX,
-        duration,
-        delay,
+        duration: cycleDuration,
         ease: 'none',
+        paused: true,
         repeat: -1,
-        repeatDelay: Math.max(SPAWN_INTERVAL_SECONDS, cycleDuration - duration),
+        onStart: () => {
+          gsap.to(el, { opacity, duration: 0.45, ease: 'power2.out' });
+        },
       });
       tweenRef.current = tween;
 
@@ -143,23 +141,18 @@ function DanmakuItem({
             start: 'top 84%',
             once: true,
             onEnter: () => {
-              tween.restart();
-              gsap.to(el, {
-                opacity,
-                duration: 0.45,
-                delay: index * 0.07,
-                ease: 'power2.out',
-              });
+              startCall = gsap.delayedCall(delay, () => tween.play(0));
             },
           })
         : null;
 
       return () => {
+        startCall?.kill();
         tween.kill();
         revealTrigger?.kill();
       };
     },
-    { dependencies: [delay, index, opacity, speed], scope: itemRef }
+    { dependencies: [delay, index, opacity], scope: itemRef }
   );
 
   const handleMouseEnter = () => {
@@ -201,18 +194,15 @@ export function SectionTestimonial() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const items = useMemo(() => {
-    const topPercents = createBalancedTopPercents(TOTAL_ITEMS);
+    const topPercents = createBalancedTopPercents(MAX_VISIBLE_ITEMS);
+    const cycleDuration = MAX_CYCLE_DURATION_SECONDS;
+    const spawnInterval = cycleDuration / MAX_VISIBLE_ITEMS;
 
-    return Array.from({ length: TOTAL_ITEMS }, (_, i) => {
+    return Array.from({ length: MAX_VISIBLE_ITEMS }, (_, i) => {
       const testimonial = testimonials[i % testimonials.length];
       return {
         ...testimonial,
-        speed: randomBetween(78, 160),
-        delay:
-          i < INTRO_VISIBLE_TARGET
-            ? i * INTRO_INTERVAL_SECONDS
-            : INTRO_VISIBLE_TARGET * INTRO_INTERVAL_SECONDS +
-              (i - INTRO_VISIBLE_TARGET) * SPAWN_INTERVAL_SECONDS,
+        delay: i * spawnInterval,
         fontSize: randomBetween(13, 17),
         opacity: randomBetween(0.5, 0.85),
         topPercent: topPercents[i],

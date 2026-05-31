@@ -110,7 +110,7 @@
   transform: scaleX(1);
 }
 
-.mobile-menu-button,
+.site-header .mobile-menu-button,
 .mobile-nav {
   display: none;
 }
@@ -206,7 +206,7 @@
     display: none;
   }
 
-  .mobile-menu-button {
+  .site-header .mobile-menu-button {
     display: inline-grid;
     margin-left: auto;
   }
