@@ -41,19 +41,16 @@
 .hero-video-layer {
   z-index: 1;
   opacity: 0;
-  filter: saturate(0.96) contrast(0.98);
   transform: scale(1.015);
   transition:
     opacity 1400ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1800ms cubic-bezier(0.22, 1, 0.36, 1),
-    filter 1400ms ease;
-  will-change: opacity, transform, filter;
+    transform 1800ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
 }
 
 .hero-video-layer.active {
   z-index: 2;
   opacity: 1;
-  filter: saturate(1.04) contrast(1);
   transform: scale(1);
 }
 
@@ -71,6 +68,10 @@
   transform: translateX(-120%);
   animation: sweep 7s ease-in-out infinite;
   mix-blend-mode: soft-light;
+}
+
+.hero-video-frame.is-paused .video-sweep {
+  animation-play-state: paused;
 }
 
 .hero-video-frame::after {

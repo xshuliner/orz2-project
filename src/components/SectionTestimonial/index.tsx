@@ -105,7 +105,7 @@ function DanmakuItem({
 
       const el = itemRef.current;
       const container = el.closest<HTMLElement>('.danmaku-container');
-      if (prefersReducedMotion()) {
+      if (prefersReducedMotion() || !el.offsetParent) {
         gsap.set(el, { x: 0, yPercent: -50, opacity });
         return;
       }
@@ -119,6 +119,7 @@ function DanmakuItem({
       const startX = containerWidth - 8;
       const endX = -itemWidth - 40;
       let startCall: gsap.core.Tween | null = null;
+      let hasStarted = false;
 
       gsap.set(el, { x: startX, yPercent: -50, opacity: 0, zIndex: 1 });
 
@@ -135,14 +136,31 @@ function DanmakuItem({
       });
       tweenRef.current = tween;
 
+      const playTween = () => {
+        if (hasStarted) {
+          tween.play();
+          return;
+        }
+
+        startCall?.kill();
+        startCall = gsap.delayedCall(delay, () => {
+          hasStarted = true;
+          tween.play(0);
+        });
+      };
+      const pauseTween = () => {
+        if (!hasStarted) startCall?.kill();
+        tween.pause();
+      };
       const revealTrigger = container
         ? ScrollTrigger.create({
             trigger: container,
             start: 'top 84%',
-            once: true,
-            onEnter: () => {
-              startCall = gsap.delayedCall(delay, () => tween.play(0));
-            },
+            end: 'bottom 16%',
+            onEnter: playTween,
+            onEnterBack: playTween,
+            onLeave: pauseTween,
+            onLeaveBack: pauseTween,
           })
         : null;
 

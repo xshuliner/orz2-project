@@ -43,13 +43,16 @@ function waitForVideoReady(video: HTMLVideoElement) {
 export function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
   const initialIndex = useMemo(() => randomIndex(media.length), [media.length]);
   const [reducedMotion, setReducedMotion] = useState(prefersReducedMotion);
+  const [playbackAllowed, setPlaybackAllowed] = useState(true);
   const [activeLayer, setActiveLayer] = useState(0);
   const [layers, setLayers] = useState([
     initialIndex,
     randomIndex(media.length, initialIndex),
   ]);
   const videoRefs = useRef<Array<HTMLVideoElement | null>>([]);
+  const frameRef = useRef<HTMLElement | null>(null);
   const activeLayerRef = useRef(activeLayer);
+  const playbackAllowedRef = useRef(playbackAllowed);
   const switchingRef = useRef(false);
   const timeoutRef = useRef<number | null>(null);
   const mountedRef = useRef(true);
@@ -71,11 +74,46 @@ export function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
   }, []);
 
   useEffect(() => {
+    const frame = frameRef.current;
+    if (!frame) return;
+
+    let isIntersecting = true;
+    const syncPlayback = () => {
+      const nextPlaybackAllowed =
+        isIntersecting && document.visibilityState === 'visible';
+      playbackAllowedRef.current = nextPlaybackAllowed;
+      setPlaybackAllowed(nextPlaybackAllowed);
+    };
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isIntersecting = entry.isIntersecting;
+        syncPlayback();
+      },
+      { rootMargin: '120px 0px' }
+    );
+
+    observer.observe(frame);
+    document.addEventListener('visibilitychange', syncPlayback);
+    syncPlayback();
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', syncPlayback);
+    };
+  }, []);
+
+  useEffect(() => {
     activeLayerRef.current = activeLayer;
   }, [activeLayer]);
 
   const switchToNext = useCallback(async () => {
-    if (switchingRef.current || reducedMotion || media.length <= 1) return;
+    if (
+      switchingRef.current ||
+      reducedMotion ||
+      !playbackAllowed ||
+      media.length <= 1
+    )
+      return;
     switchingRef.current = true;
 
     const previousLayer = activeLayerRef.current;
@@ -94,7 +132,7 @@ export function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
       new Promise(resolve => window.setTimeout(resolve, READY_WAIT_MS)),
     ]);
 
-    if (!mountedRef.current) {
+    if (!mountedRef.current || !playbackAllowedRef.current) {
       switchingRef.current = false;
       return;
     }
@@ -111,10 +149,13 @@ export function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
       });
       switchingRef.current = false;
     }, CROSSFADE_MS);
-  }, [media.length, reducedMotion]);
+  }, [media.length, playbackAllowed, reducedMotion]);
 
   useEffect(() => {
-    if (reducedMotion) return;
+    if (reducedMotion || !playbackAllowed) {
+      videoRefs.current.forEach(video => video?.pause());
+      return;
+    }
 
     const activeVideo = videoRefs.current[activeLayer];
     if (!activeVideo) return;
@@ -137,17 +178,18 @@ export function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
 
     activeVideo.addEventListener('timeupdate', handleProgress);
     activeVideo.addEventListener('ended', handleProgress);
-    activeVideo.addEventListener('pause', handleProgress);
-
-    const progressTimer = window.setInterval(handleProgress, 500);
 
     return () => {
       activeVideo.removeEventListener('timeupdate', handleProgress);
       activeVideo.removeEventListener('ended', handleProgress);
-      activeVideo.removeEventListener('pause', handleProgress);
-      window.clearInterval(progressTimer);
     };
-  }, [activeLayer, activeMediaIndex, reducedMotion, switchToNext]);
+  }, [
+    activeLayer,
+    activeMediaIndex,
+    playbackAllowed,
+    reducedMotion,
+    switchToNext,
+  ]);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -174,7 +216,13 @@ export function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
   }
 
   return (
-    <figure className='hero-video-frame' aria-label='ORZ2 自动随机视频展示'>
+    <figure
+      ref={frameRef}
+      className={
+        playbackAllowed ? 'hero-video-frame' : 'hero-video-frame is-paused'
+      }
+      aria-label='ORZ2 自动随机视频展示'
+    >
       <img
         className='hero-poster-fallback'
         src={media[activeMediaIndex].posterSrc}
