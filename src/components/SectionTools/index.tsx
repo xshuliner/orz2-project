@@ -1,15 +1,21 @@
-import { CatalogCard } from '@/components/CatalogCard';
-import { productCategories, productTools } from '@/config/site';
+import { CardCatalog } from '@/components/CardCatalog';
+import { toolCategories, tools } from '@/config/site';
 import { Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import './index.css';
 
-interface ProductDirectoryProps {
+interface SectionToolsProps {
   compact?: boolean;
+  subtitle?: string;
+  title?: string;
 }
 
-export function SectionProduct({ compact = false }: ProductDirectoryProps) {
+export function SectionTools({
+  compact = false,
+  subtitle,
+  title,
+}: SectionToolsProps) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [localQuery, setLocalQuery] = useState('');
   const [localCategory, setLocalCategory] = useState('全部');
@@ -33,7 +39,7 @@ export function SectionProduct({ compact = false }: ProductDirectoryProps) {
 
   const visibleTools = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    return productTools.filter(tool => {
+    return tools.filter(tool => {
       const matchesCategory = category === '全部' || tool.category === category;
       const haystack = [
         tool.name,
@@ -47,13 +53,19 @@ export function SectionProduct({ compact = false }: ProductDirectoryProps) {
     });
   }, [category, query]);
 
-  const tools = compact ? visibleTools.slice(0, 3) : visibleTools;
+  const displayedTools = compact ? visibleTools.slice(0, 3) : visibleTools;
 
   return (
     <section
       className={compact ? 'tool-directory compact' : 'tool-directory'}
-      aria-labelledby='tool-directory-title'
+      aria-label='在线工具'
     >
+      {title ? (
+        <div className='section-heading'>
+          <h2>{title}</h2>
+          {subtitle ? <p>{subtitle}</p> : null}
+        </div>
+      ) : null}
       <div className='directory-controls'>
         <label className='search-box'>
           <Search size={18} aria-hidden='true' />
@@ -65,7 +77,7 @@ export function SectionProduct({ compact = false }: ProductDirectoryProps) {
           />
         </label>
         <div className='category-tabs' role='list' aria-label='工具分类'>
-          {productCategories.map(item => (
+          {toolCategories.map(item => (
             <button
               key={item}
               className={
@@ -80,11 +92,11 @@ export function SectionProduct({ compact = false }: ProductDirectoryProps) {
         </div>
       </div>
       <div className='tool-grid'>
-        {tools.map(tool => (
-          <CatalogCard item={tool} key={tool.id} type='tool' />
+        {displayedTools.map(tool => (
+          <CardCatalog item={tool} key={tool.id} type='tool' />
         ))}
       </div>
-      {!tools.length ? (
+      {!displayedTools.length ? (
         <p className='empty-state'>暂时没有匹配的工具，换个关键词试试。</p>
       ) : null}
       {compact ? (

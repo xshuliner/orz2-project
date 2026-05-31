@@ -5,14 +5,14 @@ export interface HeroMedia {
   label: string;
 }
 
-export interface ProductTool {
+export interface Tool {
   id: string;
   slug: string;
   name: string;
   icon: 'Braces' | 'ImageDown' | 'Palette' | 'Send';
   category: string;
   description: string;
-  href: string;
+  href?: string;
   status: string;
   tags: string[];
   seoTitle: string;
@@ -22,7 +22,7 @@ export interface ProductTool {
   schemaType: 'SoftwareApplication';
 }
 
-export interface ProductShowcase {
+export interface Product {
   id: string;
   name: string;
   category: string;

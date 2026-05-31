@@ -46,7 +46,7 @@
 /* ---- buttons ---- */
 .nav-cta,
 .button {
-  @apply relative inline-flex min-h-11 items-center justify-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-line px-[18px] text-sm;
+  @apply relative inline-flex min-h-11 items-center justify-center gap-2 overflow-hidden rounded-md border border-line px-[18px] text-sm whitespace-nowrap;
   font-weight: 720;
   transition:
     transform 180ms ease,
@@ -181,6 +181,27 @@
   @apply rounded-md border border-dashed border-line p-7 text-muted;
 }
 
+/* ---- section heading ---- */
+.section-heading {
+  margin-bottom: 28px;
+}
+
+.section-heading h2 {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: clamp(30px, 4vw, 52px);
+  line-height: 1.05;
+  letter-spacing: 0;
+}
+
+.section-heading p {
+  max-width: 680px;
+  margin: 12px 0 0;
+  color: var(--color-muted);
+  font-size: 17px;
+  line-height: 1.72;
+}
+
 /* ---- page hero (shared) ---- */
 .page-hero {
   width: min(var(--page-max-width), calc(100% - 40px));
@@ -277,8 +298,7 @@
 
 .catalog-card p,
 .testimonial-card blockquote,
-.team-card p,
-.tool-placeholder-card p {
+.team-card p {
   color: var(--color-muted);
   line-height: 1.7;
 }

@@ -10,18 +10,44 @@
 }
 
 .login-modal {
+  position: relative;
   display: grid;
-  gap: 24px;
-  width: min(420px, 100%);
-  padding: 28px;
+  gap: 22px;
+  width: min(430px, 100%);
+  padding: 30px;
   border: 1px solid color-mix(in srgb, var(--color-line) 92%, transparent);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--color-panel);
   box-shadow: 0 24px 80px color-mix(in srgb, var(--color-ink) 18%, transparent);
 }
 
+.login-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+}
+
+.login-modal-heading {
+  display: flex;
+  gap: 14px;
+  padding-right: 34px;
+}
+
+.login-modal-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--color-green-dark);
+  background: var(--color-green-soft);
+}
+
 .login-modal-kicker {
-  margin: 0 0 8px;
+  margin: 0 0 5px;
   color: var(--color-green-dark);
   font-size: 13px;
   font-weight: 760;
@@ -35,23 +61,81 @@
 }
 
 .login-modal p:not(.login-modal-kicker) {
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   color: var(--color-muted);
   line-height: 1.62;
 }
 
-.login-modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+.login-qr-panel {
+  display: grid;
+  width: min(270px, 100%);
+  aspect-ratio: 1;
+  place-items: center;
+  justify-self: center;
+  padding: 13px;
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  background: var(--color-green-soft-surface);
 }
 
-@media (max-width: 640px) {
-  .login-modal-actions {
-    flex-direction: column-reverse;
+.login-qr-image-wrap {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  border-radius: 8px;
+}
+
+.login-qr-image {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+  background: var(--color-panel);
+  transition: filter 180ms ease;
+}
+
+.login-qr-image.expired {
+  filter: blur(5px);
+}
+
+.login-qr-expired,
+.login-qr-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  color: var(--color-muted);
+  font-size: 14px;
+  text-align: center;
+}
+
+.login-qr-expired {
+  position: absolute;
+  inset: 0;
+  color: var(--color-panel);
+  background: color-mix(in srgb, var(--color-ink) 52%, transparent);
+}
+
+.login-modal-hint {
+  margin: -4px 0 0 !important;
+  font-size: 13px;
+  text-align: center;
+}
+
+.login-spin {
+  color: var(--color-green-dark);
+  animation: login-spin 900ms linear infinite;
+}
+
+@keyframes login-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .login-modal {
+    padding: 24px;
   }
 
-  .login-modal-actions .button {
-    width: 100%;
-  }
 }

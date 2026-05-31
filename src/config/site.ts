@@ -1,11 +1,11 @@
-import products from '@/config/products.json';
-import tools from '@/config/tools.json';
+import productsData from '@/config/products.json';
+import toolsData from '@/config/tools.json';
 import type {
   HeroMedia,
-  ProductShowcase,
-  ProductTool,
+  Product,
   TeamMember,
   Testimonial,
+  Tool,
 } from '@/types';
 
 const heroBase = 'https://cos.orz2.online/Orz2/Hero';
@@ -49,8 +49,8 @@ export const heroMedia: HeroMedia[] = [
   },
 ];
 
-export const productTools = tools as ProductTool[];
-export const productShowcases = products as ProductShowcase[];
+export const tools = toolsData as Tool[];
+export const products = productsData as Product[];
 
 export const testimonials: Testimonial[] = [
   {
@@ -198,7 +198,7 @@ export const teamMembers: TeamMember[] = [
   },
 ];
 
-export const productCategories = [
+export const toolCategories = [
   '全部',
-  ...Array.from(new Set(productTools.map(tool => tool.category))),
+  ...Array.from(new Set(tools.map(tool => tool.category))),
 ];

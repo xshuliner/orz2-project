@@ -55,13 +55,7 @@ export function EffectsMotion() {
       );
 
       const introTargets = gsap.utils.toArray<HTMLElement>(
-        [
-          '.hero-copy > *',
-          '.page-hero > *',
-          '.tool-form-hero > *',
-          '.tool-placeholder > .back-link',
-          '.tool-placeholder-card',
-        ].join(',')
+        ['.hero-copy > *', '.page-hero > *', '.tool-form-hero > *'].join(',')
       );
       gsap.fromTo(
         introTargets,

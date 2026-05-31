@@ -1,3 +1,9 @@
+.testimonial-section {
+  width: min(var(--page-max-width), calc(100% - 40px));
+  margin: 0 auto;
+  padding: 38px 0 86px;
+}
+
 .danmaku-container {
   position: relative;
   height: 320px;
@@ -61,6 +67,10 @@
 }
 
 @media (max-width: 640px) {
+  .testimonial-section {
+    width: calc(100% - 28px);
+  }
+
   .danmaku-item {
     gap: 8px;
     padding: 7px 12px;

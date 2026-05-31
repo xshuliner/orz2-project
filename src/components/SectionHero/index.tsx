@@ -1,6 +1,10 @@
+import { siteConfig } from '@/config';
+import { heroMedia } from '@/config/site';
 import type { HeroMedia } from '@/types';
 import { prefersReducedMotion } from '@/utils/motion';
+import { ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './index.css';
 
 interface HeroVideoRotatorProps {
@@ -40,7 +44,7 @@ function waitForVideoReady(video: HTMLVideoElement) {
   });
 }
 
-export function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
+function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
   const initialIndex = useMemo(() => randomIndex(media.length), [media.length]);
   const [reducedMotion, setReducedMotion] = useState(prefersReducedMotion);
   const [playbackAllowed, setPlaybackAllowed] = useState(true);
@@ -256,5 +260,42 @@ export function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
       })}
       <div className='video-sweep' aria-hidden='true' />
     </figure>
+  );
+}
+
+export function SectionHero() {
+  return (
+    <section className='hero-section'>
+      <div className='hero-copy'>
+        <h1>工具驱动增长</h1>
+        <p>
+          ORZ2 汇集
+          AI、开发、设计、营销和办公效率工具，也支持为商业化场景定制独立工具站、信息架构与合规模块。
+        </p>
+        <div className='hero-actions'>
+          <Link className='button primary interactive' to='/products'>
+            查看产品
+            <ArrowRight size={18} aria-hidden='true' />
+          </Link>
+          <a
+            className='button secondary interactive'
+            href={`mailto:${siteConfig.contactEmail}`}
+          >
+            定制合作
+          </a>
+        </div>
+        <div className='hero-points' aria-label='ORZ2 特点'>
+          <span>
+            <Zap size={16} aria-hidden='true' />
+            快速入口
+          </span>
+          <span>
+            <ShieldCheck size={16} aria-hidden='true' />
+            合规清晰
+          </span>
+        </div>
+      </div>
+      <SectionHeroVideo media={heroMedia} />
+    </section>
   );
 }

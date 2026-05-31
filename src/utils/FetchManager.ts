@@ -72,7 +72,7 @@ const getApiHeaders = async (params: {
     },
   });
   const urlAndQuery = Utils.router2url(url, queryReqReal) as string;
-  const { token } = await CacheManager.getLocalStorage(['token']);
+  const token = CacheManager.getLocalStorage<string>('token') || '';
   const requestid = uuidV4();
   const t = String(new Date().getTime());
   const k = md5(
@@ -132,7 +132,7 @@ class FetchManager {
   }
 
   request = async (objConfig: RequestConfig): Promise<ApiResponse> => {
-    let result: ApiResponse = {};
+    let result: ApiResponse;
 
     const {
       method = 'GET',
@@ -147,8 +147,7 @@ class FetchManager {
       ...otherConfig
     } = objConfig || {};
 
-    const storage = await CacheManager.getLocalStorage(['token']);
-    const token = storage?.token || null;
+    const token = CacheManager.getLocalStorage<string>('token') || '';
 
     const { t, k, requestid } = await getApiHeaders({
       path: url,
@@ -225,7 +224,7 @@ class FetchManager {
   };
 
   upload = async (objConfig: UploadConfig): Promise<ApiResponse> => {
-    let result: ApiResponse = {};
+    let result: ApiResponse;
 
     const {
       method = 'POST',
@@ -242,8 +241,7 @@ class FetchManager {
 
     const { filePath, ...otherParams } = file || {};
 
-    const storage = await CacheManager.getLocalStorage(['token']);
-    const token = storage?.token || null;
+    const token = CacheManager.getLocalStorage<string>('token') || '';
 
     const { urlAndQuery, t, k, requestid } = await getApiHeaders({
       path: url,
@@ -344,7 +342,7 @@ class FetchManager {
   };
 
   stream = async (objConfig: RequestConfig): Promise<ApiResponse> => {
-    let result: ApiResponse = {};
+    let result: ApiResponse;
 
     const {
       method = 'GET',
@@ -358,8 +356,7 @@ class FetchManager {
       ...otherConfig
     } = objConfig || {};
 
-    const storage = await CacheManager.getLocalStorage(['token']);
-    const token = storage?.token || null;
+    const token = CacheManager.getLocalStorage<string>('token') || '';
 
     const { urlAndQuery, t, k, requestid } = await getApiHeaders({
       path: url,

@@ -1,6 +1,6 @@
 import { siteConfig } from '@/config';
-import { productShowcases, productTools } from '@/config/site';
-import type { SeoConfig } from '@/types';
+import { products, tools } from '@/config/site';
+import type { SeoConfig, Tool } from '@/types';
 
 export const siteUrl = 'https://orz2.com';
 export const siteName = 'ORZ2';
@@ -57,7 +57,7 @@ export const pageSeo: Record<string, SeoConfig> = {
         '@context': 'https://schema.org',
         '@type': 'ItemList',
         name: 'ORZ2 产品展示',
-        itemListElement: productShowcases.map((product, index) => ({
+        itemListElement: products.map((product, index) => ({
           '@type': 'ListItem',
           position: index + 1,
           name: product.name,
@@ -76,10 +76,10 @@ export const pageSeo: Record<string, SeoConfig> = {
         '@context': 'https://schema.org',
         '@type': 'ItemList',
         name: 'ORZ2 在线工具目录',
-        itemListElement: productTools.map((tool, index) => ({
+        itemListElement: tools.map((tool, index) => ({
           '@type': 'ListItem',
           position: index + 1,
-          url: routeUrl(tool.href),
+          ...(tool.href ? { url: routeUrl(tool.href) } : {}),
           name: tool.name,
         })),
       },
@@ -110,30 +110,32 @@ export const pageSeo: Record<string, SeoConfig> = {
 };
 
 export const toolSeo = Object.fromEntries(
-  productTools.map(tool => [
-    tool.slug,
-    {
-      title: tool.seoTitle,
-      description: tool.seoDescription,
-      canonicalPath: tool.href,
-      ogImage: tool.ogImage,
-      keywords: tool.keywords,
-      jsonLd: [
-        {
-          '@context': 'https://schema.org',
-          '@type': tool.schemaType,
-          name: tool.name,
-          applicationCategory: tool.category,
-          operatingSystem: 'Web',
-          url: routeUrl(tool.href),
-          description: tool.seoDescription,
-          offers: {
-            '@type': 'Offer',
-            price: '0',
-            priceCurrency: 'USD',
+  tools
+    .filter((tool): tool is Tool & { href: string } => Boolean(tool.href))
+    .map(tool => [
+      tool.slug,
+      {
+        title: tool.seoTitle,
+        description: tool.seoDescription,
+        canonicalPath: tool.href,
+        ogImage: tool.ogImage,
+        keywords: tool.keywords,
+        jsonLd: [
+          {
+            '@context': 'https://schema.org',
+            '@type': tool.schemaType,
+            name: tool.name,
+            applicationCategory: tool.category,
+            operatingSystem: 'Web',
+            url: routeUrl(tool.href),
+            description: tool.seoDescription,
+            offers: {
+              '@type': 'Offer',
+              price: '0',
+              priceCurrency: 'USD',
+            },
           },
-        },
-      ],
-    } satisfies SeoConfig,
-  ])
+        ],
+      } satisfies SeoConfig,
+    ])
 );

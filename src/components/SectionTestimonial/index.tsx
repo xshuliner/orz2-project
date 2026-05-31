@@ -11,6 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
 const MAX_VISIBLE_ITEMS = 8;
 const MIN_CYCLE_DURATION_SECONDS = 12.5;
 const MAX_CYCLE_DURATION_SECONDS = 20;
+const MAX_REPEAT_DELAY_SECONDS = 2.5;
 const TOP_BANDS = [
   [7, 15],
   [16, 27],
@@ -26,6 +27,17 @@ const BOTTOM_BANDS = [
 
 function randomBetween(min: number, max: number) {
   return min + Math.random() * (max - min);
+}
+
+function shuffle<T>(items: T[]) {
+  const shuffled = [...items];
+
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const randomIndex = Math.floor(randomBetween(0, i + 1));
+    [shuffled[i], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[i]];
+  }
+
+  return shuffled;
 }
 
 function createBalancedTopPercents(totalItems: number) {
@@ -130,8 +142,12 @@ function DanmakuItem({
         ease: 'none',
         paused: true,
         repeat: -1,
+        repeatDelay: randomBetween(0, MAX_REPEAT_DELAY_SECONDS),
         onStart: () => {
           gsap.to(el, { opacity, duration: 0.45, ease: 'power2.out' });
+        },
+        onRepeat: () => {
+          tween.repeatDelay(randomBetween(0, MAX_REPEAT_DELAY_SECONDS));
         },
       });
       tweenRef.current = tween;
@@ -208,19 +224,31 @@ function DanmakuItem({
   );
 }
 
-export function SectionTestimonial() {
+interface SectionTestimonialProps {
+  subtitle?: string;
+  title?: string;
+}
+
+export function SectionTestimonial({
+  subtitle,
+  title,
+}: SectionTestimonialProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const items = useMemo(() => {
     const topPercents = createBalancedTopPercents(MAX_VISIBLE_ITEMS);
     const cycleDuration = MAX_CYCLE_DURATION_SECONDS;
     const spawnInterval = cycleDuration / MAX_VISIBLE_ITEMS;
+    const shuffledTestimonials = shuffle(testimonials);
+    const shuffledDelays = shuffle(
+      Array.from({ length: MAX_VISIBLE_ITEMS }, (_, i) => i * spawnInterval)
+    );
 
     return Array.from({ length: MAX_VISIBLE_ITEMS }, (_, i) => {
-      const testimonial = testimonials[i % testimonials.length];
+      const testimonial = shuffledTestimonials[i % shuffledTestimonials.length];
       return {
         ...testimonial,
-        delay: i * spawnInterval,
+        delay: shuffledDelays[i],
         fontSize: randomBetween(13, 17),
         opacity: randomBetween(0.5, 0.85),
         topPercent: topPercents[i],
@@ -230,10 +258,18 @@ export function SectionTestimonial() {
   }, []);
 
   return (
-    <div className='danmaku-container' ref={containerRef} aria-hidden='true'>
-      {items.map(item => (
-        <DanmakuItem key={`${item.name}-${item.index}`} {...item} />
-      ))}
-    </div>
+    <section className='testimonial-section' aria-label='用户反馈'>
+      {title ? (
+        <div className='section-heading'>
+          <h2>{title}</h2>
+          {subtitle ? <p>{subtitle}</p> : null}
+        </div>
+      ) : null}
+      <div className='danmaku-container' ref={containerRef} aria-hidden='true'>
+        {items.map(item => (
+          <DanmakuItem key={`${item.name}-${item.index}`} {...item} />
+        ))}
+      </div>
+    </section>
   );
 }

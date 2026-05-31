@@ -1,4 +1,4 @@
-import type { ProductShowcase, ProductTool } from '@/types';
+import type { Product, Tool } from '@/types';
 import {
   ArrowUpRight,
   Boxes,
@@ -12,15 +12,15 @@ import './index.css';
 
 const icons = { Braces, ImageDown, Palette, Send };
 
-interface CatalogCardProps {
-  item: ProductShowcase | ProductTool;
+interface CardCatalogProps {
+  item: Product | Tool;
   type: 'product' | 'tool';
 }
 
-export function CatalogCard({ item, type }: CatalogCardProps) {
+export function CardCatalog({ item, type }: CardCatalogProps) {
   const isTool = type === 'tool';
-  const tool = isTool ? (item as ProductTool) : null;
-  const product = !isTool ? (item as ProductShowcase) : null;
+  const tool = isTool ? (item as Tool) : null;
+  const product = !isTool ? (item as Product) : null;
   const Icon = tool ? icons[tool.icon] : null;
   const href = tool?.href ?? product?.href;
   const actionLabel = isTool ? '进入工具' : '查看项目';

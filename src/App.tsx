@@ -4,8 +4,8 @@ import { PageHome } from '@/pages/PageHome';
 import { PagePrivacy } from '@/pages/PagePrivacy';
 import { PageProducts } from '@/pages/PageProducts';
 import { PageTeam } from '@/pages/PageTeam';
-import { PageTool } from '@/pages/PageTool';
 import { PageTools } from '@/pages/PageTools';
+import { PageWechatPublisher } from '@/pages/PageWechatPublisher';
 import { Route, Routes } from 'react-router-dom';
 
 export function App() {
@@ -19,7 +19,10 @@ export function App() {
           <Route path='/tools' element={<PageTools />} />
           <Route path='/team' element={<PageTeam />} />
           <Route path='/privacy' element={<PagePrivacy />} />
-          <Route path='/tools/:slug' element={<PageTool />} />
+          <Route
+            path='/tools/wechat-auto-publisher'
+            element={<PageWechatPublisher />}
+          />
         </Route>
       </Routes>
     </>
