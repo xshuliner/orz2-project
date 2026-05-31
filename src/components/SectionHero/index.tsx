@@ -3,7 +3,7 @@ import { heroMedia } from '@/config/site';
 import type { HeroMedia } from '@/types';
 import { prefersReducedMotion } from '@/utils/motion';
 import { ArrowRight, ShieldCheck, Zap } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './index.css';
 
@@ -45,8 +45,9 @@ function waitForVideoReady(video: HTMLVideoElement) {
 }
 
 function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
-  const initialIndex = useMemo(() => randomIndex(media.length), [media.length]);
+  const initialIndex = 0;
   const [reducedMotion, setReducedMotion] = useState(prefersReducedMotion);
+  const [shouldLoadVideos, setShouldLoadVideos] = useState(false);
   const [playbackAllowed, setPlaybackAllowed] = useState(true);
   const [activeLayer, setActiveLayer] = useState(0);
   const [layers, setLayers] = useState([
@@ -76,6 +77,34 @@ function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
       mountedRef.current = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+
+    let idleId: number | null = null;
+    let timeoutId: number | null = null;
+    const loadVideos = () => {
+      if ('requestIdleCallback' in window) {
+        idleId = window.requestIdleCallback(() => setShouldLoadVideos(true), {
+          timeout: 1500,
+        });
+        return;
+      }
+      timeoutId = globalThis.setTimeout(() => setShouldLoadVideos(true), 500);
+    };
+
+    if (document.readyState === 'complete') {
+      loadVideos();
+    } else {
+      window.addEventListener('load', loadVideos, { once: true });
+    }
+
+    return () => {
+      window.removeEventListener('load', loadVideos);
+      if (idleId !== null) window.cancelIdleCallback(idleId);
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+    };
+  }, [reducedMotion]);
 
   useEffect(() => {
     const frame = frameRef.current;
@@ -214,7 +243,11 @@ function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
     const current = media[initialIndex];
     return (
       <figure className='hero-video-frame static' aria-label='ORZ2 视频封面'>
-        <img src={current.posterSrc} alt={`${current.label} 视频封面`} />
+        <img
+          src={current.posterSrc}
+          alt={`${current.label} 视频封面`}
+          {...{ fetchpriority: 'high' }}
+        />
       </figure>
     );
   }
@@ -232,32 +265,35 @@ function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
         src={media[activeMediaIndex].posterSrc}
         alt=''
         aria-hidden='true'
+        {...{ fetchpriority: 'high' }}
       />
-      {layers.map((mediaIndex, layerIndex) => {
-        const item = media[mediaIndex];
-        const isActive = layerIndex === activeLayer;
-        const className = ['hero-video-layer', isActive ? 'active' : '']
-          .filter(Boolean)
-          .join(' ');
+      {shouldLoadVideos
+        ? layers.map((mediaIndex, layerIndex) => {
+            const item = media[mediaIndex];
+            const isActive = layerIndex === activeLayer;
+            const className = ['hero-video-layer', isActive ? 'active' : '']
+              .filter(Boolean)
+              .join(' ');
 
-        return (
-          <video
-            key={`${layerIndex}-${item.id}`}
-            ref={element => {
-              videoRefs.current[layerIndex] = element;
-            }}
-            className={className}
-            muted
-            playsInline
-            autoPlay={isActive}
-            preload={isActive ? 'auto' : 'metadata'}
-            poster={item.posterSrc}
-            aria-label={`${item.label} 背景视频`}
-          >
-            <source src={item.videoSrc} type='video/mp4' />
-          </video>
-        );
-      })}
+            return (
+              <video
+                key={`${layerIndex}-${item.id}`}
+                ref={element => {
+                  videoRefs.current[layerIndex] = element;
+                }}
+                className={className}
+                muted
+                playsInline
+                autoPlay={isActive}
+                preload={isActive ? 'auto' : 'metadata'}
+                poster={item.posterSrc}
+                aria-label={`${item.label} 背景视频`}
+              >
+                <source src={item.videoSrc} type='video/mp4' />
+              </video>
+            );
+          })
+        : null}
       <div className='video-sweep' aria-hidden='true' />
     </figure>
   );

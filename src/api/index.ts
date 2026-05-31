@@ -6,15 +6,15 @@ export default {
 
 export { getAvatarBorderColor, ossAvatarUrl } from './orz2.modal';
 export type {
-  TopRankItem,
-  MemberSummaryBody,
-  BackpackItemDetail,
   BackpackItem,
+  BackpackItemDetail,
   FriendItem,
+  MemberInfo,
   MemberListItem,
   MemberListPageBody,
-  MemberInfo,
+  MemberSummaryBody,
   OperatorMemberInfo,
   StoryItem,
   StoryListResult,
+  TopRankItem,
 } from './orz2.modal';

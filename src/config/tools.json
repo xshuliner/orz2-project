@@ -18,7 +18,8 @@
       "内容运营工具"
     ],
     "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
-    "schemaType": "SoftwareApplication"
+    "schemaType": "SoftwareApplication",
+    "compact": true
   },
   {
     "id": "tool-image",

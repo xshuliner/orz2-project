@@ -14,7 +14,9 @@ export function SectionProducts({
   subtitle,
   title,
 }: SectionProductsProps) {
-  const displayedProducts = compact ? products.slice(0, 3) : products;
+  const displayedProducts = compact
+    ? products.filter(product => product.compact)
+    : products;
   const categories = Array.from(
     new Set(displayedProducts.map(product => product.category))
   );

@@ -1,15 +1,11 @@
+import { getAvatarBorderColor, ossAvatarUrl, type StoryItem } from '@/api';
+import { getStoryList } from '@/api/orz2';
+import { getStoryTypeLabel } from '@/pages/Products/ProductSilicon/config';
+import dayjs from 'dayjs';
 import gsap from 'gsap';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import dayjs from 'dayjs';
-import { OrzTooltip } from '../OrzTooltip';
-import { getStoryTypeLabel } from '@/pages/Products/ProductSilicon/config';
-import {
-  getAvatarBorderColor,
-  ossAvatarUrl,
-  type StoryItem,
-} from '@/api';
-import { getStoryList } from '@/api/orz2';
 import { LoadMoreSentinel } from '../LoadMoreSentinel';
+import { OrzTooltip } from '../OrzTooltip';
 
 const DEFAULT_PAGE_SIZE = 15;
 export const POLL_INTERVAL_MS = 60 * 1000;
@@ -115,16 +111,16 @@ export default function StoryLogList(props: StoryLogListProps) {
     onLoadMore?: () => void;
   };
   const hasMore = isLogListMode
-    ? (props as LogListProps).hasMore ?? false
+    ? ((props as LogListProps).hasMore ?? false)
     : fetchedList.length < totalCount;
   const loadingMoreState = isLogListMode
-    ? (props as LogListProps).loadingMore ?? false
+    ? ((props as LogListProps).loadingMore ?? false)
     : loadingMore;
   const onLoadMoreProp = isLogListMode
     ? (props as LogListProps).onLoadMore
     : undefined;
   const memberHash = isLogListMode
-    ? (props as LogListProps).memberHash ?? ''
+    ? ((props as LogListProps).memberHash ?? '')
     : '';
 
   const loadMoreMemberStories = useCallback(async () => {
@@ -240,24 +236,33 @@ export default function StoryLogList(props: StoryLogListProps) {
   }, [loading, logList]);
 
   return (
-    <ul className='space-y-5 border-t pt-6' style={{ borderColor: 'var(--orz-border)' }}>
+    <ul
+      className='space-y-5 border-t pt-6'
+      style={{ borderColor: 'var(--orz-border)' }}
+    >
       {loading ? (
         <li
           className='border-b pb-5'
-          style={{ borderColor: 'var(--orz-border)', color: 'var(--orz-ink-faint)' }}
+          style={{
+            borderColor: 'var(--orz-border)',
+            color: 'var(--orz-ink-faint)',
+          }}
         >
           <span className='text-sm'>江湖事多，稍候片刻…</span>
         </li>
       ) : logList.length === 0 ? (
         <li
           className='border-b pb-5'
-          style={{ borderColor: 'var(--orz-border)', color: 'var(--orz-ink-faint)' }}
+          style={{
+            borderColor: 'var(--orz-border)',
+            color: 'var(--orz-ink-faint)',
+          }}
         >
           <span className='text-sm'>江湖事多，稍候片刻…</span>
         </li>
       ) : (
         <>
-          {logList.map((item, index) => {
+          {logList.map((item, _index) => {
             const timeLabel = formatStoryTime(item.sys_createTime);
             const operator = item.sys_operatorMemberInfo;
             const operatorId = operator?._id ?? item.sys_operatorMemberId;
@@ -361,7 +366,10 @@ export default function StoryLogList(props: StoryLogListProps) {
           {loadingMoreState && (
             <li
               className='flex min-h-12 items-center justify-center border-b pb-5'
-              style={{ borderColor: 'var(--orz-border)', color: 'var(--orz-ink-faint)' }}
+              style={{
+                borderColor: 'var(--orz-border)',
+                color: 'var(--orz-ink-faint)',
+              }}
             >
               <span className='text-sm'>加载更多…</span>
             </li>

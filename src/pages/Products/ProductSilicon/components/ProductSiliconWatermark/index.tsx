@@ -26,6 +26,8 @@ const WATERMARK_ROWS = [
   ],
 ];
 
+import type { CSSProperties } from 'react';
+
 export function ProductSiliconWatermark() {
   return (
     <div className='silicon-watermark' aria-hidden>
@@ -40,7 +42,7 @@ export function ProductSiliconWatermark() {
           style={
             {
               '--silicon-watermark-duration': `${44 + rowIndex * 7}s`,
-            } as React.CSSProperties
+            } as CSSProperties
           }
         >
           {[0, 1].map(copyIndex => (

@@ -101,7 +101,8 @@
   border: 1px solid color-mix(in srgb, var(--color-green-deep) 12%, transparent);
   border-radius: 8px;
   background: var(--color-panel);
-  box-shadow: 0 22px 58px color-mix(in srgb, var(--color-green-deep) 24%, transparent);
+  box-shadow: 0 22px 58px
+    color-mix(in srgb, var(--color-green-deep) 24%, transparent);
   opacity: 0;
   pointer-events: none;
   transform: translateY(-6px) scale(0.98);
@@ -407,7 +408,8 @@
   color: var(--color-green-deep);
   border-color: color-mix(in srgb, var(--color-green) 48%, transparent);
   background: var(--color-green-soft-active);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-green) 8%, transparent);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-green) 8%, transparent);
 }
 
 .choice-field input {
@@ -497,7 +499,11 @@
   border-radius: 8px;
   color: var(--color-green-score);
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--color-green) 18%, transparent), color-mix(in srgb, var(--color-gold) 22%, transparent)),
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-green) 18%, transparent),
+      color-mix(in srgb, var(--color-gold) 22%, transparent)
+    ),
     var(--color-green-soft-panel);
 }
 
@@ -635,8 +641,17 @@
   border-color: var(--color-green-action);
   font-size: 15px;
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--color-panel) 14%, transparent), transparent 38%),
-    linear-gradient(135deg, var(--color-green), var(--color-green-label) 58%, var(--color-green-score));
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-panel) 14%, transparent),
+      transparent 38%
+    ),
+    linear-gradient(
+      135deg,
+      var(--color-green),
+      var(--color-green-label) 58%,
+      var(--color-green-score)
+    );
   box-shadow:
     0 16px 34px color-mix(in srgb, var(--color-green) 30%, transparent),
     0 0 0 3px color-mix(in srgb, var(--color-green) 14%, transparent);

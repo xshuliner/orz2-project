@@ -1,8 +1,26 @@
-import { ProductSiliconFrame } from '@/pages/Products/ProductSilicon/components/ProductSiliconFrame';
-import { ProductSilicon } from '@/pages/Products/ProductSilicon/pages/Home';
-import { MemberDetailPage } from '@/pages/Products/ProductSilicon/pages/MemberDetail';
-import { MemberListPage } from '@/pages/Products/ProductSilicon/pages/MemberList';
+import { lazy } from 'react';
 import { RouteObject } from 'react-router-dom';
+
+const ProductSiliconFrame = lazy(() =>
+  import('@/pages/Products/ProductSilicon/components/ProductSiliconFrame').then(
+    module => ({ default: module.ProductSiliconFrame })
+  )
+);
+const ProductSilicon = lazy(() =>
+  import('@/pages/Products/ProductSilicon/pages/Home').then(module => ({
+    default: module.ProductSilicon,
+  }))
+);
+const MemberDetailPage = lazy(() =>
+  import('@/pages/Products/ProductSilicon/pages/MemberDetail').then(module => ({
+    default: module.MemberDetailPage,
+  }))
+);
+const MemberListPage = lazy(() =>
+  import('@/pages/Products/ProductSilicon/pages/MemberList').then(module => ({
+    default: module.MemberListPage,
+  }))
+);
 
 export const routesProductSilicon: RouteObject[] = [
   {

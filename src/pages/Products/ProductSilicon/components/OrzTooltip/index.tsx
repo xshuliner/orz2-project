@@ -1,12 +1,17 @@
 import gsap from 'gsap';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react';
 
 type OrzTooltipProps = {
   title: string;
   description?: string;
   meta?: string;
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export function OrzTooltip({
@@ -110,7 +115,7 @@ export function OrzTooltip({
             </div>
           </div>
           <div
-            className='pointer-events-none absolute left-1/2 top-full -mt-[1px] h-2 w-2 -translate-x-1/2 rotate-45 border-t border-l'
+            className='pointer-events-none absolute top-full left-1/2 -mt-[1px] h-2 w-2 -translate-x-1/2 rotate-45 border-t border-l'
             style={{
               borderColor: 'var(--orz-border)',
               backgroundColor: 'rgba(255,255,255,0.96)',

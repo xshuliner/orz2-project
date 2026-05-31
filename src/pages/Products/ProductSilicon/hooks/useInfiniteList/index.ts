@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import type { StoryItem } from '@/api';
+import type { StoryItem, StoryListResult } from '@/api';
 import { getStoryList } from '@/api/orz2';
-import type { StoryListResult } from '@/api';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -9,9 +8,9 @@ export function useInfiniteList({
   pageSize = DEFAULT_PAGE_SIZE,
   getItemId = item => item._id,
   fetchPage: customFetchPage,
-  enablePoll = false,
-  pollIntervalMs = 60 * 1000,
-  mergeNewToFrontOnPoll = true,
+  enablePoll: _enablePoll = false,
+  pollIntervalMs: _pollIntervalMs = 60 * 1000,
+  mergeNewToFrontOnPoll: _mergeNewToFrontOnPoll = true,
 }: {
   pageSize?: number;
   getItemId?: (item: StoryItem) => string;
@@ -26,15 +25,11 @@ export function useInfiniteList({
   const [loading, setLoading] = useState(false);
   const pageNumRef = useRef(0);
   const loadingInFlightRef = useRef(false);
-  const pollingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const initialLoadedRef = useRef(false);
 
-  const defaultFetchPage = useCallback(
-    async (page: number, size: number) => {
-      return getStoryList({ pageNum: page, pageSize: size });
-    },
-    []
-  );
+  const defaultFetchPage = useCallback(async (page: number, size: number) => {
+    return getStoryList({ pageNum: page, pageSize: size });
+  }, []);
 
   const fetchPage = customFetchPage ?? defaultFetchPage;
 

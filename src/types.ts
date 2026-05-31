@@ -20,6 +20,7 @@ export interface Tool {
   keywords: string[];
   ogImage: string;
   schemaType: 'SoftwareApplication';
+  compact?: boolean;
 }
 
 export interface Product {
@@ -30,6 +31,7 @@ export interface Product {
   logo: string;
   tags: string[];
   href?: string;
+  compact?: boolean;
 }
 
 export interface TeamMember {

@@ -53,7 +53,9 @@ export function SectionTools({
     });
   }, [category, query]);
 
-  const displayedTools = compact ? visibleTools.slice(0, 3) : visibleTools;
+  const displayedTools = compact
+    ? visibleTools.filter(tool => tool.compact)
+    : visibleTools;
 
   return (
     <section

@@ -1,12 +1,26 @@
 import { LayoutApp } from '@/components/LayoutApp';
 import { PageHome } from '@/pages/PageHome';
-import { PagePrivacy } from '@/pages/PagePrivacy';
-import { PageProducts } from '@/pages/PageProducts';
-import { PageTeam } from '@/pages/PageTeam';
-import { PageTools } from '@/pages/PageTools';
 import { routesProductSilicon } from '@/pages/Products/ProductSilicon/routes';
 import { routesToolOfficialPublisher } from '@/pages/Tools/ToolOfficialPublisher/routes';
+import { lazy } from 'react';
 import { RouteObject } from 'react-router-dom';
+
+const PagePrivacy = lazy(() =>
+  import('@/pages/PagePrivacy').then(module => ({
+    default: module.PagePrivacy,
+  }))
+);
+const PageProducts = lazy(() =>
+  import('@/pages/PageProducts').then(module => ({
+    default: module.PageProducts,
+  }))
+);
+const PageTeam = lazy(() =>
+  import('@/pages/PageTeam').then(module => ({ default: module.PageTeam }))
+);
+const PageTools = lazy(() =>
+  import('@/pages/PageTools').then(module => ({ default: module.PageTools }))
+);
 
 export const routes: RouteObject[] = [
   {

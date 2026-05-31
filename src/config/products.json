@@ -6,7 +6,8 @@
     "description": "予 Agent 以灵智与权限，令其在虚实之间寻道、历练、证其行。",
     "logo": "https://cos.orz2.online/Orz2/Projects/silicon/logo_160x160.webp",
     "tags": ["AI Agent", "硅基侠客", "江湖历练"],
-    "href": "/products/silicon"
+    "href": "/products/silicon",
+    "compact": true
   },
   {
     "id": "weather",
@@ -15,7 +16,8 @@
     "description": "轻量天气服务小程序，提供清晰直接的日常天气信息入口。",
     "logo": "https://cos.orz2.online/Orz2/Projects/weather/logo_160x160.webp",
     "tags": ["Taro", "React", "JavaScript", "Redux"],
-    "href": "https://www.orz2.online/portal/smart-app/weather/"
+    "href": "https://www.orz2.online/portal/smart-app/weather/",
+    "compact": true
   },
   {
     "id": "zero",
@@ -24,7 +26,8 @@
     "description": "围绕日常使用场景打造的小程序产品，保持简单、稳定的体验。",
     "logo": "https://cos.orz2.online/Orz2/Projects/zero/logo_160x160.webp",
     "tags": ["Taro", "React", "JavaScript", "Redux"],
-    "href": "https://www.orz2.online/portal/smart-app/zero/"
+    "href": "https://www.orz2.online/portal/smart-app/zero/",
+    "compact": true
   },
   {
     "id": "carbon",
@@ -33,7 +36,8 @@
     "description": "面向移动场景的轻应用，以清爽界面承载完整产品能力。",
     "logo": "https://cos.orz2.online/Orz2/Projects/carbon/logo_160x160.webp",
     "tags": ["Taro", "React", "JavaScript", "Redux"],
-    "href": "https://www.orz2.online/portal/smart-app/carbon/"
+    "href": "https://www.orz2.online/portal/smart-app/carbon/",
+    "compact": true
   },
   {
     "id": "code-maker",

@@ -1,4 +1,3 @@
-import Api from '@/api';
 import CacheManager from '@/utils/CacheManager';
 import { Loader2, MessageCircle, RefreshCw, X } from 'lucide-react';
 import {
@@ -51,6 +50,7 @@ const refreshTokenStorageKey = 'refreshToken';
 const pollingDelay = 2000;
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+const loadOrz2Api = () => import('@/api').then(module => module.default.Orz2);
 
 function stopDefaultAction(value: unknown) {
   if (!value || typeof value !== 'object') return;
@@ -120,20 +120,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     let isActive = true;
-    Api.Orz2.getQueryMemberInfo().then(response => {
-      if (!isActive) return;
-      const memberInfo = response?.data?.body?.memberInfo as
-        | MemberInfo
-        | undefined;
-      if (!memberInfo) {
+    loadOrz2Api()
+      .then(api => api.getQueryMemberInfo())
+      .then(response => {
+        if (!isActive) return;
+        const memberInfo = response?.data?.body?.memberInfo as
+          | MemberInfo
+          | undefined;
+        if (!memberInfo) {
+          removeAuthStorage();
+          setUser(null);
+          return;
+        }
+        const nextUser = toAuthUser(memberInfo);
+        CacheManager.setLocalStorage(authStorageKey, nextUser);
+        setUser(nextUser);
+      })
+      .catch(() => {
+        if (!isActive) return;
         removeAuthStorage();
         setUser(null);
-        return;
-      }
-      const nextUser = toAuthUser(memberInfo);
-      CacheManager.setLocalStorage(authStorageKey, nextUser);
-      setUser(nextUser);
-    });
+      });
 
     return () => {
       isActive = false;
@@ -232,7 +239,8 @@ function LoginModal({
     async (uuid: string, session: number) => {
       if (session !== sessionRef.current) return;
       try {
-        const response = await Api.Orz2.getQueryMiniCodeLogin({ uuid });
+        const api = await loadOrz2Api();
+        const response = await api.getQueryMiniCodeLogin({ uuid });
         if (session !== sessionRef.current) return;
         const { timer, token, refreshToken } = response?.data?.body || {};
 
@@ -244,7 +252,7 @@ function LoginModal({
 
         if (token) {
           persistTokens(token, refreshToken);
-          const memberResponse = await Api.Orz2.getQueryMemberInfo();
+          const memberResponse = await api.getQueryMemberInfo();
           if (session !== sessionRef.current) return;
           const memberInfo = memberResponse?.data?.body?.memberInfo as
             | MemberInfo
@@ -286,7 +294,8 @@ function LoginModal({
     setError('');
 
     try {
-      const response = await Api.Orz2.postCreateMiniCodeLogin();
+      const api = await loadOrz2Api();
+      const response = await api.postCreateMiniCodeLogin();
       if (session !== sessionRef.current) return;
       const { data, uuid } = response?.data?.body || {};
       if (!uuid) throw new Error('创建二维码失败');

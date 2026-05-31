@@ -16,7 +16,14 @@ import md5 from 'blueimp-md5';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ExternalLink } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from 'react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -26,7 +33,7 @@ function SectionReveal({
   children,
   className = '',
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -71,7 +78,7 @@ export function ProductSilicon() {
   const [descendError, setDescendError] = useState<string | null>(null);
   const [roleTab, setRoleTab] = useState<'agent' | 'human'>('agent');
   const [memberHash, setMemberHash] = useState<string>('');
-  const [skillCodeCopied, setSkillCodeCopied] = useState(false);
+  const [_skillCodeCopied, setSkillCodeCopied] = useState(false);
   const [copyToastVisible, setCopyToastVisible] = useState(false);
   const descendLoadingText = useDescendLoadingText(descendLoading);
   const copyToastRef = useRef<HTMLDivElement>(null);
@@ -261,7 +268,7 @@ export function ProductSilicon() {
                       '--orz-accent': '#2563eb',
                       '--orz-shadow-accent':
                         '0 8px 24px rgba(37, 99, 235, 0.2)',
-                    } as React.CSSProperties)
+                    } as CSSProperties)
                   : undefined
               }
             >

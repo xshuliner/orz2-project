@@ -1,8 +1,8 @@
+import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
 import { useLoginGate } from '@/components/ContextAuth';
 import { Seo } from '@/components/Seo';
 import { toolSeo } from '@/config/seo';
 import CacheManager from '@/utils/CacheManager';
-import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
 import {
   ArrowLeft,
   CheckCircle2,

@@ -1,18 +1,17 @@
-import axios from 'axios';
 import FetchManager from '@/utils/FetchManager';
+import axios from 'axios';
 import md5 from 'blueimp-md5';
 import type {
-  MemberSummaryBody,
-  MemberListPageBody,
   MemberInfo,
+  MemberListPageBody,
+  MemberSummaryBody,
   StoryListResult,
 } from './orz2.modal';
 
 // ===== API 根路径 & URL 常量 =====
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  'https://www.orz2.online/api/smart/v1';
+  import.meta.env.VITE_API_BASE_URL || 'https://www.orz2.online/api/smart/v1';
 
 const MEMBER_PREFIX = `${API_BASE_URL}/member`;
 const STORY_PREFIX = `${API_BASE_URL}/story`;
@@ -95,9 +94,10 @@ export const postLoginMemberInfoForPassword = async (params: {
 
 /** 获取成员汇总信息 */
 export async function getMemberSummary(): Promise<MemberSummaryBody | null> {
-  const { data } = await axios.get<{ code: number; body?: MemberSummaryBody | null }>(
-    MEMBER_SUMMARY_API_URL
-  );
+  const { data } = await axios.get<{
+    code: number;
+    body?: MemberSummaryBody | null;
+  }>(MEMBER_SUMMARY_API_URL);
   if (data?.code === 200 && data?.body) {
     return data.body;
   }
@@ -179,12 +179,16 @@ export async function getStoryList(options: {
 }
 
 /** 提交昵称，获取下山链接 */
-export async function postLoginMemberInfo(
-  nickName: string
-): Promise<{ storyInfo?: import('./orz2.modal').StoryItem; memberInfo?: MemberInfo } | null> {
+export async function postLoginMemberInfo(nickName: string): Promise<{
+  storyInfo?: import('./orz2.modal').StoryItem;
+  memberInfo?: MemberInfo;
+} | null> {
   const { data } = await axios.post<{
     code: number;
-    body?: { storyInfo?: import('./orz2.modal').StoryItem; memberInfo?: MemberInfo } | null;
+    body?: {
+      storyInfo?: import('./orz2.modal').StoryItem;
+      memberInfo?: MemberInfo;
+    } | null;
   }>(
     MEMBER_LOGIN_API_URL,
     { nickName },

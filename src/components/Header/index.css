@@ -11,7 +11,8 @@
   margin: 0;
   padding-inline: var(--header-page-gutter);
   background: color-mix(in srgb, var(--color-panel) 88%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--color-line) 80%, transparent);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-line) 80%, transparent);
   backdrop-filter: blur(18px);
   transition:
     height 260ms ease,

@@ -1,14 +1,10 @@
 import { ProductSiliconWatermark } from '@/pages/Products/ProductSilicon/components/ProductSiliconWatermark';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './index.css';
 
-export function ProductSiliconFrame({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export function ProductSiliconFrame({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   const isSiliconHome = pathname === '/products/silicon';
 
