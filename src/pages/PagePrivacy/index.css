@@ -1,0 +1,47 @@
+.privacy-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 38px;
+  width: min(var(--max), calc(100% - 40px));
+  margin: 0 auto;
+  padding: 34px 0 96px;
+}
+
+.privacy-toc {
+  position: sticky;
+  top: 104px;
+  align-self: start;
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.privacy-article {
+  display: grid;
+  gap: 22px;
+  max-width: 820px;
+}
+
+.privacy-article section {
+  scroll-margin-top: 104px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (max-width: 960px) {
+  .privacy-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .privacy-toc {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .privacy-layout {
+    width: calc(100% - 28px);
+  }
+}

@@ -1,23 +1,23 @@
-import { Route, Routes } from "react-router-dom";
-import { AppLayout } from "./components/AppLayout";
-import { UseMotionEffects } from "./components/UseMotionEffects";
-import { HomePage } from "./pages/HomePage";
-import { PrivacyPage } from "./pages/PrivacyPage";
-import { ProductsPage } from "./pages/ProductsPage";
-import { TeamPage } from "./pages/TeamPage";
-import { ToolPage } from "./pages/ToolPage";
+import { EffectsMotion } from '@/components/EffectsMotion';
+import { LayoutApp } from '@/components/LayoutApp';
+import { PageHome } from '@/pages/PageHome';
+import { PagePrivacy } from '@/pages/PagePrivacy';
+import { PageProducts } from '@/pages/PageProducts';
+import { PageTeam } from '@/pages/PageTeam';
+import { PageTool } from '@/pages/PageTool';
+import { Route, Routes } from 'react-router-dom';
 
 export function App() {
   return (
     <>
-      <UseMotionEffects />
+      <EffectsMotion />
       <Routes>
-        <Route element={<AppLayout />}>
-          <Route index element={<HomePage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/team" element={<TeamPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/tools/:slug" element={<ToolPage />} />
+        <Route element={<LayoutApp />}>
+          <Route index element={<PageHome />} />
+          <Route path='/products' element={<PageProducts />} />
+          <Route path='/team' element={<PageTeam />} />
+          <Route path='/privacy' element={<PagePrivacy />} />
+          <Route path='/tools/:slug' element={<PageTool />} />
         </Route>
       </Routes>
     </>

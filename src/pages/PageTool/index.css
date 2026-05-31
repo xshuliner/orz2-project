@@ -1,0 +1,42 @@
+.tool-placeholder {
+  width: min(var(--max), calc(100% - 40px));
+  margin: 0 auto;
+  min-height: 64vh;
+  padding: 82px 0 96px;
+}
+
+.tool-placeholder-card {
+  width: min(760px, 100%);
+  margin-top: 24px;
+  padding: 42px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.tool-placeholder-card > span {
+  color: var(--green-dark);
+  font-weight: 760;
+}
+
+.tool-placeholder-card h1 {
+  margin: 14px 0 12px;
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 1.02;
+  white-space: nowrap;
+}
+
+.placeholder-note {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 640px) {
+  .tool-placeholder {
+    width: calc(100% - 28px);
+  }
+
+  .tool-placeholder-card {
+    padding: 24px;
+  }
+}

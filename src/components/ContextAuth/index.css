@@ -1,0 +1,57 @@
+.login-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(17, 20, 17, 0.34);
+  backdrop-filter: blur(8px);
+}
+
+.login-modal {
+  display: grid;
+  gap: 24px;
+  width: min(420px, 100%);
+  padding: 28px;
+  border: 1px solid rgba(223, 231, 226, 0.92);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 24px 80px rgba(17, 20, 17, 0.18);
+}
+
+.login-modal-kicker {
+  margin: 0 0 8px;
+  color: var(--green-dark);
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.login-modal h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.login-modal p:not(.login-modal-kicker) {
+  margin: 10px 0 0;
+  color: var(--muted);
+  line-height: 1.62;
+}
+
+.login-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+@media (max-width: 640px) {
+  .login-modal-actions {
+    flex-direction: column-reverse;
+  }
+
+  .login-modal-actions .button {
+    width: 100%;
+  }
+}

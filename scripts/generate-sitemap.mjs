@@ -9,7 +9,7 @@ const pages = [
   { path: "/privacy", changefreq: "monthly", priority: "0.6" },
 ];
 
-const tools = JSON.parse(await readFile(new URL("../src/data/tools.json", import.meta.url), "utf8"));
+const tools = JSON.parse(await readFile(new URL("../src/config/tools.json", import.meta.url), "utf8"));
 
 const urls = [
   ...pages,

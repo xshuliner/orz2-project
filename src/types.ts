@@ -18,7 +18,7 @@ export interface ProductTool {
   seoDescription: string;
   keywords: string[];
   ogImage: string;
-  schemaType: "SoftwareApplication";
+  schemaType: 'SoftwareApplication';
 }
 
 export interface TeamMember {

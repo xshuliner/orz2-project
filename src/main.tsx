@@ -1,16 +1,18 @@
-import ReactDOM from "react-dom/client";
-import { HelmetProvider } from "react-helmet-async";
-import { BrowserRouter } from "react-router-dom";
-import { App } from "./App";
-import { AuthProvider } from "./auth/AuthContext";
-import "./styles.css";
+import { App } from '@/App';
+import { AuthProvider } from '@/components/ContextAuth';
+import ReactDOM from 'react-dom/client';
+import { HelmetProvider } from 'react-helmet-async';
+import { BrowserRouter } from 'react-router-dom';
+import './styles/index.css';
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <HelmetProvider>
-    <BrowserRouter future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+    <BrowserRouter
+      future={{ v7_relativeSplatPath: true, v7_startTransition: true }}
+    >
       <AuthProvider>
         <App />
       </AuthProvider>
     </BrowserRouter>
-  </HelmetProvider>,
+  </HelmetProvider>
 );
