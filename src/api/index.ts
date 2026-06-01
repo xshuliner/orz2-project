@@ -4,6 +4,7 @@ export default {
   Orz2,
 };
 
+export { postOfficialPublisher, streamPostOfficialPublisher } from './orz2';
 export { getAvatarBorderColor, ossAvatarUrl } from './orz2.modal';
 export type {
   BackpackItem,
@@ -13,7 +14,15 @@ export type {
   MemberListItem,
   MemberListPageBody,
   MemberSummaryBody,
+  OfficialArticleType,
+  OfficialCommentConfig,
+  OfficialDraftResult,
+  OfficialImageConfig,
+  OfficialImageSourceType,
+  OfficialPublisherProgressEvent,
+  OfficialPublisherProgressStatus,
   OperatorMemberInfo,
+  PostOfficialPublisherBody,
   StoryItem,
   StoryListResult,
   TopRankItem,

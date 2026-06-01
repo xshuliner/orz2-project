@@ -5,6 +5,9 @@ import type {
   MemberInfo,
   MemberListPageBody,
   MemberSummaryBody,
+  OfficialDraftResult,
+  OfficialPublisherProgressEvent,
+  PostOfficialPublisherBody,
   StoryListResult,
 } from './orz2.modal';
 
@@ -15,12 +18,14 @@ const API_BASE_URL =
 
 const MEMBER_PREFIX = `${API_BASE_URL}/member`;
 const STORY_PREFIX = `${API_BASE_URL}/story`;
+const OFFICIAL_PREFIX = `${API_BASE_URL}/official`;
 
 export const MEMBER_SUMMARY_API_URL = `${MEMBER_PREFIX}/getQueryMemberSummaryForSilicon`;
 export const MEMBER_LIST_API_URL = `${MEMBER_PREFIX}/getQueryMemberListForSilicon`;
 export const MEMBER_INFO_API_URL = `${MEMBER_PREFIX}/getQueryMemberInfoForSilicon`;
 export const MEMBER_LOGIN_API_URL = `${MEMBER_PREFIX}/postLoginMemberInfoForSilicon`;
 export const STORY_LIST_API_URL = `${STORY_PREFIX}/getQueryStoryListForSilicon`;
+export const OFFICIAL_PUBLISHER_API_URL = `${OFFICIAL_PREFIX}/postOfficialPublisher`;
 
 /**
  * 查询二维码登录状态
@@ -210,3 +215,145 @@ export default {
   getQueryMemberInfo,
   postLoginMemberInfoForPassword,
 };
+
+// ===== 公众号发布 API =====
+
+/**
+ * 调用后端生成微信公众号草稿并创建草稿。
+ * 后端路由：POST /smart/v1/official/postOfficialPublisher
+ * 后端 header 要求 brand=zero|weather|carbon、platform=WEAPP|WEB|OTHER，
+ * 这里按 FetchManager 的默认常量覆盖成 brand='orz2'、platform='WEB'。
+ */
+export async function postOfficialPublisher(
+  body: PostOfficialPublisherBody
+): Promise<OfficialDraftResult | null> {
+  const { data } = await axios.post<{
+    code?: number;
+    body?: OfficialDraftResult | null;
+    message?: string;
+    content?: string;
+  }>(OFFICIAL_PUBLISHER_API_URL, body, {
+    headers: {
+      brand: 'orz2',
+      platform: 'WEB',
+    },
+    timeout: 600000,
+  });
+  if (data?.code === 200 && data?.body) {
+    return data.body;
+  }
+  const message = data?.message || data?.content || '发布任务提交失败';
+  throw new Error(message);
+}
+
+interface PostOfficialPublisherStreamOptions {
+  signal?: AbortSignal;
+  onConnected?: (event: OfficialPublisherProgressEvent) => void;
+  onProgress?: (event: OfficialPublisherProgressEvent) => void;
+}
+
+interface OfficialPublisherStreamPayload {
+  code?: number;
+  body?: OfficialDraftResult | null;
+  message?: string;
+  content?: string;
+}
+
+function getPublisherError(payload: OfficialPublisherStreamPayload) {
+  return payload.message || payload.content || '发布任务提交失败';
+}
+
+function parsePublisherStreamPayload(
+  rawData: string
+): OfficialPublisherStreamPayload {
+  try {
+    return JSON.parse(rawData) as OfficialPublisherStreamPayload;
+  } catch {
+    throw new Error('发布进度数据解析失败');
+  }
+}
+
+/**
+ * 以 SSE 模式生成微信公众号草稿。
+ * EventSource 不支持 POST body，因此使用 fetch 读取 text/event-stream。
+ */
+export async function streamPostOfficialPublisher(
+  body: PostOfficialPublisherBody,
+  options: PostOfficialPublisherStreamOptions = {}
+): Promise<OfficialDraftResult | null> {
+  const response = await fetch(`${OFFICIAL_PUBLISHER_API_URL}?stream=true`, {
+    method: 'POST',
+    headers: {
+      Accept: 'text/event-stream',
+      'Content-Type': 'application/json',
+      brand: 'orz2',
+      platform: 'WEB',
+    },
+    body: JSON.stringify(body),
+    signal: options.signal,
+  });
+
+  if (!response.ok) {
+    const payload = (await response.json().catch(() => ({}))) as {
+      message?: string;
+      content?: string;
+    };
+    throw new Error(getPublisherError(payload));
+  }
+
+  if (!response.body) {
+    throw new Error('当前浏览器无法读取实时发布进度');
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let isCompleted = false;
+  let result: OfficialDraftResult | null = null;
+
+  function processFrame(frame: string) {
+    const lines = frame.split('\n');
+    let eventName = 'message';
+    const dataLines: string[] = [];
+
+    lines.forEach(line => {
+      if (!line || line.startsWith(':')) return;
+      if (line.startsWith('event:')) {
+        eventName = line.slice(6).trim();
+      } else if (line.startsWith('data:')) {
+        dataLines.push(line.slice(5).trimStart());
+      }
+    });
+
+    if (!dataLines.length) return;
+    const payload = parsePublisherStreamPayload(dataLines.join('\n'));
+
+    if (eventName === 'connected') {
+      options.onConnected?.(payload as OfficialPublisherProgressEvent);
+    } else if (eventName === 'progress') {
+      options.onProgress?.(payload as OfficialPublisherProgressEvent);
+    } else if (eventName === 'complete') {
+      if (payload.code !== 200) throw new Error(getPublisherError(payload));
+      isCompleted = true;
+      result = payload.body ?? null;
+    } else if (eventName === 'error') {
+      throw new Error(getPublisherError(payload));
+    }
+  }
+
+  while (true) {
+    const { done, value } = await reader.read();
+    buffer += decoder.decode(value, { stream: !done }).replace(/\r\n/g, '\n');
+    let boundary = buffer.indexOf('\n\n');
+    while (boundary >= 0) {
+      processFrame(buffer.slice(0, boundary));
+      buffer = buffer.slice(boundary + 2);
+      boundary = buffer.indexOf('\n\n');
+    }
+    if (done) break;
+  }
+
+  if (buffer.trim()) processFrame(buffer);
+  if (!isCompleted) throw new Error('实时发布连接意外中断，请重新提交');
+  return result;
+}

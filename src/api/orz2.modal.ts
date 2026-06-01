@@ -143,3 +143,66 @@ export type StoryListResult = {
   pageSize: number;
   totalCount: number;
 };
+
+// ===== 公众号发布 =====
+
+export type OfficialArticleType = 'news' | 'newspic';
+export type OfficialImageSourceType = 'ai' | 'url' | 'base64';
+
+export interface OfficialImageConfig {
+  type: OfficialImageSourceType;
+  value: string;
+}
+
+export interface OfficialCommentConfig {
+  open: 0 | 1;
+  fansOnly: 0 | 1;
+}
+
+export interface PostOfficialPublisherBody {
+  appId: string;
+  appSecret: string;
+  articleType: OfficialArticleType;
+  promptSystem?: string;
+  promptContent?: string | string[];
+  promptReferences?: string[];
+  imageCover: OfficialImageConfig;
+  imagesInlineList?: OfficialImageConfig[];
+  author?: string;
+  digest?: string;
+  sourceUrl?: string;
+  comment?: OfficialCommentConfig;
+}
+
+export interface OfficialDraftResult {
+  time?: string;
+  articleType?: OfficialArticleType;
+  title?: string;
+  imagePath?: string;
+  inlineImagePaths?: string[];
+  mediaId?: string;
+}
+
+export type OfficialPublisherProgressStatus =
+  | 'connected'
+  | 'running'
+  | 'completed'
+  | 'failed'
+  | 'info'
+  | 'warning';
+
+export interface OfficialPublisherProgressEvent {
+  status: OfficialPublisherProgressStatus;
+  step?: number;
+  totalSteps?: number;
+  key?: string;
+  name?: string;
+  message?: string;
+  durationMs?: number;
+  requestedCount?: number;
+  uploadedCount?: number;
+  skippedCount?: number;
+  imageIndex?: number;
+  mediaId?: string;
+  skippedInlineImageCount?: number;
+}
