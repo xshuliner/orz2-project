@@ -904,11 +904,17 @@ export function OfficialPublisher() {
           (event.status === 'info' && event.imageIndex
             ? `正文配图 ${event.imageIndex} 已上传`
             : undefined);
+        const durationMs =
+          event.key === 'prepare_inline_images' &&
+          event.status === 'info' &&
+          event.durationMs !== undefined
+            ? (step.durationMs ?? 0) + event.durationMs
+            : (event.durationMs ?? step.durationMs);
         return {
           ...step,
           status,
           message: message ?? step.message,
-          durationMs: event.durationMs ?? step.durationMs,
+          durationMs,
         };
       })
     );
