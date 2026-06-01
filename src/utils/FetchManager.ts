@@ -9,7 +9,8 @@ import { v4 as uuidV4 } from 'uuid';
 import CacheManager from './CacheManager';
 import Utils from './utils';
 
-const webenv = 'prod';
+const webenv =
+  (import.meta.env.VITE_APP_ENV as 'local' | 'uat' | 'prod') || 'prod';
 const env = 'EXTENSION';
 const brand = 'gatling';
 const secretKey = 'I@, ha*ve #187076081$ dream(s)!~';

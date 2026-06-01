@@ -1,6 +1,15 @@
 import { readFile, writeFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { loadEnv } from 'vite';
 
-const siteUrl = 'https://orz2.com';
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const rootDir = resolve(__dirname, '..');
+
+const mode = process.argv[2] || 'prod';
+const env = loadEnv(mode, rootDir, 'SITE_');
+const siteUrl = env.SITE_URL || 'https://orz2.com';
+
 const routeUrl = path => (path === '/' ? `${siteUrl}/` : `${siteUrl}${path}`);
 const pages = [
   { path: '/', changefreq: 'weekly', priority: '1.0' },
