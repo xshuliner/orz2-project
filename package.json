@@ -9,14 +9,15 @@
     "start:uat": "vite --host 0.0.0.0 --mode uat",
     "start:prod": "vite --host 0.0.0.0 --mode prod",
     "generate:sitemap": "node scripts/generate-sitemap.mjs",
-    "build": "npm run generate:sitemap && tsc -b && vite build",
-    "build:local": "node scripts/generate-sitemap.mjs dev && tsc -b && vite build --mode dev",
-    "build:uat": "node scripts/generate-sitemap.mjs uat && tsc -b && vite build --mode uat",
-    "build:prod": "node scripts/generate-sitemap.mjs prod && tsc -b && vite build --mode prod",
+    "build": "npm run clean && npm run generate:sitemap && tsc -b && vite build",
+    "build:local": "npm run clean && node scripts/generate-sitemap.mjs dev && tsc -b && vite build --mode dev",
+    "build:uat": "npm run clean && node scripts/generate-sitemap.mjs uat && tsc -b && vite build --mode uat",
+    "build:prod": "npm run clean && node scripts/generate-sitemap.mjs prod && tsc -b && vite build --mode prod",
     "preview": "vite preview --host 0.0.0.0",
     "test:e2e": "playwright test",
     "lint": "eslint src --fix",
-    "format": "eslint src --fix && prettier --write \"src/**/*.{ts,tsx,js,jsx,css,json,md}\""
+    "format": "eslint src --fix && prettier --write \"src/**/*.{ts,tsx,js,jsx,css,json,md}\"",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
