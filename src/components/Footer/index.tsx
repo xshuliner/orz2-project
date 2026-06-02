@@ -49,6 +49,12 @@ export function Footer() {
           >
             隐私协议
           </Link>
+          <Link
+            className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
+            to='/design-system'
+          >
+            设计系统
+          </Link>
         </nav>
         <div className='grid content-start gap-2'>
           <h2 className='!mb-[14px] text-[15px] !text-white'>联系</h2>
@@ -75,7 +81,7 @@ export function Footer() {
           </Link>
         </div>
       </div>
-      <div className='mx-auto flex w-[min(var(--page-max-width),calc(100%-40px))] justify-between gap-4 border-t border-white/10 px-0 pt-[18px] pb-[26px] text-[13px] text-footer-muted max-sm:w-[calc(100%-28px)] max-sm:flex-col'>
+      <div className='footer-bottom mx-auto flex justify-between gap-4 border-t border-white/10 px-0 pt-[18px] pb-[26px] text-[13px] text-footer-muted max-sm:flex-col'>
         <span>© 2026 ORZ2. All rights reserved.</span>
         <span>Built for useful, compliant online tools.</span>
       </div>

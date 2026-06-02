@@ -1,15 +1,15 @@
 .tool-form-page {
-  width: min(var(--page-max-width), calc(100% - 40px));
+  width: var(--page-content-width);
   margin: 0 auto;
-  padding: 28px 0 86px;
+  padding: var(--space-8) 0 var(--space-24);
 }
 
 .tool-form-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
+  gap: var(--space-5);
   align-items: end;
-  margin: 14px 0 16px;
+  margin: var(--space-4) 0 var(--space-5);
 }
 
 .tool-form-hero::after {
@@ -30,8 +30,8 @@
   max-width: 760px;
   margin: 0;
   color: var(--color-muted);
-  font-size: 16px;
-  line-height: 1.62;
+  font-size: var(--text-body);
+  line-height: var(--line-height-compact);
 }
 
 .json-actions {
@@ -43,27 +43,16 @@
 
 .publisher-form {
   display: grid;
-  gap: 20px;
+  gap: var(--space-6);
 }
 
 .wechat-setup-card {
   position: relative;
   display: grid;
   grid-template-columns: 136px minmax(0, 1fr);
-  gap: 16px;
+  gap: var(--space-4);
   align-items: center;
-  margin-bottom: 16px;
-  padding: 12px;
-  border: 1px solid color-mix(in srgb, var(--color-gold) 34%, transparent);
-  border-radius: 8px;
-  background:
-    linear-gradient(
-      135deg,
-      color-mix(in srgb, var(--color-gold) 13%, transparent),
-      color-mix(in srgb, var(--color-panel) calc(0 * 100%), transparent) 46%
-    ),
-    var(--color-panel-warm);
-  box-shadow: 0 10px 28px color-mix(in srgb, var(--color-gold) 6%, transparent);
+  margin-bottom: var(--space-4);
   overflow: visible;
 }
 
@@ -198,14 +187,14 @@
 
 .publisher-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 326px;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: var(--space-5);
   align-items: start;
 }
 
 .publisher-main {
   display: grid;
-  gap: 14px;
+  gap: var(--space-4);
 }
 
 .publisher-aside {
@@ -214,7 +203,7 @@
   top: var(--publisher-sticky-top);
   align-self: start;
   display: grid;
-  gap: 12px;
+  gap: var(--space-4);
   max-height: calc(100vh - var(--publisher-sticky-top) - 18px);
   overflow-y: auto;
   padding-bottom: 2px;
@@ -223,31 +212,14 @@
 
 .form-panel {
   position: relative;
-  padding: 20px 22px 22px;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--color-line-card) 86%, transparent);
-  border-radius: 8px;
-  background: var(--color-panel);
-  box-shadow: 0 12px 32px color-mix(in srgb, var(--color-ink) 4.5%, transparent);
-  transition:
-    border-color 220ms ease,
-    box-shadow 220ms ease;
-}
-
-.form-panel::before {
-  content: '';
-  position: absolute;
-  inset: 0 auto 0 0;
-  z-index: 1;
-  width: 4px;
-  background: var(--gradient-panel-accent);
 }
 
 .form-panel-heading {
   display: flex;
   align-items: flex-start;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: var(--space-5);
 }
 
 .form-panel-heading-main {
@@ -263,7 +235,6 @@
 .autofill-menu {
   z-index: 60;
   width: min(380px, calc(100vw - 32px));
-  padding: 14px;
   border: 1px solid color-mix(in srgb, var(--color-green) 18%, transparent);
   border-radius: 8px;
   background: var(--color-panel);
@@ -749,8 +720,8 @@
   display: inline-grid;
   place-items: center;
   flex: 0 0 auto;
-  width: 38px;
-  height: 38px;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
   border: 1px solid color-mix(in srgb, var(--color-green) 18%, transparent);
   border-radius: 8px;
   color: var(--color-green-label);
@@ -767,15 +738,15 @@
 .form-panel-heading h2 {
   margin: 0;
   color: var(--color-ink);
-  font-size: 20px;
+  font-size: var(--text-heading-sm);
   line-height: 1.18;
 }
 
 .form-panel-heading p {
   margin: 6px 0 0;
   color: var(--color-muted);
-  font-size: 14px;
-  line-height: 1.55;
+  font-size: var(--text-body-sm);
+  line-height: var(--line-height-compact);
 }
 
 .form-grid {
@@ -825,7 +796,7 @@
 }
 
 .field input {
-  min-height: 46px;
+  min-height: var(--control-height-lg);
   padding: 0 14px;
 }
 
@@ -878,7 +849,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 38px;
+  min-height: var(--control-height-sm);
   padding: 0 13px;
   border: 1px solid var(--color-line-input);
   border-radius: 8px;
@@ -942,14 +913,6 @@
 .inline-image-item {
   display: grid;
   gap: 12px;
-  padding: 14px;
-  border: 1px solid var(--color-line-card);
-  border-radius: 8px;
-  background: var(--color-green-soft-surface);
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
 }
 
 .inline-image-item:hover {
@@ -970,17 +933,11 @@
 
 .publish-summary-card {
   position: relative;
-  padding: 18px;
-  border: 1px solid color-mix(in srgb, var(--color-line-card) 90%, transparent);
-  border-radius: 8px;
-  background: var(--color-panel);
-  box-shadow: 0 12px 32px color-mix(in srgb, var(--color-ink) 4.5%, transparent);
   overflow: hidden;
 }
 
 .publish-progress-card {
   position: relative;
-  padding: 18px;
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--color-green) 22%, transparent);
   border-radius: 8px;
@@ -1349,11 +1306,7 @@
   display: grid;
   gap: 6px;
   margin-top: 14px;
-  padding: 14px 16px;
-  border: 1px solid color-mix(in srgb, var(--color-danger) 25%, transparent);
-  border-radius: 8px;
   color: var(--color-danger);
-  background: var(--color-panel-danger);
 }
 
 .form-errors p {
@@ -1367,7 +1320,6 @@
   order: -1;
   display: grid;
   gap: 10px;
-  padding: 10px;
   border: 1px solid color-mix(in srgb, var(--color-line-card) 92%, transparent);
   border-radius: 8px;
   background: color-mix(in srgb, var(--color-panel) 90%, transparent);
@@ -1418,10 +1370,6 @@
   display: grid;
   grid-template-columns: 82px minmax(0, 1fr);
   gap: 8px;
-}
-
-.publisher-action-buttons .button {
-  min-height: 48px;
 }
 
 .publisher-submit {
@@ -1748,10 +1696,6 @@
   padding: 18px 24px 0;
 }
 
-.draft-success-actions .button {
-  min-height: 48px;
-}
-
 .draft-success-footnote {
   flex: 0 0 auto;
   margin: 11px 24px 20px;
@@ -1824,15 +1768,6 @@
 }
 
 @media (max-width: 640px) {
-  .tool-form-page {
-    width: calc(100% - 28px);
-  }
-
-  .wechat-setup-card,
-  .form-panel {
-    padding: 24px;
-  }
-
   .wechat-setup-content {
     padding: 0;
   }
@@ -1983,13 +1918,11 @@
   }
 
   .json-actions .button {
-    min-height: 42px;
-    padding: 0 12px;
-    font-size: 13px;
+    padding-inline: var(--control-padding-sm);
   }
 
   .wechat-setup-card {
-    padding: 14px;
+    --o-card-padding: 14px;
   }
 
   .wechat-setup-visual {
@@ -2011,12 +1944,11 @@
   }
 
   .setup-actions .button {
-    min-height: 42px;
-    font-size: 13px;
+    min-height: var(--control-height-md);
   }
 
   .form-panel {
-    padding: 18px;
+    --o-card-padding: 18px;
   }
 
   .draft-success-grid {

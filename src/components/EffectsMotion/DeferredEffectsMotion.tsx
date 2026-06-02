@@ -57,18 +57,20 @@ export function DeferredEffectsMotion() {
       const introTargets = gsap.utils.toArray<HTMLElement>(
         ['.hero-copy > *', '.page-hero > *', '.tool-form-hero > *'].join(',')
       );
-      gsap.fromTo(
-        introTargets,
-        { y: 20, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.72,
-          ease: 'power3.out',
-          stagger: 0.08,
-          clearProps: 'transform,opacity',
-        }
-      );
+      if (introTargets.length) {
+        gsap.fromTo(
+          introTargets,
+          { y: 20, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.72,
+            ease: 'power3.out',
+            stagger: 0.08,
+            clearProps: 'transform,opacity',
+          }
+        );
+      }
 
       const revealTargets = gsap.utils.toArray<HTMLElement>(
         [
@@ -78,31 +80,33 @@ export function DeferredEffectsMotion() {
           '.footer-grid > *',
         ].join(',')
       );
-      gsap.set(revealTargets, { y: 26, opacity: 0 });
+      if (revealTargets.length) {
+        gsap.set(revealTargets, { y: 26, opacity: 0 });
 
-      ScrollTrigger.batch(revealTargets, {
-        start: 'top 95%',
-        once: true,
-        interval: 0.08,
-        batchMax: 4,
-        onEnter: batch => {
-          batch.forEach(element => {
-            (element as HTMLElement).dataset.motionShown = 'true';
-          });
-          gsap.to(batch, {
-            y: 0,
-            opacity: 1,
-            duration: 0.68,
-            ease: 'power3.out',
-            stagger: 0.09,
-            onComplete: () => {
-              batch.forEach(element => {
-                (element as HTMLElement).classList.add('is-revealed');
-              });
-            },
-          });
-        },
-      });
+        ScrollTrigger.batch(revealTargets, {
+          start: 'top 95%',
+          once: true,
+          interval: 0.08,
+          batchMax: 4,
+          onEnter: batch => {
+            batch.forEach(element => {
+              (element as HTMLElement).dataset.motionShown = 'true';
+            });
+            gsap.to(batch, {
+              y: 0,
+              opacity: 1,
+              duration: 0.68,
+              ease: 'power3.out',
+              stagger: 0.09,
+              onComplete: () => {
+                batch.forEach(element => {
+                  (element as HTMLElement).classList.add('is-revealed');
+                });
+              },
+            });
+          },
+        });
+      }
 
       const revealVisibleDynamicItems = () => {
         const visibleHiddenItems = gsap.utils
@@ -156,7 +160,10 @@ export function DeferredEffectsMotion() {
       ).matches;
       const tiltCards = canUsePointerEffects
         ? gsap.utils.toArray<HTMLElement>(
-            ['.catalog-card', '.team-card', '.contact-section'].join(',')
+            [
+              '.o-card[data-o-card-interactive="true"]',
+              '.contact-section',
+            ].join(',')
           )
         : [];
 

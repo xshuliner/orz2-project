@@ -107,6 +107,13 @@ export const pageSeo: Record<string, SeoConfig> = {
     canonicalPath: '/privacy',
     ogImage: defaultImageOg,
   },
+  designSystem: {
+    title: '设计系统 - ORZ2',
+    description:
+      '浏览 ORZ2 公共组件、视觉 token、卡片、按钮、标签、空状态与弹窗实例。',
+    canonicalPath: '/design-system',
+    ogImage: defaultImageOg,
+  },
 };
 
 export const toolSeo = Object.fromEntries(

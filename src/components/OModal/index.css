@@ -1,0 +1,19 @@
+.o-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: color-mix(in srgb, var(--color-ink) 34%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.o-modal-panel {
+  position: relative;
+  width: min(100%, 520px);
+  border: 1px solid color-mix(in srgb, var(--color-line) 92%, transparent);
+  border-radius: var(--radius-modal);
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-modal);
+}

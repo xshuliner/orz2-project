@@ -5,6 +5,9 @@
 
   body {
     @apply m-0 min-w-80 bg-panel font-sans;
+    color: var(--color-ink);
+    font-size: var(--text-body);
+    line-height: var(--line-height-body);
   }
 
   a {
@@ -26,11 +29,11 @@
 .interactive {
   @apply cursor-pointer;
   transition:
-    color 180ms ease,
-    background 180ms ease,
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
+    color var(--motion-fast) ease,
+    background var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
 }
 
 .interactive:focus-visible {
@@ -46,7 +49,10 @@
 /* ---- buttons ---- */
 .nav-cta,
 .button {
-  @apply relative inline-flex min-h-11 items-center justify-center gap-2 overflow-hidden rounded-md border border-line px-[18px] text-sm whitespace-nowrap;
+  @apply relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-md border border-line whitespace-nowrap;
+  min-height: var(--control-height-md);
+  padding-inline: var(--control-padding-md);
+  font-size: var(--text-body-sm);
   font-weight: 720;
   transition:
     transform 180ms ease,
@@ -110,7 +116,9 @@
 
 /* ---- icon button ---- */
 .icon-button {
-  @apply inline-grid size-[42px] place-items-center rounded-md border border-line bg-panel text-ink;
+  @apply inline-grid place-items-center rounded-md border border-line bg-panel text-ink;
+  width: var(--control-height-md);
+  height: var(--control-height-md);
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -183,13 +191,13 @@
 
 /* ---- section heading ---- */
 .section-heading {
-  margin-bottom: 28px;
+  margin-bottom: var(--space-8);
 }
 
 .section-heading h2 {
   margin: 0;
   color: var(--color-ink);
-  font-size: clamp(30px, 4vw, 52px);
+  font-size: var(--text-section-title);
   line-height: 1.05;
   letter-spacing: 0;
 }
@@ -198,21 +206,21 @@
   max-width: 680px;
   margin: 12px 0 0;
   color: var(--color-muted);
-  font-size: 17px;
-  line-height: 1.72;
+  font-size: var(--text-lead);
+  line-height: var(--line-height-body);
 }
 
 /* ---- page hero (shared) ---- */
 .page-hero {
-  width: min(var(--page-max-width), calc(100% - 40px));
+  width: var(--page-content-width);
   margin: 0 auto;
-  padding: 92px 0 42px;
+  padding: var(--space-20) 0 var(--space-10);
 }
 
 .page-hero h1 {
   margin: 0;
   color: var(--color-ink);
-  font-size: clamp(46px, 7vw, 84px);
+  font-size: var(--text-page-title);
   line-height: 0.98;
   letter-spacing: 0;
   font-weight: 820;
@@ -222,8 +230,8 @@
 .page-hero p {
   margin: 14px 0 0;
   color: var(--color-muted);
-  font-size: 17px;
-  line-height: 1.72;
+  font-size: var(--text-lead);
+  line-height: var(--line-height-body);
 }
 
 .compact-hero {
@@ -234,73 +242,14 @@
 }
 
 .compact-hero h1 {
-  font-size: clamp(40px, 6vw, 72px);
-}
-
-/* ---- shared card base ---- */
-.catalog-card,
-.testimonial-card,
-.team-card {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid var(--color-line);
-  border-radius: 8px;
-  background: var(--color-panel);
-  box-shadow: 0 10px 30px color-mix(in srgb, var(--color-ink) 4%, transparent);
-  isolation: isolate;
-  transform-style: preserve-3d;
-  transition:
-    border-color 220ms ease,
-    box-shadow 220ms ease,
-    background 220ms ease;
-}
-
-.catalog-card::after,
-.testimonial-card::after,
-.team-card::after,
-.contact-section::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: radial-gradient(
-    circle at var(--pointer-x, 50%) var(--pointer-y, 0%),
-    color-mix(in srgb, var(--color-green) 18%, transparent),
-    transparent 38%
-  );
-  opacity: 0;
-  transition: opacity 220ms ease;
-}
-
-.catalog-card > *,
-.testimonial-card > *,
-.team-card > *,
-.contact-section > * {
-  position: relative;
-  z-index: 1;
-}
-
-.catalog-card:hover,
-.testimonial-card:hover,
-.team-card:hover,
-.contact-section:hover {
-  border-color: color-mix(in srgb, var(--color-green) 36%, transparent);
-  box-shadow: 0 24px 64px color-mix(in srgb, var(--color-ink) 10%, transparent);
-}
-
-.catalog-card:hover::after,
-.testimonial-card:hover::after,
-.team-card:hover::after,
-.contact-section:hover::after {
-  opacity: 1;
+  font-size: var(--text-page-title);
 }
 
 .catalog-card p,
 .testimonial-card blockquote,
 .team-card p {
   color: var(--color-muted);
-  line-height: 1.7;
+  line-height: var(--line-height-body);
 }
 
 /* ---- reveal on scroll ---- */
@@ -347,10 +296,6 @@
 }
 
 @media (max-width: 640px) {
-  .page-hero {
-    width: calc(100% - 28px);
-  }
-
   .page-hero h1 {
     font-size: 40px;
     line-height: 1.04;

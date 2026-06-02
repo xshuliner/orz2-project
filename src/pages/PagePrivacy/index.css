@@ -1,10 +1,10 @@
 .privacy-layout {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
-  gap: 38px;
-  width: min(var(--page-max-width), calc(100% - 40px));
+  gap: var(--space-10);
+  width: var(--page-content-width);
   margin: 0 auto;
-  padding: 34px 0 96px;
+  padding: var(--space-8) 0 var(--space-24);
 }
 
 .privacy-toc {
@@ -13,9 +13,6 @@
   align-self: start;
   display: grid;
   gap: 8px;
-  padding: 16px;
-  border: 1px solid var(--color-line);
-  border-radius: 8px;
 }
 
 .privacy-article {
@@ -37,11 +34,5 @@
 
   .privacy-toc {
     position: static;
-  }
-}
-
-@media (max-width: 640px) {
-  .privacy-layout {
-    width: calc(100% - 28px);
   }
 }

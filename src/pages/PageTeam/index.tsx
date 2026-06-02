@@ -1,3 +1,5 @@
+import { OCard } from '@/components/OCard';
+import { OPageHero } from '@/components/OPageHero';
 import { Seo } from '@/components/Seo';
 import { pageSeo } from '@/config/seo';
 import { teamMembers } from '@/config/site';
@@ -8,18 +10,18 @@ export function PageTeam() {
   return (
     <>
       <Seo config={pageSeo.team} />
-      <section className='page-hero compact-hero'>
-        <h1>核心团队</h1>
-        <p>
-          ORZ2
-          团队横跨产品、研发、设计、商业和组织协作，让工具站从想法走到长期运营。
-        </p>
-      </section>
+      <OPageHero
+        title='核心团队'
+        description='ORZ2 团队横跨产品、研发、设计、商业和组织协作，让工具站从想法走到长期运营。'
+      />
       <section className='team-grid' aria-label='ORZ2 团队成员'>
         {teamMembers.map(member => (
-          <article
+          <OCard
+            as='article'
             className='team-card reveal-on-scroll'
+            interactive
             key={member.id}
+            padding='md'
             style={{ '--member-color': member.color } as CSSProperties}
           >
             <img
@@ -34,7 +36,7 @@ export function PageTeam() {
               </strong>
               <p className='!mt-[10px] text-sm'>{member.bio}</p>
             </div>
-          </article>
+          </OCard>
         ))}
       </section>
     </>

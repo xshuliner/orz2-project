@@ -1,0 +1,36 @@
+.o-badge {
+  display: inline-flex;
+  min-height: var(--badge-height);
+  align-items: center;
+  padding: 0 9px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  color: var(--color-text-accent);
+  background: var(--color-green-soft-feature);
+  font-size: 12px;
+  font-weight: 680;
+}
+
+.o-badge--pill {
+  border-radius: 999px;
+}
+
+.o-badge--neutral {
+  color: var(--color-text-status);
+  background: var(--color-soft);
+}
+
+.o-badge--brand {
+  color: var(--color-green-label);
+  background: var(--color-green-soft);
+}
+
+.o-badge--warning {
+  color: var(--color-warning-text);
+  background: var(--color-warning-soft);
+}
+
+.o-badge--danger {
+  color: var(--color-danger);
+  background: var(--color-panel-danger);
+}

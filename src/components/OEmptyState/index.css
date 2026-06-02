@@ -1,0 +1,4 @@
+.o-empty-state {
+  border-radius: var(--radius-card);
+  background: var(--surface-soft);
+}

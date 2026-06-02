@@ -4,7 +4,7 @@
   z-index: 60;
   display: grid;
   place-items: center;
-  padding: 24px;
+  padding: var(--space-6);
   background: color-mix(in srgb, var(--color-ink) 34%, transparent);
   backdrop-filter: blur(8px);
 }
@@ -12,13 +12,13 @@
 .login-modal {
   position: relative;
   display: grid;
-  gap: 22px;
+  gap: var(--space-6);
   width: min(430px, 100%);
-  padding: 30px;
+  padding: var(--space-8);
   border: 1px solid color-mix(in srgb, var(--color-line) 92%, transparent);
-  border-radius: 12px;
+  border-radius: var(--radius-modal);
   background: var(--color-panel);
-  box-shadow: 0 24px 80px color-mix(in srgb, var(--color-ink) 18%, transparent);
+  box-shadow: var(--shadow-modal);
 }
 
 .login-modal-close {
@@ -56,7 +56,7 @@
 .login-modal h2 {
   margin: 0;
   color: var(--color-ink);
-  font-size: 28px;
+  font-size: var(--text-heading-md);
   line-height: 1.1;
 }
 
@@ -135,6 +135,6 @@
 
 @media (max-width: 480px) {
   .login-modal {
-    padding: 24px;
+    padding: var(--space-6);
   }
 }

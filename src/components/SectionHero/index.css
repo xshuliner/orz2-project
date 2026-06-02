@@ -2,12 +2,12 @@
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
-  gap: 44px;
+  gap: var(--space-12);
   align-items: center;
-  width: min(var(--page-max-width), calc(100% - 40px));
+  width: var(--page-content-width);
   min-height: auto;
   margin: 0 auto;
-  padding: 28px 0 26px;
+  padding: var(--space-8) 0;
 }
 
 .hero-section::after {
@@ -42,24 +42,24 @@
 
 .hero-copy p {
   width: min(100%, 560px);
-  margin: 24px 0 0;
+  margin: var(--space-6) 0 0;
   color: var(--color-muted);
-  font-size: 18px;
-  line-height: 1.72;
+  font-size: var(--text-lead);
+  line-height: var(--line-height-body);
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 34px;
+  gap: var(--space-3);
+  margin-top: var(--space-8);
 }
 
 .hero-points {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 24px;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
 }
 
 .hero-points span {
@@ -67,7 +67,7 @@
   align-items: center;
   gap: 8px;
   color: var(--color-text-feature);
-  font-size: 14px;
+  font-size: var(--text-body-sm);
   font-weight: 680;
 }
 
@@ -181,10 +181,6 @@
 }
 
 @media (max-width: 640px) {
-  .hero-section {
-    width: calc(100% - 28px);
-  }
-
   .hero-copy h1 {
     font-size: 40px;
     line-height: 1.04;

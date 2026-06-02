@@ -1,0 +1,101 @@
+.o-card {
+  --o-card-padding: 0;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-card);
+  background: var(--surface-panel);
+  box-shadow: var(--shadow-card-sm);
+  isolation: isolate;
+  padding: var(--o-card-padding);
+  transition:
+    border-color var(--motion-base) ease,
+    box-shadow var(--motion-base) ease,
+    background var(--motion-base) ease,
+    transform var(--motion-base) ease;
+}
+
+.o-card--padding-sm {
+  --o-card-padding: var(--panel-padding-sm);
+}
+
+.o-card--padding-md {
+  --o-card-padding: var(--panel-padding-md);
+}
+
+.o-card--padding-lg {
+  --o-card-padding: var(--panel-padding-lg);
+}
+
+.o-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.o-card--soft {
+  background: var(--surface-soft);
+}
+
+.o-card--brand {
+  border-color: color-mix(in srgb, var(--color-green) 24%, transparent);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--color-green) 8%, transparent),
+      transparent 42%
+    ),
+    var(--surface-panel);
+}
+
+.o-card--warm {
+  border-color: color-mix(in srgb, var(--color-gold) 34%, transparent);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-gold) 13%, transparent),
+      transparent 46%
+    ),
+    var(--surface-warm);
+}
+
+.o-card--danger {
+  border-color: color-mix(in srgb, var(--color-danger) 30%, transparent);
+  background: var(--surface-danger);
+}
+
+.o-card--accent::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  z-index: 1;
+  width: 4px;
+  content: '';
+  background: var(--gradient-panel-accent);
+}
+
+.o-card--interactive {
+  transform-style: preserve-3d;
+}
+
+.o-card--interactive::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  content: '';
+  background: radial-gradient(
+    circle at var(--pointer-x, 50%) var(--pointer-y, 0%),
+    color-mix(in srgb, var(--color-green) 18%, transparent),
+    transparent 38%
+  );
+  opacity: 0;
+  transition: opacity var(--motion-base) ease;
+}
+
+.o-card--interactive:hover {
+  border-color: color-mix(in srgb, var(--color-green) 38%, transparent);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.o-card--interactive:hover::after {
+  opacity: 1;
+}

@@ -1,10 +1,10 @@
+import { OButton } from '@/components/OButton';
 import { siteConfig } from '@/config';
 import { heroMedia } from '@/config/site';
 import type { HeroMedia } from '@/types';
 import { prefersReducedMotion } from '@/utils/motion';
 import { ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
 import './index.css';
 
 interface HeroVideoRotatorProps {
@@ -309,16 +309,17 @@ export function SectionHero() {
           AI、开发、设计、营销和办公效率工具，也支持为商业化场景定制独立工具站、信息架构与合规模块。
         </p>
         <div className='hero-actions'>
-          <Link className='button primary interactive' to='/products'>
+          <OButton size='lg' to='/products'>
             查看产品
             <ArrowRight size={18} aria-hidden='true' />
-          </Link>
-          <a
-            className='button secondary interactive'
+          </OButton>
+          <OButton
+            size='lg'
             href={`mailto:${siteConfig.contactEmail}`}
+            variant='secondary'
           >
             定制合作
-          </a>
+          </OButton>
         </div>
         <div className='hero-points' aria-label='ORZ2 特点'>
           <span>

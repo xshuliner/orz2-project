@@ -1,10 +1,10 @@
 .footer-grid {
   display: grid;
   grid-template-columns: 1.35fr 0.7fr 1fr 1fr;
-  gap: 30px;
-  width: min(var(--page-max-width), calc(100% - 40px));
+  gap: var(--space-8);
+  width: var(--page-content-width);
   margin: 0 auto;
-  padding: 56px 0;
+  padding: var(--space-16) 0;
 }
 
 @media (max-width: 960px) {
@@ -15,7 +15,10 @@
 
 @media (max-width: 640px) {
   .footer-grid {
-    width: calc(100% - 28px);
     grid-template-columns: 1fr;
   }
+}
+
+.footer-bottom {
+  width: var(--page-content-width);
 }

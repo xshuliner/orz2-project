@@ -1,3 +1,6 @@
+import { OButton } from '@/components/OButton';
+import { OIconButton } from '@/components/OIconButton';
+import { OModal } from '@/components/OModal';
 import CacheManager from '@/utils/CacheManager';
 import { Loader2, MessageCircle, RefreshCw, X } from 'lucide-react';
 import {
@@ -322,39 +325,30 @@ function LoginModal({
     }
     initQrCode();
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
       stopPolling();
     };
-  }, [initQrCode, isOpen, onClose, stopPolling]);
+  }, [initQrCode, isOpen, stopPolling]);
 
   if (!isOpen) return null;
 
   return (
-    <div
-      className='login-modal-overlay'
-      role='presentation'
-      onMouseDown={onClose}
+    <OModal
+      className='login-modal'
+      isOpen={isOpen}
+      onClose={onClose}
+      overlayClassName='login-modal-overlay'
+      titleId='login-modal-title'
     >
-      <div
-        className='login-modal'
-        role='dialog'
-        aria-modal='true'
-        aria-labelledby='login-modal-title'
-        onMouseDown={event => event.stopPropagation()}
-      >
-        <button
-          className='login-modal-close icon-button interactive'
-          type='button'
+      <>
+        <OIconButton
+          className='login-modal-close'
+          size='sm'
           aria-label='关闭登录窗口'
           onClick={onClose}
         >
           <X size={18} aria-hidden='true' />
-        </button>
+        </OIconButton>
         <div className='login-modal-heading'>
           <span className='login-modal-icon' aria-hidden='true'>
             <MessageCircle size={22} />
@@ -397,20 +391,16 @@ function LoginModal({
         </div>
 
         <p className='login-modal-hint'>请在微信中扫码，并按提示完成授权</p>
-      </div>
-    </div>
+      </>
+    </OModal>
   );
 }
 
 function RefreshButton({ onClick }: { onClick: () => void }) {
   return (
-    <button
-      className='button secondary interactive'
-      type='button'
-      onClick={onClick}
-    >
+    <OButton type='button' variant='secondary' onClick={onClick}>
       <RefreshCw size={16} aria-hidden='true' />
       刷新太阳码
-    </button>
+    </OButton>
   );
 }

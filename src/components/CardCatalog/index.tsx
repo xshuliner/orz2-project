@@ -1,3 +1,5 @@
+import { OBadge } from '@/components/OBadge';
+import { OCard } from '@/components/OCard';
 import type { Product, Tool } from '@/types';
 import {
   ArrowUpRight,
@@ -26,7 +28,12 @@ export function CardCatalog({ item, type }: CardCatalogProps) {
   const actionLabel = isTool ? '进入工具' : '查看项目';
 
   return (
-    <article className={`catalog-card ${type}-card reveal-on-scroll`}>
+    <OCard
+      as='article'
+      className={`catalog-card ${type}-card reveal-on-scroll`}
+      interactive
+      padding='lg'
+    >
       <div className='catalog-card-header'>
         <div className='catalog-card-media'>
           {Icon ? (
@@ -61,7 +68,9 @@ export function CardCatalog({ item, type }: CardCatalogProps) {
       </div>
       <div className='tag-row'>
         {item.tags.map(tag => (
-          <span key={tag}>{tag}</span>
+          <OBadge key={tag} tone='brand'>
+            {tag}
+          </OBadge>
         ))}
       </div>
       <div className='catalog-card-footer'>
@@ -87,6 +96,6 @@ export function CardCatalog({ item, type }: CardCatalogProps) {
           <span className='catalog-card-muted'>持续整理中</span>
         )}
       </div>
-    </article>
+    </OCard>
   );
 }

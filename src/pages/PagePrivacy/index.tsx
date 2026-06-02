@@ -1,3 +1,5 @@
+import { OCard } from '@/components/OCard';
+import { OPageHero } from '@/components/OPageHero';
 import { Seo } from '@/components/Seo';
 import { siteConfig } from '@/config';
 import { pageSeo } from '@/config/seo';
@@ -17,14 +19,18 @@ export function PagePrivacy() {
   return (
     <>
       <Seo config={pageSeo.privacy} />
-      <section className='page-hero compact-hero'>
-        <h1>隐私协议</h1>
-        <p>
-          我们以必要、透明、可替换为原则设计数据与合规说明，便于后续接入广告和商业化服务。
-        </p>
-      </section>
+      <OPageHero
+        title='隐私协议'
+        description='我们以必要、透明、可替换为原则设计数据与合规说明，便于后续接入广告和商业化服务。'
+      />
       <section className='privacy-layout'>
-        <aside className='privacy-toc' aria-label='隐私协议目录'>
+        <OCard
+          as='aside'
+          className='privacy-toc'
+          aria-label='隐私协议目录'
+          padding='sm'
+          tone='soft'
+        >
           {sections.map(section => (
             <a
               className='interactive rounded-lg px-2 py-[10px] text-sm text-text-toc hover:bg-green-soft-toc hover:text-ink'
@@ -34,7 +40,7 @@ export function PagePrivacy() {
               {section.title}
             </a>
           ))}
-        </aside>
+        </OCard>
         <article className='privacy-article'>
           <section id='overview'>
             <h2 className='!m-0 !mb-[10px] text-[28px]'>协议概述</h2>

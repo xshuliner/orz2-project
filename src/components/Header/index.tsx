@@ -1,4 +1,5 @@
 import { useAuth } from '@/components/ContextAuth';
+import { OIconButton } from '@/components/OIconButton';
 import { LogOut, Menu, UserCircle, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
@@ -50,15 +51,14 @@ export function Header() {
         userName={user?.name}
         variant='desktop'
       />
-      <button
-        className='icon-button mobile-menu-button interactive'
-        type='button'
+      <OIconButton
+        className='mobile-menu-button'
         aria-label={isOpen ? '关闭导航' : '打开导航'}
         aria-expanded={isOpen}
         onClick={() => setIsOpen(value => !value)}
       >
         {isOpen ? <X size={20} /> : <Menu size={20} />}
-      </button>
+      </OIconButton>
       <div className={isOpen ? 'mobile-nav open' : 'mobile-nav'}>
         {navItems.map(item => (
           <NavLink

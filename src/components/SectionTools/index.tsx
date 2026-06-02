@@ -1,8 +1,11 @@
 import { CardCatalog } from '@/components/CardCatalog';
+import { OButton } from '@/components/OButton';
+import { OEmptyState } from '@/components/OEmptyState';
+import { OSectionHeading } from '@/components/OSectionHeading';
 import { toolCategories, tools } from '@/config/site';
 import { Search } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import './index.css';
 
 interface SectionToolsProps {
@@ -62,12 +65,7 @@ export function SectionTools({
       className={compact ? 'tool-directory compact' : 'tool-directory'}
       aria-label='在线工具'
     >
-      {title ? (
-        <div className='section-heading'>
-          <h2>{title}</h2>
-          {subtitle ? <p>{subtitle}</p> : null}
-        </div>
-      ) : null}
+      {title ? <OSectionHeading description={subtitle} title={title} /> : null}
       <div className='directory-controls'>
         <label className='search-box'>
           <Search size={18} aria-hidden='true' />
@@ -99,13 +97,11 @@ export function SectionTools({
         ))}
       </div>
       {!displayedTools.length ? (
-        <p className='empty-state'>暂时没有匹配的工具，换个关键词试试。</p>
+        <OEmptyState>暂时没有匹配的工具，换个关键词试试。</OEmptyState>
       ) : null}
       {compact ? (
         <div className='section-action'>
-          <Link className='button primary interactive' to='/tools'>
-            查看全部工具
-          </Link>
+          <OButton to='/tools'>查看全部工具</OButton>
         </div>
       ) : null}
     </section>

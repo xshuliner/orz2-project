@@ -1,0 +1,24 @@
+.o-icon-button {
+  border-radius: var(--radius-control);
+}
+
+.o-icon-button--sm {
+  width: var(--control-height-sm);
+  height: var(--control-height-sm);
+}
+
+.o-icon-button--md {
+  width: var(--control-height-md);
+  height: var(--control-height-md);
+}
+
+.o-icon-button--lg {
+  width: var(--control-height-lg);
+  height: var(--control-height-lg);
+}
+
+.o-icon-button--ghost {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}

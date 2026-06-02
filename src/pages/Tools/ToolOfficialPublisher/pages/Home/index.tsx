@@ -9,7 +9,10 @@ import {
   type PostOfficialPublisherBody,
 } from '@/api';
 import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
-import { useLoginGate } from '@/components/ContextAuth';
+import { OButton } from '@/components/OButton';
+import { OCard } from '@/components/OCard';
+import { OIconButton } from '@/components/OIconButton';
+import { OModal } from '@/components/OModal';
 import { Seo } from '@/components/Seo';
 import { toolSeo } from '@/config/seo';
 import {
@@ -58,8 +61,6 @@ import { Link } from 'react-router-dom';
 import './index.css';
 
 type ReferenceType = 'festivals' | 'solarTerms';
-type ImageType = OfficialImageSourceType;
-
 interface WechatPublisherForm {
   appId: string;
   appSecret: string;
@@ -136,12 +137,6 @@ const referenceOptions: Array<{ label: string; value: ReferenceType }> = [
   { label: '节气', value: 'solarTerms' },
 ];
 
-const imageTypeOptions: Array<{ label: string; value: ImageType }> = [
-  { label: 'AI 生成', value: 'ai' },
-  // { label: '图片 URL', value: 'url' },
-  // { label: 'Base64 文件', value: 'base64' },
-];
-
 const commentOptions: Array<{
   label: string;
   value: OfficialCommentConfig;
@@ -195,9 +190,12 @@ function PublisherProgressPanel({
           : '发布遇到问题';
 
   return (
-    <section
+    <OCard
+      as='section'
       className={`publish-progress-card is-${phase}`}
       aria-label='实时发布状态'
+      padding='md'
+      tone='brand'
     >
       <div className='publish-progress-head'>
         <div className='summary-heading'>
@@ -258,7 +256,7 @@ function PublisherProgressPanel({
           </li>
         ))}
       </ol>
-    </section>
+    </OCard>
   );
 }
 
@@ -271,24 +269,24 @@ function DraftSuccessModal({
 }) {
   const inlineImageCount = draftResult?.inlineImagePaths?.length ?? 0;
 
-  return createPortal(
-    <div className='draft-success-overlay' onMouseDown={onClose}>
-      <section
-        className='draft-success-modal'
-        role='dialog'
-        aria-modal='true'
-        aria-labelledby='draft-success-title'
-        onMouseDown={event => event.stopPropagation()}
-      >
-        <button
-          className='draft-success-close interactive'
-          type='button'
+  return (
+    <OModal
+      className='draft-success-modal'
+      isOpen
+      onClose={onClose}
+      overlayClassName='draft-success-overlay'
+      titleId='draft-success-title'
+    >
+      <>
+        <OIconButton
+          className='draft-success-close'
+          variant='ghost'
           onClick={onClose}
           aria-label='关闭草稿发布结果'
           autoFocus
         >
           <X size={18} aria-hidden='true' />
-        </button>
+        </OIconButton>
 
         <div className='draft-success-hero'>
           <div className='draft-success-icon' aria-hidden='true'>
@@ -370,30 +368,25 @@ function DraftSuccessModal({
         </div>
 
         <footer className='draft-success-actions'>
-          <button
-            className='button ghost interactive'
-            type='button'
-            onClick={onClose}
-          >
+          <OButton size='lg' type='button' variant='ghost' onClick={onClose}>
             留在当前页面
-          </button>
-          <a
-            className='button primary interactive'
+          </OButton>
+          <OButton
             href={wechatDraftBoxUrl}
+            size='lg'
             target='_blank'
             rel='noreferrer'
           >
             前往公众号草稿箱
             <ExternalLink size={17} aria-hidden='true' />
-          </a>
+          </OButton>
         </footer>
 
         <p className='draft-success-footnote'>
           草稿箱页面将在新窗口打开，当前任务配置会继续保留。
         </p>
-      </section>
-    </div>,
-    document.body
+      </>
+    </OModal>
   );
 }
 
@@ -494,15 +487,6 @@ function normalizeForm(input: unknown): WechatPublisherForm {
     })),
     comment,
   };
-}
-
-function readFileAsDataUrl(file: File) {
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result ?? ''));
-    reader.onerror = () => reject(new Error('文件读取失败'));
-    reader.readAsDataURL(file);
-  });
 }
 
 function hasText(value: string) {
@@ -653,8 +637,6 @@ export function OfficialPublisher() {
   const publisherAsideRef = useRef<HTMLElement | null>(null);
   const publisherAbortRef = useRef<AbortController | null>(null);
   const publishStartedAtRef = useRef<number | null>(null);
-  const requireLogin = useLoginGate();
-
   useEffect(() => {
     CacheManager.setLocalStorage(storageKey, form);
   }, [form]);
@@ -681,20 +663,6 @@ export function OfficialPublisher() {
       publisherAsideRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, [publishPhase]);
-
-  useEffect(() => {
-    if (!isDraftResultOpen) return;
-    function handleKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') setDraftResultOpen(false);
-    }
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    document.addEventListener('keydown', handleKey);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener('keydown', handleKey);
-    };
-  }, [isDraftResultOpen]);
 
   // 计算模板弹层在视口中的位置（fixed 定位 + Portal 渲染，避开 form-panel 的 overflow:hidden）
   useLayoutEffect(() => {
@@ -800,16 +768,6 @@ export function OfficialPublisher() {
     setForm(current => ({ ...current, [key]: value }));
   }
 
-  function updateCoverImageType(type: ImageType) {
-    setForm(current => ({
-      ...current,
-      imageCover: {
-        type,
-        value: current.imageCover.type === type ? current.imageCover.value : '',
-      },
-    }));
-  }
-
   function updateCoverImageValue(value: string) {
     setForm(current => ({
       ...current,
@@ -825,22 +783,6 @@ export function OfficialPublisher() {
     const nextErrors = getValidationErrors(form);
     setErrors(nextErrors);
     return nextErrors.length === 0;
-  }
-
-  async function handleCoverFile(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    updateCoverImageValue(await readFileAsDataUrl(file));
-  }
-
-  async function handleInlineFile(
-    index: number,
-    event: ChangeEvent<HTMLInputElement>
-  ) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    const value = await readFileAsDataUrl(file);
-    updateInlineImage(index, { value });
   }
 
   function updateInlineImage(
@@ -1359,22 +1301,18 @@ export function OfficialPublisher() {
             </p>
           </div>
           <div className='json-actions' aria-label='JSON 配置操作'>
-            <button
-              className='button ghost interactive'
+            <OButton
               type='button'
+              variant='ghost'
               onClick={() => importInputRef.current?.click()}
             >
               <Upload size={17} aria-hidden='true' />
               导入 JSON
-            </button>
-            <button
-              className='button secondary interactive'
-              type='button'
-              onClick={handleExport}
-            >
+            </OButton>
+            <OButton type='button' variant='secondary' onClick={handleExport}>
               <Download size={17} aria-hidden='true' />
               导出 JSON
-            </button>
+            </OButton>
             <input
               ref={importInputRef}
               className='sr-only'
@@ -1385,9 +1323,12 @@ export function OfficialPublisher() {
           </div>
         </div>
 
-        <section
+        <OCard
+          as='section'
           className='wechat-setup-card'
           aria-labelledby='wechat-setup-title'
+          padding='sm'
+          tone='warm'
         >
           <div
             className='wechat-setup-visual interactive'
@@ -1412,35 +1353,19 @@ export function OfficialPublisher() {
               </li>
             </ol>
             <div className='setup-actions'>
-              <a
-                className='button primary interactive'
-                href={wechatConsoleUrl}
-                target='_blank'
-                rel='noreferrer'
-              >
+              <OButton href={wechatConsoleUrl} target='_blank' rel='noreferrer'>
                 <ExternalLink size={17} aria-hidden='true' />
                 打开微信公众平台
-              </a>
-              <button
-                className='button secondary interactive'
-                type='button'
-                onClick={handleCopyIp}
-              >
+              </OButton>
+              <OButton type='button' variant='secondary' onClick={handleCopyIp}>
                 <Clipboard size={17} aria-hidden='true' />
                 {copiedIp ? '已复制 IP' : '复制白名单 IP'}
-              </button>
+              </OButton>
             </div>
           </div>
-        </section>
+        </OCard>
 
-        <form
-          className='publisher-form'
-          onSubmit={
-            // requireLogin(
-            handleGenerate
-            // )
-          }
-        >
+        <form className='publisher-form' onSubmit={handleGenerate}>
           {lastAutoFill ? (
             <div className='autofill-banner' role='status'>
               <Sparkles size={16} aria-hidden='true' />
@@ -1468,7 +1393,7 @@ export function OfficialPublisher() {
           ) : null}
           <div className='publisher-workspace'>
             <div className='publisher-main'>
-              <section className='form-panel'>
+              <OCard as='section' accentBar className='form-panel' padding='lg'>
                 <div className='form-panel-heading'>
                   <span className='panel-icon'>
                     <KeyRound size={19} aria-hidden='true' />
@@ -1522,9 +1447,9 @@ export function OfficialPublisher() {
                     newspic 贴图/图片消息
                   </label> */}
                 </fieldset>
-              </section>
+              </OCard>
 
-              <section className='form-panel'>
+              <OCard as='section' accentBar className='form-panel' padding='lg'>
                 <div className='form-panel-heading'>
                   <span className='panel-icon'>
                     <Sparkles size={19} aria-hidden='true' />
@@ -1534,17 +1459,18 @@ export function OfficialPublisher() {
                     <p>定义内容角色、主题、结构和可引用的信息。</p>
                   </div>
                   <div className='autofill-trigger' ref={templateMenuRef}>
-                    <button
+                    <OButton
                       ref={templateButtonRef}
-                      className='button ghost interactive'
                       type='button'
+                      size='sm'
+                      variant='ghost'
                       aria-haspopup='dialog'
                       aria-expanded={isTemplateMenuOpen}
                       onClick={() => setTemplateMenuOpen(current => !current)}
                     >
                       <Wand2 size={17} aria-hidden='true' />
                       AI 智能填充
-                    </button>
+                    </OButton>
                   </div>
                 </div>
                 <label className='field'>
@@ -1592,9 +1518,9 @@ export function OfficialPublisher() {
                     </label>
                   ))}
                 </fieldset>
-              </section>
+              </OCard>
 
-              <section className='form-panel'>
+              <OCard as='section' accentBar className='form-panel' padding='lg'>
                 <div className='form-panel-heading'>
                   <span className='panel-icon'>
                     <Image size={19} aria-hidden='true' />
@@ -1604,55 +1530,26 @@ export function OfficialPublisher() {
                     <p>管理首图和正文插图，支持 AI 描述、URL 与本地文件。</p>
                   </div>
                 </div>
-                {/* <fieldset className='choice-field'>
-                  <legend>封面图生成类型 *</legend>
-                  {imageTypeOptions.map(option => (
-                    <label className='interactive' key={option.value}>
-                      <input
-                        type='radio'
-                        checked={form.imageCover.type === option.value}
-                        onChange={() => updateCoverImageType(option.value)}
-                      />
-                      {option.label}
-                    </label>
-                  ))}
-                </fieldset> */}
-                {false ? ( // 临时注释掉 Base64 文件上传分支（原条件: form.imageCover.type === 'base64'）
-                  <label className='field'>
-                    <span>封面图文件 *</span>
-                    <input
-                      type='file'
-                      accept='image/*'
-                      onChange={handleCoverFile}
+                <label className='field'>
+                  <span>封面图生成值 *</span>
+                  <input
+                    value={form.imageCover.value}
+                    onChange={event =>
+                      updateCoverImageValue(event.target.value)
+                    }
+                    placeholder={
+                      form.imageCover.type === 'ai'
+                        ? '描述希望生成的封面图'
+                        : 'https://example.com/cover.png'
+                    }
+                    required
+                  />
+                  {autoFilledKeys.has('imageCover.value') ? (
+                    <AutoFillChip
+                      onClear={() => clearAutoFillField('imageCover.value')}
                     />
-                    <small>
-                      {form.imageCover.value
-                        ? '已保存 Base64 文件内容。'
-                        : '请选择图片文件，系统会转为 Base64 保存。'}
-                    </small>
-                  </label>
-                ) : (
-                  <label className='field'>
-                    <span>封面图生成值 *</span>
-                    <input
-                      value={form.imageCover.value}
-                      onChange={event =>
-                        updateCoverImageValue(event.target.value)
-                      }
-                      placeholder={
-                        form.imageCover.type === 'ai'
-                          ? '描述希望生成的封面图'
-                          : 'https://example.com/cover.png'
-                      }
-                      required
-                    />
-                    {autoFilledKeys.has('imageCover.value') ? (
-                      <AutoFillChip
-                        onClear={() => clearAutoFillField('imageCover.value')}
-                      />
-                    ) : null}
-                  </label>
-                )}
+                  ) : null}
+                </label>
 
                 <div className='inline-image-head'>
                   <div>
@@ -1663,97 +1560,71 @@ export function OfficialPublisher() {
                         : '正文插图可稍后补充'}
                     </p>
                   </div>
-                  <button
-                    className='button ghost interactive'
+                  <OButton
                     type='button'
+                    size='sm'
+                    variant='ghost'
                     onClick={addInlineImage}
                     disabled={form.imagesInlineList.length >= 9}
                   >
                     <Plus size={17} aria-hidden='true' />
                     增加图片
-                  </button>
+                  </OButton>
                 </div>
                 <div className='inline-image-list'>
                   {form.imagesInlineList.map((item, index) => (
-                    <article className='inline-image-item' key={index}>
+                    <OCard
+                      as='article'
+                      className='inline-image-item'
+                      interactive
+                      key={index}
+                      padding='sm'
+                      tone='soft'
+                    >
                       <div className='inline-image-title'>
                         <strong>内嵌图片 {index + 1}</strong>
-                        <button
-                          className='icon-button interactive'
+                        <OIconButton
                           type='button'
                           aria-label={`删除内嵌图片 ${index + 1}`}
                           onClick={() => removeInlineImage(index)}
+                          size='sm'
                         >
                           <Trash2 size={17} />
-                        </button>
+                        </OIconButton>
                       </div>
-                      {/* <fieldset className='choice-field compact'>
-                        <legend>图片类型</legend>
-                        {imageTypeOptions.map(option => (
-                          <label className='interactive' key={option.value}>
-                            <input
-                              type='radio'
-                              checked={item.type === option.value}
-                              onChange={() =>
-                                updateInlineImage(index, {
-                                  type: option.value,
-                                  value: '',
-                                })
-                              }
-                            />
-                            {option.label}
-                          </label>
-                        ))}
-                      </fieldset> */}
-                      {false ? ( // 临时注释掉 Base64 文件上传分支（原条件: item.type === 'base64'）
-                        <label className='field'>
-                          <span>图片文件</span>
-                          <input
-                            type='file'
-                            accept='image/*'
-                            onChange={event => handleInlineFile(index, event)}
-                          />
-                          <small>
-                            {item.value
-                              ? '已保存 Base64 文件内容。'
-                              : '请选择图片文件。'}
-                          </small>
-                        </label>
-                      ) : (
-                        <label className='field'>
-                          <span>图片生成值</span>
-                          <input
-                            value={item.value}
-                            onChange={event =>
-                              updateInlineImage(index, {
-                                value: event.target.value,
-                              })
-                            }
-                            placeholder={
-                              item.type === 'ai'
-                                ? '描述这张内嵌图'
-                                : 'https://example.com/inline.png'
+                      <label className='field'>
+                        <span>图片生成值</span>
+                        <input
+                          value={item.value}
+                          onChange={event =>
+                            updateInlineImage(index, {
+                              value: event.target.value,
+                            })
+                          }
+                          placeholder={
+                            item.type === 'ai'
+                              ? '描述这张内嵌图'
+                              : 'https://example.com/inline.png'
+                          }
+                        />
+                        {autoFilledKeys.has(
+                          `imagesInlineList.${index}.value` as AutoFillKey
+                        ) ? (
+                          <AutoFillChip
+                            onClear={() =>
+                              clearAutoFillField(
+                                `imagesInlineList.${index}.value` as AutoFillKey
+                              )
                             }
                           />
-                          {autoFilledKeys.has(
-                            `imagesInlineList.${index}.value` as AutoFillKey
-                          ) ? (
-                            <AutoFillChip
-                              onClear={() =>
-                                clearAutoFillField(
-                                  `imagesInlineList.${index}.value` as AutoFillKey
-                                )
-                              }
-                            />
-                          ) : null}
-                        </label>
-                      )}
-                    </article>
+                        ) : null}
+                      </label>
+                    </OCard>
                   ))}
                 </div>
-              </section>
+              </OCard>
 
-              <section className='form-panel'>
+              <OCard as='section' accentBar className='form-panel' padding='lg'>
                 <div className='form-panel-heading'>
                   <span className='panel-icon'>
                     <Newspaper size={19} aria-hidden='true' />
@@ -1817,7 +1688,7 @@ export function OfficialPublisher() {
                     </label>
                   ))}
                 </fieldset>
-              </section>
+              </OCard>
             </div>
 
             <aside
@@ -1833,9 +1704,11 @@ export function OfficialPublisher() {
                 />
               ) : null}
 
-              <section
+              <OCard
+                as='section'
                 className='publish-summary-card publish-readiness-card'
                 aria-label='配置进度'
+                padding='md'
               >
                 <div className='publish-readiness-head'>
                   <div className='summary-heading'>
@@ -1863,9 +1736,15 @@ export function OfficialPublisher() {
                     </div>
                   ))}
                 </div>
-              </section>
+              </OCard>
 
-              <section className='publisher-action-dock' aria-label='发布操作'>
+              <OCard
+                as='section'
+                className='publisher-action-dock'
+                aria-label='发布操作'
+                padding='sm'
+                tone='soft'
+              >
                 <div className='publisher-status-line' aria-live='polite'>
                   {isGenerating ? (
                     <Loader2 className='spin' size={18} aria-hidden='true' />
@@ -1885,17 +1764,18 @@ export function OfficialPublisher() {
                   </button>
                 ) : null}
                 <div className='publisher-action-buttons'>
-                  <button
-                    className='button ghost publisher-reset interactive'
+                  <OButton
+                    className='publisher-reset'
                     type='button'
+                    variant='ghost'
                     onClick={handleReset}
                     disabled={isGenerating}
                   >
                     <RotateCcw size={17} aria-hidden='true' />
                     重置
-                  </button>
-                  <button
-                    className='button primary publisher-submit interactive'
+                  </OButton>
+                  <OButton
+                    className='publisher-submit'
                     type='submit'
                     disabled={isGenerating}
                   >
@@ -1905,18 +1785,23 @@ export function OfficialPublisher() {
                       <Sparkles size={17} aria-hidden='true' />
                     )}
                     {isGenerating ? '生成中...' : '生成发布任务'}
-                  </button>
+                  </OButton>
                 </div>
-              </section>
+              </OCard>
             </aside>
           </div>
 
           {errors.length ? (
-            <div className='form-errors' role='alert'>
+            <OCard
+              className='form-errors'
+              padding='sm'
+              role='alert'
+              tone='danger'
+            >
               {errors.map(error => (
                 <p key={error}>{error}</p>
               ))}
-            </div>
+            </OCard>
           ) : null}
         </form>
       </section>
@@ -1930,16 +1815,18 @@ export function OfficialPublisher() {
 
       {isTemplateMenuOpen && popoverPos
         ? createPortal(
-            <div
+            <OCard
               className='autofill-menu'
               role='dialog'
               aria-label='选择提示词模板'
+              padding='sm'
               ref={templateMenuRef}
               style={{
                 position: 'fixed',
                 top: popoverPos.top,
                 right: popoverPos.right,
               }}
+              tone='soft'
             >
               <div className='autofill-menu-head'>
                 <strong>选择提示词模板</strong>
@@ -1992,156 +1879,141 @@ export function OfficialPublisher() {
                   );
                 })}
               </div>
-            </div>,
+            </OCard>,
             document.body
           )
         : null}
 
-      {pendingTemplate
-        ? createPortal(
-            <div
-              className='autofill-confirm-overlay'
-              role='dialog'
-              aria-modal='true'
-              aria-labelledby='autofill-confirm-title'
-              onMouseDown={event => {
-                // 仅在点击发生在 overlay 自身时关闭
-                if (event.target === event.currentTarget) {
-                  cancelPendingTemplate();
-                }
-              }}
-            >
-              <div
-                className='autofill-confirm'
-                ref={confirmDialogRef}
-                onClick={event => event.stopPropagation()}
-                onMouseDown={event => event.stopPropagation()}
-              >
-                <div className='autofill-confirm-head'>
-                  <span className='autofill-confirm-icon' aria-hidden='true'>
-                    ⚠️
-                  </span>
-                  <div>
-                    <h3 id='autofill-confirm-title'>
-                      切换到「{pendingTemplate.label}」模板？
-                    </h3>
-                    <p>
-                      勾选要替换的字段；未勾选的字段将保持原值。 共{' '}
-                      {buildApplyPlan(form).filledKeys.length} 项可替换， 已选{' '}
-                      {selectedKeys.size} 项。
-                    </p>
-                  </div>
-                  <button
-                    className='autofill-banner-close interactive'
-                    type='button'
-                    aria-label='关闭确认'
-                    onClick={cancelPendingTemplate}
-                  >
-                    <X size={16} aria-hidden='true' />
-                  </button>
-                </div>
-                <div className='autofill-confirm-toolbar'>
-                  <button
-                    className='autofill-confirm-tool interactive'
-                    type='button'
-                    onClick={() => {
-                      const plan = buildApplyPlan(form);
-                      setAllSelectedKeys(plan.filledKeys, true);
-                    }}
-                  >
-                    <CheckCheck size={13} aria-hidden='true' />
-                    全选
-                  </button>
-                  <button
-                    className='autofill-confirm-tool interactive'
-                    type='button'
-                    onClick={() => {
-                      const plan = buildApplyPlan(form);
-                      setAllSelectedKeys(plan.filledKeys, false);
-                    }}
-                  >
-                    <Square size={13} aria-hidden='true' />
-                    全不选
-                  </button>
-                </div>
-                <ul className='autofill-confirm-list'>
-                  {(() => {
-                    const plan = buildApplyPlan(form);
-                    const labelOf = (key: AutoFillKey) => {
-                      if (key === 'promptSystem') return '系统提示词';
-                      if (key === 'promptContent') return '主体内容提示词';
-                      if (key === 'digest') return '摘要';
-                      if (key === 'imageCover.value') return '封面图描述（AI）';
-                      if (key.startsWith('imagesInlineList.')) {
-                        const idx = Number(key.split('.')[1]);
-                        return `内嵌图 ${idx + 1} 描述（AI）`;
-                      }
-                      return key;
-                    };
-                    return plan.filledKeys.map(key => {
-                      const checked = selectedKeys.has(key);
-                      return (
-                        <li
-                          key={key}
-                          className={
-                            checked
-                              ? 'autofill-confirm-item is-checked'
-                              : 'autofill-confirm-item'
-                          }
-                        >
-                          <label className='autofill-confim-row interactive'>
-                            <input
-                              type='checkbox'
-                              checked={checked}
-                              onChange={() => toggleSelectedKey(key)}
-                            />
-                            <span className='autofill-confirm-label'>
-                              {labelOf(key)}
-                            </span>
-                            <span className='autofill-confirm-current'>
-                              {truncate(plan.previousValues[key] ?? '', 50)}
-                            </span>
-                            <span
-                              className='autofill-confirm-arrow'
-                              aria-hidden='true'
-                            >
-                              →
-                            </span>
-                            <span className='autofill-confirm-new'>
-                              {truncate(
-                                newValueForKey(pendingTemplate, key),
-                                50
-                              )}
-                            </span>
-                          </label>
-                        </li>
-                      );
-                    });
-                  })()}
-                </ul>
-                <div className='autofill-confirm-actions'>
-                  <button
-                    className='button ghost interactive'
-                    type='button'
-                    onClick={cancelPendingTemplate}
-                  >
-                    取消
-                  </button>
-                  <button
-                    className='button primary interactive'
-                    type='button'
-                    onClick={confirmPendingTemplate}
-                    disabled={selectedKeys.size === 0}
-                  >
-                    <Wand2 size={16} aria-hidden='true' />
-                    替换 {selectedKeys.size} 个字段
-                  </button>
-                </div>
+      {pendingTemplate ? (
+        <OModal
+          className='autofill-confirm'
+          isOpen
+          onClose={cancelPendingTemplate}
+          overlayClassName='autofill-confirm-overlay'
+          panelRef={confirmDialogRef}
+          titleId='autofill-confirm-title'
+        >
+          <>
+            <div className='autofill-confirm-head'>
+              <span className='autofill-confirm-icon' aria-hidden='true'>
+                ⚠️
+              </span>
+              <div>
+                <h3 id='autofill-confirm-title'>
+                  切换到「{pendingTemplate.label}」模板？
+                </h3>
+                <p>
+                  勾选要替换的字段；未勾选的字段将保持原值。 共{' '}
+                  {buildApplyPlan(form).filledKeys.length} 项可替换， 已选{' '}
+                  {selectedKeys.size} 项。
+                </p>
               </div>
-            </div>,
-            document.body
-          )
-        : null}
+              <OIconButton
+                className='autofill-banner-close interactive'
+                aria-label='关闭确认'
+                size='sm'
+                variant='ghost'
+                onClick={cancelPendingTemplate}
+              >
+                <X size={16} aria-hidden='true' />
+              </OIconButton>
+            </div>
+            <div className='autofill-confirm-toolbar'>
+              <button
+                className='autofill-confirm-tool interactive'
+                type='button'
+                onClick={() => {
+                  const plan = buildApplyPlan(form);
+                  setAllSelectedKeys(plan.filledKeys, true);
+                }}
+              >
+                <CheckCheck size={13} aria-hidden='true' />
+                全选
+              </button>
+              <button
+                className='autofill-confirm-tool interactive'
+                type='button'
+                onClick={() => {
+                  const plan = buildApplyPlan(form);
+                  setAllSelectedKeys(plan.filledKeys, false);
+                }}
+              >
+                <Square size={13} aria-hidden='true' />
+                全不选
+              </button>
+            </div>
+            <ul className='autofill-confirm-list'>
+              {(() => {
+                const plan = buildApplyPlan(form);
+                const labelOf = (key: AutoFillKey) => {
+                  if (key === 'promptSystem') return '系统提示词';
+                  if (key === 'promptContent') return '主体内容提示词';
+                  if (key === 'digest') return '摘要';
+                  if (key === 'imageCover.value') return '封面图描述（AI）';
+                  if (key.startsWith('imagesInlineList.')) {
+                    const idx = Number(key.split('.')[1]);
+                    return `内嵌图 ${idx + 1} 描述（AI）`;
+                  }
+                  return key;
+                };
+                return plan.filledKeys.map(key => {
+                  const checked = selectedKeys.has(key);
+                  return (
+                    <li
+                      key={key}
+                      className={
+                        checked
+                          ? 'autofill-confirm-item is-checked'
+                          : 'autofill-confirm-item'
+                      }
+                    >
+                      <label className='autofill-confim-row interactive'>
+                        <input
+                          type='checkbox'
+                          checked={checked}
+                          onChange={() => toggleSelectedKey(key)}
+                        />
+                        <span className='autofill-confirm-label'>
+                          {labelOf(key)}
+                        </span>
+                        <span className='autofill-confirm-current'>
+                          {truncate(plan.previousValues[key] ?? '', 50)}
+                        </span>
+                        <span
+                          className='autofill-confirm-arrow'
+                          aria-hidden='true'
+                        >
+                          →
+                        </span>
+                        <span className='autofill-confirm-new'>
+                          {truncate(newValueForKey(pendingTemplate, key), 50)}
+                        </span>
+                      </label>
+                    </li>
+                  );
+                });
+              })()}
+            </ul>
+            <div className='autofill-confirm-actions'>
+              <OButton
+                type='button'
+                variant='ghost'
+                onClick={cancelPendingTemplate}
+              >
+                取消
+              </OButton>
+              <OButton
+                type='button'
+                onClick={confirmPendingTemplate}
+                disabled={selectedKeys.size === 0}
+              >
+                <Wand2 size={16} aria-hidden='true' />
+                替换 {selectedKeys.size} 个字段
+              </OButton>
+            </div>
+          </>
+        </OModal>
+      ) : null}
     </>
   );
 }

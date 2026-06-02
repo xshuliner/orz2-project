@@ -1,6 +1,7 @@
 import { CardCatalog } from '@/components/CardCatalog';
+import { OButton } from '@/components/OButton';
+import { OSectionHeading } from '@/components/OSectionHeading';
 import { products } from '@/config/site';
-import { Link } from 'react-router-dom';
 import './index.css';
 
 interface SectionProductsProps {
@@ -26,12 +27,7 @@ export function SectionProducts({
       className={compact ? 'product-directory compact' : 'product-directory'}
       aria-label='产品展示'
     >
-      {title ? (
-        <div className='section-heading'>
-          <h2>{title}</h2>
-          {subtitle ? <p>{subtitle}</p> : null}
-        </div>
-      ) : null}
+      {title ? <OSectionHeading description={subtitle} title={title} /> : null}
       <div className='product-groups'>
         {categories.map(category => {
           const categoryProducts = displayedProducts.filter(
@@ -57,9 +53,7 @@ export function SectionProducts({
       </div>
       {compact ? (
         <div className='section-action'>
-          <Link className='button primary interactive' to='/products'>
-            查看全部产品
-          </Link>
+          <OButton to='/products'>查看全部产品</OButton>
         </div>
       ) : null}
     </section>

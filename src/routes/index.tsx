@@ -10,6 +10,11 @@ const PagePrivacy = lazy(() =>
     default: module.PagePrivacy,
   }))
 );
+const PageDesignSystem = lazy(() =>
+  import('@/pages/PageDesignSystem').then(module => ({
+    default: module.PageDesignSystem,
+  }))
+);
 const PageProducts = lazy(() =>
   import('@/pages/PageProducts').then(module => ({
     default: module.PageProducts,
@@ -57,6 +62,10 @@ export const routes: RouteObject[] = [
       {
         path: '/privacy',
         element: <PagePrivacy />,
+      },
+      {
+        path: '/design-system',
+        element: <PageDesignSystem />,
       },
     ],
   },

@@ -28,6 +28,8 @@
   --color-muted-icon: #b6c3bb;
   --color-danger: #9f1239;
   --color-gold: #ffbe4d;
+  --color-warning-text: #72531a;
+  --color-warning-soft: #fff8e7;
   --color-soft: #f5f8f6;
   --color-line: #dfe7e2;
   --color-line-input: #d9e4dd;
@@ -69,13 +71,65 @@
   --shadow-button: 0 10px 28px rgba(24, 182, 106, 0.22);
   --shadow-button-hover: 0 16px 34px rgba(17, 20, 17, 0.12);
   --shadow-icon-hover: 0 12px 28px rgba(17, 20, 17, 0.08);
+  --shadow-modal: 0 24px 80px rgba(17, 20, 17, 0.18);
   --radius-md: 8px;
   --default-transition-duration: 180ms;
 }
 
 :root {
   --page-max-width: 1180px;
+  --page-gutter: 20px;
+  --page-content-width: min(
+    var(--page-max-width),
+    calc(100% - (var(--page-gutter) * 2))
+  );
+  --header-height: 76px;
+  --header-height-compact: 64px;
   --publisher-sticky-top: 92px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --text-caption: 12px;
+  --text-meta: 13px;
+  --text-body-sm: 14px;
+  --text-body: 16px;
+  --text-lead: 17px;
+  --text-heading-sm: 20px;
+  --text-heading-md: 28px;
+  --text-section-title: clamp(30px, 4vw, 52px);
+  --text-page-title: clamp(40px, 6vw, 72px);
+  --line-height-tight: 1.12;
+  --line-height-compact: 1.55;
+  --line-height-body: 1.68;
+  --control-height-sm: 36px;
+  --control-height-md: 44px;
+  --control-height-lg: 48px;
+  --control-padding-sm: 12px;
+  --control-padding-md: 18px;
+  --control-padding-lg: 22px;
+  --badge-height: 28px;
+  --panel-padding-sm: 16px;
+  --panel-padding-md: 20px;
+  --panel-padding-lg: 24px;
+  --surface-panel: var(--color-panel);
+  --surface-soft: var(--color-green-soft-surface);
+  --surface-warm: var(--color-panel-warm);
+  --surface-danger: var(--color-panel-danger);
+  --surface-border: var(--color-line-card);
+  --radius-control: 8px;
+  --radius-card: 8px;
+  --radius-modal: 12px;
+  --motion-fast: 180ms;
+  --motion-base: 220ms;
   --gradient-brand: linear-gradient(
     135deg,
     var(--color-green),
@@ -86,4 +140,10 @@
     var(--color-green),
     var(--color-gold)
   );
+}
+
+@media (max-width: 640px) {
+  :root {
+    --page-gutter: 14px;
+  }
 }
