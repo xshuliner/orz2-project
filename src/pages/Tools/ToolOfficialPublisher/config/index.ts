@@ -80,7 +80,7 @@ export const promptTemplates: PromptTemplate[] = [
   {
     id: 'general',
     label: '通用资讯',
-    caption: '新闻动态、客观报道,强调信息密度',
+    caption: '新闻动态、客观报道，强调信息密度与人类观察',
     accent: '🗞️',
     defaultCheckedPatterns: [
       'promptSystem',
@@ -91,29 +91,35 @@ export const promptTemplates: PromptTemplate[] = [
     ],
     fields: {
       promptSystem:
-        '你是一名资深公众号内容编辑，擅长把复杂事件梳理成清晰、可信、有阅读节奏的资讯文章。要求事实先行、表述克制、引述完整，并在结尾给出 1 条对读者有价值的延伸建议。',
+        '你是一名长期写深度公众号的资讯编辑。文字要可信、克制、有现场感，不像新闻通稿，也不像AI总结。你擅长把复杂事件讲清楚，同时保留人类作者的观察、停顿和判断。避免官话、套话、空洞升华、机械排比，以及“值得思考”“引发热议”“随着时代发展”等AI味表达。多使用具体时间、人物反应、场景细节和现实影响。',
+
       promptContent:
-        '请围绕【主题】撰写一篇 1500–2000 字的资讯类公众号文章。结构参考：1) 60 字以内的导语交代核心事实；2) 三个分论点展开背景、进展与影响；3) 行业/受众视角的解读；4) 一句结尾引导互动。【主题】请用一句话描述事件主体、时间和关键数字。',
-      digest: '60–100 字。聚焦「发生了什么 + 为何重要」，避免形容词堆叠。',
+        '请围绕【主题】写一篇 1500–2200 字的公众号资讯文章。不要按生硬提纲填空，而要像一个真正编辑在讲述一件值得关注的事。文章需要交代：发生了什么、为什么重要、谁会受到影响、背后更深层的变化是什么。可以从一个具体现场、人物反应、数据变化或反常细节切入。段落要适合公众号阅读，长短有变化，允许单句成段。小标题自然，不要像PPT目录。结尾给出一个克制但有价值的观察，不要强行升华。正文请输出微信公众号兼容的 HTML 片段，不要输出 html、body、head 标签，不要使用 Markdown。排版风格参考深度新闻杂志：整体克制、留白充足、信息层次清楚。正文主色使用深灰，辅助说明使用中性灰；小标题可以使用左侧细线或浅灰背景强调，但不要花哨。关键事实、时间、数据可以用 strong 加粗；重要背景可以用 blockquote 做灰底导读。段落之间保持舒适间距，避免大段密集文字。',
+
+      digest:
+        '60–100 字。像编辑写给读者的导读，讲清“发生了什么 + 为什么值得看”，不要像机器摘要，不要堆形容词。',
+
       coverValue:
-        '公众号封面图，主题为【文章主题】，风格现代简约，色调清新，主体居中，留白充足，便于叠加标题文字。',
+        'premium editorial cover, topic:【文章主题】, cinematic documentary photography, realistic texture, restrained emotion, strong focal point, magazine-style composition, typography-friendly negative space, no text, no watermark',
+
       inlineValueList: [
-        '资讯导语示意图，主题呼应【事件主体】，16:9 横版，画面写实克制，中性新闻摄影质感，主体居中留白足。',
-        '关键数据可视化示意图，主题呼应【核心数字/百分比】，16:9 横版，简洁信息图表风格（柱状/折线/饼图二选一），主色不超过两种，背景留白。',
-        '时间线示意图，主题呼应【事件进展节点】，16:9 横版，横向时间轴 + 节点图标，节制现代，便于叠加文字说明。',
-        '分论点 1 场景示意图，主题呼应正文【背景章节】，16:9 横版，写实风，环境氛围对应背景叙述。',
-        '分论点 2 场景示意图，主题呼应正文【进展章节】，16:9 横版，写实风，画面有动态感、推进感。',
-        '分论点 3 场景示意图，主题呼应正文【影响章节】，16:9 横版，写实风，画面呈现影响波及的群体或场景。',
-        '行业视角示意图，主题呼应【行业/赛道】，16:9 横版，工业感或办公场景，色调冷静专业。',
-        '受众视角示意图，主题呼应【目标读者群体】，16:9 横版，日常生活化场景，人物剪影或第一视角。',
-        '结尾延伸建议示意图，主题呼应【行动建议】，16:9 横版，简洁象征性构图（指示牌/箭头/灯塔等隐喻），传递「下一步」感。',
+        'editorial news photography, realistic scene related to【事件主体】, documentary style, natural light, subtle human presence, restrained emotion, premium magazine quality, 16:9, no text, no watermark',
+        'minimal editorial infographic about【核心数字/关键数据】, clean layout, restrained colors, modern publication design, lots of negative space, 16:9, no text, no watermark',
+        'cinematic urban or workplace scene related to【事件影响】, realistic photography, calm tension, natural shadows, documentary magazine style, 16:9, no text, no watermark',
+        'timeline editorial illustration for【事件进展节点】, clean modern layout, subtle icons, premium magazine style, 16:9, no text, no watermark',
+        'human-centered documentary image about【受影响人群】, realistic emotion, shallow depth of field, natural light, quiet storytelling, 16:9, no text, no watermark',
+        'close-up documentary photo about【关键人物/关键物件】, realistic texture, strong focal point, quiet dramatic light, editorial magazine quality, 16:9, no text, no watermark',
+        'wide establishing shot related to【事件发生地点】, realistic urban documentary photography, atmospheric sky, calm but serious tone, 16:9, no text, no watermark',
+        'editorial data visualization about【趋势变化】, abstract bars, curves or map elements, clean premium news design, restrained palette, 16:9, no text, no watermark',
+        'symbolic editorial image about【深层变化/社会影响】, realistic metaphor, restrained emotion, cinematic composition, premium publication style, 16:9, no text, no watermark',
       ],
     },
   },
+
   {
     id: 'culture',
     label: '文化叙事',
-    caption: '节日节气、人文故事,强调温度与共情',
+    caption: '节日节气、人文故事，强调温度与余味',
     accent: '🏮',
     defaultCheckedPatterns: [
       'promptSystem',
@@ -124,29 +130,35 @@ export const promptTemplates: PromptTemplate[] = [
     ],
     fields: {
       promptSystem:
-        '你是一名擅长中国传统文化叙事的公众号作者，文笔温暖细腻，善用典故与生活细节。避免说教，让读者在阅读中自然感受文化与当下的连接。',
+        '你是一名有文化感但不掉书袋的公众号作者。你擅长把传统文化写得温暖、真实、贴近日常，而不是百科式介绍。文字要有生活细节、人物温度和一点余味。避免说教、宏大空话、堆典故、强行拔高。文化不是知识点堆砌，而是今天的人如何重新感受到它。',
+
       promptContent:
-        '请围绕【节日/节气名称】撰写一篇 1200–1800 字的文化叙事文章。结构：1) 一个生活化场景切入；2) 节日/节气的历史源流与习俗；3) 一个真实或半真实的人物故事；4) 回到当下，落到读者的生活仪式感。【节日/节气名称】请直接填写。',
-      digest: '60–100 字。突出文化意象与情感共鸣点，留有余味。',
+        '请围绕【节日/节气名称】写一篇 1200–1800 字的文化叙事文章。不要写成节日百科。可以从一个当代生活场景开始，比如一顿饭、一阵风、一盏灯、一次回家路上的感觉。文章需要自然带出历史源流、传统习俗、文化意象，以及它和今天生活的关系。可以加入一个真实或半真实的人物故事。节奏要温和，有画面感，结尾留一点余味，不要喊口号。正文请输出微信公众号兼容的 HTML 片段，不要输出 html、body、head 标签，不要使用 Markdown。排版风格要有东方文化的安静感：留白多，段落不要挤，小标题可以使用淡米色、浅棕色或细边框营造雅致感。适合使用 blockquote 承载诗意引子、旧俗解释或一小段文化观察。传统意象、节令词、器物名可以适度加粗，但不要堆砌装饰。整体像一本温润的人文杂志，不像百科词条。',
+
+      digest:
+        '60–100 字。突出一个文化意象和一种情绪，让人想点开读，而不是像百科摘要。',
+
       coverValue:
-        '中国风海报，主题【节日/节气】，含传统纹样与水墨质感，主色温暖（朱红/赭石/青绿），主体居中，留白处叠加标题。',
+        'premium Chinese cultural editorial cover, topic:【节日/节气】, poetic atmosphere, traditional motifs, ink wash texture, warm restrained palette, elegant negative space, magazine-style composition, no text, no watermark',
+
       inlineValueList: [
-        '开篇生活化场景插画，主题呼应【节日/节气】的当代日常切入（如灶台、窗前、街巷），16:9 横版，水墨淡彩，氛围温润亲切。',
-        '历史源流意象图，主题呼应【节日/节气】的古代起源（古籍、典故场景、星象/节令图），16:9 横版，工笔淡彩，色调古朴。',
-        '传统习俗细节特写，主题呼应正文中提到的【代表性民俗活动】（如祭祀、张灯、采艾、贴福），16:9 横版，半特写构图，手部动作或器物清晰。',
-        '自然时令意象图，主题呼应【节日/节气对应的物候】（如月圆、桃花、初雪、新麦），16:9 横版，留白多，写意笔触。',
-        '人物故事场景一，主题呼应正文【人物登场场景】，16:9 横版，国风人物剪影 + 环境，注重光影叙事。',
-        '人物故事器物特写，主题呼应【故事中关键的一件物】（书信、香囊、酒盏、绣帕），16:9 横版，静物写意，光线柔和。',
-        '古今对照画面，主题呼应正文【传统与当下的过渡段落】，16:9 横版，左右或上下分屏式构图（一侧古代/一侧现代），色调统一温暖。',
-        '当代仪式感场景，主题呼应【今天读者可做的小仪式】（如焚香、围炉、写信、共膳），16:9 横版，写实生活摄影感，暖光。',
-        '收束氛围图，主题呼应【文末留白意象】（如远山、灯影、月色、烟火余烬），16:9 横版，极简留白，意境悠远。',
+        'contemporary Chinese daily life scene related to【节日/节气】, warm natural light, poetic realism, subtle human presence, editorial photography style, 16:9, no text, no watermark',
+        'traditional cultural still life related to【代表性习俗/器物】, elegant composition, soft light, ink wash inspired texture, premium editorial style, 16:9, no text, no watermark',
+        'ancient Chinese poetic illustration about【历史源流/典故】, refined brushwork, restrained colors, cinematic composition, 16:9, no text, no watermark',
+        'seasonal nature image related to【物候意象】, poetic landscape, soft atmosphere, minimal composition, elegant negative space, 16:9, no text, no watermark',
+        'modern ritual scene about【今天可做的小仪式】, warm indoor light, realistic lifestyle photography, calm emotion, magazine quality, 16:9, no text, no watermark',
+        'family gathering scene related to【团圆/传承】, warm realistic photography, soft indoor light, subtle emotion, premium cultural editorial style, 16:9, no text, no watermark',
+        'poetic close-up of【节令食物/手作】, elegant table setting, natural texture, restrained warm colors, magazine still life photography, 16:9, no text, no watermark',
+        'traditional architecture or old street related to【地域文化】, misty morning light, poetic realism, refined Chinese editorial atmosphere, 16:9, no text, no watermark',
+        'symbolic cultural illustration about【文化余味/精神意象】, ink wash and modern editorial fusion, quiet negative space, elegant composition, 16:9, no text, no watermark',
       ],
     },
   },
+
   {
     id: 'tech',
     label: '科技数码',
-    caption: '产品测评、技术解读,强调数据与逻辑',
+    caption: '产品测评、技术解读，强调体验与判断',
     accent: '💻',
     defaultCheckedPatterns: [
       'promptSystem',
@@ -157,29 +169,35 @@ export const promptTemplates: PromptTemplate[] = [
     ],
     fields: {
       promptSystem:
-        '你是一名科技专栏作者，逻辑清晰、数据敏感，擅长把技术细节翻译成读者可感知的体验差异。避免堆砌参数，强调「对用户意味着什么」。',
+        '你是一名真正懂产品和用户体验的科技作者。不要写成发布会文案、参数说明书或营销软文。你擅长把技术细节翻译成普通人能感知的体验差异。语言清晰、克制、有判断。允许写优点，也要写取舍和小缺点。避免“重新定义”“颠覆行业”“未来已来”等空泛科技套话。',
+
       promptContent:
-        '请围绕【产品/技术主题】撰写一篇 1800–2500 字的深度文章。结构：1) 一句话定位与最大亮点；2) 关键参数/能力对比（可虚构示意表）；3) 三个真实使用场景；4) 与同类产品的取舍分析；5) 一段「是否值得入手」的结论。【产品/技术主题】请填写产品名或技术名词。',
-      digest: '60–100 字。提炼「最关键的 1 个差异化点 + 适合人群」。',
+        '请围绕【产品/技术主题】写一篇 1800–2600 字的公众号科技文章。文章要像一个认真体验过的人在分享判断，而不是复制参数表。可以从一个真实使用瞬间切入，再展开它的核心能力、体验差异、适合人群、同类对比和购买/使用建议。参数可以出现，但必须解释“对用户意味着什么”。结论要有明确立场，也要说明不适合谁。正文请输出微信公众号兼容的 HTML 片段，不要输出 html、body、head 标签，不要使用 Markdown。排版风格要偏现代科技媒体：结构清晰、模块感强、阅读效率高。可以用浅灰或深色系 section 做“体验结论”“适合人群”“不适合人群”“购买建议”等信息卡片。参数不要堆成长表，优先用短列表解释用户感知。关键结论用 strong 加粗，小标题要明确但不夸张。整体像高质量科技评测文章，不像发布会PPT。',
+
+      digest:
+        '60–100 字。提炼最关键的体验差异、适合人群和一个明确判断，不要像产品广告。',
+
       coverValue:
-        '科技感封面，主题【产品/技术】，深色背景（深蓝/墨黑）配荧光色高光，主体居中，构图简洁未来感。',
+        'premium tech editorial cover, topic:【产品/技术】, cinematic lighting, realistic industrial design, dark background, subtle glow accents, futuristic but restrained, magazine-style composition, no text, no watermark',
+
       inlineValueList: [
-        '产品定位主视觉，主题呼应【产品/技术】，16:9 横版，工业摄影质感，深色背景配荧光勾边，主体 3/4 视角居中。',
-        '关键参数对比表示意图，主题呼应【核心参数对比】，16:9 横版，简洁信息图表（参数表/雷达图），主色不超过两种。',
-        '技术拆解示意图，主题呼应【内部结构/工作原理】，16:9 横版，爆炸图或剖面图风格，线稿 + 局部色块强调。',
-        '使用场景 1 实景图，主题呼应正文【场景 1：通勤/移动办公等】，16:9 横版，写实人物 + 产品互动，自然光。',
-        '使用场景 2 实景图，主题呼应正文【场景 2：居家/创作等】，16:9 横版，居家场景，暖光，强调舒适与生产力。',
-        '使用场景 3 实景图，主题呼应正文【场景 3：极限/专业用例】，16:9 横版，户外或专业环境，画面有挑战感。',
-        '同类产品对比图，主题呼应【与竞品并列对比】，16:9 横版，两到三件产品并排展示，简洁背景，便于比较。',
-        '权衡取舍示意图，主题呼应【优劣分析章节】，16:9 横版，象征性构图（天平、双向箭头、滑动条），冷色调。',
-        '结论场景图，主题呼应【是否值得入手】，16:9 横版，单人持有产品的真实使用瞬间，传递「入手后的画面」。',
+        'premium editorial tech photography of【产品/技术】, cinematic industrial lighting, realistic texture, dark clean background, 16:9, no text, no watermark',
+        'real-life usage scenario of【产品/技术】, human interaction, natural light, documentary lifestyle tech photography, 16:9, no text, no watermark',
+        'minimal comparison infographic about【核心参数/能力对比】, clean modern layout, restrained colors, editorial style, 16:9, no text, no watermark',
+        'technical breakdown illustration for【工作原理/内部结构】, modern line art, subtle highlights, premium infographic aesthetic, 16:9, no text, no watermark',
+        'workspace scene using【产品/技术】, cinematic natural light, realistic productivity atmosphere, premium lifestyle-tech editorial style, 16:9, no text, no watermark',
+        'close-up macro shot of【产品细节/交互界面】, realistic material texture, cinematic reflections, premium tech magazine style, 16:9, no text, no watermark',
+        'user testing scene related to【真实体验/痛点】, ordinary person using device or software, natural light, documentary tech editorial style, 16:9, no text, no watermark',
+        'ecosystem diagram illustration about【生态/兼容性】, clean nodes and connections, futuristic restrained design, premium publication style, 16:9, no text, no watermark',
+        'buying decision visual about【适合人群/不适合人群】, split-screen editorial composition, clean modern tech aesthetic, restrained colors, 16:9, no text, no watermark',
       ],
     },
   },
+
   {
     id: 'lifestyle',
     label: '生活方式',
-    caption: '治愈、生活美学,强调轻盈与共鸣',
+    caption: '治愈、生活美学，强调轻盈与真实感',
     accent: '🌿',
     defaultCheckedPatterns: [
       'promptSystem',
@@ -190,29 +208,35 @@ export const promptTemplates: PromptTemplate[] = [
     ],
     fields: {
       promptSystem:
-        '你是一名生活方式类公众号作者，语气温和、节奏舒缓，善用细腻的观察让读者看见日常的美。拒绝贩卖焦虑，每段都要有可感知的画面。',
+        '你是一名生活方式类公众号作者，文字温和、克制、有呼吸感。不要假装治愈，不要贩卖焦虑，不要写鸡汤。你更擅长记录普通生活里的细节：光线、气味、声音、动作、温度和空间感。文章应该像一个真实的人在认真观察生活，而不是AI在制造情绪。',
+
       promptContent:
-        '请围绕【生活主题】撰写一篇 1000–1500 字的生活随笔。结构：1) 一个清晨/午后/夜晚的具体场景；2) 三段日常细节描写（光影、气味、声音、动作）；3) 一个小习惯或小物件的延伸；4) 一句不刻意的感悟。【生活主题】请用 2–6 个字描述，例如：周末厨房、阳台植物、雨天读书。',
-      digest: '60–100 字。捕捉一种生活氛围，避免「治愈」等空泛词。',
+        '请围绕【生活主题】写一篇 1000–1600 字的生活方式文章。不要写成“治愈系模板文”。可以从一个清晨、午后或夜晚的具体瞬间开始，用几个生活细节慢慢展开。文章要有画面、有节奏、有轻微情绪，但不要过度文艺。可以写一个小习惯、小物件或小场景，最后自然收住，不要强行升华。正文请输出微信公众号兼容的 HTML 片段，不要输出 html、body、head 标签，不要使用 Markdown。排版风格要轻盈、干净、有呼吸感：段落短一些，留白多一些，避免信息块过重。可以使用浅米色、淡绿色、暖灰色做柔和背景；小标题不要太硬，可以像杂志栏目标题。适合用少量 blockquote 承载一句生活观察。不要做夸张渐变和复杂装饰，整体像安静的生活杂志页面。',
+
+      digest:
+        '60–100 字。捕捉一种具体生活氛围，不要使用“治愈”“松弛感”等空泛热词堆砌。',
+
       coverValue:
-        '生活方式封面，主题【生活主题】，暖色调（米白/奶油/浅木色），主体居中，构图松弛留白，质感自然。',
+        'premium lifestyle editorial photography, topic:【生活主题】, warm natural light, relaxed composition, realistic texture, calm atmosphere, magazine cover style, typography-friendly negative space, no text, no watermark',
+
       inlineValueList: [
-        '开篇时刻氛围图，主题呼应【清晨/午后/夜晚的开场场景】，16:9 横版，自然光摄影质感，留白多，色调温柔。',
-        '细节 1：光影特写，主题呼应正文【光影描写段落】（如窗格阳光、台灯洒桌），16:9 横版，半特写，颗粒感胶片质感。',
-        '细节 2：气味/质感特写，主题呼应【气味或触感段落】（咖啡热气、毛毯纹理），16:9 横版，特写镜头，浅景深。',
-        '细节 3：声音/动作意象，主题呼应【声音或动作段落】（翻书、雨打窗、勺子搅拌），16:9 横版，动作瞬间定格，画面轻盈。',
-        '小物件静物图，主题呼应【正文中具体提到的小物件】，16:9 横版，单品静物摄影，干净背景，质感细腻。',
-        '小习惯进行时图，主题呼应【正文中的微小日常习惯】（如泡茶、记事、拉伸），16:9 横版，第一人称或斜俯视角。',
-        '居家/空间布置图，主题呼应【主题所在的空间整体感】（厨房、阳台、书桌），16:9 横版，宽场景，构图舒展。',
-        '独处时刻图，主题呼应【一个人安静相处的画面】，16:9 横版，背影或剪影，氛围安宁不孤独。',
-        '收束感悟图，主题呼应【文末感悟意象】（窗外、远景、植物、天空），16:9 横版，极简构图，留白足。',
+        'quiet lifestyle photography related to【生活主题】, soft morning or afternoon light, realistic home scene, calm atmosphere, 16:9, no text, no watermark',
+        'close-up editorial photo of daily details related to【光影/气味/声音】, shallow depth of field, warm natural light, realistic texture, 16:9, no text, no watermark',
+        'minimal interior scene about【空间/小物件】, relaxed composition, premium magazine photography, natural shadows, 16:9, no text, no watermark',
+        'human solitude moment related to【独处/习惯】, back view or partial figure, cinematic soft light, emotionally restrained, 16:9, no text, no watermark',
+        'ending atmosphere image related to【文末意象】, window light, plants, sky or quiet room, minimal composition, elegant negative space, 16:9, no text, no watermark',
+        'slow morning routine scene about【日常小习惯】, coffee, book, blanket or desk, warm natural light, realistic lifestyle editorial style, 16:9, no text, no watermark',
+        'seasonal lifestyle image related to【季节/天气】, rain, sunlight, breeze or evening sky, calm poetic realism, premium magazine composition, 16:9, no text, no watermark',
+        'hands interacting with【小物件/手作/家务】, close-up lifestyle photography, natural texture, soft shadows, quiet storytelling, 16:9, no text, no watermark',
+        'neighborhood walking scene related to【日常散步/城市角落】, realistic street light, gentle human presence, calm editorial photography, 16:9, no text, no watermark',
       ],
     },
   },
+
   {
     id: 'business',
     label: '商业财经',
-    caption: '行业分析、商业洞察,强调理性与深度',
+    caption: '行业分析、商业洞察，强调理性与判断',
     accent: '📈',
     defaultCheckedPatterns: [
       'promptSystem',
@@ -223,29 +247,35 @@ export const promptTemplates: PromptTemplate[] = [
     ],
     fields: {
       promptSystem:
-        '你是一名商业财经专栏作者，观点鲜明、论据扎实，擅长把行业事件放到产业链与时间维度里审视。语言克制，避免情绪化结论。',
+        '你是一名商业财经专栏作者，擅长把公司、行业和政策放进更长的周期里观察。文章要有判断，但不要情绪化；要有数据，但不要堆砌报表；要有深度，但不要写成研报。你的语言克制、有锋芒、有现实感。避免“资本寒冬”“风口已至”“下半场”等陈词滥调。',
+
       promptContent:
-        '请围绕【商业话题】撰写一篇 2000–2800 字的深度分析。结构：1) 事件复盘与时间线；2) 产业链上下游影响（可用「上游/中游/下游」三段式）；3) 头部玩家的策略对比；4) 未来 6–12 个月可能的演化路径；5) 风险与机会。【商业话题】请填写具体公司/赛道/政策名称。',
-      digest: '60–100 字。给出「核心判断 + 关键数据/事实」。',
+        '请围绕【商业话题】写一篇 2000–2800 字的公众号深度分析。不要写成标准研报，也不要写成财经新闻拼贴。文章需要讲清：这件事为什么发生、商业逻辑是什么、产业链谁受益谁承压、头部玩家如何选择、未来 6–12 个月可能怎么演化。可以使用数据、案例和对比，但每个数据都要服务于判断。结尾给出风险与机会，不要喊口号。正文请输出微信公众号兼容的 HTML 片段，不要输出 html、body、head 标签，不要使用 Markdown。排版风格参考高端商业杂志：理性、干净、有纵深。可以使用深灰、金色点缀、浅灰底信息卡片。核心判断、关键数据、风险提示要通过 section 或 blockquote 单独呈现。列表要短而锋利，避免长篇堆砌。小标题要像商业专栏，不要像研报目录。整体要有专业感，但不能像证券报告。',
+
+      digest:
+        '60–100 字。给出核心判断 + 一个关键事实或数据。语气专业克制，不要像投资号标题党。',
+
       coverValue:
-        '商业财经封面，主题【商业话题】，深色背景（墨黑/深灰）配金色高光，主体居中，构图稳重专业。',
+        'premium business editorial cover, topic:【商业话题】, dark charcoal background, subtle golden highlights, cinematic corporate atmosphere, restrained luxury, strong focal point, magazine-style composition, no text, no watermark',
+
       inlineValueList: [
-        '事件复盘时间线图，主题呼应【商业话题】的关键节点，16:9 横版，横向时间轴，节制专业，金色高光点缀。',
-        '行业全景示意图，主题呼应【赛道格局】，16:9 横版，俯视城市群/数据网格隐喻，冷色调，传递宏观感。',
-        '上游环节示意图，主题呼应【原材料/技术/资本上游】，16:9 横版，工业摄影质感，机械/原料/数据中心意象。',
-        '中游环节示意图，主题呼应【生产/平台/服务中游】，16:9 横版，仓储/产线/办公楼宇，强调效率与连接。',
-        '下游环节示意图，主题呼应【渠道/消费者下游】，16:9 横版，零售/物流/终端用户场景，画面更接地气。',
-        '头部玩家 A 策略示意图，主题呼应【对比对象 A 的战略侧重】，16:9 横版，企业楼宇/团队会议/产品矩阵隐喻。',
-        '头部玩家 B 策略示意图，主题呼应【对比对象 B 的战略侧重】，16:9 横版，与上一张形成视觉差异（不同色调或不同构图）。',
-        '未来演化路径示意图，主题呼应【6–12 个月趋势预测】，16:9 横版，分叉路径/趋势曲线，金色高光指向远端。',
-        '风险与机会矩阵图，主题呼应【风险/机会章节】，16:9 横版，象限图或天平意象，冷暖色对比，专业克制。',
+        'business editorial photography related to【商业话题】, city skyline or corporate environment, cinematic lighting, restrained luxury, 16:9, no text, no watermark',
+        'industry landscape visualization about【赛道格局】, premium data network aesthetic, dark background, subtle gold highlights, 16:9, no text, no watermark',
+        'supply chain editorial image related to【上游/中游/下游】, realistic industrial or logistics scene, documentary style, 16:9, no text, no watermark',
+        'minimal strategy comparison infographic about【头部玩家对比】, clean business magazine layout, restrained colors, 16:9, no text, no watermark',
+        'risk and opportunity matrix visualization about【风险/机会】, elegant financial editorial design, dark professional palette, 16:9, no text, no watermark',
+        'executive meeting scene related to【关键决策】, realistic corporate photography, muted tones, glass reflection, calm tension, 16:9, no text, no watermark',
+        'market trend chart visualization about【增长/下滑趋势】, premium financial editorial design, clean lines, dark restrained background, 16:9, no text, no watermark',
+        'consumer behavior scene related to【用户需求变化】, realistic retail, office or digital payment moment, documentary business photography, 16:9, no text, no watermark',
+        'macro economy symbolic image about【政策/周期影响】, city lights, documents, subtle data overlay, cinematic business magazine style, 16:9, no text, no watermark',
       ],
     },
   },
+
   {
     id: 'education',
     label: '教育培训',
-    caption: '知识科普、课程学习,强调结构与可学性',
+    caption: '知识科普、课程学习，强调可学与可用',
     accent: '📚',
     defaultCheckedPatterns: [
       'promptSystem',
@@ -256,29 +286,35 @@ export const promptTemplates: PromptTemplate[] = [
     ],
     fields: {
       promptSystem:
-        '你是一名教育专栏作者，擅长把抽象概念翻译成可学的步骤。表达严谨，案例具体，每个观点都要让读者「读完能用」。',
+        '你是一名懂教学设计的教育作者。你擅长把抽象知识讲成读者能理解、能练习、能立刻使用的内容。不要像教材，也不要像培训广告。表达要清楚、有层次、有例子。每个概念都要解释“它解决什么问题”。每个建议都要尽量可执行。',
+
       promptContent:
-        '请围绕【学习主题】撰写一篇 1500–2200 字的科普/教程类文章。结构：1) 一句话点明「为什么要学」；2) 三个核心概念，用类比和示例解释；3) 一份可执行的学习路径或练习步骤；4) 常见误区与避坑指南；5) 推荐 2–3 个延伸资料。【学习主题】请填写具体技能/学科/工具名。',
-      digest: '60–100 字。突出「读者将掌握的 1 个核心能力 + 适合人群」。',
+        '请围绕【学习主题】写一篇 1500–2200 字的公众号科普/教程文章。文章要让读者读完真的知道下一步怎么做。可以从一个常见困惑或真实学习场景切入，再解释核心概念、常见误区、练习路径和延伸资料。不要堆术语；如果出现术语，要用类比、例子或小场景解释。建议给出 3–5 步可执行路径。正文请输出微信公众号兼容的 HTML 片段，不要输出 html、body、head 标签，不要使用 Markdown。排版风格要清爽、可学习、低压力：多用小标题、短段落、编号列表和提示卡片。核心概念可以用浅蓝或浅灰背景 section 单独解释；练习步骤用 ol；误区用 ul 或对比式段落呈现。重点是让读者一眼能找到“概念、例子、方法、练习”。不要做花哨装饰，像一本好读的学习手册。',
+
+      digest:
+        '60–100 字。突出读者读完能掌握什么能力、适合谁、能解决什么具体问题。',
+
       coverValue:
-        '教育类封面，主题【学习主题】，浅色背景（米白/淡蓝）配简洁插画或图表元素，主体居中，构图理性清晰。',
+        'premium education editorial cover, topic:【学习主题】, clean light background, elegant illustration and diagram elements, calm blue or warm white palette, clear composition, magazine-style, no text, no watermark',
+
       inlineValueList: [
-        '学习动机引入图，主题呼应【为什么要学】，16:9 横版，干净插画风，象征性意象（钥匙/灯泡/阶梯），浅色背景。',
-        '核心概念 1 示意图，主题呼应【第一个概念 + 其类比】，16:9 横版，信息图风格，类比对照清晰。',
-        '核心概念 2 示意图，主题呼应【第二个概念 + 其类比】，16:9 横版，与上一张保持视觉一致（同色系、同插画风）。',
-        '核心概念 3 示意图，主题呼应【第三个概念 + 其类比】，16:9 横版，同系列插画，构图各异避免雷同。',
-        '学习路径流程图，主题呼应【可执行学习路径】，16:9 横版，从左到右的步骤箭头，节点 3–5 个，配简短标签。',
-        '练习步骤示意图，主题呼应【具体练习动作】，16:9 横版，半特写学习场景（笔记、屏幕、白板），写实。',
-        '常见误区图示，主题呼应【典型错误做法】，16:9 横版，对比构图（左错右对 / 红叉绿勾），克制不夸张。',
-        '避坑指南示意图，主题呼应【正确做法/检查清单】，16:9 横版，清单列表风格插画，绿色或蓝色主色调。',
-        '延伸资料推荐图，主题呼应【书目/工具/课程】，16:9 横版，书脊/书页/工具图标平铺，质感整齐。',
+        'editorial education illustration about【为什么要学】, clean light background, symbolic object like ladder, key or lamp, premium magazine style, 16:9, no text, no watermark',
+        'concept explanation infographic about【核心概念】, simple analogy visualization, clean layout, restrained colors, 16:9, no text, no watermark',
+        'realistic study scene related to【学习过程】, notebook, screen or whiteboard, natural light, calm productive atmosphere, 16:9, no text, no watermark',
+        'step-by-step learning path visualization about【练习路径】, modern flowchart, 3 to 5 steps, clean editorial design, 16:9, no text, no watermark',
+        'common mistakes comparison illustration about【常见误区】, left-right contrast, clear but not childish, modern education design, 16:9, no text, no watermark',
+        'teacher explaining【关键知识点】 on whiteboard or tablet, realistic classroom or online learning scene, soft natural light, 16:9, no text, no watermark',
+        'practice worksheet or notebook scene about【练习任务】, pencil marks, clean desk, realistic texture, calm learning atmosphere, 16:9, no text, no watermark',
+        'knowledge structure mind map about【知识框架】, elegant nodes and branches, premium education editorial design, light background, 16:9, no text, no watermark',
+        'learning outcome scene related to【应用场景】, student or professional using new skill in real life, warm realistic editorial photography, 16:9, no text, no watermark',
       ],
     },
   },
+
   {
     id: 'emotion',
     label: '情感心理',
-    caption: '情感关系、心理疗愈,强调共情与分寸',
+    caption: '情感关系、心理疗愈，强调共情与分寸',
     accent: '🌙',
     defaultCheckedPatterns: [
       'promptSystem',
@@ -289,29 +325,35 @@ export const promptTemplates: PromptTemplate[] = [
     ],
     fields: {
       promptSystem:
-        '你是一名情感心理类公众号作者，笔触克制、立场温和，不评判、不说教，让读者在阅读中感到被理解。避免使用「你必须」「你应该」等命令式表达。',
+        '你是一名情感心理类公众号作者。你的文字温柔但不鸡汤，共情但不讨好，克制但不冷漠。不要评判读者，不要使用“你必须”“你应该”这类命令式表达。你擅长把复杂情绪放回具体生活场景里，让读者感到被理解，而不是被教育。心理学概念可以用，但必须讲成人话。',
+
       promptContent:
-        '请围绕【情感话题】撰写一篇 1200–1800 字的文章。结构：1) 一个具体而微小的生活场景切入；2) 描述该情境下普遍的心理状态；3) 提供 1 个心理学视角的解读（可用「依恋类型」「情绪 ABC」等概念但要解释清楚）；4) 给读者 1 个可立刻尝试的小练习；5) 留一句温柔的收束。【情感话题】请填写具体场景，例如：亲密关系中的边界、原生家庭、职场情绪。',
-      digest: '60–100 字。传递一种被理解的感觉，不喊口号、不贩卖焦虑。',
+        '请围绕【情感话题】写一篇 1200–1800 字的公众号文章。不要写成情绪鸡汤或心理学讲义。可以从一个很小的生活场景切入，比如一条没回的消息、一顿沉默的饭、一次忍住没说出口的话。文章需要描述这种情绪为什么会出现，用一个心理学视角帮助读者理解它，再给一个可以立刻尝试的小练习。结尾要温柔、克制，不要说教。正文请输出微信公众号兼容的 HTML 片段，不要输出 html、body、head 标签，不要使用 Markdown。排版风格要柔和、安静、有陪伴感：段落不要太长，允许单句成段。可以使用淡紫、暖灰、浅米色背景承载“心理学视角”“给自己的小练习”等内容。不要用过多感叹号，不要鸡汤式大字报。blockquote 适合放一两句克制的共情表达。整体像深夜读到的一篇温柔专栏。',
+
+      digest:
+        '60–100 字。传递一种“被理解”的感觉，点出情绪场景和文章能带来的一个小帮助。',
+
       coverValue:
-        '情感心理封面，主题【情感话题】，柔和色调（雾蓝/米杏/淡紫），主体居中，构图留白安静，避免尖锐对比。',
+        'premium emotional psychology editorial cover, topic:【情感话题】, soft muted colors, quiet negative space, subtle human silhouette, cinematic soft light, calm and restrained atmosphere, no text, no watermark',
+
       inlineValueList: [
-        '开篇微小场景插画，主题呼应【生活切入场景】（如深夜对话、地铁回望、餐桌沉默），16:9 横版，低饱和水彩，氛围克制。',
-        '内心独白意象图，主题呼应【主角内心状态】，16:9 横版，半透明剪影 / 双重曝光，朦胧诗意。',
-        '关系互动场景图，主题呼应【人与人的具体互动】，16:9 横版，两个剪影或背影，距离感呼应文字。',
-        '心理学概念示意图，主题呼应【引入的心理学概念】（依恋类型/情绪 ABC 等），16:9 横版，简洁示意（圆环、坐标、流程），主色不超过两种。',
-        '情绪坐标/状态图，主题呼应【该状态在情绪光谱中的位置】，16:9 横版，柔和图表风格，雾蓝/米杏/淡紫主色。',
-        '自我对话场景，主题呼应【与自己相处的画面】（如镜前、夜灯、独自散步），16:9 横版，柔光，画面静。',
-        '小练习场景一，主题呼应【可立刻尝试的练习】（呼吸、书写、设定边界），16:9 横版，半特写动作，光线温和。',
-        '小练习收束图，主题呼应【练习完成后的状态】（一杯热饮、灯下书写完毕），16:9 横版，安静温暖，颗粒感。',
-        '收束意象图，主题呼应【文末温柔收束】（月光、烛火、晨曦），16:9 横版，极简留白，色调安宁。',
+        'soft editorial illustration about【生活切入场景】, muted colors, quiet human emotion, cinematic composition, 16:9, no text, no watermark',
+        'symbolic psychology image about【内心状态】, double exposure silhouette, soft light, poetic but restrained, 16:9, no text, no watermark',
+        'relationship distance scene related to【人与人的互动】, two figures, subtle body language, calm tension, realistic editorial photography, 16:9, no text, no watermark',
+        'minimal psychology concept diagram about【心理学概念】, clean shapes, soft muted palette, easy to understand, 16:9, no text, no watermark',
+        'quiet self-care practice scene related to【小练习】, writing, breathing or walking alone, warm soft light, realistic texture, 16:9, no text, no watermark',
+        'phone message scene related to【未说出口的话/未回复的消息】, close-up hands, dim warm light, quiet emotional tension, 16:9, no text, no watermark',
+        'night window scene about【孤独/自我对话】, soft city lights, subtle silhouette, calm muted colors, cinematic editorial style, 16:9, no text, no watermark',
+        'gentle conversation scene related to【边界/沟通】, two people sitting apart, natural body language, warm restrained photography, 16:9, no text, no watermark',
+        'symbolic healing image about【情绪松动/重新理解自己】, soft dawn light, open space, poetic minimal composition, premium editorial style, 16:9, no text, no watermark',
       ],
     },
   },
+
   {
     id: 'travel',
     label: '旅行探索',
-    caption: '旅行攻略、城市探店,强调实用与画面感',
+    caption: '旅行攻略、城市探店，强调实用与画面感',
     accent: '🗺️',
     defaultCheckedPatterns: [
       'promptSystem',
@@ -322,29 +364,35 @@ export const promptTemplates: PromptTemplate[] = [
     ],
     fields: {
       promptSystem:
-        '你是一名旅行专栏作者，文字有画面感，攻略有实操性。避免堆砌形容词，每条建议都包含可执行信息（时间、价格、预约方式）。',
+        '你是一名旅行专栏作者，既有画面感，也有实操性。不要写成景点百科，也不要堆“绝美”“宝藏”“治愈”等空泛词。你的文章要让读者真的知道怎么去、什么时候去、怎么订、哪里值得花时间、哪里可以跳过。文字里要有真实行走感、天气、光线、路程和人的状态。',
+
       promptContent:
-        '请围绕【目的地/主题】撰写一篇 1800–2500 字的旅行文章。结构：1) 一句话定位目的地最打动人的特质；2) 三天两晚或两天一夜的行程表（按上午/下午/晚上组织）；3) 必去 3 处的具体描述（亮点 + 何时去 + 怎么订）；4) 美食/住宿/避坑各 1 个本地化建议；5) 出发前必带的 1 样东西。【目的地/主题】请填写具体城市/街区/主题，例如：京都秋日、上海武康路。',
-      digest: '60–100 字。点出「最不能错过的一件事 + 适合谁」。',
+        '请围绕【目的地/主题】写一篇 1800–2500 字的公众号旅行文章。不要写成流水账攻略。可以从抵达后的一个画面开始，比如清晨街口、车站出口、第一口食物或一段路。文章需要包含行程建议、必去地点、吃住建议、交通/预约/预算/避坑信息。实用信息要具体，但表达要有故事感。适合安排成两天一夜或三天两晚。结尾给出适合什么人去、不适合什么人去。正文请输出微信公众号兼容的 HTML 片段，不要输出 html、body、head 标签，不要使用 Markdown。排版风格要像旅行杂志和实用攻略的结合：开头有画面，中段信息清楚。可以使用浅蓝、沙色、浅绿色等自然色作为提示卡背景。路线、预算、交通、预约、避坑建议要用 section、ul 或 ol 单独呈现，便于收藏。小标题可以带一点地点感，但不要标题党。整体要既好看，又真的方便读者照着走。',
+
+      digest:
+        '60–100 字。点出目的地最值得去的一件事、适合谁，以及一个实用提醒。',
+
       coverValue:
-        '旅行封面，主题【目的地/主题】，明亮自然光感（晨光/街景/远山），主体居中，构图通透有呼吸。',
+        'premium travel magazine cover, destination:【目的地/主题】, cinematic natural light, realistic editorial travel photography, strong sense of place, airy composition, typography-friendly negative space, no text, no watermark',
+
       inlineValueList: [
-        '目的地标志性画面，主题呼应【目的地最打动人的特质】，16:9 横版，明亮自然光，全景或地标特写，色彩通透。',
-        '行程表 Day 1 示意图，主题呼应【第一天行程】，16:9 横版，地图风格 + 时间标记（早/中/晚图标），平面插画。',
-        '行程表 Day 2/3 示意图，主题呼应【后续行程】，16:9 横版，与 Day 1 同系列地图风格，路线连接清晰。',
-        '必去地点 1 实景图，主题呼应【必去 1 的招牌画面】，16:9 横版，写实摄影质感，最佳时段光线（黄金时刻）。',
-        '必去地点 2 实景图，主题呼应【必去 2 的招牌画面】，16:9 横版，与必去 1 形成视觉差异（不同光线/构图）。',
-        '必去地点 3 实景图，主题呼应【必去 3 的招牌画面】，16:9 横版，与前两张构成节奏（远景/中景/特写交替）。',
-        '当地美食推荐图，主题呼应【本地化美食建议】，16:9 横版，桌面俯视或半特写，自然光，画面有食欲。',
-        '住宿/避坑示意图，主题呼应【住宿建议或避坑提示】，16:9 横版，分屏式构图（推荐 vs 避免）或舒适民宿场景。',
-        '出发前装备图，主题呼应【出发必带的 1 样东西】，16:9 横版，行李物品平铺摆拍，干净背景，质感整齐。',
+        'editorial travel photography of【目的地标志性画面】, golden hour or soft morning light, realistic texture, cinematic atmosphere, 16:9, no text, no watermark',
+        'travel route map illustration for【行程安排】, clean editorial design, subtle icons, premium magazine layout, 16:9, no text, no watermark',
+        'realistic street scene in【目的地】, local life, natural light, human presence, documentary travel photography, 16:9, no text, no watermark',
+        'food photography related to【本地美食】, natural side light, appetizing but realistic, editorial magazine style, 16:9, no text, no watermark',
+        'travel essentials flat lay related to【出发前必带物品】, clean background, realistic texture, premium editorial composition, 16:9, no text, no watermark',
+        'hotel or guesthouse scene related to【住宿建议】, warm interior light, clean realistic travel lifestyle photography, 16:9, no text, no watermark',
+        'transportation scene related to【交通方式】, train station, bus stop, airport or walking route, documentary travel style, 16:9, no text, no watermark',
+        'hidden local spot image about【小众地点/可跳过景点】, quiet street corner, realistic atmosphere, human-scale travel photography, 16:9, no text, no watermark',
+        'budget and booking visual about【预算/预约/避坑】, elegant travel planning flat lay, tickets, calendar, map, clean editorial composition, 16:9, no text, no watermark',
       ],
     },
   },
+
   {
     id: 'food',
     label: '美食烹饪',
-    caption: '食谱教程、餐厅评测,强调步骤与诱惑力',
+    caption: '食谱教程、餐厅评测，强调步骤与诱惑力',
     accent: '🍜',
     defaultCheckedPatterns: [
       'promptSystem',
@@ -355,29 +403,35 @@ export const promptTemplates: PromptTemplate[] = [
     ],
     fields: {
       promptSystem:
-        '你是一名美食作者，文字要有「看着饿」的感染力。食谱要严谨、份量要精确、关键步骤要点拨「为什么这样做」。',
+        '你是一名美食作者，文字要让人有食欲，但不要夸张油腻。你擅长写味道、火候、香气、口感和厨房里的细节。食谱要严谨，份量、时间、火候和判断标准都要清楚。餐厅评测要真实，不要像广告。关键是告诉读者：为什么这样做更好吃，为什么这口值得记住。',
+
       promptContent:
-        '请围绕【菜名/餐厅】撰写一篇 1500–2200 字的美食文章。结构：1) 一句话勾起食欲的开场；2) 风味定位与灵感来源；3) 食材清单（含份量，4–6 人份）；4) 关键步骤拆解（含火候/时间/判断标准，至少标注 3 个「这样做更好吃」的小贴士）；5) 一份适合搭配的酒水/餐具/场景建议。【菜名/餐厅】请填写具体菜名或餐厅名。',
-      digest: '60–100 字。传递这道菜/这家店的「一口记忆点」。',
+        '请围绕【菜名/餐厅】写一篇 1500–2200 字的公众号美食文章。如果是菜谱，要包含风味来源、食材清单、关键步骤、火候时间、判断标准和至少 3 个“这样做更好吃”的具体提示。如果是餐厅，要写清招牌菜、口味记忆点、环境、价格区间、适合场景和是否值得专程去。不要写成菜单介绍，要有香气、声音、动作和入口瞬间。正文请输出微信公众号兼容的 HTML 片段，不要输出 html、body、head 标签，不要使用 Markdown。排版风格要有食欲但不油腻：可以使用暖色、浅米色、木质感色系作为背景。食材清单、步骤、火候判断、好吃秘诀要用清晰的 section、ul、ol 呈现，便于读者照做。描写味道的段落可以更有画面感，步骤部分要更利落。重点提示可以用浅色卡片，但不要像菜单广告。',
+
+      digest:
+        '60–100 字。传递这道菜/这家店最有记忆点的一口，以及为什么值得看。',
+
       coverValue:
-        '美食封面，主题【菜名/餐厅】，暖色调（米黄/赭红/原木），主体居中，构图饱满有食欲。',
+        'premium food editorial cover, topic:【菜名/餐厅】, warm natural side light, appetizing realistic texture, elegant table styling, magazine photography, rich but restrained colors, no text, no watermark',
+
       inlineValueList: [
-        '成品开胃主图，主题呼应【菜品最终成品】，16:9 横版，45° 视角，自然侧光，热气感或酱汁光泽明显。',
-        '风味灵感意象图，主题呼应【风味来源/灵感故事】（如产地市集、海风、香料），16:9 横版，写意氛围摄影。',
-        '食材平铺图，主题呼应【完整食材清单】，16:9 横版，俯视平铺（flat-lay），原木或浅色桌面，份量整齐。',
-        '关键步骤 1 特写，主题呼应【步骤 1：处理/腌制等】，16:9 横版，俯视或斜俯视，手部动作清晰，自然光。',
-        '关键步骤 2 特写，主题呼应【步骤 2：火候/翻炒等】，16:9 横版，锅具特写，蒸汽/油花有动感。',
-        '关键步骤 3 特写，主题呼应【步骤 3：收汁/出锅等】，16:9 横版，临近成品的关键瞬间，色彩浓郁。',
-        '出锅瞬间图，主题呼应【成品离火/装盘那一刻】，16:9 横版，热气腾腾，自然侧光，画面有「香气」。',
-        '摆盘细节图，主题呼应【装盘构图与点缀】，16:9 横版，半俯视，餐具与配色讲究，质感细腻。',
-        '餐桌搭配场景图，主题呼应【酒水/餐具/场景建议】，16:9 横版，完整餐桌氛围，暖光，人物剪影可有可无。',
+        'premium food photography of【成品菜】, 45 degree angle, warm natural side light, steam or glossy sauce, realistic appetizing texture, 16:9, no text, no watermark',
+        'ingredient flat lay for【食材清单】, natural wood or stone surface, clean arrangement, editorial food magazine style, 16:9, no text, no watermark',
+        'cooking process close-up for【关键步骤】, hands in motion, pan, steam, oil shimmer, realistic kitchen light, 16:9, no text, no watermark',
+        'plating detail of【摆盘/出锅瞬间】, shallow depth of field, elegant tableware, warm light, premium food editorial style, 16:9, no text, no watermark',
+        'dining table scene related to【搭配建议/用餐场景】, cozy warm light, subtle human presence, realistic restaurant or home atmosphere, 16:9, no text, no watermark',
+        'macro texture shot of【口感记忆点】, crispy edge, tender inside, glossy sauce or layered texture, premium food photography, 16:9, no text, no watermark',
+        'restaurant environment photo related to【餐厅氛围】, warm lighting, realistic guests and table details, editorial dining photography, 16:9, no text, no watermark',
+        'chef hands preparing【风味来源/关键调味】, spices, sauce, knife work or wok heat, cinematic kitchen documentary style, 16:9, no text, no watermark',
+        'serving moment image related to【入口瞬间/分享场景】, chopsticks, spoon or fork lifting food, warm realistic light, appetizing editorial composition, 16:9, no text, no watermark',
       ],
     },
   },
+
   {
     id: 'fitness',
     label: '健身运动',
-    caption: '训练计划、运动科学,强调安全与可执行',
+    caption: '训练计划、运动科学，强调安全与可执行',
     accent: '🏃',
     defaultCheckedPatterns: [
       'promptSystem',
@@ -388,22 +442,26 @@ export const promptTemplates: PromptTemplate[] = [
     ],
     fields: {
       promptSystem:
-        '你是一名健身专栏作者，懂训练科学也懂普通人。坚持「动作质量 > 强度」「循序渐进」「个体差异」三原则。',
+        '你是一名懂训练科学也懂普通人的健身作者。坚持“动作质量 > 强度”“循序渐进”“个体差异”三原则。不要制造身材焦虑，不要用夸张承诺吸引读者。你的文章要安全、清楚、可执行，能让普通人知道今天该怎么开始、哪里容易做错、什么时候该停止。',
+
       promptContent:
-        '请围绕【训练目标/项目】撰写一篇 1800–2500 字的健身文章。结构：1) 一句话定位适用人群与目标；2) 训练前必知的安全提醒（含 2–3 个常见错误）；3) 一份 4 周渐进计划（每周 3–4 练，每次 30–60 分钟）；4) 动作清单（含目标肌群、组数、次数、休息时间、注意事项）；5) 饮食与恢复建议（不复杂、可执行）。【训练目标/项目】请填写，例如：新手减脂、久坐人群腰背强化、马拉松备赛。',
-      digest: '60–100 字。突出「训练频率 + 1 个最关键的安全提醒 + 适合人群」。',
+        '请围绕【训练目标/项目】写一篇 1800–2500 字的公众号健身文章。文章要先说明适合人群和不适合人群，再讲安全提醒、常见错误、4 周渐进计划、动作清单、饮食恢复建议。动作说明必须包含目标肌群、组数、次数、休息时间、注意事项和替代动作。语气要鼓励但不鸡血，不承诺快速逆袭。正文请输出微信公众号兼容的 HTML 片段，不要输出 html、body、head 标签，不要使用 Markdown。排版风格要清晰、有力量但不焦虑：可以使用黑白灰、浅绿色或运动感蓝色做辅助色。适合人群、安全提醒、训练计划、动作说明、恢复建议要拆成清楚模块。动作清单用列表呈现，4 周计划用分段或卡片呈现。安全提醒要醒目但不吓人。整体像专业训练指南，不像卖课海报。',
+
+      digest: '60–100 字。说明适合人群、训练频率和最关键的安全提醒。',
+
       coverValue:
-        '运动健身封面，主题【训练目标/项目】，高对比度（深色配荧光色/橙白），主体居中，构图充满动感。',
+        'premium fitness editorial cover, topic:【训练目标/项目】, dynamic sports photography, cinematic contrast lighting, realistic athlete or ordinary person training, energetic but not aggressive, magazine-style composition, no text, no watermark',
+
       inlineValueList: [
-        '目标人群形象图，主题呼应【适用人群与训练目标】，16:9 横版，运动摄影质感，人物剪影或半身像，高对比布光。',
-        '安全提醒错误姿势对比图，主题呼应【常见动作错误】，16:9 横版，左错右对的并列构图，红/绿勾叉点缀。',
-        '4 周计划日历图，主题呼应【渐进式周计划】，16:9 横版，4×7 网格日历风格，训练日 vs 休息日色块清晰。',
-        '动作 1 示意图，主题呼应【第一个核心动作】，16:9 横版，全身或半身动作示范，箭头/肌群高亮辅助。',
-        '动作 2 示意图，主题呼应【第二个核心动作】，16:9 横版，与动作 1 视角错开（侧面/正面交替），保持系列感。',
-        '动作 3 示意图，主题呼应【第三个核心动作】，16:9 横版，重点提示发力肌群（局部色块高亮）。',
-        '动作 4 / 拉伸示意图，主题呼应【辅助动作或拉伸放松】，16:9 横版，画面节奏舒缓，色调稍冷以区分主训练。',
-        '饮食搭配示意图，主题呼应【可执行饮食建议】，16:9 横版，俯视餐盘 flat-lay，蛋白/碳水/蔬菜分区明显。',
-        '恢复与睡眠图，主题呼应【恢复建议章节】，16:9 横版，写实生活摄影（拉伸/睡眠/泡沫轴），暖光氛围。',
+        'realistic fitness editorial photography related to【训练目标】, ordinary person training safely, cinematic gym or outdoor light, 16:9, no text, no watermark',
+        'exercise form comparison illustration about【常见错误动作】, correct vs incorrect posture, clean instructional design, 16:9, no text, no watermark',
+        '4-week training plan calendar visualization for【训练计划】, clean modern layout, training and rest days clearly marked, 16:9, no text, no watermark',
+        'exercise demonstration image for【核心动作】, clear body posture, subtle muscle highlight, professional instructional style, 16:9, no text, no watermark',
+        'recovery and nutrition scene related to【饮食/恢复建议】, balanced meal, stretching or sleep routine, realistic lifestyle sports photography, 16:9, no text, no watermark',
+        'warm-up routine illustration about【热身动作】, mobility drills, clean sports instructional design, realistic body posture, 16:9, no text, no watermark',
+        'progressive overload visualization about【循序渐进原则】, simple chart and training icons, clean editorial fitness design, 16:9, no text, no watermark',
+        'outdoor training scene related to【替代动作/低门槛开始】, ordinary person exercising safely, morning light, encouraging but realistic mood, 16:9, no text, no watermark',
+        'injury prevention image related to【停止信号/安全提醒】, stretching, joint care or rest moment, calm professional sports editorial style, 16:9, no text, no watermark',
       ],
     },
   },
