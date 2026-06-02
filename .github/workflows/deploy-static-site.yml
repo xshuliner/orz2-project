@@ -1,0 +1,217 @@
+name: Deploy static site
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        description: Name of the uploaded static site artifact.
+        required: true
+        type: string
+      ssh_host:
+        description: SSH host name or IP address.
+        required: true
+        type: string
+      ssh_port:
+        description: SSH port.
+        required: false
+        default: 22
+        type: number
+      ssh_user:
+        description: SSH deployment user.
+        required: true
+        type: string
+      allowed_root:
+        description: Absolute server path that must contain target_dir.
+        required: true
+        type: string
+      target_dir:
+        description: Absolute server directory that receives the static site files.
+        required: true
+        type: string
+      sync_mode:
+        description: Use manifest-clean for the root-site helper, managed-clean for declared entries, or overlay to only overwrite files.
+        required: false
+        default: overlay
+        type: string
+      managed_entries:
+        description: Newline-separated artifact entries to deploy in order. Use a single dot for an overlay of the whole artifact.
+        required: false
+        default: "."
+        type: string
+      protected_entries:
+        description: Comma-separated top-level entries that manifest-clean must reject.
+        required: false
+        default: ""
+        type: string
+    secrets:
+      ssh_private_key:
+        description: Private SSH key for the deployment user.
+        required: true
+      ssh_known_hosts:
+        description: Verified SSH known_hosts line for ssh_host.
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy static site artifact
+    runs-on: ubuntu-latest
+    concurrency:
+      group: deploy-static-site-${{ inputs.ssh_host }}-${{ inputs.target_dir }}
+      cancel-in-progress: false
+    steps:
+      - name: Download static site artifact
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: artifact
+
+      - name: Configure SSH
+        id: ssh
+        shell: bash
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.ssh_private_key }}
+          SSH_KNOWN_HOSTS: ${{ secrets.ssh_known_hosts }}
+        run: |
+          set -euo pipefail
+
+          key_path="${RUNNER_TEMP}/deploy_static_site_key"
+          known_hosts_path="${RUNNER_TEMP}/deploy_static_site_known_hosts"
+
+          install -m 600 /dev/null "${key_path}"
+          install -m 600 /dev/null "${known_hosts_path}"
+          printf '%s\n' "${SSH_PRIVATE_KEY}" > "${key_path}"
+          printf '%s\n' "${SSH_KNOWN_HOSTS}" > "${known_hosts_path}"
+
+          printf 'key_path=%s\n' "${key_path}" >> "${GITHUB_OUTPUT}"
+          printf 'known_hosts_path=%s\n' "${known_hosts_path}" >> "${GITHUB_OUTPUT}"
+
+      - name: Deploy artifact with rsync
+        shell: bash
+        env:
+          ARTIFACT_DIR: ${{ github.workspace }}/artifact
+          SSH_HOST: ${{ inputs.ssh_host }}
+          SSH_PORT: ${{ inputs.ssh_port }}
+          SSH_USER: ${{ inputs.ssh_user }}
+          SSH_KEY_PATH: ${{ steps.ssh.outputs.key_path }}
+          SSH_KNOWN_HOSTS_PATH: ${{ steps.ssh.outputs.known_hosts_path }}
+          ALLOWED_ROOT: ${{ inputs.allowed_root }}
+          TARGET_DIR: ${{ inputs.target_dir }}
+          SYNC_MODE: ${{ inputs.sync_mode }}
+          MANAGED_ENTRIES: ${{ inputs.managed_entries }}
+          PROTECTED_ENTRIES: ${{ inputs.protected_entries }}
+        run: |
+          set -euo pipefail
+
+          fail() {
+            printf 'Deployment input error: %s\n' "$*" >&2
+            exit 1
+          }
+
+          validate_absolute_path() {
+            local path="$1"
+            local segment
+
+            [[ "${path}" == /* ]] || fail "path must be absolute: ${path}"
+            [[ "${path}" != "/" ]] || fail "refusing to deploy to server root"
+            [[ "${path}" != *"//"* ]] || fail "path must not contain //: ${path}"
+            [[ "${path}" =~ ^/[A-Za-z0-9._/-]+$ ]] || fail "path contains unsupported characters: ${path}"
+
+            IFS='/' read -ra segments <<< "${path}"
+            for segment in "${segments[@]}"; do
+              [[ "${segment}" != "." && "${segment}" != ".." ]] || fail "path must not contain dot segments: ${path}"
+            done
+          }
+
+          validate_entry() {
+            local entry="$1"
+            local segment
+
+            [[ -n "${entry}" ]] || fail "managed entry must not be empty"
+            [[ "${entry}" != /* ]] || fail "managed entry must be relative: ${entry}"
+            [[ "${entry}" != *"//"* ]] || fail "managed entry must not contain //: ${entry}"
+            [[ "${entry}" =~ ^[A-Za-z0-9._/-]+$ ]] || fail "managed entry contains unsupported characters: ${entry}"
+
+            IFS='/' read -ra segments <<< "${entry}"
+            for segment in "${segments[@]}"; do
+              [[ "${segment}" != "." && "${segment}" != ".." ]] || fail "managed entry must not contain dot segments: ${entry}"
+            done
+          }
+
+          [[ "${SSH_HOST}" =~ ^[A-Za-z0-9.-]+$ ]] || fail "invalid SSH host"
+          [[ "${SSH_PORT}" =~ ^[0-9]+$ ]] || fail "invalid SSH port"
+          (( SSH_PORT >= 1 && SSH_PORT <= 65535 )) || fail "SSH port is out of range"
+          [[ "${SSH_USER}" =~ ^[A-Za-z0-9._-]+$ ]] || fail "invalid SSH user"
+          [[ "${SYNC_MODE}" == "manifest-clean" || "${SYNC_MODE}" == "managed-clean" || "${SYNC_MODE}" == "overlay" ]] || fail "sync_mode must be manifest-clean, managed-clean, or overlay"
+          [[ -z "${PROTECTED_ENTRIES}" || "${PROTECTED_ENTRIES}" =~ ^[A-Za-z0-9._-]+(,[A-Za-z0-9._-]+)*$ ]] || fail "invalid protected_entries"
+
+          ALLOWED_ROOT="${ALLOWED_ROOT%/}"
+          TARGET_DIR="${TARGET_DIR%/}"
+          validate_absolute_path "${ALLOWED_ROOT}"
+          validate_absolute_path "${TARGET_DIR}"
+          [[ "${TARGET_DIR}/" == "${ALLOWED_ROOT}/"* ]] || fail "target_dir must be inside allowed_root"
+          [[ -d "${ARTIFACT_DIR}" ]] || fail "artifact directory does not exist"
+
+          ssh_options=(
+            -i "${SSH_KEY_PATH}"
+            -o IdentitiesOnly=yes
+            -o StrictHostKeyChecking=yes
+            -o "UserKnownHostsFile=${SSH_KNOWN_HOSTS_PATH}"
+            -p "${SSH_PORT}"
+          )
+          rsync_ssh="ssh -i ${SSH_KEY_PATH} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=${SSH_KNOWN_HOSTS_PATH} -p ${SSH_PORT}"
+          remote="${SSH_USER}@${SSH_HOST}"
+
+          if [[ "${SYNC_MODE}" == "manifest-clean" ]]; then
+            [[ "${TARGET_DIR}" == "${ALLOWED_ROOT}" ]] || fail "manifest-clean requires target_dir to equal allowed_root"
+            ssh "${ssh_options[@]}" "${remote}" "test \"\$(sudo /usr/local/sbin/orz2-deploy-root-site --print-deploy-root)\" = '${TARGET_DIR}'"
+            ssh "${ssh_options[@]}" "${remote}" "test \"\$(sudo /usr/local/sbin/orz2-deploy-root-site --print-protected-entries)\" = '${PROTECTED_ENTRIES}'"
+            ssh "${ssh_options[@]}" "${remote}" "rm -rf -- '.orz2-deploy-stage' && mkdir -p -- '.orz2-deploy-stage'"
+            rsync -rzc --delete -e "${rsync_ssh}" -- "${ARTIFACT_DIR}/" "${remote}:.orz2-deploy-stage/"
+            ssh "${ssh_options[@]}" "${remote}" "sudo /usr/local/sbin/orz2-deploy-root-site"
+            exit 0
+          fi
+
+          entries=()
+          while IFS= read -r entry || [[ -n "${entry}" ]]; do
+            entry="${entry%$'\r'}"
+            [[ -n "${entry}" ]] || continue
+
+            if [[ "${entry}" == "." ]]; then
+              [[ "${SYNC_MODE}" == "overlay" ]] || fail "dot entry is only allowed in overlay mode"
+            else
+              validate_entry "${entry}"
+              [[ -e "${ARTIFACT_DIR}/${entry}" || -L "${ARTIFACT_DIR}/${entry}" ]] || fail "artifact entry does not exist: ${entry}"
+            fi
+
+            entries+=("${entry}")
+          done <<< "${MANAGED_ENTRIES}"
+          (( ${#entries[@]} > 0 )) || fail "managed_entries did not contain any entries"
+
+          ssh "${ssh_options[@]}" "${remote}" "mkdir -p -- '${TARGET_DIR}'"
+
+          for entry in "${entries[@]}"; do
+            if [[ "${entry}" == "." ]]; then
+              rsync -rzc -e "${rsync_ssh}" -- "${ARTIFACT_DIR}/" "${remote}:${TARGET_DIR}/"
+            else
+              if [[ -d "${ARTIFACT_DIR}/${entry}" ]]; then
+                remote_entry_dir="${TARGET_DIR}/${entry}"
+                ssh "${ssh_options[@]}" "${remote}" "mkdir -p -- '${remote_entry_dir}'"
+
+                rsync_args=(-rzc -e "${rsync_ssh}")
+                if [[ "${SYNC_MODE}" == "managed-clean" ]]; then
+                  rsync_args+=(--delete)
+                fi
+                rsync "${rsync_args[@]}" -- "${ARTIFACT_DIR}/${entry}/" "${remote}:${remote_entry_dir}/"
+              else
+                remote_parent_dir="${TARGET_DIR}"
+                if [[ "${entry}" == */* ]]; then
+                  remote_parent_dir="${TARGET_DIR}/${entry%/*}"
+                  ssh "${ssh_options[@]}" "${remote}" "mkdir -p -- '${remote_parent_dir}'"
+                fi
+                rsync -zc --inplace -e "${rsync_ssh}" -- "${ARTIFACT_DIR}/${entry}" "${remote}:${TARGET_DIR}/${entry}"
+              fi
+            fi
+          done
