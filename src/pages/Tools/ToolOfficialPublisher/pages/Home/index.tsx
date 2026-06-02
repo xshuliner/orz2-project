@@ -137,8 +137,8 @@ const referenceOptions: Array<{ label: string; value: ReferenceType }> = [
 
 const imageTypeOptions: Array<{ label: string; value: ImageType }> = [
   { label: 'AI 生成', value: 'ai' },
-  { label: '图片 URL', value: 'url' },
-  { label: 'Base64 文件', value: 'base64' },
+  // { label: '图片 URL', value: 'url' },
+  // { label: 'Base64 文件', value: 'base64' },
 ];
 
 const commentOptions: Array<{
@@ -1587,7 +1587,7 @@ export function OfficialPublisher() {
                     <p>管理首图和正文插图，支持 AI 描述、URL 与本地文件。</p>
                   </div>
                 </div>
-                <fieldset className='choice-field'>
+                {/* <fieldset className='choice-field'>
                   <legend>封面图生成类型 *</legend>
                   {imageTypeOptions.map(option => (
                     <label className='interactive' key={option.value}>
@@ -1599,8 +1599,8 @@ export function OfficialPublisher() {
                       {option.label}
                     </label>
                   ))}
-                </fieldset>
-                {form.imageCover.type === 'base64' ? (
+                </fieldset> */}
+                {false ? ( // 临时注释掉 Base64 文件上传分支（原条件: form.imageCover.type === 'base64'）
                   <label className='field'>
                     <span>封面图文件 *</span>
                     <input
@@ -1670,7 +1670,7 @@ export function OfficialPublisher() {
                           <Trash2 size={17} />
                         </button>
                       </div>
-                      <fieldset className='choice-field compact'>
+                      {/* <fieldset className='choice-field compact'>
                         <legend>图片类型</legend>
                         {imageTypeOptions.map(option => (
                           <label className='interactive' key={option.value}>
@@ -1687,8 +1687,8 @@ export function OfficialPublisher() {
                             {option.label}
                           </label>
                         ))}
-                      </fieldset>
-                      {item.type === 'base64' ? (
+                      </fieldset> */}
+                      {false ? ( // 临时注释掉 Base64 文件上传分支（原条件: item.type === 'base64'）
                         <label className='field'>
                           <span>图片文件</span>
                           <input
