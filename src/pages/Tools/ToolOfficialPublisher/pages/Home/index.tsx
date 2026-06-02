@@ -100,6 +100,7 @@ interface PublishStep {
   status: PublishStepStatus;
   message?: string;
   durationMs?: number;
+  requestedCount?: number;
 }
 
 const storageKey = 'orz2:wechat-auto-publisher-form';
@@ -899,11 +900,26 @@ export function OfficialPublisher() {
                   event.status === 'running'
                 ? event.status
                 : step.status;
+        const requestedCount = event.requestedCount ?? step.requestedCount;
+        const currentInlineImageIndex =
+          event.key === 'prepare_inline_images' &&
+          requestedCount &&
+          (event.status === 'running' || event.status === 'info')
+            ? event.status === 'info' && event.imageIndex !== undefined
+              ? Math.min(event.imageIndex + 1, requestedCount)
+              : 1
+            : undefined;
         const message =
-          event.message ||
-          (event.status === 'info' && event.imageIndex
-            ? `正文配图 ${event.imageIndex} 已上传`
-            : undefined);
+          currentInlineImageIndex && requestedCount
+            ? event.status === 'info' &&
+              event.imageIndex !== undefined &&
+              event.imageIndex >= requestedCount
+              ? `正文配图已上传（${requestedCount}/${requestedCount}）`
+              : `正在生成正文配图（${currentInlineImageIndex}/${requestedCount}）`
+            : event.message ||
+              (event.status === 'info' && event.imageIndex
+                ? `正文配图 ${event.imageIndex} 已上传`
+                : undefined);
         const durationMs =
           event.key === 'prepare_inline_images' &&
           event.status === 'info' &&
@@ -915,6 +931,7 @@ export function OfficialPublisher() {
           status,
           message: message ?? step.message,
           durationMs,
+          requestedCount,
         };
       })
     );
