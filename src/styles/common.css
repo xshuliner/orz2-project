@@ -23,6 +23,78 @@
     overflow-x: clip;
     overflow-y: visible;
   }
+
+  .app-shell {
+    min-height: 100vh;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        var(--app-background-grid) 0,
+        var(--app-background-grid) 1px,
+        transparent 1px,
+        transparent 104px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        var(--app-background-paper) 0,
+        var(--app-background-paper) 1px,
+        transparent 1px,
+        transparent 72px
+      ),
+      linear-gradient(
+        128deg,
+        transparent 0%,
+        transparent 10%,
+        var(--app-background-green-wash) 28%,
+        transparent 52%
+      ),
+      linear-gradient(
+        22deg,
+        transparent 0%,
+        var(--app-background-gold-wash) 38%,
+        transparent 67%
+      ),
+      linear-gradient(
+        180deg,
+        var(--app-background-base) 0%,
+        var(--app-background-soft) 42%,
+        var(--app-background-warm) 100%
+      );
+    background-attachment: fixed, fixed, scroll, scroll, scroll;
+    background-color: var(--app-background-base);
+  }
+
+  .product-silicon-active .app-shell {
+    background: var(--color-panel);
+  }
+}
+
+@media (max-width: 640px) {
+  @layer base {
+    .app-shell {
+      background:
+        repeating-linear-gradient(
+          90deg,
+          color-mix(in srgb, var(--app-background-grid) 62%, transparent) 0,
+          color-mix(in srgb, var(--app-background-grid) 62%, transparent) 1px,
+          transparent 1px,
+          transparent 132px
+        ),
+        linear-gradient(
+          132deg,
+          transparent 0%,
+          var(--app-background-green-wash) 32%,
+          transparent 66%
+        ),
+        linear-gradient(
+          180deg,
+          var(--app-background-base) 0%,
+          var(--app-background-soft) 54%,
+          var(--color-panel) 100%
+        );
+      background-attachment: scroll;
+    }
+  }
 }
 
 /* ---- interactive base ---- */
