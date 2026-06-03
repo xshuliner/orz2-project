@@ -1,11 +1,11 @@
 import productsData from '@/config/products.json';
 import toolsData from '@/config/tools.json';
 import type {
+  CatalogGroup,
+  CatalogItem,
   HeroMedia,
-  Product,
   TeamMember,
   Testimonial,
-  Tool,
 } from '@/types';
 
 const heroBase = 'https://cos.orz2.online/Orz2/Hero';
@@ -49,8 +49,8 @@ export const heroMedia: HeroMedia[] = [
   },
 ];
 
-export const tools = toolsData as Tool[];
-export const products = productsData as Product[];
+export const tools = toolsData as CatalogItem[];
+export const products = productsData as CatalogItem[];
 
 export const testimonials: Testimonial[] = [
   {
@@ -200,5 +200,47 @@ export const teamMembers: TeamMember[] = [
 
 export const toolCategories = [
   '全部',
-  ...Array.from(new Set(tools.map(tool => tool.category))),
+  ...Array.from(new Set(tools.map(tool => tool.group))),
+];
+
+export const productGroups: CatalogGroup[] = [
+  {
+    name: 'AI 社区',
+    description: '围绕 Agent、身份与长期互动体验沉淀的产品实验。',
+  },
+  {
+    name: 'Saas多端应用',
+    description: '覆盖 H5 与小程序等移动入口，适合轻量业务快速触达。',
+  },
+  {
+    name: '浏览器与编辑器扩展',
+    description: '贴近开发与工作流场景，把常用能力放到触手可及的位置。',
+  },
+  {
+    name: '互动游戏',
+    description: '以网页为入口的小型互动体验，保留完整可玩的产品形态。',
+  },
+  {
+    name: '个人博客',
+    description: '承载工程实践、产品思考和长期内容沉淀的 Web 站点。',
+  },
+];
+
+export const toolGroups: CatalogGroup[] = [
+  {
+    name: '公众号工具',
+    description: '面向内容运营与自动化发布流程的效率工具。',
+  },
+  {
+    name: '图片处理',
+    description: '处理素材体积、质量与网页性能之间的平衡。',
+  },
+  {
+    name: '开发工具',
+    description: '减少调试与整理成本，让开发任务更直接。',
+  },
+  {
+    name: '设计工具',
+    description: '辅助配色、对比度与前端可交付资产的生成。',
+  },
 ];

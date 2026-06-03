@@ -7,7 +7,8 @@
 }
 
 .design-token-grid,
-.design-card-grid {
+.design-card-grid,
+.design-catalog-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
@@ -120,6 +121,29 @@
   line-height: 1.68;
 }
 
+.design-catalog-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.design-catalog-feature-card {
+  display: grid;
+  gap: 8px;
+}
+
+.design-catalog-feature-card strong {
+  color: var(--color-ink);
+  font-size: var(--text-body-sm);
+}
+
+.design-catalog-feature-card span {
+  color: var(--color-muted);
+  font-size: var(--text-caption);
+  line-height: 1.65;
+}
+
 .design-modal-action {
   margin-top: 18px;
 }
@@ -154,7 +178,12 @@
 
 @media (max-width: 960px) {
   .design-token-grid,
-  .design-card-grid {
+  .design-card-grid,
+  .design-catalog-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .design-catalog-feature-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -166,6 +195,8 @@
 
   .design-token-grid,
   .design-card-grid,
+  .design-catalog-grid,
+  .design-catalog-feature-grid,
   .design-foundation-grid {
     grid-template-columns: 1fr;
   }

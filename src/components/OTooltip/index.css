@@ -9,3 +9,7 @@
   pointer-events: none;
   opacity: 1;
 }
+
+.o-tooltip[data-interactive='true'] {
+  pointer-events: auto;
+}

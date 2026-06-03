@@ -1,69 +1,121 @@
 [
   {
     "id": "tool-wechat-publisher",
-    "slug": "official-publisher",
     "name": "公众号自动发布",
-    "icon": "Send",
-    "category": "公众号工具",
-    "description": "配置公众号凭据、文章提示词、封面图和内嵌图片，一站式准备自动发布任务。",
-    "href": "/tools/official-publisher",
-    "status": "内测",
-    "tags": ["公众号", "自动发布", "LLM", "内容运营"],
-    "seoTitle": "公众号自动发布工具 - ORZ2 内容运营工具",
-    "seoDescription": "使用 ORZ2 公众号自动发布工具配置 appId、appSecret、文章提示词、封面图和图片素材，准备自动化发布任务。",
-    "keywords": [
-      "公众号自动发布",
-      "微信公众号工具",
-      "AI文章生成",
-      "内容运营工具"
+    "group": "公众号工具",
+    "summary": "配置公众号凭据、文章提示词、封面图和内嵌图片，一站式准备自动发布任务。",
+    "media": {
+      "kind": "icon",
+      "name": "Send"
+    },
+    "badges": ["AI", "公众号", "自动发布", "LLM", "内容运营"],
+    "lifecycle": {
+      "stage": "内测",
+      "version": "0.6.0",
+      "updatedAt": "2026-06-03"
+    },
+    "platform": ["web"],
+    "entries": [
+      {
+        "id": "web",
+        "kind": "link",
+        "label": "工具入口",
+        "href": "/tools/official-publisher",
+        "qrValue": "https://orz2.com/tools/official-publisher",
+        "primary": true
+      }
     ],
-    "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
-    "schemaType": "SoftwareApplication",
+    "seo": {
+      "slug": "official-publisher",
+      "title": "公众号自动发布工具 - ORZ2 内容运营工具",
+      "description": "使用 ORZ2 公众号自动发布工具配置 appId、appSecret、文章提示词、封面图和图片素材，准备自动化发布任务。",
+      "keywords": [
+        "公众号自动发布",
+        "微信公众号工具",
+        "AI文章生成",
+        "内容运营工具"
+      ],
+      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "schemaType": "SoftwareApplication"
+    },
     "compact": true
   },
   {
     "id": "tool-image",
-    "slug": "smart-image-compressor",
     "name": "智能图片压缩",
-    "icon": "ImageDown",
-    "category": "图片处理",
-    "description": "在保持清晰度的同时压缩图片体积，适合网页和社媒素材。",
-    "status": "规划中",
-    "tags": ["图片", "压缩", "性能"],
-    "seoTitle": "智能图片压缩 - ORZ2 在线图片工具",
-    "seoDescription": "ORZ2 智能图片压缩工具帮助网页、博客和社媒素材降低体积并保持视觉质量。",
-    "keywords": ["图片压缩", "在线图片工具", "网页性能"],
-    "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
-    "schemaType": "SoftwareApplication"
+    "group": "图片处理",
+    "summary": "在保持清晰度的同时压缩图片体积，适合网页和社媒素材。",
+    "media": {
+      "kind": "icon",
+      "name": "ImageDown"
+    },
+    "badges": ["图片", "压缩", "性能"],
+    "lifecycle": {
+      "stage": "规划中",
+      "version": "0.1.0",
+      "updatedAt": "2026-06-03"
+    },
+    "platform": ["web"],
+    "entries": [],
+    "seo": {
+      "slug": "smart-image-compressor",
+      "title": "智能图片压缩 - ORZ2 在线图片工具",
+      "description": "ORZ2 智能图片压缩工具帮助网页、博客和社媒素材降低体积并保持视觉质量。",
+      "keywords": ["图片压缩", "在线图片工具", "网页性能"],
+      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "schemaType": "SoftwareApplication"
+    }
   },
   {
     "id": "tool-json",
-    "slug": "json-formatter",
     "name": "JSON 格式化",
-    "icon": "Braces",
-    "category": "开发工具",
-    "description": "快速格式化、折叠和校验 JSON，减少调试时的手工整理。",
-    "status": "规划中",
-    "tags": ["JSON", "开发", "校验"],
-    "seoTitle": "JSON 格式化工具 - ORZ2 开发者工具",
-    "seoDescription": "使用 ORZ2 JSON 格式化工具在线整理、校验和查看 JSON 数据。",
-    "keywords": ["JSON格式化", "开发者工具", "JSON校验"],
-    "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
-    "schemaType": "SoftwareApplication"
+    "group": "开发工具",
+    "summary": "快速格式化、折叠和校验 JSON，减少调试时的手工整理。",
+    "media": {
+      "kind": "icon",
+      "name": "Braces"
+    },
+    "badges": ["JSON", "开发", "校验"],
+    "lifecycle": {
+      "stage": "规划中",
+      "version": "0.1.0",
+      "updatedAt": "2026-06-03"
+    },
+    "platform": ["web"],
+    "entries": [],
+    "seo": {
+      "slug": "json-formatter",
+      "title": "JSON 格式化工具 - ORZ2 开发者工具",
+      "description": "使用 ORZ2 JSON 格式化工具在线整理、校验和查看 JSON 数据。",
+      "keywords": ["JSON格式化", "开发者工具", "JSON校验"],
+      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "schemaType": "SoftwareApplication"
+    }
   },
   {
     "id": "tool-color",
-    "slug": "palette-lab",
     "name": "配色实验室",
-    "icon": "Palette",
-    "category": "设计工具",
-    "description": "生成品牌配色、检查对比度，并导出前端可用色值。",
-    "status": "规划中",
-    "tags": ["配色", "设计", "可访问性"],
-    "seoTitle": "配色实验室 - ORZ2 在线设计工具",
-    "seoDescription": "ORZ2 配色实验室帮助设计师和开发者生成品牌色、检查对比度并导出色值。",
-    "keywords": ["在线配色", "设计工具", "颜色对比度"],
-    "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
-    "schemaType": "SoftwareApplication"
+    "group": "设计工具",
+    "summary": "生成品牌配色、检查对比度，并导出前端可用色值。",
+    "media": {
+      "kind": "icon",
+      "name": "Palette"
+    },
+    "badges": ["配色", "设计", "可访问性"],
+    "lifecycle": {
+      "stage": "规划中",
+      "version": "0.1.0",
+      "updatedAt": "2026-06-03"
+    },
+    "platform": ["web"],
+    "entries": [],
+    "seo": {
+      "slug": "palette-lab",
+      "title": "配色实验室 - ORZ2 在线设计工具",
+      "description": "ORZ2 配色实验室帮助设计师和开发者生成品牌色、检查对比度并导出色值。",
+      "keywords": ["在线配色", "设计工具", "颜色对比度"],
+      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "schemaType": "SoftwareApplication"
+    }
   }
 ]

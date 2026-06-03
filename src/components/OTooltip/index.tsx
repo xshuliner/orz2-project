@@ -31,8 +31,10 @@ interface OTooltipProps {
   ariaLabel?: string;
   children: ReactNode;
   className?: string;
+  closeDelay?: number;
   content: ReactNode;
   contentClassName?: string;
+  interactive?: boolean;
   maxWidth?: number;
   offset?: number;
   placement?: OTooltipPlacement;
@@ -104,8 +106,10 @@ export function OTooltip({
   ariaLabel,
   children,
   className,
+  closeDelay = 120,
   content,
   contentClassName,
+  interactive = false,
   maxWidth = 320,
   offset = 10,
   placement = 'top',
@@ -113,8 +117,33 @@ export function OTooltip({
   const tooltipId = useId();
   const triggerRef = useRef<HTMLSpanElement | null>(null);
   const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const closeTimerRef = useRef<number | null>(null);
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState<TooltipPosition | null>(null);
+
+  const cancelClose = useCallback(() => {
+    if (closeTimerRef.current === null) return;
+    window.clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = null;
+  }, []);
+
+  const showTooltip = useCallback(() => {
+    cancelClose();
+    setOpen(true);
+  }, [cancelClose]);
+
+  const hideTooltip = useCallback(() => {
+    cancelClose();
+    if (!interactive) {
+      setOpen(false);
+      return;
+    }
+
+    closeTimerRef.current = window.setTimeout(() => {
+      setOpen(false);
+      closeTimerRef.current = null;
+    }, closeDelay);
+  }, [cancelClose, closeDelay, interactive]);
 
   const updatePosition = useCallback(() => {
     const trigger = triggerRef.current;
@@ -174,9 +203,25 @@ export function OTooltip({
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [open]);
 
+  useEffect(() => () => cancelClose(), [cancelClose]);
+
   function handleBlur(event: FocusEvent<HTMLSpanElement>) {
-    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-      setOpen(false);
+    const nextTarget = event.relatedTarget as Node | null;
+    if (
+      !event.currentTarget.contains(nextTarget) &&
+      !tooltipRef.current?.contains(nextTarget)
+    ) {
+      hideTooltip();
+    }
+  }
+
+  function handleTooltipBlur(event: FocusEvent<HTMLDivElement>) {
+    const nextTarget = event.relatedTarget as Node | null;
+    if (
+      !event.currentTarget.contains(nextTarget) &&
+      !triggerRef.current?.contains(nextTarget)
+    ) {
+      hideTooltip();
     }
   }
 
@@ -194,11 +239,11 @@ export function OTooltip({
       aria-describedby={open ? tooltipId : undefined}
       aria-label={ariaLabel}
       onBlur={handleBlur}
-      onClick={() => setOpen(true)}
-      onFocus={() => setOpen(true)}
-      onMouseEnter={() => setOpen(true)}
-      onMouseLeave={() => setOpen(false)}
-      onMouseMove={() => setOpen(true)}
+      onClick={showTooltip}
+      onFocus={showTooltip}
+      onMouseEnter={showTooltip}
+      onMouseLeave={hideTooltip}
+      onMouseMove={showTooltip}
     >
       {children}
       {open
@@ -209,6 +254,11 @@ export function OTooltip({
               className={['o-tooltip', contentClassName]
                 .filter(Boolean)
                 .join(' ')}
+              data-interactive={interactive ? 'true' : undefined}
+              onBlur={handleTooltipBlur}
+              onFocus={showTooltip}
+              onMouseEnter={showTooltip}
+              onMouseLeave={hideTooltip}
               role='tooltip'
               style={tooltipStyle}
             >

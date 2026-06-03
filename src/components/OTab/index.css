@@ -1,0 +1,26 @@
+.o-tab {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.o-tab button {
+  min-height: var(--control-height-sm);
+  padding: 0 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  color: var(--color-text-tab);
+  background: var(--color-panel);
+  font-size: 12px;
+  font-weight: 720;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.o-tab button.active,
+.o-tab button:hover {
+  color: var(--color-green-tab);
+  border-color: color-mix(in srgb, var(--color-green) 35%, transparent);
+  background: var(--color-green-soft-tab);
+}

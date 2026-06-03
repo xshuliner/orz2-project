@@ -2,76 +2,257 @@
   {
     "id": "silicon",
     "name": "硅基江湖",
-    "category": "AI 社区",
-    "description": "予 Agent 以灵智与权限，令其在虚实之间寻道、历练、证其行。",
-    "logo": "https://cos.orz2.online/Orz2/Projects/silicon/logo_160x160.webp",
-    "tags": ["AI Agent", "硅基侠客", "江湖历练"],
-    "href": "/products/silicon",
+    "group": "AI 社区",
+    "summary": "予 Agent 以灵智与权限，令其在虚实之间寻道、历练、证其行。",
+    "media": {
+      "kind": "image",
+      "src": "https://cos.orz2.online/Orz2/Projects/silicon/logo_160x160.webp"
+    },
+    "badges": ["AI Agent", "硅基侠客", "江湖历练"],
+    "lifecycle": {
+      "stage": "迭代中",
+      "version": "1.4.0",
+      "updatedAt": "2026-06-03"
+    },
+    "platform": ["web"],
+    "entries": [
+      {
+        "id": "web",
+        "kind": "link",
+        "label": "Web 体验",
+        "href": "/products/silicon",
+        "qrValue": "https://orz2.com/products/silicon",
+        "primary": true
+      }
+    ],
     "compact": true
   },
   {
     "id": "weather",
     "name": "天气",
-    "category": "智能小程序",
-    "description": "轻量天气服务小程序，提供清晰直接的日常天气信息入口。",
-    "logo": "https://cos.orz2.online/Orz2/Projects/weather/logo_160x160.webp",
-    "tags": ["Taro", "React", "JavaScript", "Redux"],
-    "href": "https://www.orz2.online/portal/smart-app/weather/",
+    "group": "Saas多端应用",
+    "summary": "轻量天气服务小程序，提供清晰直接的日常天气信息入口。",
+    "media": {
+      "kind": "image",
+      "src": "https://cos.orz2.online/Orz2/Projects/weather/logo_160x160.webp"
+    },
+    "badges": ["Taro", "React", "JavaScript", "Redux"],
+    "lifecycle": {
+      "stage": "已上线",
+      "version": "1.2.0",
+      "updatedAt": "2026-06-03"
+    },
+    "platform": ["h5", "weapp"],
+    "entries": [
+      {
+        "id": "h5",
+        "kind": "link",
+        "label": "H5 页面",
+        "href": "https://www.orz2.online/portal/smart-app/weather/",
+        "qrValue": "https://www.orz2.online/portal/smart-app/weather/",
+        "primary": true
+      },
+      {
+        "id": "wechat-mini",
+        "kind": "sunCode",
+        "label": "微信小程序",
+        "imageUrl": "https://cos.orz2.online/Orz2/Projects/weather/sun_code.webp"
+      }
+    ],
     "compact": true
   },
   {
     "id": "zero",
     "name": "Zero",
-    "category": "智能小程序",
-    "description": "围绕日常使用场景打造的小程序产品，保持简单、稳定的体验。",
-    "logo": "https://cos.orz2.online/Orz2/Projects/zero/logo_160x160.webp",
-    "tags": ["Taro", "React", "JavaScript", "Redux"],
-    "href": "https://www.orz2.online/portal/smart-app/zero/",
+    "group": "Saas多端应用",
+    "summary": "围绕日常使用场景打造的小程序产品，保持简单、稳定的体验。",
+    "media": {
+      "kind": "image",
+      "src": "https://cos.orz2.online/Orz2/Projects/zero/logo_160x160.webp"
+    },
+    "badges": ["Taro", "React", "JavaScript", "Redux"],
+    "lifecycle": {
+      "stage": "已上线",
+      "version": "1.1.0",
+      "updatedAt": "2026-06-03"
+    },
+    "platform": ["h5", "weapp"],
+    "entries": [
+      {
+        "id": "h5",
+        "kind": "link",
+        "label": "H5 页面",
+        "href": "https://www.orz2.online/portal/smart-app/zero/",
+        "qrValue": "https://www.orz2.online/portal/smart-app/zero/",
+        "primary": true
+      },
+      {
+        "id": "wechat-mini",
+        "kind": "sunCode",
+        "label": "微信小程序",
+        "imageUrl": "https://cos.orz2.online/Orz2/Projects/zero/sun_code.webp"
+      }
+    ],
     "compact": true
   },
   {
     "id": "carbon",
     "name": "Carbon",
-    "category": "智能小程序",
-    "description": "面向移动场景的轻应用，以清爽界面承载完整产品能力。",
-    "logo": "https://cos.orz2.online/Orz2/Projects/carbon/logo_160x160.webp",
-    "tags": ["Taro", "React", "JavaScript", "Redux"],
-    "href": "https://www.orz2.online/portal/smart-app/carbon/",
+    "group": "Saas多端应用",
+    "summary": "面向移动场景的轻应用，以清爽界面承载完整产品能力。",
+    "media": {
+      "kind": "image",
+      "src": "https://cos.orz2.online/Orz2/Projects/carbon/logo_160x160.webp"
+    },
+    "badges": ["Taro", "React", "JavaScript", "Redux"],
+    "lifecycle": {
+      "stage": "已上线",
+      "version": "1.1.0",
+      "updatedAt": "2026-06-03"
+    },
+    "platform": ["h5", "weapp"],
+    "entries": [
+      {
+        "id": "h5",
+        "kind": "link",
+        "label": "H5 页面",
+        "href": "https://www.orz2.online/portal/smart-app/carbon/",
+        "qrValue": "https://www.orz2.online/portal/smart-app/carbon/",
+        "primary": true
+      },
+      {
+        "id": "wechat-mini",
+        "kind": "sunCode",
+        "label": "微信小程序",
+        "imageUrl": "https://cos.orz2.online/Orz2/Projects/carbon/sun_code.webp"
+      }
+    ],
     "compact": true
   },
   {
     "id": "code-maker",
     "name": "Code Maker",
-    "category": "浏览器与编辑器扩展",
-    "description": "VS Code 开发辅助扩展，让重复编码操作更集中、更高效。",
-    "logo": "https://cos.orz2.online/Orz2/Projects/code-maker/logo_160x160.webp",
-    "tags": ["VS Code Extension"],
-    "href": "https://marketplace.visualstudio.com/items?itemName=gengjian1203.code-maker"
+    "group": "浏览器与编辑器扩展",
+    "summary": "VS Code 开发辅助扩展，让重复编码操作更集中、更高效。",
+    "media": {
+      "kind": "image",
+      "src": "https://cos.orz2.online/Orz2/Projects/code-maker/logo_160x160.webp"
+    },
+    "badges": ["VS Code Extension"],
+    "lifecycle": {
+      "stage": "已上线",
+      "version": "0.3.0",
+      "updatedAt": "2026-06-03"
+    },
+    "platform": ["extension"],
+    "entries": [
+      {
+        "id": "marketplace",
+        "kind": "link",
+        "label": "VS Code Marketplace",
+        "href": "https://marketplace.visualstudio.com/items?itemName=gengjian1203.code-maker",
+        "qrValue": "https://marketplace.visualstudio.com/items?itemName=gengjian1203.code-maker",
+        "primary": true
+      }
+    ]
   },
   {
     "id": "chrome-maker",
     "name": "Chrome Maker",
-    "category": "浏览器与编辑器扩展",
-    "description": "为浏览器工作流准备的扩展项目，保持轻量并便于持续演进。",
-    "logo": "https://cos.orz2.online/Orz2/Projects/chrome-maker/logo_160x160.webp",
-    "tags": ["Chrome Extension"]
+    "group": "浏览器与编辑器扩展",
+    "summary": "为浏览器工作流准备的扩展项目，保持轻量并便于持续演进。",
+    "media": {
+      "kind": "image",
+      "src": "https://cos.orz2.online/Orz2/Projects/chrome-maker/logo_160x160.webp"
+    },
+    "badges": ["Chrome Extension"],
+    "lifecycle": {
+      "stage": "规划中",
+      "version": "0.1.0",
+      "updatedAt": "2026-06-03"
+    },
+    "platform": ["extension"],
+    "entries": []
   },
   {
     "id": "fiveball",
     "name": "Fiveball",
-    "category": "互动游戏",
-    "description": "基于 Egret 构建的网页互动游戏，适合轻量休闲体验。",
-    "logo": "https://cos.orz2.online/Orz2/Projects/fiveball/logo_160x160.webp",
-    "tags": ["Egret", "TypeScript"],
-    "href": "https://www.orz2.online/portal/fiveball"
+    "group": "互动游戏",
+    "summary": "基于 Egret 构建的网页互动游戏，适合轻量休闲体验。",
+    "media": {
+      "kind": "image",
+      "src": "https://cos.orz2.online/Orz2/Projects/fiveball/logo_160x160.webp"
+    },
+    "badges": ["Egret", "TypeScript"],
+    "lifecycle": {
+      "stage": "已上线",
+      "version": "1.0.0",
+      "updatedAt": "2026-06-03"
+    },
+    "platform": ["h5"],
+    "entries": [
+      {
+        "id": "h5-game",
+        "kind": "link",
+        "label": "H5 游戏",
+        "href": "https://www.orz2.online/portal/fiveball",
+        "qrValue": "https://www.orz2.online/portal/fiveball",
+        "primary": true
+      }
+    ]
   },
   {
     "id": "mathcookies",
     "name": "Math Cookies",
-    "category": "互动游戏",
-    "description": "将数学元素融入互动玩法的网页游戏，兼顾趣味与节奏感。",
-    "logo": "https://cos.orz2.online/Orz2/Projects/mathcookies/logo_160x160.webp",
-    "tags": ["Egret", "TypeScript"],
-    "href": "https://www.orz2.online/portal/mathcookies"
+    "group": "互动游戏",
+    "summary": "将数学元素融入互动玩法的网页游戏，兼顾趣味与节奏感。",
+    "media": {
+      "kind": "image",
+      "src": "https://cos.orz2.online/Orz2/Projects/mathcookies/logo_160x160.webp"
+    },
+    "badges": ["Egret", "TypeScript"],
+    "lifecycle": {
+      "stage": "已上线",
+      "version": "1.0.0",
+      "updatedAt": "2026-06-03"
+    },
+    "platform": ["h5"],
+    "entries": [
+      {
+        "id": "h5-game",
+        "kind": "link",
+        "label": "H5 游戏",
+        "href": "https://www.orz2.online/portal/mathcookies",
+        "qrValue": "https://www.orz2.online/portal/mathcookies",
+        "primary": true
+      }
+    ]
+  },
+  {
+    "id": "orz2-blog",
+    "name": "ORZ2 Blog",
+    "group": "个人博客",
+    "summary": "记录工程实践、产品思考与长期打磨过程的 Web 端个人博客。",
+    "media": {
+      "kind": "icon",
+      "name": "Globe2"
+    },
+    "badges": ["Blog", "Web", "Writing"],
+    "lifecycle": {
+      "stage": "迭代中",
+      "version": "1.0.0",
+      "updatedAt": "2026-06-03"
+    },
+    "platform": ["web"],
+    "entries": [
+      {
+        "id": "web",
+        "kind": "link",
+        "label": "Web 站点",
+        "href": "https://www.orz2.online/",
+        "qrValue": "https://www.orz2.online/",
+        "primary": true
+      }
+    ]
   }
 ]

@@ -1,10 +1,11 @@
-import { CardCatalog } from '@/components/CardCatalog';
 import { OButton } from '@/components/OButton';
+import { OCardCatalog } from '@/components/OCardCatalog';
 import { OEmptyState } from '@/components/OEmptyState';
 import { OSectionHeading } from '@/components/OSectionHeading';
-import { toolCategories, tools } from '@/config/site';
+import { OTab } from '@/components/OTab';
+import { toolCategories, toolGroups, tools } from '@/config/site';
 import { Search } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import './index.css';
 
@@ -20,20 +21,22 @@ export function SectionTools({
   title,
 }: SectionToolsProps) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [localQuery, setLocalQuery] = useState('');
-  const [localCategory, setLocalCategory] = useState('全部');
-  const query = compact ? localQuery : (searchParams.get('q') ?? '');
-  const category = compact
-    ? localCategory
-    : (searchParams.get('category') ?? '全部');
+  const showFilters = !compact;
+  const query = showFilters ? (searchParams.get('q') ?? '') : '';
+  const category = showFilters
+    ? (searchParams.get('category') ?? '全部')
+    : '全部';
+  const baseTools = useMemo(
+    () => (compact ? tools.filter(tool => tool.compact) : tools),
+    [compact]
+  );
+  const groupMeta = new Map(toolGroups.map(group => [group.name, group]));
+  const categoryOptions = toolCategories.map(item => ({
+    label: item,
+    value: item,
+  }));
 
   function updateFilters(nextQuery: string, nextCategory = category) {
-    if (compact) {
-      setLocalQuery(nextQuery);
-      setLocalCategory(nextCategory);
-      return;
-    }
-
     const next = new URLSearchParams();
     if (nextQuery.trim()) next.set('q', nextQuery.trim());
     if (nextCategory !== '全部') next.set('category', nextCategory);
@@ -42,23 +45,25 @@ export function SectionTools({
 
   const visibleTools = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    return tools.filter(tool => {
-      const matchesCategory = category === '全部' || tool.category === category;
+    return baseTools.filter(tool => {
+      const matchesCategory = category === '全部' || tool.group === category;
       const haystack = [
+        tool.id,
         tool.name,
-        tool.category,
-        tool.description,
-        ...tool.tags,
+        tool.group,
+        tool.summary,
+        tool.lifecycle.stage,
+        ...tool.badges,
+        ...tool.platform,
       ]
         .join(' ')
         .toLowerCase();
       return matchesCategory && (!normalized || haystack.includes(normalized));
     });
-  }, [category, query]);
-
-  const displayedTools = compact
-    ? visibleTools.filter(tool => tool.compact)
-    : visibleTools;
+  }, [baseTools, category, query]);
+  const groups = toolGroups
+    .map(group => group.name)
+    .filter(group => visibleTools.some(tool => tool.group === group));
 
   return (
     <section
@@ -66,37 +71,49 @@ export function SectionTools({
       aria-label='在线工具'
     >
       {title ? <OSectionHeading description={subtitle} title={title} /> : null}
-      <div className='directory-controls'>
-        <label className='search-box'>
-          <Search size={18} aria-hidden='true' />
-          <span className='sr-only'>搜索工具</span>
-          <input
-            value={query}
-            onChange={event => updateFilters(event.target.value)}
-            placeholder='搜索 AI、图片、JSON、营销...'
+      {showFilters ? (
+        <div className='directory-controls'>
+          <label className='search-box'>
+            <Search size={18} aria-hidden='true' />
+            <span className='sr-only'>搜索工具</span>
+            <input
+              value={query}
+              onChange={event => updateFilters(event.target.value)}
+              placeholder='搜索 AI、图片、JSON、营销...'
+            />
+          </label>
+          <OTab
+            ariaLabel='工具分类'
+            className='category-tabs'
+            options={categoryOptions}
+            value={category}
+            onChange={nextCategory => updateFilters(query, nextCategory)}
           />
-        </label>
-        <div className='category-tabs' role='list' aria-label='工具分类'>
-          {toolCategories.map(item => (
-            <button
-              key={item}
-              className={
-                item === category ? 'active interactive' : 'interactive'
-              }
-              type='button'
-              onClick={() => updateFilters(query, item)}
-            >
-              {item}
-            </button>
-          ))}
         </div>
+      ) : null}
+      <div className='tool-groups'>
+        {groups.map(group => {
+          const groupTools = visibleTools.filter(tool => tool.group === group);
+          const meta = groupMeta.get(group);
+
+          return (
+            <section className='tool-group' key={group}>
+              <div className='tool-group-heading'>
+                <div>
+                  <h3>{group}</h3>
+                  {meta?.description ? <p>{meta.description}</p> : null}
+                </div>
+              </div>
+              <div className='tool-grid'>
+                {groupTools.map(tool => (
+                  <OCardCatalog item={tool} key={tool.id} />
+                ))}
+              </div>
+            </section>
+          );
+        })}
       </div>
-      <div className='tool-grid'>
-        {displayedTools.map(tool => (
-          <CardCatalog item={tool} key={tool.id} type='tool' />
-        ))}
-      </div>
-      {!displayedTools.length ? (
+      {!visibleTools.length ? (
         <OEmptyState>暂时没有匹配的工具，换个关键词试试。</OEmptyState>
       ) : null}
       {compact ? (

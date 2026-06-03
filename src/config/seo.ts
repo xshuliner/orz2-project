@@ -1,6 +1,6 @@
 import { siteConfig } from '@/config';
 import { products, tools } from '@/config/site';
-import type { SeoConfig, Tool } from '@/types';
+import type { CatalogEntry, CatalogItem, SeoConfig } from '@/types';
 
 export const siteUrl = 'https://orz2.com';
 export const siteName = 'ORZ2';
@@ -11,6 +11,23 @@ export const defaultImageLogo =
 
 export function routeUrl(path: string) {
   return path === '/' ? `${siteUrl}/` : `${siteUrl}${path}`;
+}
+
+function getPrimaryLink(item: CatalogItem) {
+  return (
+    item.entries.find(
+      (entry): entry is Extract<CatalogEntry, { kind: 'link' }> =>
+        entry.kind === 'link' && Boolean(entry.primary)
+    ) ??
+    item.entries.find(
+      (entry): entry is Extract<CatalogEntry, { kind: 'link' }> =>
+        entry.kind === 'link'
+    )
+  );
+}
+
+function entryUrl(entry: Extract<CatalogEntry, { kind: 'link' }>) {
+  return entry.href.startsWith('/') ? routeUrl(entry.href) : entry.href;
 }
 
 export const pageSeo: Record<string, SeoConfig> = {
@@ -79,7 +96,9 @@ export const pageSeo: Record<string, SeoConfig> = {
         itemListElement: tools.map((tool, index) => ({
           '@type': 'ListItem',
           position: index + 1,
-          ...(tool.href ? { url: routeUrl(tool.href) } : {}),
+          ...(getPrimaryLink(tool)
+            ? { url: entryUrl(getPrimaryLink(tool)!) }
+            : {}),
           name: tool.name,
         })),
       },
@@ -118,24 +137,24 @@ export const pageSeo: Record<string, SeoConfig> = {
 
 export const toolSeo = Object.fromEntries(
   tools
-    .filter((tool): tool is Tool & { href: string } => Boolean(tool.href))
+    .filter(tool => Boolean(tool.seo?.slug && getPrimaryLink(tool)))
     .map(tool => [
-      tool.slug,
+      tool.seo!.slug,
       {
-        title: tool.seoTitle,
-        description: tool.seoDescription,
-        canonicalPath: tool.href,
-        ogImage: tool.ogImage,
-        keywords: tool.keywords,
+        title: tool.seo!.title,
+        description: tool.seo!.description,
+        canonicalPath: getPrimaryLink(tool)!.href,
+        ogImage: tool.seo!.ogImage,
+        keywords: tool.seo!.keywords,
         jsonLd: [
           {
             '@context': 'https://schema.org',
-            '@type': tool.schemaType,
+            '@type': tool.seo!.schemaType ?? 'SoftwareApplication',
             name: tool.name,
-            applicationCategory: tool.category,
+            applicationCategory: tool.group,
             operatingSystem: 'Web',
-            url: routeUrl(tool.href),
-            description: tool.seoDescription,
+            url: entryUrl(getPrimaryLink(tool)!),
+            description: tool.seo!.description,
             offers: {
               '@type': 'Offer',
               price: '0',

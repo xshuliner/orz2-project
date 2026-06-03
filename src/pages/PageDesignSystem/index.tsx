@@ -1,6 +1,7 @@
 import { OBadge } from '@/components/OBadge';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
+import { OCardCatalog } from '@/components/OCardCatalog';
 import { OEmptyState } from '@/components/OEmptyState';
 import { OIconButton } from '@/components/OIconButton';
 import { OModal } from '@/components/OModal';
@@ -8,6 +9,8 @@ import { OPageHero } from '@/components/OPageHero';
 import { OSectionHeading } from '@/components/OSectionHeading';
 import { Seo } from '@/components/Seo';
 import { pageSeo } from '@/config/seo';
+import { products, tools } from '@/config/site';
+import type { CatalogItem } from '@/types';
 import { ArrowUpRight, Plus, Sparkles, X } from 'lucide-react';
 import { useState } from 'react';
 import './index.css';
@@ -45,6 +48,26 @@ const cardTones = [
   ['warm', '暖色面板', '适合操作前的准备说明。'],
   ['danger', '危险面板', '适合错误信息和阻断性提醒。'],
 ] as const;
+
+const catalogFeatureGroups = [
+  ['信息', 'logo/icon、分组、阶段、版本、更新日期'],
+  ['平台', 'WEB、H5、WEAPP、APP、EXTENSION'],
+  ['入口', '主链接、动态二维码、微信太阳码、筹备态'],
+  ['交互', '多入口切换、扫码 Tooltip、固定尺寸切换面板'],
+] as const;
+
+function isCatalogItem(item: CatalogItem | undefined): item is CatalogItem {
+  return Boolean(item);
+}
+
+const catalogShowcaseItems = [
+  products.find(item => item.id === 'weather'),
+  products.find(item => item.id === 'silicon'),
+  products.find(item => item.id === 'fiveball'),
+  products.find(item => item.id === 'orz2-blog'),
+  tools.find(item => item.id === 'tool-wechat-publisher'),
+  products.find(item => item.id === 'chrome-maker'),
+].filter(isCatalogItem);
 
 export function PageDesignSystem() {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -179,6 +202,31 @@ export function PageDesignSystem() {
               <h3>强调边栏</h3>
               <p>用于表单面板和需要强化节奏的业务分组。</p>
             </OCard>
+          </div>
+        </section>
+
+        <section className='design-system-section'>
+          <OSectionHeading
+            title='目录卡片'
+            description='OCardCatalog 用统一 CatalogItem 模型承载产品、工具、博客、小游戏与多端项目。'
+          />
+          <div className='design-catalog-feature-grid'>
+            {catalogFeatureGroups.map(([title, description]) => (
+              <OCard
+                className='design-catalog-feature-card'
+                key={title}
+                padding='md'
+                tone='soft'
+              >
+                <strong>{title}</strong>
+                <span>{description}</span>
+              </OCard>
+            ))}
+          </div>
+          <div className='design-catalog-grid'>
+            {catalogShowcaseItems.map(item => (
+              <OCardCatalog item={item} key={item.id} />
+            ))}
           </div>
         </section>
 

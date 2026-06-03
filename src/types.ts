@@ -5,33 +5,81 @@ export interface HeroMedia {
   label: string;
 }
 
-export interface Tool {
-  id: string;
-  slug: string;
-  name: string;
-  icon: 'Braces' | 'ImageDown' | 'Palette' | 'Send';
-  category: string;
-  description: string;
-  href?: string;
-  status: string;
-  tags: string[];
-  seoTitle: string;
-  seoDescription: string;
-  keywords: string[];
-  ogImage: string;
-  schemaType: 'SoftwareApplication';
-  compact?: boolean;
+export type CatalogIconName =
+  | 'Braces'
+  | 'Gamepad2'
+  | 'Globe2'
+  | 'ImageDown'
+  | 'Palette'
+  | 'Send'
+  | 'Smartphone'
+  | 'Sparkles'
+  | 'Workflow';
+
+export type CatalogPlatform = 'web' | 'h5' | 'weapp' | 'app' | 'extension';
+
+export type CatalogStage = '已上线' | '内测' | '迭代中' | '规划中' | '归档';
+
+export interface CatalogLifecycle {
+  stage: CatalogStage;
+  version: string;
+  updatedAt: string;
 }
 
-export interface Product {
+export type CatalogMedia =
+  | {
+      kind: 'image';
+      src: string;
+      alt?: string;
+    }
+  | {
+      kind: 'icon';
+      name: CatalogIconName;
+    };
+
+export type CatalogEntry =
+  | {
+      id: string;
+      kind: 'link';
+      label: string;
+      href: string;
+      qrValue: string;
+      primary?: boolean;
+    }
+  | {
+      id: string;
+      kind: 'sunCode';
+      label: string;
+      imageUrl: string;
+      primary?: boolean;
+    };
+
+export interface CatalogSeo {
+  slug?: string;
+  title: string;
+  description: string;
+  keywords?: string[];
+  ogImage?: string;
+  schemaType?: 'SoftwareApplication';
+}
+
+export interface CatalogItem {
   id: string;
   name: string;
-  category: string;
-  description: string;
-  logo: string;
-  tags: string[];
-  href?: string;
+  group: string;
+  summary: string;
+  media: CatalogMedia;
+  badges: string[];
+  lifecycle: CatalogLifecycle;
+  platform: CatalogPlatform[];
+  entries: CatalogEntry[];
   compact?: boolean;
+  seo?: CatalogSeo;
+}
+
+export interface CatalogGroup {
+  name: string;
+  description: string;
 }
 
 export interface TeamMember {

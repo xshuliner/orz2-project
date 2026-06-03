@@ -27,9 +27,15 @@ const tools = JSON.parse(
 const urls = [
   ...pages,
   ...tools
-    .filter(tool => tool.href)
-    .map(tool => ({
-      path: tool.href,
+    .map(tool =>
+      tool.entries?.find(
+        entry =>
+          entry.kind === 'link' && entry.primary && entry.href.startsWith('/')
+      )
+    )
+    .filter(Boolean)
+    .map(entry => ({
+      path: entry.href,
       changefreq: 'weekly',
       priority: '0.8',
     })),
