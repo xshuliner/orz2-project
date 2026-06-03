@@ -13,6 +13,7 @@ import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { OIconButton } from '@/components/OIconButton';
 import { OModal } from '@/components/OModal';
+import { OTooltip } from '@/components/OTooltip';
 import { Seo } from '@/components/Seo';
 import { toolSeo } from '@/config/seo';
 import {
@@ -1330,19 +1331,24 @@ export function OfficialPublisher() {
           padding='sm'
           tone='warm'
         >
-          <div
+          <OTooltip
             className='wechat-setup-visual interactive'
-            tabIndex={0}
-            aria-label='查看微信公众平台配置示意大图'
+            ariaLabel='查看微信公众平台配置示意大图'
+            content={
+              <div className='wechat-setup-preview'>
+                <img src={WechatConsoleGuide} alt='' />
+              </div>
+            }
+            contentClassName='wechat-setup-tooltip'
+            maxWidth={680}
+            placement='bottom-start'
+            offset={12}
           >
             <img
               src={WechatConsoleGuide}
               alt='微信公众平台配置 AppId、AppSecret 和 API IP 白名单示意图'
             />
-            <div className='wechat-setup-preview' aria-hidden='true'>
-              <img src={WechatConsoleGuide} alt='' />
-            </div>
-          </div>
+          </OTooltip>
           <div className='wechat-setup-content'>
             <h2 id='wechat-setup-title'>先完成公众号开发配置</h2>
             <ol className='setup-steps'>
