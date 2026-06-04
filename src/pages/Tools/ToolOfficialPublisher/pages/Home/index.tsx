@@ -16,6 +16,7 @@ import { OModal } from '@/components/OModal';
 import { OTooltip } from '@/components/OTooltip';
 import { Seo } from '@/components/Seo';
 import { toolSeo } from '@/config/seo';
+import { pageTitles, tools } from '@/config/site';
 import {
   promptTemplates,
   type AutoFillKeyPattern,
@@ -761,6 +762,12 @@ export function OfficialPublisher() {
   const exportedJson = useMemo(() => JSON.stringify(form, null, 2), [form]);
   const completionItems = useMemo(() => getCompletionItems(form), [form]);
   const completedCount = completionItems.filter(item => item.done).length;
+  // 页面标题 / 描述 / 面包屑文字统一从 tools.json 读取，
+  // 与目录卡片、SEO 数据保持单一数据源；slug 改了就同步更新。
+  const publisherTool = useMemo(
+    () => tools.find(item => item.seo?.slug === 'official-publisher'),
+    []
+  );
 
   function updateField<K extends keyof WechatPublisherForm>(
     key: K,
@@ -1292,13 +1299,14 @@ export function OfficialPublisher() {
       <section className='tool-form-page'>
         <Link className='back-link interactive' to='/tools'>
           <ArrowLeft size={16} aria-hidden='true' />
-          在线工具
+          {pageTitles.onlineTools}
         </Link>
         <div className='tool-form-hero'>
           <div>
-            <h1>公众号发布</h1>
+            <h1>{publisherTool?.name ?? '公众号发布'}</h1>
             <p>
-              把账号、提示词、图片素材和发布元信息整理成一张清晰的任务单，发布前的关键信息一眼可查。
+              {publisherTool?.summary ??
+                '把账号、提示词、图片素材和发布元信息整理成一张清晰的任务单，发布前的关键信息一眼可查。'}
             </p>
           </div>
           <div className='json-actions' aria-label='JSON 配置操作'>
