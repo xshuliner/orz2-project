@@ -70,7 +70,7 @@
     "id": "tool-json",
     "name": "JSON 格式化",
     "group": "开发工具",
-    "summary": "快速格式化、折叠和校验 JSON，减少调试时的手工整理。",
+    "summary": "支持语法高亮和错误检测的 JSON 数据格式化、验证和美化工具",
     "media": {
       "kind": "icon",
       "name": "Braces"
@@ -96,7 +96,7 @@
     "id": "tool-color",
     "name": "配色实验室",
     "group": "设计工具",
-    "summary": "生成品牌配色、检查对比度，并导出前端可用色值。",
+    "summary": "专业的颜色选择工具，支持多种颜色格式和调色板",
     "media": {
       "kind": "icon",
       "name": "Palette"
@@ -114,6 +114,84 @@
       "title": "配色实验室 - ORZ2 在线设计工具",
       "description": "ORZ2 配色实验室帮助设计师和开发者生成品牌色、检查对比度并导出色值。",
       "keywords": ["在线配色", "设计工具", "颜色对比度"],
+      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "schemaType": "SoftwareApplication"
+    }
+  },
+  {
+    "id": "tool-base64",
+    "name": "Base64 转换器",
+    "group": "开发工具",
+    "summary": "文本和文件的 Base64 编码解码转换工具",
+    "media": {
+      "kind": "icon",
+      "name": "Workflow"
+    },
+    "badges": ["Base64", "编码", "解码"],
+    "lifecycle": {
+      "stage": "规划中",
+      "version": "0.1.0",
+      "updatedAt": "2026-06-04"
+    },
+    "platform": ["web"],
+    "entries": [],
+    "seo": {
+      "slug": "base64-converter",
+      "title": "Base64 转换器 - ORZ2 开发者工具",
+      "description": "ORZ2 Base64 转换器支持文本与文件的 Base64 编码解码，方便开发与调试。",
+      "keywords": ["Base64转换", "编码解码", "开发者工具"],
+      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "schemaType": "SoftwareApplication"
+    }
+  },
+  {
+    "id": "tool-markdown",
+    "name": "Markdown 编辑器",
+    "group": "开发工具",
+    "summary": "功能丰富的 Markdown 编辑器，支持实时预览和导出功能",
+    "media": {
+      "kind": "icon",
+      "name": "Workflow"
+    },
+    "badges": ["Markdown", "编辑器", "预览"],
+    "lifecycle": {
+      "stage": "规划中",
+      "version": "0.1.0",
+      "updatedAt": "2026-06-04"
+    },
+    "platform": ["web"],
+    "entries": [],
+    "seo": {
+      "slug": "markdown-editor",
+      "title": "Markdown 编辑器 - ORZ2 开发者工具",
+      "description": "ORZ2 Markdown 编辑器提供实时预览、导出 HTML、文件导入等丰富的编辑能力。",
+      "keywords": ["Markdown编辑器", "在线编辑", "HTML导出"],
+      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "schemaType": "SoftwareApplication"
+    }
+  },
+  {
+    "id": "tool-qrcode",
+    "name": "二维码生成器",
+    "group": "开发工具",
+    "summary": "创建和自定义 URL、文本和联系信息的二维码",
+    "media": {
+      "kind": "icon",
+      "name": "Workflow"
+    },
+    "badges": ["二维码", "QR Code", "生成"],
+    "lifecycle": {
+      "stage": "规划中",
+      "version": "0.1.0",
+      "updatedAt": "2026-06-04"
+    },
+    "platform": ["web"],
+    "entries": [],
+    "seo": {
+      "slug": "qrcode-generator",
+      "title": "二维码生成器 - ORZ2 在线工具",
+      "description": "ORZ2 二维码生成器可创建 URL、文本与联系信息的二维码，支持自定义尺寸。",
+      "keywords": ["二维码生成", "QR Code", "在线工具"],
       "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
       "schemaType": "SoftwareApplication"
     }
