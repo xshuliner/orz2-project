@@ -10,7 +10,7 @@
     },
     "badges": ["AI Agent", "硅基侠客", "江湖历练"],
     "lifecycle": {
-      "stage": "迭代中",
+      "stage": "LIVE",
       "version": "1.4.0",
       "updatedAt": "2026-06-03"
     },
@@ -38,7 +38,7 @@
     },
     "badges": ["Taro", "React", "JavaScript", "Redux"],
     "lifecycle": {
-      "stage": "已上线",
+      "stage": "LIVE",
       "version": "1.2.0",
       "updatedAt": "2026-06-03"
     },
@@ -72,7 +72,7 @@
     },
     "badges": ["Taro", "React", "JavaScript", "Redux"],
     "lifecycle": {
-      "stage": "已上线",
+      "stage": "LIVE",
       "version": "1.1.0",
       "updatedAt": "2026-06-03"
     },
@@ -106,7 +106,7 @@
     },
     "badges": ["Taro", "React", "JavaScript", "Redux"],
     "lifecycle": {
-      "stage": "已上线",
+      "stage": "LIVE",
       "version": "1.1.0",
       "updatedAt": "2026-06-03"
     },
@@ -140,7 +140,7 @@
     },
     "badges": ["VS Code Extension"],
     "lifecycle": {
-      "stage": "已上线",
+      "stage": "LIVE",
       "version": "0.3.0",
       "updatedAt": "2026-06-03"
     },
@@ -167,7 +167,7 @@
     },
     "badges": ["Chrome Extension"],
     "lifecycle": {
-      "stage": "规划中",
+      "stage": "PLANNING",
       "version": "0.1.0",
       "updatedAt": "2026-06-03"
     },
@@ -185,7 +185,7 @@
     },
     "badges": ["Egret", "TypeScript"],
     "lifecycle": {
-      "stage": "已上线",
+      "stage": "LIVE",
       "version": "1.0.0",
       "updatedAt": "2026-06-03"
     },
@@ -212,7 +212,7 @@
     },
     "badges": ["Egret", "TypeScript"],
     "lifecycle": {
-      "stage": "已上线",
+      "stage": "LIVE",
       "version": "1.0.0",
       "updatedAt": "2026-06-03"
     },
@@ -239,7 +239,7 @@
     },
     "badges": ["Blog", "Web", "Writing"],
     "lifecycle": {
-      "stage": "迭代中",
+      "stage": "LIVE",
       "version": "1.0.0",
       "updatedAt": "2026-06-03"
     },

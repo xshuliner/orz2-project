@@ -18,7 +18,7 @@ export type CatalogIconName =
 
 export type CatalogPlatform = 'web' | 'h5' | 'weapp' | 'app' | 'extension';
 
-export type CatalogStage = '已上线' | '内测' | '迭代中' | '规划中' | '归档';
+export type CatalogStage = 'LIVE' | 'BETA' | 'PLANNING';
 
 export interface CatalogLifecycle {
   stage: CatalogStage;

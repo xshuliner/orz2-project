@@ -2,6 +2,11 @@ import { OBadge } from '@/components/OBadge';
 import { OCard } from '@/components/OCard';
 import { OTab } from '@/components/OTab';
 import { OTooltip } from '@/components/OTooltip';
+import {
+  catalogStages,
+  getStageLabel,
+  getStageToneClass,
+} from '@/config/catalog-stages';
 import type {
   CatalogEntry,
   CatalogIconName,
@@ -133,9 +138,12 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
         </div>
         <div className='catalog-card-kicker'>
           <span className='catalog-card-category'>{item.group}</span>
-          <span className='catalog-card-stage'>
+          <span
+            className={`catalog-card-stage ${getStageToneClass(item.lifecycle.stage)}`}
+            title={catalogStages[item.lifecycle.stage].description}
+          >
             <span aria-hidden='true' />
-            {item.lifecycle.stage}
+            {getStageLabel(item.lifecycle.stage)}
           </span>
         </div>
       </div>

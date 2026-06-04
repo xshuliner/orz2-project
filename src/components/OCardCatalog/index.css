@@ -76,6 +76,24 @@
   font-weight: 720;
 }
 
+.catalog-card-stage--live {
+  border-color: color-mix(in srgb, var(--color-green) 20%, transparent);
+  color: var(--color-green-label);
+  background: var(--color-green-soft);
+}
+
+.catalog-card-stage--beta {
+  border-color: color-mix(in srgb, var(--color-gold) 38%, transparent);
+  color: var(--color-warning-text);
+  background: var(--color-warning-soft);
+}
+
+.catalog-card-stage--planning {
+  border-color: var(--color-line-card);
+  color: var(--color-muted);
+  background: var(--color-soft);
+}
+
 .catalog-card-stage span {
   width: 7px;
   height: 7px;

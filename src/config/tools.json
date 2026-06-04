@@ -10,7 +10,7 @@
     },
     "badges": ["AI", "公众号", "自动发布", "LLM", "内容运营"],
     "lifecycle": {
-      "stage": "内测",
+      "stage": "BETA",
       "version": "0.6.0",
       "updatedAt": "2026-06-03"
     },
@@ -51,7 +51,7 @@
     },
     "badges": ["图片", "压缩", "性能"],
     "lifecycle": {
-      "stage": "规划中",
+      "stage": "PLANNING",
       "version": "0.1.0",
       "updatedAt": "2026-06-03"
     },
@@ -77,7 +77,7 @@
     },
     "badges": ["JSON", "开发", "校验"],
     "lifecycle": {
-      "stage": "规划中",
+      "stage": "PLANNING",
       "version": "0.1.0",
       "updatedAt": "2026-06-03"
     },
@@ -103,7 +103,7 @@
     },
     "badges": ["配色", "设计", "可访问性"],
     "lifecycle": {
-      "stage": "规划中",
+      "stage": "PLANNING",
       "version": "0.1.0",
       "updatedAt": "2026-06-03"
     },
@@ -129,7 +129,7 @@
     },
     "badges": ["Base64", "编码", "解码"],
     "lifecycle": {
-      "stage": "规划中",
+      "stage": "PLANNING",
       "version": "0.1.0",
       "updatedAt": "2026-06-04"
     },
@@ -155,7 +155,7 @@
     },
     "badges": ["Markdown", "编辑器", "预览"],
     "lifecycle": {
-      "stage": "规划中",
+      "stage": "PLANNING",
       "version": "0.1.0",
       "updatedAt": "2026-06-04"
     },
@@ -181,7 +181,7 @@
     },
     "badges": ["二维码", "QR Code", "生成"],
     "lifecycle": {
-      "stage": "规划中",
+      "stage": "PLANNING",
       "version": "0.1.0",
       "updatedAt": "2026-06-04"
     },
