@@ -29,9 +29,9 @@
   },
   {
     "id": "weather",
-    "name": "天气",
+    "name": "雾凇科普",
     "group": "Saas多端应用",
-    "summary": "轻量天气服务小程序，提供清晰直接的日常天气信息入口。",
+    "summary": "该项目是一款融合自然美学与科学知识的互动应用,包含雾凇相册、雾凇模拟、雾凇问答、雾凇文章四大核心模块。通过视觉呈现与互动功能,既展现雾凇景观的独特魅力,又解析其形成原理及生态价值,满足用户从认知到体验的探索需求。",
     "media": {
       "kind": "image",
       "src": "https://cos.orz2.online/Orz2/Projects/weather/logo_160x160.webp"
@@ -63,9 +63,9 @@
   },
   {
     "id": "zero",
-    "name": "Zero",
+    "name": "即将放飞理想的工具箱",
     "group": "Saas多端应用",
-    "summary": "围绕日常使用场景打造的小程序产品，保持简单、稳定的体验。",
+    "summary": "本项目是一款结合智能交互与实用工具的创新应用,聚焦 AI 聊天与游戏模拟计算两大核心功能。AI 聊天模块提供知识问答及趣味对话,游戏模拟计算器支持策略模拟与实时数据推演。实现工具实用性与趣味性的深度结合。",
     "media": {
       "kind": "image",
       "src": "https://cos.orz2.online/Orz2/Projects/zero/logo_160x160.webp"
@@ -97,9 +97,9 @@
   },
   {
     "id": "carbon",
-    "name": "Carbon",
+    "name": "即将放飞理想的小工具",
     "group": "Saas多端应用",
-    "summary": "面向移动场景的轻应用，以清爽界面承载完整产品能力。",
+    "summary": "本项目是一款基建应用,致力于构建和展示 Saas 项目的核心基础设施。通过自研的跨端组件库,实现了统一的用户体验和开发标准。同时集成了用户认证、社交分享、海报生成等基础功能模块,为上层应用提供可靠的技术支持。该应用不仅展示了技术实力,也为开发者提供了最佳实践参考。",
     "media": {
       "kind": "image",
       "src": "https://cos.orz2.online/Orz2/Projects/carbon/logo_160x160.webp"
@@ -131,9 +131,9 @@
   },
   {
     "id": "code-maker",
-    "name": "Code Maker",
+    "name": "代码助手",
     "group": "浏览器与编辑器扩展",
-    "summary": "VS Code 开发辅助扩展，让重复编码操作更集中、更高效。",
+    "summary": "一款提升开发效率的 VSCode 插件。具备快速生成模板代码,快速新建 VSCode window ,检查项目中未使用静态资源等功能。",
     "media": {
       "kind": "image",
       "src": "https://cos.orz2.online/Orz2/Projects/code-maker/logo_160x160.webp"
@@ -158,9 +158,9 @@
   },
   {
     "id": "chrome-maker",
-    "name": "Chrome Maker",
+    "name": "Chrome 助手",
     "group": "浏览器与编辑器扩展",
-    "summary": "为浏览器工作流准备的扩展项目，保持轻量并便于持续演进。",
+    "summary": "一款提升办公效率的 Chrome 插件。提供网页优化、快捷操作等功能,提升上网体验。",
     "media": {
       "kind": "image",
       "src": "https://cos.orz2.online/Orz2/Projects/chrome-maker/logo_160x160.webp"
@@ -176,9 +176,9 @@
   },
   {
     "id": "fiveball",
-    "name": "Fiveball",
+    "name": "五子连珠",
     "group": "互动游戏",
-    "summary": "基于 Egret 构建的网页互动游戏，适合轻量休闲体验。",
+    "summary": "经典的五子连珠小游戏,我们需要尝试制作五个或更多颜色相同的球,可以消除球并得分。但要小心哦,每一个动作,都会是各种颜色的球落到棋盘随机位置,不要让球填满你的棋盘。",
     "media": {
       "kind": "image",
       "src": "https://cos.orz2.online/Orz2/Projects/fiveball/logo_160x160.webp"
@@ -203,9 +203,9 @@
   },
   {
     "id": "mathcookies",
-    "name": "Math Cookies",
+    "name": "数学饼干",
     "group": "互动游戏",
-    "summary": "将数学元素融入互动玩法的网页游戏，兼顾趣味与节奏感。",
+    "summary": "这是一款类似《找你妹》类型的游戏,在单位时间内点击即可吃到满足要求的饼干,让数学变得更有趣。",
     "media": {
       "kind": "image",
       "src": "https://cos.orz2.online/Orz2/Projects/mathcookies/logo_160x160.webp"
@@ -230,7 +230,7 @@
   },
   {
     "id": "orz2-blog",
-    "name": "ORZ2 Blog",
+    "name": "个人博客",
     "group": "个人博客",
     "summary": "记录工程实践、产品思考与长期打磨过程的 Web 端个人博客。",
     "media": {
@@ -249,8 +249,8 @@
         "id": "web",
         "kind": "link",
         "label": "Web 站点",
-        "href": "https://www.orz2.online/",
-        "qrValue": "https://www.orz2.online/",
+        "href": "https://www.orz2.online/gengjian1203",
+        "qrValue": "https://www.orz2.online/gengjian1203",
         "primary": true
       }
     ]
