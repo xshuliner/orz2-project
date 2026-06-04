@@ -138,16 +138,8 @@
     var(--color-gold) 6%,
     transparent
   );
-  --app-background-grid: color-mix(
-    in srgb,
-    var(--color-line) 26%,
-    transparent
-  );
-  --app-background-paper: color-mix(
-    in srgb,
-    var(--color-ink) 2%,
-    transparent
-  );
+  --app-background-grid: color-mix(in srgb, var(--color-line) 26%, transparent);
+  --app-background-paper: color-mix(in srgb, var(--color-ink) 2%, transparent);
   --radius-control: 8px;
   --radius-card: 8px;
   --radius-modal: 12px;

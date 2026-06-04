@@ -1,4 +1,5 @@
 import { siteConfig } from '@/config';
+import { footerCopy, pageTitles } from '@/config/site';
 import { Link } from 'react-router-dom';
 import './index.css';
 
@@ -13,51 +14,57 @@ export function Footer() {
             alt='ORZ2'
           />
           <p className='mt-2 text-sm leading-relaxed text-footer-copy'>
-            ORZ2 专注在线 AI
-            工具、效率工具与可定制工具站方案，帮助团队把重复工作交给更稳定的流程。
+            {footerCopy.brandDescription}
           </p>
         </div>
-        <nav className='grid content-start gap-2' aria-label='页脚导航'>
-          <h2 className='!mb-[14px] text-[15px] !text-white'>导航</h2>
+        <nav
+          className='grid content-start gap-2'
+          aria-label={footerCopy.navAriaLabel}
+        >
+          <h2 className='!mb-[14px] text-[15px] !text-white'>
+            {footerCopy.sections.nav}
+          </h2>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
             to='/'
           >
-            首页
+            {pageTitles.home}
           </Link>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
             to='/tools'
           >
-            在线工具
+            {pageTitles.onlineTools}
           </Link>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
             to='/products'
           >
-            产品展示
+            {pageTitles.products}
           </Link>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
             to='/team'
           >
-            团队
+            {pageTitles.team}
           </Link>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
             to='/privacy'
           >
-            隐私协议
+            {pageTitles.privacy}
           </Link>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
             to='/design-system'
           >
-            设计系统
+            {pageTitles.designSystem}
           </Link>
         </nav>
         <div className='grid content-start gap-2'>
-          <h2 className='!mb-[14px] text-[15px] !text-white'>联系</h2>
+          <h2 className='!mb-[14px] text-[15px] !text-white'>
+            {footerCopy.sections.contact}
+          </h2>
           <a
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
             href={`mailto:${siteConfig.contactEmail}`}
@@ -65,25 +72,27 @@ export function Footer() {
             {siteConfig.contactEmail}
           </a>
           <p className='text-sm leading-relaxed text-footer-copy'>
-            支持工具定制、商业化落地与效率工作流搭建。
+            {footerCopy.contactSupport}
           </p>
         </div>
         <div className='grid content-start gap-2'>
-          <h2 className='!mb-[14px] text-[15px] !text-white'>合规</h2>
+          <h2 className='!mb-[14px] text-[15px] !text-white'>
+            {footerCopy.sections.compliance}
+          </h2>
           <p className='text-sm leading-relaxed text-footer-copy'>
-            清晰标注数据使用、第三方服务、广告说明与用户权利。
+            {footerCopy.complianceNote}
           </p>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
             to='/privacy'
           >
-            查看隐私协议
+            {footerCopy.viewPrivacy}
           </Link>
         </div>
       </div>
       <div className='footer-bottom mx-auto flex justify-between gap-4 border-t border-white/10 px-0 pt-[18px] pb-[26px] text-[13px] text-footer-muted max-sm:flex-col'>
-        <span>© 2026 ORZ2. All rights reserved.</span>
-        <span>Built for useful, compliant online tools.</span>
+        <span>{footerCopy.copyright}</span>
+        <span>{footerCopy.tagline}</span>
       </div>
     </footer>
   );

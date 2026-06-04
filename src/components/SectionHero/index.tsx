@@ -1,6 +1,6 @@
 import { OButton } from '@/components/OButton';
 import { siteConfig } from '@/config';
-import { heroMedia } from '@/config/site';
+import { heroMedia, homeSections } from '@/config/site';
 import type { HeroMedia } from '@/types';
 import { prefersReducedMotion } from '@/utils/motion';
 import { ArrowRight, ShieldCheck, Zap } from 'lucide-react';
@@ -300,17 +300,15 @@ function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
 }
 
 export function SectionHero() {
+  const heroCopy = homeSections.hero;
   return (
     <section className='hero-section'>
       <div className='hero-copy'>
-        <h1>工具驱动增长</h1>
-        <p>
-          ORZ2 汇集
-          AI、开发、设计、营销和办公效率工具，也支持为商业化场景定制独立工具站、信息架构与合规模块。
-        </p>
+        <h1>{heroCopy.title}</h1>
+        <p>{heroCopy.description}</p>
         <div className='hero-actions'>
           <OButton size='lg' to='/products'>
-            查看产品
+            {heroCopy.primaryCta}
             <ArrowRight size={18} aria-hidden='true' />
           </OButton>
           <OButton
@@ -318,18 +316,20 @@ export function SectionHero() {
             href={`mailto:${siteConfig.contactEmail}`}
             variant='secondary'
           >
-            定制合作
+            {heroCopy.secondaryCta}
           </OButton>
         </div>
-        <div className='hero-points' aria-label='ORZ2 特点'>
-          <span>
-            <Zap size={16} aria-hidden='true' />
-            快速入口
-          </span>
-          <span>
-            <ShieldCheck size={16} aria-hidden='true' />
-            合规清晰
-          </span>
+        <div className='hero-points' aria-label={heroCopy.highlightsAriaLabel}>
+          {heroCopy.highlights.map((item, index) => (
+            <span key={item.label}>
+              {index === 0 ? (
+                <Zap size={16} aria-hidden='true' />
+              ) : (
+                <ShieldCheck size={16} aria-hidden='true' />
+              )}
+              {item.label}
+            </span>
+          ))}
         </div>
       </div>
       <SectionHeroVideo media={heroMedia} />

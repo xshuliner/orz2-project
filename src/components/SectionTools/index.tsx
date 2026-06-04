@@ -3,7 +3,8 @@ import { OCardCatalog } from '@/components/OCardCatalog';
 import { OEmptyState } from '@/components/OEmptyState';
 import { OSectionHeading } from '@/components/OSectionHeading';
 import { OTab } from '@/components/OTab';
-import { toolCategories, toolGroups, tools } from '@/config/site';
+import { getStageLabel } from '@/config/catalog-stages';
+import { homeSections, toolCategories, toolGroups, tools } from '@/config/site';
 import { Search } from 'lucide-react';
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -52,7 +53,7 @@ export function SectionTools({
         tool.name,
         tool.group,
         tool.summary,
-        tool.lifecycle.stage,
+        getStageLabel(tool.lifecycle.stage),
         ...tool.badges,
         ...tool.platform,
       ]
@@ -68,22 +69,24 @@ export function SectionTools({
   return (
     <section
       className={compact ? 'tool-directory compact' : 'tool-directory'}
-      aria-label='在线工具'
+      aria-label={homeSections.tools.ariaLabel}
     >
       {title ? <OSectionHeading description={subtitle} title={title} /> : null}
       {showFilters ? (
         <div className='directory-controls'>
           <label className='search-box'>
             <Search size={18} aria-hidden='true' />
-            <span className='sr-only'>搜索工具</span>
+            <span className='sr-only'>
+              {homeSections.tools.searchAriaLabel}
+            </span>
             <input
               value={query}
               onChange={event => updateFilters(event.target.value)}
-              placeholder='搜索 AI、图片、JSON、营销...'
+              placeholder={homeSections.tools.searchPlaceholder}
             />
           </label>
           <OTab
-            ariaLabel='工具分类'
+            ariaLabel={homeSections.tools.categoryAriaLabel}
             className='category-tabs'
             options={categoryOptions}
             value={category}
@@ -114,11 +117,11 @@ export function SectionTools({
         })}
       </div>
       {!visibleTools.length ? (
-        <OEmptyState>暂时没有匹配的工具，换个关键词试试。</OEmptyState>
+        <OEmptyState>{homeSections.tools.emptyState}</OEmptyState>
       ) : null}
       {compact ? (
         <div className='section-action'>
-          <OButton to='/tools'>查看全部工具</OButton>
+          <OButton to='/tools'>{homeSections.tools.allButton}</OButton>
         </div>
       ) : null}
     </section>

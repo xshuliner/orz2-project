@@ -1,5 +1,5 @@
 import { siteConfig } from '@/config';
-import { products, tools } from '@/config/site';
+import { pageTitles, products, tools } from '@/config/site';
 import type { CatalogEntry, CatalogItem, SeoConfig } from '@/types';
 
 export const siteUrl = 'https://orz2.com';
@@ -83,7 +83,7 @@ export const pageSeo: Record<string, SeoConfig> = {
     ],
   },
   tools: {
-    title: '在线工具 - ORZ2',
+    title: `${pageTitles.onlineTools} - ORZ2`,
     description:
       '浏览 ORZ2 在线工具目录，查找公众号自动发布、JSON 格式化、配色和图片压缩工具。',
     canonicalPath: '/tools',
@@ -92,7 +92,7 @@ export const pageSeo: Record<string, SeoConfig> = {
       {
         '@context': 'https://schema.org',
         '@type': 'ItemList',
-        name: 'ORZ2 在线工具目录',
+        name: `ORZ2 ${pageTitles.onlineTools}目录`,
         itemListElement: tools.map((tool, index) => ({
           '@type': 'ListItem',
           position: index + 1,

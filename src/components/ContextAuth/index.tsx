@@ -1,6 +1,7 @@
 import { OButton } from '@/components/OButton';
 import { OIconButton } from '@/components/OIconButton';
 import { OModal } from '@/components/OModal';
+import { loginCopy } from '@/config/site';
 import CacheManager from '@/utils/CacheManager';
 import { Loader2, MessageCircle, RefreshCw, X } from 'lucide-react';
 import {
@@ -262,7 +263,7 @@ function LoginModal({
             | undefined;
           if (!memberInfo) {
             removeAuthStorage();
-            setError('登录失败，请刷新二维码后重试');
+            setError(loginCopy.errors.loginFailed);
             stopPolling();
             return;
           }
@@ -309,7 +310,7 @@ function LoginModal({
     } catch (initError) {
       console.error('ContextAuth init QR code error', initError);
       if (session === sessionRef.current) {
-        setError('二维码加载失败，请稍后刷新重试');
+        setError(loginCopy.errors.qrLoadFailed);
       }
     } finally {
       if (session === sessionRef.current) {
@@ -344,7 +345,7 @@ function LoginModal({
         <OIconButton
           className='login-modal-close'
           size='sm'
-          aria-label='关闭登录窗口'
+          aria-label={loginCopy.closeAriaLabel}
           onClick={onClose}
         >
           <X size={18} aria-hidden='true' />
@@ -354,9 +355,9 @@ function LoginModal({
             <MessageCircle size={22} />
           </span>
           <div>
-            <p className='login-modal-kicker'>微信扫码登录</p>
-            <h2 id='login-modal-title'>欢迎回来</h2>
-            <p>使用微信扫描太阳码，完成授权后将自动登录。</p>
+            <p className='login-modal-kicker'>{loginCopy.kicker}</p>
+            <h2 id='login-modal-title'>{loginCopy.title}</h2>
+            <p>{loginCopy.description}</p>
           </div>
         </div>
 
@@ -364,7 +365,7 @@ function LoginModal({
           {isLoading ? (
             <div className='login-qr-placeholder'>
               <Loader2 className='login-spin' size={30} aria-hidden='true' />
-              <span>正在生成太阳码...</span>
+              <span>{loginCopy.loading}</span>
             </div>
           ) : qrCodeUrl ? (
             <div className='login-qr-image-wrap'>
@@ -373,24 +374,24 @@ function LoginModal({
                   isExpired ? 'login-qr-image expired' : 'login-qr-image'
                 }
                 src={qrCodeUrl}
-                alt='微信小程序登录太阳码'
+                alt={loginCopy.qrAlt}
               />
               {isExpired || error ? (
                 <div className='login-qr-expired'>
-                  <span>{error || '太阳码已过期'}</span>
+                  <span>{error || loginCopy.expired}</span>
                   <RefreshButton onClick={initQrCode} />
                 </div>
               ) : null}
             </div>
           ) : (
             <div className='login-qr-placeholder'>
-              <span>{error || '暂未获取到太阳码'}</span>
+              <span>{error || loginCopy.noQr}</span>
               <RefreshButton onClick={initQrCode} />
             </div>
           )}
         </div>
 
-        <p className='login-modal-hint'>请在微信中扫码，并按提示完成授权</p>
+        <p className='login-modal-hint'>{loginCopy.hint}</p>
       </>
     </OModal>
   );
@@ -400,7 +401,7 @@ function RefreshButton({ onClick }: { onClick: () => void }) {
   return (
     <OButton type='button' variant='secondary' onClick={onClick}>
       <RefreshCw size={16} aria-hidden='true' />
-      刷新太阳码
+      {loginCopy.refreshButton}
     </OButton>
   );
 }

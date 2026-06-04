@@ -3,7 +3,8 @@ import { OCardCatalog } from '@/components/OCardCatalog';
 import { OEmptyState } from '@/components/OEmptyState';
 import { OSectionHeading } from '@/components/OSectionHeading';
 import { OTab } from '@/components/OTab';
-import { productGroups, products } from '@/config/site';
+import { getStageLabel } from '@/config/catalog-stages';
+import { homeSections, productGroups, products } from '@/config/site';
 import { Search } from 'lucide-react';
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -52,7 +53,7 @@ export function SectionProducts({
         product.name,
         product.group,
         product.summary,
-        product.lifecycle.stage,
+        getStageLabel(product.lifecycle.stage),
         ...product.badges,
         ...product.platform,
       ]
@@ -69,22 +70,24 @@ export function SectionProducts({
   return (
     <section
       className={compact ? 'product-directory compact' : 'product-directory'}
-      aria-label='产品展示'
+      aria-label={homeSections.products.ariaLabel}
     >
       {title ? <OSectionHeading description={subtitle} title={title} /> : null}
       {showFilters ? (
         <div className='directory-controls'>
           <label className='search-box'>
             <Search size={18} aria-hidden='true' />
-            <span className='sr-only'>搜索产品</span>
+            <span className='sr-only'>
+              {homeSections.products.searchAriaLabel}
+            </span>
             <input
               value={query}
               onChange={event => updateFilters(event.target.value)}
-              placeholder='搜索 H5、WEAPP、AI、游戏...'
+              placeholder={homeSections.products.searchPlaceholder}
             />
           </label>
           <OTab
-            ariaLabel='产品分类'
+            ariaLabel={homeSections.products.categoryAriaLabel}
             className='category-tabs'
             options={categoryOptions}
             value={category}
@@ -117,11 +120,11 @@ export function SectionProducts({
         })}
       </div>
       {!visibleProducts.length ? (
-        <OEmptyState>暂时没有匹配的产品，换个关键词试试。</OEmptyState>
+        <OEmptyState>{homeSections.products.emptyState}</OEmptyState>
       ) : null}
       {compact ? (
         <div className='section-action'>
-          <OButton to='/products'>查看全部产品</OButton>
+          <OButton to='/products'>{homeSections.products.allButton}</OButton>
         </div>
       ) : null}
     </section>

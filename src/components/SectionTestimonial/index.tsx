@@ -1,5 +1,5 @@
 import { OSectionHeading } from '@/components/OSectionHeading';
-import { testimonials } from '@/config/site';
+import { homeSections, testimonials } from '@/config/site';
 import { prefersReducedMotion } from '@/utils/motion';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
@@ -259,7 +259,10 @@ export function SectionTestimonial({
   }, []);
 
   return (
-    <section className='testimonial-section' aria-label='用户反馈'>
+    <section
+      className='testimonial-section'
+      aria-label={homeSections.testimonials.ariaLabel}
+    >
       {title ? <OSectionHeading description={subtitle} title={title} /> : null}
       <div className='danmaku-container' ref={containerRef} aria-hidden='true'>
         {items.map(item => (

@@ -52,6 +52,124 @@ export const heroMedia: HeroMedia[] = [
 export const tools = toolsData as CatalogItem[];
 export const products = productsData as CatalogItem[];
 
+/**
+ * 跨页面共用的简短中文标签。
+ * 用于导航、面包屑、页面标题等需要多处保持一致的地方，
+ * 避免在多个组件里各自写死。
+ */
+export const pageTitles = {
+  home: '首页',
+  onlineTools: '在线工具',
+  products: '产品展示',
+  team: '核心团队',
+  privacy: '隐私协议',
+  designSystem: '设计系统',
+} as const;
+
+/**
+ * 首页各 Section 的标题与副标题。
+ * 集中在这里管理，方便文案改版时只改一处；
+ * `title` 引用 `pageTitles` 保证与导航/面包屑一致。
+ */
+export const homeSections = {
+  tools: {
+    title: pageTitles.onlineTools,
+    subtitle: '把高频任务整理成清晰直接的入口，需要时随手打开，用完即可离开。',
+    ariaLabel: pageTitles.onlineTools,
+    searchPlaceholder: '搜索 AI、图片、JSON、营销...',
+    searchAriaLabel: '搜索工具',
+    categoryAriaLabel: '工具分类',
+    emptyState: '暂时没有匹配的工具，换个关键词试试。',
+    allButton: '查看全部工具',
+  },
+  products: {
+    title: pageTitles.products,
+    subtitle: '记录已经落地的产品实践，也保留每个项目独立而清晰的入口。',
+    ariaLabel: pageTitles.products,
+    searchPlaceholder: '搜索 H5、WEAPP、AI、游戏...',
+    searchAriaLabel: '搜索产品',
+    categoryAriaLabel: '产品分类',
+    emptyState: '暂时没有匹配的产品，换个关键词试试。',
+    allButton: '查看全部产品',
+  },
+  testimonials: {
+    title: '用户反馈',
+    subtitle: '真实的使用感受，帮助我们持续打磨更直接、更好用的工具体验。',
+    ariaLabel: '用户反馈',
+  },
+  hero: {
+    title: '工具驱动增长',
+    description:
+      'ORZ2 汇集 AI、开发、设计、营销和办公效率工具，也支持为商业化场景定制独立工具站、信息架构与合规模块。',
+    primaryCta: '查看产品',
+    secondaryCta: '定制合作',
+    highlightsAriaLabel: 'ORZ2 特点',
+    highlights: [{ label: '快速入口' }, { label: '合规清晰' }],
+  },
+  contact: {
+    title: '你的商业工具入口',
+    description:
+      '我们可以围绕你的行业、团队流程和商业化目标，定制工具页面、数据接入、广告合规内容与独立站点架构。',
+    capabilities: '工具目录设计、AI 流程接入、企业落地页、隐私合规模块',
+    ctaLabel: '查看可扩展入口',
+  },
+} as const;
+
+/**
+ * 站点底部 Footer 的全部文案。
+ * 包括品牌描述、栏目标题、版权信息等。
+ */
+export const footerCopy = {
+  brandDescription:
+    'ORZ2 专注在线 AI 工具、效率工具与可定制工具站方案，帮助团队把重复工作交给更稳定的流程。',
+  sections: {
+    nav: '导航',
+    contact: '联系',
+    compliance: '合规',
+  },
+  navAriaLabel: '页脚导航',
+  contactSupport: '支持工具定制、商业化落地与效率工作流搭建。',
+  complianceNote: '清晰标注数据使用、第三方服务、广告说明与用户权利。',
+  viewPrivacy: '查看隐私协议',
+  copyright: '© 2026 ORZ2. All rights reserved.',
+  tagline: 'Built for useful, compliant online tools.',
+} as const;
+
+/**
+ * 登录弹窗的全部文案（ContextAuth 使用）。
+ */
+export const loginCopy = {
+  closeAriaLabel: '关闭登录窗口',
+  kicker: '微信扫码登录',
+  title: '欢迎回来',
+  description: '使用微信扫描太阳码，完成授权后将自动登录。',
+  qrAlt: '微信小程序登录太阳码',
+  loading: '正在生成太阳码...',
+  expired: '太阳码已过期',
+  noQr: '暂未获取到太阳码',
+  hint: '请在微信中扫码，并按提示完成授权',
+  refreshButton: '刷新太阳码',
+  errors: {
+    loginFailed: '登录失败，请刷新二维码后重试',
+    qrLoadFailed: '二维码加载失败，请稍后刷新重试',
+  },
+} as const;
+
+/**
+ * 顶部导航栏（Header）相关文案。
+ */
+export const headerCopy = {
+  brandAriaLabel: 'ORZ2 首页',
+  navAriaLabel: '主导航',
+  openNavAriaLabel: '打开导航',
+  closeNavAriaLabel: '关闭导航',
+  loggedOut: '未登录',
+  loggedIn: '已登录',
+  defaultAvatar: '测',
+  defaultUserName: '测试用户',
+  logoutAriaLabel: '退出登录',
+} as const;
+
 export const testimonials: Testimonial[] = [
   {
     id: 'ops',
