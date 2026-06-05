@@ -1,8 +1,12 @@
 import { useAuth } from '@/components/ContextAuth';
 import { OIconButton } from '@/components/OIconButton';
 import { ORadio, type ORadioOption } from '@/components/ORadio';
-import { OSelector, type OSelectorOption } from '@/components/OSelector';
-import { localeNames, useI18n, type Locale } from '@/i18n';
+import {
+  localeNames,
+  localeShortNames,
+  useI18n,
+  type Locale,
+} from '@/i18n';
 import { useTheme, type ThemePreference } from '@/theme';
 import { LogOut, Menu, Monitor, Moon, Sun, UserCircle, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -135,11 +139,9 @@ function HeaderPreferenceControls({
     label: localeNames[item],
     ariaLabel: `${messages.locale.switchTo} ${localeNames[item]}`,
   }));
-  const desktopLocaleOptions: OSelectorOption<Locale>[] = locales.map(item => ({
+  const desktopLocaleOptions: ORadioOption<Locale>[] = locales.map(item => ({
     value: item,
-    label: localeNames[item],
-    description: item,
-    ariaLabel: `${messages.locale.switchTo} ${localeNames[item]}`,
+    label: localeShortNames[item],
   }));
   const themeOptions: ORadioOption<ThemePreference>[] = [
     {
@@ -161,31 +163,44 @@ function HeaderPreferenceControls({
       icon: Moon,
     },
   ];
-  const desktopThemeOptions: OSelectorOption<ThemePreference>[] =
-    themeOptions.map(option => ({
-      value: option.value,
-      label: option.label,
-      ariaLabel: option.ariaLabel,
-      icon: option.icon,
-    }));
+  const currentThemeOption =
+    themeOptions.find(option => option.value === preference) ?? themeOptions[0];
+  const CurrentThemeIcon = currentThemeOption.icon ?? Monitor;
+
+  function cycleThemePreference() {
+    const order: ThemePreference[] = ['system', 'light', 'dark'];
+    const nextIndex = (order.indexOf(preference) + 1) % order.length;
+    setPreference(order[nextIndex]);
+  }
 
   if (variant === 'desktop') {
     return (
       <div className='header-preferences desktop-only'>
-        <OSelector
-          ariaLabel={messages.locale.ariaLabel}
-          className='header-selector header-locale-selector'
-          options={desktopLocaleOptions}
-          value={locale}
-          onChange={onLocaleChange}
-        />
-        <OSelector
-          ariaLabel={messages.theme.ariaLabel}
-          className='header-selector header-theme-selector'
-          options={desktopThemeOptions}
-          value={preference}
-          onChange={setPreference}
-        />
+        <div
+          className='desktop-locale-switch'
+          aria-label={messages.locale.ariaLabel}
+        >
+          {desktopLocaleOptions.map(option => (
+            <button
+              key={option.value}
+              className={option.value === locale ? 'active interactive' : 'interactive'}
+              type='button'
+              aria-pressed={option.value === locale}
+              onClick={() => onLocaleChange(option.value)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+        <OIconButton
+          aria-label={currentThemeOption.ariaLabel ?? messages.theme.ariaLabel}
+          className='theme-cycle-button'
+          onClick={cycleThemePreference}
+          size='sm'
+          title={currentThemeOption.label}
+        >
+          <CurrentThemeIcon size={16} aria-hidden='true' />
+        </OIconButton>
       </div>
     );
   }

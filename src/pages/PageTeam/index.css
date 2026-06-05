@@ -14,14 +14,19 @@
   gap: 18px;
   align-items: center;
   overflow: hidden;
+  border-color: color-mix(in srgb, var(--color-green) 14%, var(--color-line-card));
 }
 
 .team-card::before {
   content: '';
   position: absolute;
   inset: 0 auto 0 0;
-  width: 4px;
-  background: var(--member-color);
+  width: 3px;
+  background: linear-gradient(
+    180deg,
+    var(--member-color),
+    color-mix(in srgb, var(--color-green) 48%, var(--member-color))
+  );
 }
 
 .team-avatar {
@@ -29,8 +34,9 @@
   aspect-ratio: 1;
   border-radius: 8px;
   object-fit: cover;
-  box-shadow: inset 0 0 0 1px
-    color-mix(in srgb, var(--color-ink) 8%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-ink) 8%, transparent),
+    0 14px 28px color-mix(in srgb, var(--color-ink) 8%, transparent);
 }
 
 @media (max-width: 960px) {

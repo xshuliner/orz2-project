@@ -3,12 +3,12 @@
   min-height: var(--badge-height);
   align-items: center;
   padding: 0 9px;
-  border: 1px solid transparent;
+  border: 1px solid color-mix(in srgb, var(--color-green) 12%, transparent);
   border-radius: var(--radius-control);
   color: var(--color-text-accent);
   background: var(--color-green-soft-feature);
   font-size: 12px;
-  font-weight: 680;
+  font-weight: 720;
 }
 
 .o-badge--pill {
@@ -18,19 +18,23 @@
 .o-badge--neutral {
   color: var(--color-text-status);
   background: var(--color-soft);
+  border-color: var(--color-line-soft);
 }
 
 .o-badge--brand {
   color: var(--color-green-label);
   background: var(--color-green-soft);
+  border-color: color-mix(in srgb, var(--color-green) 20%, transparent);
 }
 
 .o-badge--warning {
   color: var(--color-warning-text);
   background: var(--color-warning-soft);
+  border-color: color-mix(in srgb, var(--color-gold) 28%, transparent);
 }
 
 .o-badge--danger {
   color: var(--color-danger);
   background: var(--color-panel-danger);
+  border-color: color-mix(in srgb, var(--color-danger) 24%, transparent);
 }

@@ -1,3 +1,7 @@
 .o-page-hero {
   position: relative;
 }
+
+.o-page-hero p {
+  max-width: 760px;
+}

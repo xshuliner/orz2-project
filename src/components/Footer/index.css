@@ -7,6 +7,18 @@
   padding: var(--space-16) 0;
 }
 
+footer {
+  position: relative;
+  border-top: 1px solid color-mix(in srgb, var(--color-green) 16%, transparent);
+  background:
+    radial-gradient(
+      circle at 18% 0,
+      color-mix(in srgb, var(--color-green) 13%, transparent),
+      transparent 34%
+    ),
+    var(--color-footer);
+}
+
 @media (max-width: 960px) {
   .footer-grid {
     grid-template-columns: 1fr 1fr;

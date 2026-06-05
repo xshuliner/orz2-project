@@ -5,15 +5,27 @@
   display: grid;
   place-items: center;
   padding: var(--space-6);
-  background: color-mix(in srgb, var(--color-ink) 34%, transparent);
-  backdrop-filter: blur(8px);
+  background:
+    radial-gradient(
+      circle at 50% 28%,
+      color-mix(in srgb, var(--color-green-deep) 10%, transparent),
+      transparent 42%
+    ),
+    color-mix(in srgb, var(--color-ink) 38%, transparent);
+  backdrop-filter: blur(10px) saturate(1.05);
 }
 
 .o-modal-panel {
   position: relative;
   width: min(100%, 520px);
-  border: 1px solid color-mix(in srgb, var(--color-line) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-green) 18%, var(--color-line));
   border-radius: var(--radius-modal);
-  background: var(--surface-panel);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, white 28%, transparent),
+      transparent 56%
+    ),
+    var(--surface-panel);
   box-shadow: var(--shadow-modal);
 }

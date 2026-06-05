@@ -9,7 +9,10 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--space-5);
   align-items: end;
-  margin: var(--space-4) 0 var(--space-5);
+  margin: var(--space-4) 0 var(--space-6);
+  padding-bottom: var(--space-5);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-green) 18%, transparent);
 }
 
 .tool-form-hero::after {
@@ -20,7 +23,7 @@
   max-width: 760px;
   margin: 0 0 10px;
   color: var(--color-ink);
-  font-size: clamp(36px, 4.4vw, 56px);
+  font-size: 54px;
   line-height: 1;
   letter-spacing: 0;
   white-space: nowrap;
@@ -54,6 +57,7 @@
   align-items: center;
   margin-bottom: var(--space-4);
   overflow: visible;
+  border-color: color-mix(in srgb, var(--color-green) 18%, var(--color-line-card));
 }
 
 .wechat-setup-visual {
@@ -61,7 +65,7 @@
   overflow: visible;
   display: block;
   align-self: stretch;
-  border: 1px solid color-mix(in srgb, var(--color-gold) 34%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-green) 24%, transparent);
   border-radius: 8px;
   background: var(--color-panel);
   cursor: zoom-in;
@@ -88,8 +92,8 @@
   border: 1px solid color-mix(in srgb, var(--color-green-deep) 12%, transparent);
   border-radius: 8px;
   background: var(--color-panel);
-  box-shadow: 0 22px 58px
-    color-mix(in srgb, var(--color-green-deep) 24%, transparent);
+  box-shadow: 0 24px 64px
+    color-mix(in srgb, var(--color-green-deep) 22%, transparent);
   animation: wechat-setup-tooltip-in 160ms ease both;
 }
 
@@ -131,7 +135,7 @@
   border: 1px solid color-mix(in srgb, var(--color-green) 20%, transparent);
   border-radius: 8px;
   color: var(--color-green-label);
-  background: var(--color-green-soft);
+  background: color-mix(in srgb, var(--color-green-soft) 92%, transparent);
   font-size: 13px;
   font-weight: 760;
 }
@@ -181,7 +185,7 @@
 
 .publisher-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-columns: minmax(0, 1fr) 336px;
   gap: var(--space-5);
   align-items: start;
 }
@@ -213,12 +217,28 @@
 .form-panel {
   position: relative;
   overflow: hidden;
+  border-color: color-mix(in srgb, var(--color-line-card) 92%, transparent);
+}
+
+.form-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-green) 4%, transparent),
+    transparent 34%
+  );
 }
 
 .form-panel-heading {
   display: flex;
   align-items: flex-start;
   gap: 12px;
+  position: relative;
+  z-index: 1;
   margin-bottom: var(--space-5);
 }
 
@@ -235,10 +255,11 @@
 .autofill-menu {
   z-index: 60;
   width: min(380px, calc(100vw - 32px));
-  border: 1px solid color-mix(in srgb, var(--color-green) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-green) 22%, transparent);
   border-radius: 8px;
-  background: var(--color-panel);
+  background: color-mix(in srgb, var(--color-panel) 98%, transparent);
   box-shadow: 0 22px 58px color-mix(in srgb, var(--color-ink) 16%, transparent);
+  backdrop-filter: blur(18px);
   animation: autofill-menu-in 180ms ease both;
 }
 
@@ -291,7 +312,7 @@
   padding: 10px 12px;
   border: 1px solid var(--color-line-card);
   border-radius: 8px;
-  background: var(--color-panel);
+  background: color-mix(in srgb, var(--color-panel) 88%, transparent);
   text-align: left;
   color: inherit;
   cursor: pointer;
@@ -420,7 +441,7 @@
   flex-wrap: wrap;
   gap: 10px;
   padding: 10px 14px;
-  border: 1px solid color-mix(in srgb, var(--color-green) 32%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-green) 34%, transparent);
   border-radius: 8px;
   color: var(--color-green-deep);
   background:
@@ -527,8 +548,9 @@
   flex-direction: column;
   gap: 14px;
   padding: 20px 22px 18px;
-  border-radius: 8px;
-  background: var(--color-panel);
+  border: 1px solid color-mix(in srgb, var(--color-green) 16%, var(--color-line));
+  border-radius: var(--radius-modal);
+  background: color-mix(in srgb, var(--color-panel) 98%, transparent);
   box-shadow: 0 30px 80px color-mix(in srgb, var(--color-ink) 30%, transparent);
   animation: autofill-confirm-pop 200ms ease both;
 }
@@ -725,7 +747,13 @@
   border: 1px solid color-mix(in srgb, var(--color-green) 18%, transparent);
   border-radius: 8px;
   color: var(--color-green-label);
-  background: var(--color-green-soft);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--color-green) 13%, transparent),
+      transparent 52%
+    ),
+    var(--color-green-soft);
   transition:
     transform 180ms ease,
     background 180ms ease;
@@ -752,6 +780,8 @@
 .form-grid {
   display: grid;
   gap: 14px;
+  position: relative;
+  z-index: 1;
 }
 
 .form-grid.two {
@@ -762,6 +792,8 @@
   display: grid;
   gap: 8px;
   margin-top: 14px;
+  position: relative;
+  z-index: 1;
 }
 
 .form-grid .field {
@@ -787,7 +819,8 @@
   border: 1px solid var(--color-line-input);
   border-radius: 8px;
   color: var(--color-ink);
-  background: var(--color-panel-input);
+  background: color-mix(in srgb, var(--color-panel-input) 94%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 58%, transparent);
   outline: 0;
   transition:
     border-color 160ms ease,
@@ -834,6 +867,8 @@
   margin: 16px 0 0;
   padding: 0;
   border: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .choice-field.compact {
@@ -854,7 +889,7 @@
   border: 1px solid var(--color-line-input);
   border-radius: 8px;
   color: var(--color-text-body-strong);
-  background: var(--color-panel);
+  background: color-mix(in srgb, var(--color-panel) 88%, transparent);
   font-size: 14px;
   font-weight: 640;
   transition:
@@ -889,7 +924,9 @@
   gap: 16px;
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid var(--color-line);
+  border-top: 1px solid color-mix(in srgb, var(--color-line) 90%, transparent);
+  position: relative;
+  z-index: 1;
 }
 
 .inline-image-head h3 {
@@ -908,6 +945,8 @@
   display: grid;
   gap: 12px;
   margin-top: 14px;
+  position: relative;
+  z-index: 1;
 }
 
 .inline-image-item {
@@ -934,6 +973,7 @@
 .publish-summary-card {
   position: relative;
   overflow: hidden;
+  border-color: color-mix(in srgb, var(--color-green) 16%, var(--color-line-card));
 }
 
 .publish-progress-card {
@@ -949,7 +989,7 @@
     ),
     var(--color-panel);
   box-shadow:
-    0 16px 38px color-mix(in srgb, var(--color-green-deep) 8%, transparent),
+    0 18px 44px color-mix(in srgb, var(--color-green-deep) 9%, transparent),
     inset 0 1px color-mix(in srgb, var(--color-panel) 78%, transparent);
   animation: publish-progress-in 260ms ease both;
 }
@@ -1046,7 +1086,7 @@
   background: linear-gradient(
     90deg,
     var(--color-green),
-    var(--color-green-label),
+    var(--color-green-dark),
     var(--color-gold)
   );
   box-shadow: 0 0 14px color-mix(in srgb, var(--color-green) 40%, transparent);
@@ -1320,9 +1360,15 @@
   order: -1;
   display: grid;
   gap: 10px;
-  border: 1px solid color-mix(in srgb, var(--color-line-card) 92%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-green) 18%, var(--color-line-card));
   border-radius: 8px;
-  background: color-mix(in srgb, var(--color-panel) 90%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-green) 5%, transparent),
+      transparent 64%
+    ),
+    color-mix(in srgb, var(--color-panel) 92%, transparent);
   box-shadow:
     0 -8px 26px color-mix(in srgb, var(--color-panel) 86%, transparent),
     0 14px 32px color-mix(in srgb, var(--color-ink) 7%, transparent);
@@ -1384,7 +1430,7 @@
     linear-gradient(
       135deg,
       var(--color-green),
-      var(--color-green-label) 58%,
+      var(--color-green-dark) 58%,
       var(--color-green-score)
     );
   box-shadow:
@@ -1409,7 +1455,7 @@
   background:
     radial-gradient(
       circle at 50% 42%,
-      color-mix(in srgb, var(--color-green-deep) 12%, transparent),
+      color-mix(in srgb, var(--color-green-deep) 13%, transparent),
       transparent 54%
     ),
     color-mix(in srgb, var(--color-ink) 56%, transparent);
@@ -1434,7 +1480,7 @@
   max-height: min(88vh, 820px);
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--color-green) 30%, transparent);
-  border-radius: 14px;
+  border-radius: var(--radius-modal);
   background: var(--color-panel);
   box-shadow:
     0 34px 100px color-mix(in srgb, var(--color-ink) 36%, transparent),
@@ -1489,12 +1535,12 @@
   background:
     radial-gradient(
       circle at 50% 0,
-      color-mix(in srgb, var(--color-gold) 20%, transparent),
+      color-mix(in srgb, var(--color-green) 16%, transparent),
       transparent 43%
     ),
     linear-gradient(
       145deg,
-      color-mix(in srgb, var(--color-green) 14%, var(--color-panel)),
+      color-mix(in srgb, var(--color-green) 15%, var(--color-panel)),
       color-mix(in srgb, var(--color-green) 4%, var(--color-panel)) 66%
     );
 }
@@ -1546,7 +1592,7 @@
   color: var(--color-ink);
   font-size: 28px;
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: 0;
 }
 
 .draft-success-hero > span {

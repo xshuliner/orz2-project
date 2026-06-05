@@ -11,7 +11,7 @@
   border: 1px solid var(--color-line);
   border-radius: 8px;
   color: var(--color-text-tab);
-  background: var(--color-panel);
+  background: color-mix(in srgb, var(--color-panel) 88%, transparent);
   font-size: 12px;
   font-weight: 720;
   line-height: 1;
@@ -21,6 +21,14 @@
 .o-tab button.active,
 .o-tab button:hover {
   color: var(--color-green-tab);
-  border-color: color-mix(in srgb, var(--color-green) 35%, transparent);
-  background: var(--color-green-soft-tab);
+  border-color: color-mix(in srgb, var(--color-green) 42%, transparent);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-green) 8%, transparent),
+      transparent
+    ),
+    var(--color-green-soft-tab);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-green) 8%, transparent);
 }

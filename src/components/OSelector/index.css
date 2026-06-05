@@ -15,8 +15,10 @@
   border: 1px solid var(--color-line);
   border-radius: var(--radius-control);
   color: var(--color-text-button);
-  background: color-mix(in srgb, var(--color-panel) 96%, transparent);
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--color-ink) 4%, transparent);
+  background: color-mix(in srgb, var(--color-panel) 92%, transparent);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 72%, transparent) inset,
+    0 8px 22px color-mix(in srgb, var(--color-ink) 4%, transparent);
   font-size: 12px;
   font-weight: 760;
   white-space: nowrap;
@@ -31,7 +33,7 @@
 .o-selector-trigger:hover,
 .o-selector.is-open .o-selector-trigger {
   color: var(--color-ink);
-  border-color: color-mix(in srgb, var(--color-green) 28%, var(--color-line));
+  border-color: color-mix(in srgb, var(--color-green) 34%, var(--color-line));
   background: var(--color-green-soft-button);
   box-shadow: 0 12px 28px color-mix(in srgb, var(--color-ink) 8%, transparent);
 }
@@ -89,6 +91,7 @@
   border-radius: 8px;
   background: color-mix(in srgb, var(--color-panel) 98%, transparent);
   box-shadow: var(--shadow-card);
+  backdrop-filter: blur(18px);
   animation: o-selector-menu-in 140ms ease-out;
   transform-origin: top right;
 }

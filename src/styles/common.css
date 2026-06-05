@@ -27,6 +27,16 @@
   .app-shell {
     min-height: 100vh;
     background:
+      radial-gradient(
+        circle at 14% -8%,
+        color-mix(in srgb, var(--color-green) 14%, transparent),
+        transparent 34%
+      ),
+      radial-gradient(
+        circle at 88% 8%,
+        color-mix(in srgb, var(--color-green-dark) 9%, transparent),
+        transparent 30%
+      ),
       repeating-linear-gradient(
         90deg,
         var(--app-background-grid) 0,
@@ -44,8 +54,8 @@
       linear-gradient(
         128deg,
         transparent 0%,
-        transparent 10%,
-        var(--app-background-green-wash) 28%,
+        transparent 18%,
+        var(--app-background-green-wash) 36%,
         transparent 52%
       ),
       linear-gradient(
@@ -60,7 +70,7 @@
         var(--app-background-soft) 42%,
         var(--app-background-warm) 100%
       );
-    background-attachment: fixed, fixed, scroll, scroll, scroll;
+    background-attachment: fixed, fixed, fixed, fixed, scroll, scroll, scroll;
     background-color: var(--app-background-base);
   }
 
@@ -109,8 +119,8 @@
 }
 
 .interactive:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--color-green) 28%, transparent);
-  outline-offset: 3px;
+  outline: 2px solid color-mix(in srgb, var(--color-green) 42%, transparent);
+  outline-offset: 4px;
 }
 
 .interactive:disabled,
@@ -125,7 +135,8 @@
   min-height: var(--control-height-md);
   padding-inline: var(--control-padding-md);
   font-size: var(--text-body-sm);
-  font-weight: 720;
+  letter-spacing: 0;
+  font-weight: 760;
   transition:
     transform 180ms ease,
     box-shadow 180ms ease,
@@ -142,7 +153,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    color-mix(in srgb, var(--color-panel) 42%, transparent),
+    color-mix(in srgb, var(--color-panel) 52%, transparent),
     transparent
   );
   transform: skewX(-18deg);
@@ -158,15 +169,21 @@
 .button.primary {
   @apply border-green text-panel;
   background: var(--gradient-brand);
-  box-shadow: var(--shadow-button);
+  box-shadow:
+    var(--shadow-button),
+    inset 0 1px color-mix(in srgb, white 34%, transparent);
 }
 
 .button.secondary {
   @apply bg-panel text-ink;
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 74%, transparent) inset,
+    0 10px 26px color-mix(in srgb, var(--color-ink) 5%, transparent);
 }
 
 .button.ghost {
   @apply bg-green-soft-ghost text-ink;
+  border-color: color-mix(in srgb, var(--color-green) 14%, var(--color-line));
 }
 
 .button:hover,
@@ -200,7 +217,7 @@
 
 .icon-button:hover {
   transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--color-green) 32%, transparent);
+  border-color: color-mix(in srgb, var(--color-green) 40%, transparent);
   @apply bg-green-soft-button;
   box-shadow: var(--shadow-icon-hover);
 }
@@ -247,6 +264,7 @@
 .tag-row span {
   @apply inline-flex min-h-7 items-center rounded-md bg-green-soft-feature px-[9px] text-xs text-text-accent;
   font-weight: 680;
+  border: 1px solid color-mix(in srgb, var(--color-green) 10%, transparent);
   background: var(--color-green-soft-feature);
   transition:
     transform 180ms ease,
@@ -259,6 +277,8 @@
 
 .empty-state {
   @apply rounded-md border border-dashed border-line p-7 text-muted;
+  background: color-mix(in srgb, var(--color-panel) 78%, transparent);
+  box-shadow: var(--shadow-card-sm);
 }
 
 /* ---- section heading ---- */
@@ -272,6 +292,7 @@
   font-size: var(--text-section-title);
   line-height: 1.05;
   letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .section-heading p {
@@ -284,9 +305,25 @@
 
 /* ---- page hero (shared) ---- */
 .page-hero {
+  position: relative;
   width: var(--page-content-width);
   margin: 0 auto;
-  padding: var(--space-20) 0 var(--space-10);
+  padding: var(--space-20) 0 var(--space-12);
+}
+
+.page-hero::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 24px;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--color-green) 26%, transparent),
+    transparent
+  );
 }
 
 .page-hero h1 {
@@ -297,6 +334,7 @@
   letter-spacing: 0;
   font-weight: 820;
   white-space: nowrap;
+  text-wrap: balance;
 }
 
 .page-hero p {
@@ -368,9 +406,14 @@
 }
 
 @media (max-width: 640px) {
+  :root {
+    --text-section-title: 34px;
+    --text-page-title: 42px;
+  }
+
   .page-hero h1 {
-    font-size: 40px;
     line-height: 1.04;
+    white-space: normal;
   }
 
   .page-hero p,

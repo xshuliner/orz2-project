@@ -13,6 +13,12 @@
   align-self: start;
   display: grid;
   gap: 8px;
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-line) 88%, transparent);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--color-panel) 82%, transparent);
+  box-shadow: var(--shadow-card-sm);
+  backdrop-filter: blur(14px);
 }
 
 .privacy-article {
@@ -24,7 +30,7 @@
 .privacy-article section {
   scroll-margin-top: 104px;
   padding-bottom: 22px;
-  border-bottom: 1px solid var(--color-line);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-line) 90%, transparent);
 }
 
 @media (max-width: 960px) {
