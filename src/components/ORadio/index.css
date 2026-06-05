@@ -1,0 +1,138 @@
+.o-radio {
+  position: relative;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 0;
+  min-width: 0;
+  min-height: 42px;
+  padding: 3px;
+  border: 1px solid color-mix(in srgb, var(--color-line) 86%, transparent);
+  border-radius: var(--radius-control);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-panel) 74%, transparent),
+      color-mix(in srgb, var(--color-green-soft-surface) 88%, var(--color-panel))
+    );
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--color-panel) 76%, transparent),
+    inset 0 -1px 0 color-mix(in srgb, var(--color-ink) 4%, transparent);
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.o-radio-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  z-index: 0;
+  width: calc((100% - 6px) / var(--o-radio-count));
+  border: 1px solid color-mix(in srgb, var(--color-green) 20%, var(--color-line));
+  border-radius: 7px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-panel) 98%, transparent),
+      color-mix(in srgb, var(--color-green-soft-active) 76%, var(--color-panel))
+    );
+  box-shadow:
+    0 8px 20px color-mix(in srgb, var(--color-ink) 8%, transparent),
+    0 1px 0 color-mix(in srgb, var(--color-panel) 90%, transparent) inset;
+  transform: translateX(calc(var(--o-radio-index) * 100%));
+  transition:
+    transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    background var(--motion-fast) ease;
+}
+
+.o-radio:hover .o-radio-thumb {
+  border-color: color-mix(in srgb, var(--color-green) 30%, var(--color-line));
+  box-shadow:
+    0 10px 24px color-mix(in srgb, var(--color-ink) 10%, transparent),
+    0 0 0 3px color-mix(in srgb, var(--color-green) 7%, transparent),
+    0 1px 0 color-mix(in srgb, var(--color-panel) 90%, transparent) inset;
+}
+
+.o-radio-option {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 0;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--color-text-button);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 740;
+  transition:
+    color var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+}
+
+.o-radio-option:hover {
+  color: var(--color-ink);
+  transform: translateY(-1px);
+}
+
+.o-radio-option.is-selected {
+  color: var(--color-green-deep);
+}
+
+.o-radio-icon {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: var(--color-muted);
+  transition:
+    color var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+}
+
+.o-radio-option.is-selected .o-radio-icon {
+  color: var(--color-green-dark);
+}
+
+.o-radio-option:hover .o-radio-icon {
+  color: var(--color-green-dark);
+  transform: scale(1.06);
+}
+
+.o-radio-copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.o-radio-copy span,
+.o-radio-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.o-radio-copy span {
+  line-height: 1.2;
+  transition: color var(--motion-fast) ease;
+}
+
+.o-radio-copy small {
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 620;
+  line-height: 1.2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .o-radio-thumb,
+  .o-radio-option {
+    transition: none;
+  }
+}

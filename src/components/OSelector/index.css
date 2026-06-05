@@ -1,0 +1,192 @@
+.o-selector {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+}
+
+.o-selector-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 112px;
+  min-height: 36px;
+  padding: 0 9px 0 11px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-control);
+  color: var(--color-text-button);
+  background: color-mix(in srgb, var(--color-panel) 96%, transparent);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--color-ink) 4%, transparent);
+  font-size: 12px;
+  font-weight: 760;
+  white-space: nowrap;
+  transition:
+    color var(--motion-fast) ease,
+    border-color var(--motion-fast) ease,
+    background var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+}
+
+.o-selector-trigger:hover,
+.o-selector.is-open .o-selector-trigger {
+  color: var(--color-ink);
+  border-color: color-mix(in srgb, var(--color-green) 28%, var(--color-line));
+  background: var(--color-green-soft-button);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--color-ink) 8%, transparent);
+}
+
+.o-selector-trigger:hover {
+  transform: translateY(-1px);
+}
+
+.o-selector-trigger:hover .o-selector-value svg {
+  color: var(--color-green-dark);
+  transform: scale(1.05);
+}
+
+.o-selector-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.o-selector-value svg {
+  transition:
+    color var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+}
+
+.o-selector-value span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.o-selector-chevron {
+  flex: 0 0 auto;
+  color: var(--color-muted);
+  transition:
+    color var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+}
+
+.o-selector.is-open .o-selector-chevron {
+  color: var(--color-green-dark);
+  transform: rotate(180deg);
+}
+
+.o-selector-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  display: grid;
+  gap: 4px;
+  min-width: max(100%, 168px);
+  padding: 6px;
+  border: 1px solid color-mix(in srgb, var(--color-line) 92%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-panel) 98%, transparent);
+  box-shadow: var(--shadow-card);
+  animation: o-selector-menu-in 140ms ease-out;
+  transform-origin: top right;
+}
+
+.o-selector-option {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 40px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 7px;
+  color: var(--color-text-button);
+  background: transparent;
+  text-align: left;
+  transition:
+    color var(--motion-fast) ease,
+    background var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+}
+
+.o-selector-option.is-highlighted,
+.o-selector-option:hover {
+  color: var(--color-ink);
+  background: var(--color-green-soft-button);
+  transform: translateX(1px);
+}
+
+.o-selector-option.is-selected {
+  color: var(--color-green-deep);
+  background: var(--color-green-soft-active);
+}
+
+.o-selector-option-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  color: var(--color-muted);
+  transition:
+    color var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+}
+
+.o-selector-option.is-selected .o-selector-option-icon {
+  color: var(--color-green-dark);
+}
+
+.o-selector-option:hover .o-selector-option-icon {
+  color: var(--color-green-dark);
+  transform: scale(1.06);
+}
+
+.o-selector-option-copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.o-selector-option-copy span,
+.o-selector-option-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.o-selector-option-copy span {
+  font-size: 13px;
+  font-weight: 760;
+  line-height: 1.25;
+}
+
+.o-selector-option-copy small {
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 620;
+  line-height: 1.25;
+}
+
+.o-selector-check {
+  color: var(--color-green-dark);
+  opacity: 0;
+}
+
+.o-selector-option.is-selected .o-selector-check {
+  opacity: 1;
+}
+
+@keyframes o-selector-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
