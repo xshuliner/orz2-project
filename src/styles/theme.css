@@ -157,6 +157,114 @@
   );
 }
 
+[data-theme='dark'] {
+  --color-green: #33d889;
+  --color-green-dark: #13ad69;
+  --color-green-label: #86f0bd;
+  --color-green-action: #4ce09a;
+  --color-green-deep: #c9f8df;
+  --color-green-score: #baf4d4;
+  --color-green-tab: #c3f6da;
+  --color-green-summary: #d2f8e3;
+  --color-ink: #edf7f0;
+  --color-ink-soft: #d5e9dd;
+  --color-text-heading-soft: #d7eadf;
+  --color-text-feature: #cde2d6;
+  --color-text-accent: #b9d8c7;
+  --color-text-status: #b7d2c2;
+  --color-text-body-strong: #cfdfd6;
+  --color-text-link: #c1ddce;
+  --color-text-score: #b9dcca;
+  --color-text-button: #d6eadf;
+  --color-text-nav: #b8cfc1;
+  --color-text-tab: #c6dccf;
+  --color-text-toc: #c4d8cc;
+  --color-text-icon: #bfd4c7;
+  --color-muted: #9bb2a4;
+  --color-muted-strong: #adc4b5;
+  --color-muted-card: #a1b8aa;
+  --color-muted-summary: #a5bcaf;
+  --color-muted-icon: #5d7165;
+  --color-danger: #fb7185;
+  --color-gold: #f6c65b;
+  --color-warning-text: #ffe1a1;
+  --color-warning-soft: #352b14;
+  --color-soft: #111a15;
+  --color-line: #22352a;
+  --color-line-input: #284235;
+  --color-line-card: #263d31;
+  --color-line-status: #2a4236;
+  --color-line-soft: #1a2a22;
+  --color-panel: #101813;
+  --color-panel-input: #142119;
+  --color-panel-warm: #1e1a12;
+  --color-panel-danger: #25151a;
+  --color-green-soft: #10251a;
+  --color-green-soft-active: #143a25;
+  --color-green-soft-card: #13261d;
+  --color-green-soft-feature: #172c22;
+  --color-green-soft-hover: #173724;
+  --color-green-soft-tag-hover: #173223;
+  --color-green-soft-tab: #112f20;
+  --color-green-soft-nav: #14251c;
+  --color-green-soft-ghost: #151f19;
+  --color-green-soft-choice: #15241c;
+  --color-green-soft-surface: #0f1712;
+  --color-green-soft-panel: #121e17;
+  --color-green-soft-button: #17271e;
+  --color-green-soft-status: #121e17;
+  --color-green-soft-toc: #14241b;
+  --color-green-soft-video: #101b15;
+  --color-green-soft-logout: #18291f;
+  --color-footer: #070b09;
+  --color-footer-text: #edf7f0;
+  --color-footer-copy: #bdd5c8;
+  --color-footer-muted: #8ca99a;
+  --shadow-card: 0 20px 70px rgba(0, 0, 0, 0.34);
+  --shadow-card-sm: 0 10px 30px rgba(0, 0, 0, 0.24);
+  --shadow-card-hover: 0 24px 64px rgba(0, 0, 0, 0.42);
+  --shadow-button: 0 10px 28px rgba(51, 216, 137, 0.22);
+  --shadow-button-hover: 0 16px 34px rgba(0, 0, 0, 0.35);
+  --shadow-icon-hover: 0 12px 28px rgba(0, 0, 0, 0.34);
+  --shadow-modal: 0 24px 80px rgba(0, 0, 0, 0.48);
+  --surface-panel: var(--color-panel);
+  --surface-soft: var(--color-green-soft-surface);
+  --surface-warm: var(--color-panel-warm);
+  --surface-danger: var(--color-panel-danger);
+  --surface-border: var(--color-line-card);
+  --app-background-base: #09100c;
+  --app-background-soft: #0d1711;
+  --app-background-warm: #14160f;
+  --app-background-green-wash: color-mix(
+    in srgb,
+    var(--color-green) 13%,
+    transparent
+  );
+  --app-background-gold-wash: color-mix(
+    in srgb,
+    var(--color-gold) 9%,
+    transparent
+  );
+  --app-background-grid: color-mix(in srgb, var(--color-line) 34%, transparent);
+  --app-background-paper: color-mix(in srgb, white 3%, transparent);
+}
+
+[data-theme='dark'] .product-silicon-theme {
+  --orz-ink: #efe7d5;
+  --orz-ink-muted: #d5c5a8;
+  --orz-ink-faint: #a99b82;
+  --orz-paper: #17130f;
+  --orz-paper-warm: #211a13;
+  --orz-accent: #e15a4f;
+  --orz-accent-hover: #ff7669;
+  --orz-danger: #ff7669;
+  --orz-border: rgba(239, 231, 213, 0.16);
+  --orz-border-strong: rgba(239, 231, 213, 0.28);
+  --orz-shadow: 0 6px 24px rgba(0, 0, 0, 0.28);
+  --orz-shadow-lg: 0 18px 52px rgba(0, 0, 0, 0.38);
+  --orz-shadow-accent: 0 8px 24px rgba(225, 90, 79, 0.22);
+}
+
 @media (max-width: 640px) {
   :root {
     --page-gutter: 14px;
