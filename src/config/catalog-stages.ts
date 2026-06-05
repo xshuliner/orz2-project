@@ -1,3 +1,4 @@
+import { getMessages, type Locale } from '@/i18n/messages';
 import type { CatalogStage } from '@/types';
 
 /**
@@ -32,8 +33,10 @@ export const catalogStages: Record<CatalogStage, CatalogStageMeta> = {
 };
 
 /** 取渲染文本的便捷访问方法 */
-export function getStageLabel(stage: CatalogStage): string {
-  return catalogStages[stage].label;
+export function getStageLabel(stage: CatalogStage, locale?: Locale): string {
+  return locale
+    ? getMessages(locale).catalogStages[stage].label
+    : catalogStages[stage].label;
 }
 
 /** 取 tone class 的便捷访问方法（OCardCatalog 直接消费） */

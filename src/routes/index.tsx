@@ -1,9 +1,10 @@
 import { LayoutApp } from '@/components/LayoutApp';
+import { defaultLocale, localePrefixes, type Locale } from '@/i18n/messages';
 import { PageHome } from '@/pages/PageHome';
 import { routesProductSilicon } from '@/pages/Products/ProductSilicon/routes';
 import { routesToolOfficialPublisher } from '@/pages/Tools/ToolOfficialPublisher/routes';
 import { lazy } from 'react';
-import { RouteObject } from 'react-router-dom';
+import { Navigate, RouteObject, useParams } from 'react-router-dom';
 
 const PagePrivacy = lazy(() =>
   import('@/pages/PagePrivacy').then(module => ({
@@ -27,46 +28,68 @@ const PageTools = lazy(() =>
   import('@/pages/PageTools').then(module => ({ default: module.PageTools }))
 );
 
-export const routes: RouteObject[] = [
-  {
+function InvalidLocaleRedirect() {
+  const params = useParams();
+  const rest = params['*'];
+  return <Navigate replace to={rest ? `/${rest}` : '/'} />;
+}
+
+function createAppChildren(): RouteObject[] {
+  return [
+    {
+      index: true,
+      element: <PageHome />,
+    },
+    {
+      path: 'products',
+      children: [
+        {
+          index: true,
+          element: <PageProducts />,
+        },
+        ...routesProductSilicon,
+      ],
+    },
+    {
+      path: 'tools',
+      children: [
+        {
+          index: true,
+          element: <PageTools />,
+        },
+        ...routesToolOfficialPublisher,
+      ],
+    },
+    {
+      path: 'team',
+      element: <PageTeam />,
+    },
+    {
+      path: 'privacy',
+      element: <PagePrivacy />,
+    },
+    {
+      path: 'design-system',
+      element: <PageDesignSystem />,
+    },
+  ];
+}
+
+function createLocaleBranch(locale: Locale): RouteObject {
+  const prefix = localePrefixes[locale];
+  return {
+    path: prefix || '/',
     element: <LayoutApp />,
-    children: [
-      {
-        index: true,
-        element: <PageHome />,
-      },
-      {
-        path: '/products',
-        children: [
-          {
-            index: true,
-            element: <PageProducts />,
-          },
-          ...routesProductSilicon,
-        ],
-      },
-      {
-        path: '/tools',
-        children: [
-          {
-            index: true,
-            element: <PageTools />,
-          },
-          ...routesToolOfficialPublisher,
-        ],
-      },
-      {
-        path: '/team',
-        element: <PageTeam />,
-      },
-      {
-        path: '/privacy',
-        element: <PagePrivacy />,
-      },
-      {
-        path: '/design-system',
-        element: <PageDesignSystem />,
-      },
-    ],
+    children: createAppChildren(),
+  };
+}
+
+export const routes: RouteObject[] = [
+  createLocaleBranch(defaultLocale),
+  createLocaleBranch('en'),
+  createLocaleBranch('ja'),
+  {
+    path: ':locale/*',
+    element: <InvalidLocaleRedirect />,
   },
 ];

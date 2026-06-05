@@ -1,3 +1,4 @@
+import { useI18n } from '@/i18n';
 import {
   forwardRef,
   type AnchorHTMLAttributes,
@@ -63,6 +64,7 @@ export const OButton = forwardRef<
   OButtonProps
 >(function OButton(props, ref) {
   const { className, size = 'md', variant = 'primary' } = props;
+  const { localizePath } = useI18n();
   const resolvedClassName = buttonClassName(size, variant, className);
 
   if ('to' in props && props.to) {
@@ -79,7 +81,7 @@ export const OButton = forwardRef<
         {...linkProps}
         ref={ref as Ref<HTMLAnchorElement>}
         className={resolvedClassName}
-        to={to}
+        to={localizePath(to)}
       >
         {linkChildren}
       </Link>

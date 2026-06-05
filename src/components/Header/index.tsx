@@ -1,23 +1,29 @@
 import { useAuth } from '@/components/ContextAuth';
 import { OIconButton } from '@/components/OIconButton';
-import { headerCopy, pageTitles } from '@/config/site';
-import { LogOut, Menu, UserCircle, X } from 'lucide-react';
+import { ORadio, type ORadioOption } from '@/components/ORadio';
+import { OSelector, type OSelectorOption } from '@/components/OSelector';
+import { useI18n } from '@/i18n';
+import { localeNames, type Locale } from '@/i18n/messages';
+import { useTheme, type ThemePreference } from '@/theme';
+import { LogOut, Menu, Monitor, Moon, Sun, UserCircle, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import './index.css';
-
-const navItems = [
-  { label: pageTitles.home, to: '/' },
-  { label: pageTitles.onlineTools, to: '/tools' },
-  { label: pageTitles.products, to: '/products' },
-  { label: pageTitles.team, to: '/team' },
-  { label: pageTitles.privacy, to: '/privacy' },
-];
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { isAuthenticated, openLogin, logout, user } = useAuth();
+  const { locale, locales, localizePath, messages, switchLocale } = useI18n();
+  const headerCopy = messages.header;
+  const pageTitles = messages.pageTitles;
+  const navItems = [
+    { label: pageTitles.home, to: '/' },
+    { label: pageTitles.onlineTools, to: '/tools' },
+    { label: pageTitles.products, to: '/products' },
+    { label: pageTitles.team, to: '/team' },
+    { label: pageTitles.privacy, to: '/privacy' },
+  ];
 
   useEffect(() => {
     setIsOpen(false);
@@ -26,7 +32,7 @@ export function Header() {
   return (
     <header className='site-header'>
       <Link
-        to='/'
+        to={localizePath('/')}
         className='brand-link interactive'
         aria-label={headerCopy.brandAriaLabel}
       >
@@ -40,7 +46,8 @@ export function Header() {
         {navItems.map(item => (
           <NavLink
             key={item.to}
-            to={item.to}
+            to={localizePath(item.to)}
+            end={item.to === '/'}
             className={({ isActive }) =>
               isActive ? 'nav-link active interactive' : 'nav-link interactive'
             }
@@ -49,6 +56,12 @@ export function Header() {
           </NavLink>
         ))}
       </nav>
+      <HeaderPreferenceControls
+        locale={locale}
+        locales={locales}
+        onLocaleChange={switchLocale}
+        variant='desktop'
+      />
       <UserInfoModule
         isAuthenticated={isAuthenticated}
         onLogin={openLogin}
@@ -67,26 +80,132 @@ export function Header() {
         {isOpen ? <X size={20} /> : <Menu size={20} />}
       </OIconButton>
       <div className={isOpen ? 'mobile-nav open' : 'mobile-nav'}>
-        {navItems.map(item => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) =>
-              isActive ? 'nav-link active interactive' : 'nav-link interactive'
-            }
-          >
-            {item.label}
-          </NavLink>
-        ))}
-        <UserInfoModule
-          isAuthenticated={isAuthenticated}
-          onLogin={openLogin}
-          onLogout={logout}
-          userName={user?.name}
-          variant='mobile'
-        />
+        <nav className='mobile-nav-links' aria-label={headerCopy.navAriaLabel}>
+          {navItems.map(item => (
+            <NavLink
+              key={item.to}
+              to={localizePath(item.to)}
+              end={item.to === '/'}
+              className={({ isActive }) =>
+                isActive ? 'nav-link active interactive' : 'nav-link interactive'
+              }
+            >
+              {item.label}
+            </NavLink>
+          ))}
+        </nav>
+        <div className='mobile-nav-panel'>
+          <HeaderPreferenceControls
+            locale={locale}
+            locales={locales}
+            onLocaleChange={switchLocale}
+            variant='mobile'
+          />
+        </div>
+        <div className='mobile-nav-account'>
+          <UserInfoModule
+            isAuthenticated={isAuthenticated}
+            onLogin={openLogin}
+            onLogout={logout}
+            userName={user?.name}
+            variant='mobile'
+          />
+        </div>
       </div>
     </header>
+  );
+}
+
+function HeaderPreferenceControls({
+  locale,
+  locales,
+  onLocaleChange,
+  variant,
+}: {
+  locale: Locale;
+  locales: readonly Locale[];
+  onLocaleChange: (locale: Locale) => void;
+  variant: 'desktop' | 'mobile';
+}) {
+  const { preference, setPreference } = useTheme();
+  const { messages } = useI18n();
+  const localeOptions: ORadioOption<Locale>[] = locales.map(item => ({
+    value: item,
+    label: localeNames[item],
+    ariaLabel: `${messages.locale.switchTo} ${localeNames[item]}`,
+  }));
+  const desktopLocaleOptions: OSelectorOption<Locale>[] = locales.map(item => ({
+    value: item,
+    label: localeNames[item],
+    description: item,
+    ariaLabel: `${messages.locale.switchTo} ${localeNames[item]}`,
+  }));
+  const themeOptions: ORadioOption<ThemePreference>[] = [
+    {
+      value: 'system',
+      label: messages.theme.system,
+      ariaLabel: messages.theme.switchToSystem,
+      icon: Monitor,
+    },
+    {
+      value: 'light',
+      label: messages.theme.light,
+      ariaLabel: messages.theme.switchToLight,
+      icon: Sun,
+    },
+    {
+      value: 'dark',
+      label: messages.theme.dark,
+      ariaLabel: messages.theme.switchToDark,
+      icon: Moon,
+    },
+  ];
+  const desktopThemeOptions: OSelectorOption<ThemePreference>[] =
+    themeOptions.map(option => ({
+      value: option.value,
+      label: option.label,
+      ariaLabel: option.ariaLabel,
+      icon: option.icon,
+    }));
+
+  if (variant === 'desktop') {
+    return (
+      <div className='header-preferences desktop-only'>
+        <OSelector
+          ariaLabel={messages.locale.ariaLabel}
+          className='header-selector header-locale-selector'
+          options={desktopLocaleOptions}
+          value={locale}
+          onChange={onLocaleChange}
+        />
+        <OSelector
+          ariaLabel={messages.theme.ariaLabel}
+          className='header-selector header-theme-selector'
+          options={desktopThemeOptions}
+          value={preference}
+          onChange={setPreference}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className='header-preferences mobile-preferences'>
+      <ORadio
+        ariaLabel={messages.locale.ariaLabel}
+        className='header-radio header-locale-radio'
+        options={localeOptions}
+        value={locale}
+        onChange={onLocaleChange}
+      />
+      <ORadio
+        ariaLabel={messages.theme.ariaLabel}
+        className='header-radio header-theme-radio'
+        options={themeOptions}
+        value={preference}
+        onChange={setPreference}
+      />
+    </div>
   );
 }
 
@@ -103,6 +222,8 @@ function UserInfoModule({
   userName?: string;
   variant: 'desktop' | 'mobile';
 }) {
+  const { messages } = useI18n();
+  const headerCopy = messages.header;
   const className =
     variant === 'desktop' ? 'nav-user desktop-only' : 'nav-user';
 

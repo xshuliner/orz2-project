@@ -1,4 +1,11 @@
 import { defaultImageOg, routeUrl, siteName, siteUrl } from '@/config/seo';
+import {
+  defaultLocale,
+  localeOpenGraph,
+  locales,
+  type Locale,
+} from '@/i18n/messages';
+import { localizePath } from '@/i18n/routes';
 import type { SeoConfig } from '@/types';
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -13,7 +20,8 @@ function absoluteUrl(path = defaultImageOg) {
 }
 
 export function Seo({ config }: SeoProps) {
-  const canonical = routeUrl(config.canonicalPath);
+  const locale = config.locale ?? defaultLocale;
+  const canonical = routeUrl(config.canonicalPath, locale);
   const image = absoluteUrl(config.ogImage);
   const jsonLd = Array.isArray(config.jsonLd)
     ? config.jsonLd
@@ -30,11 +38,17 @@ export function Seo({ config }: SeoProps) {
     setMeta('meta[name="description"]', 'content', config.description);
     setMeta('meta[property="og:title"]', 'content', config.title);
     setMeta('meta[property="og:description"]', 'content', config.description);
+    setMeta('meta[property="og:locale"]', 'content', localeOpenGraph[locale]);
     setMeta('meta[property="og:image"]', 'content', image);
     setMeta('meta[name="twitter:title"]', 'content', config.title);
     setMeta('meta[name="twitter:description"]', 'content', config.description);
     setMeta('meta[name="twitter:image"]', 'content', image);
-  }, [config.description, config.title, image]);
+  }, [config.description, config.title, image, locale]);
+
+  const alternateLocales: Array<Locale | 'x-default'> = [
+    ...locales,
+    'x-default',
+  ];
 
   return (
     <Helmet>
@@ -44,7 +58,20 @@ export function Seo({ config }: SeoProps) {
         <meta name='keywords' content={config.keywords.join(', ')} />
       ) : null}
       <link rel='canonical' href={canonical} />
+      {alternateLocales.map(item => {
+        const hrefLang = item === 'x-default' ? 'x-default' : item;
+        const hrefLocale = item === 'x-default' ? defaultLocale : item;
+        return (
+          <link
+            key={hrefLang}
+            rel='alternate'
+            hrefLang={hrefLang}
+            href={`${siteUrl}${localizePath(config.canonicalPath, hrefLocale)}`}
+          />
+        );
+      })}
       <meta property='og:site_name' content={siteName} />
+      <meta property='og:locale' content={localeOpenGraph[locale]} />
       <meta property='og:type' content='website' />
       <meta property='og:title' content={config.title} />
       <meta property='og:description' content={config.description} />

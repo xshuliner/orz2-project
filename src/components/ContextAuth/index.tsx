@@ -1,7 +1,7 @@
 import { OButton } from '@/components/OButton';
 import { OIconButton } from '@/components/OIconButton';
 import { OModal } from '@/components/OModal';
-import { loginCopy } from '@/config/site';
+import { useI18n } from '@/i18n';
 import CacheManager from '@/utils/CacheManager';
 import { Loader2, MessageCircle, RefreshCw, X } from 'lucide-react';
 import {
@@ -66,11 +66,14 @@ function stopDefaultAction(value: unknown) {
   eventLike.stopPropagation?.();
 }
 
-function toAuthUser(memberInfo: MemberInfo): AuthUser {
+function toAuthUser(
+  memberInfo: MemberInfo,
+  fallbackName = '微信用户'
+): AuthUser {
   return {
     id: memberInfo._id || memberInfo.sys_thirdId || 'wechat-user',
     name:
-      memberInfo.user_nickName || memberInfo.identity_username || '微信用户',
+      memberInfo.user_nickName || memberInfo.identity_username || fallbackName,
     email: memberInfo.identity_email || '',
     avatarUrl: memberInfo.user_avatarUrl || undefined,
   };
@@ -98,6 +101,8 @@ function readStoredUser() {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const { messages } = useI18n();
+  const loginCopy = messages.login;
   const [user, setUser] = useState<AuthUser | null>(readStoredUser);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
 
@@ -136,7 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(null);
           return;
         }
-        const nextUser = toAuthUser(memberInfo);
+        const nextUser = toAuthUser(memberInfo, loginCopy.wechatUser);
         CacheManager.setLocalStorage(authStorageKey, nextUser);
         setUser(nextUser);
       })
@@ -149,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       isActive = false;
     };
-  }, []);
+  }, [loginCopy.wechatUser]);
 
   const withLoginRequired = useCallback<LoginGate>(
     action =>
@@ -200,15 +205,18 @@ export function useLoginGate() {
   return useAuth().withLoginRequired;
 }
 
-function readQrCodeAsDataUrl(buffer: unknown) {
+function readQrCodeAsDataUrl(
+  buffer: unknown,
+  copy: ReturnType<typeof useI18n>['messages']['login']
+) {
   return new Promise<string>((resolve, reject) => {
     if (!Array.isArray(buffer)) {
-      reject(new Error('二维码图片数据格式异常'));
+      reject(new Error(copy.errors.qrDataInvalid));
       return;
     }
     const reader = new FileReader();
     reader.onloadend = () => resolve(String(reader.result || ''));
-    reader.onerror = () => reject(new Error('二维码图片读取失败'));
+    reader.onerror = () => reject(new Error(copy.errors.qrReadFailed));
     reader.readAsDataURL(
       new Blob([new Uint8Array(buffer)], { type: 'image/jpeg' })
     );
@@ -224,6 +232,8 @@ function LoginModal({
   onClose: () => void;
   onLogin: (user: AuthUser) => void;
 }) {
+  const { messages } = useI18n();
+  const loginCopy = messages.login;
   const [isLoading, setIsLoading] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
   const [qrCodeUrl, setQrCodeUrl] = useState('');
@@ -268,7 +278,7 @@ function LoginModal({
             return;
           }
           stopPolling();
-          onLogin(toAuthUser(memberInfo));
+          onLogin(toAuthUser(memberInfo, loginCopy.wechatUser));
           return;
         }
 
@@ -286,7 +296,7 @@ function LoginModal({
         }
       }
     },
-    [onLogin, stopPolling]
+    [loginCopy.wechatUser, onLogin, stopPolling]
   );
 
   const initQrCode = useCallback(async () => {
@@ -302,8 +312,8 @@ function LoginModal({
       const response = await api.postCreateMiniCodeLogin();
       if (session !== sessionRef.current) return;
       const { data, uuid } = response?.data?.body || {};
-      if (!uuid) throw new Error('创建二维码失败');
-      setQrCodeUrl(await readQrCodeAsDataUrl(data?.data));
+      if (!uuid) throw new Error(loginCopy.errors.qrCreateFailed);
+      setQrCodeUrl(await readQrCodeAsDataUrl(data?.data, loginCopy));
       if (session === sessionRef.current) {
         queryLoginStatus(uuid, session);
       }
@@ -317,7 +327,7 @@ function LoginModal({
         setIsLoading(false);
       }
     }
-  }, [queryLoginStatus, stopPolling]);
+  }, [loginCopy, queryLoginStatus, stopPolling]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -398,6 +408,9 @@ function LoginModal({
 }
 
 function RefreshButton({ onClick }: { onClick: () => void }) {
+  const { messages } = useI18n();
+  const loginCopy = messages.login;
+
   return (
     <OButton type='button' variant='secondary' onClick={onClick}>
       <RefreshCw size={16} aria-hidden='true' />

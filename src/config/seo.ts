@@ -1,5 +1,7 @@
 import { siteConfig } from '@/config';
-import { pageTitles, products, tools } from '@/config/site';
+import { getProducts, getTools } from '@/i18n/catalog';
+import { defaultLocale, getMessages, type Locale } from '@/i18n/messages';
+import { localizePath } from '@/i18n/routes';
 import type { CatalogEntry, CatalogItem, SeoConfig } from '@/types';
 
 export const siteUrl = 'https://orz2.com';
@@ -9,8 +11,9 @@ export const defaultImageOg =
 export const defaultImageLogo =
   'https://cos.orz2.online/Orz2/Logo/logo_light_320x320.webp';
 
-export function routeUrl(path: string) {
-  return path === '/' ? `${siteUrl}/` : `${siteUrl}${path}`;
+export function routeUrl(path: string, locale: Locale = defaultLocale) {
+  const localized = localizePath(path, locale);
+  return localized === '/' ? `${siteUrl}/` : `${siteUrl}${localized}`;
 }
 
 function getPrimaryLink(item: CatalogItem) {
@@ -26,142 +29,158 @@ function getPrimaryLink(item: CatalogItem) {
   );
 }
 
-function entryUrl(entry: Extract<CatalogEntry, { kind: 'link' }>) {
-  return entry.href.startsWith('/') ? routeUrl(entry.href) : entry.href;
+function entryUrl(
+  entry: Extract<CatalogEntry, { kind: 'link' }>,
+  locale: Locale
+) {
+  return entry.href.startsWith('/') ? routeUrl(entry.href, locale) : entry.href;
 }
 
-export const pageSeo: Record<string, SeoConfig> = {
-  home: {
-    title: 'ORZ2 - 在线 AI 工具与效率工具平台',
-    description:
-      'ORZ2 汇集 AI 写作、图片处理、开发调试、营销和办公效率工具，并提供可定制的商业化工具站方案。',
-    canonicalPath: '/',
-    ogImage: defaultImageOg,
-    jsonLd: [
-      {
-        '@context': 'https://schema.org',
-        '@type': 'Organization',
-        name: siteName,
-        url: routeUrl('/'),
-        logo: defaultImageLogo,
-        contactPoint: {
-          '@type': 'ContactPoint',
-          email: siteConfig.contactEmail,
-          contactType: 'customer support',
-        },
-      },
-      {
-        '@context': 'https://schema.org',
-        '@type': 'WebSite',
-        name: siteName,
-        url: routeUrl('/'),
-        potentialAction: {
-          '@type': 'SearchAction',
-          target: `${routeUrl('/tools')}?q={search_term_string}`,
-          'query-input': 'required name=search_term_string',
-        },
-      },
-    ],
-  },
-  products: {
-    title: '产品展示 - ORZ2',
-    description:
-      '浏览 ORZ2 已落地的产品实践，包括智能小程序、浏览器与编辑器扩展和互动游戏。',
-    canonicalPath: '/products',
-    ogImage: defaultImageOg,
-    jsonLd: [
-      {
-        '@context': 'https://schema.org',
-        '@type': 'ItemList',
-        name: 'ORZ2 产品展示',
-        itemListElement: products.map((product, index) => ({
-          '@type': 'ListItem',
-          position: index + 1,
-          name: product.name,
-        })),
-      },
-    ],
-  },
-  tools: {
-    title: `${pageTitles.onlineTools} - ORZ2`,
-    description:
-      '浏览 ORZ2 在线工具目录，查找公众号自动发布、JSON 格式化、配色和图片压缩工具。',
-    canonicalPath: '/tools',
-    ogImage: defaultImageOg,
-    jsonLd: [
-      {
-        '@context': 'https://schema.org',
-        '@type': 'ItemList',
-        name: `ORZ2 ${pageTitles.onlineTools}目录`,
-        itemListElement: tools.map((tool, index) => ({
-          '@type': 'ListItem',
-          position: index + 1,
-          ...(getPrimaryLink(tool)
-            ? { url: entryUrl(getPrimaryLink(tool)!) }
-            : {}),
-          name: tool.name,
-        })),
-      },
-    ],
-  },
-  team: {
-    title: '团队 - ORZ2',
-    description:
-      '认识 ORZ2 团队：项目、研发、产品、设计、财务和 HR 一起打造稳定、合规、可扩展的在线工具平台。',
-    canonicalPath: '/team',
-    ogImage: defaultImageOg,
-    jsonLd: [
-      {
-        '@context': 'https://schema.org',
-        '@type': 'AboutPage',
-        name: 'ORZ2 团队',
-        url: routeUrl('/team'),
-      },
-    ],
-  },
-  privacy: {
-    title: '隐私协议 - ORZ2',
-    description:
-      '了解 ORZ2 如何处理必要信息、Cookie、第三方服务、广告合规和用户隐私权利。',
-    canonicalPath: '/privacy',
-    ogImage: defaultImageOg,
-  },
-  designSystem: {
-    title: '设计系统 - ORZ2',
-    description:
-      '浏览 ORZ2 公共组件、视觉 token、卡片、按钮、标签、空状态与弹窗实例。',
-    canonicalPath: '/design-system',
-    ogImage: defaultImageOg,
-  },
-};
+export function getPageSeo(locale: Locale): Record<string, SeoConfig> {
+  const m = getMessages(locale);
+  const products = getProducts(locale);
+  const tools = getTools(locale);
 
-export const toolSeo = Object.fromEntries(
-  tools
-    .filter(tool => Boolean(tool.seo?.slug && getPrimaryLink(tool)))
-    .map(tool => [
-      tool.seo!.slug,
-      {
-        title: tool.seo!.title,
-        description: tool.seo!.description,
-        canonicalPath: getPrimaryLink(tool)!.href,
-        ogImage: tool.seo!.ogImage,
-        keywords: tool.seo!.keywords,
-        jsonLd: [
-          {
-            '@context': 'https://schema.org',
-            '@type': tool.seo!.schemaType ?? 'SoftwareApplication',
-            name: tool.name,
-            applicationCategory: tool.group,
-            operatingSystem: 'Web',
-            url: entryUrl(getPrimaryLink(tool)!),
-            description: tool.seo!.description,
-            offers: {
-              '@type': 'Offer',
-              price: '0',
-              priceCurrency: 'USD',
-            },
+  return {
+    home: {
+      title: m.seo.home.title,
+      description: m.seo.home.description,
+      canonicalPath: '/',
+      ogImage: defaultImageOg,
+      locale,
+      jsonLd: [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'Organization',
+          name: siteName,
+          url: routeUrl('/', locale),
+          logo: defaultImageLogo,
+          contactPoint: {
+            '@type': 'ContactPoint',
+            email: siteConfig.contactEmail,
+            contactType: 'customer support',
           },
-        ],
-      } satisfies SeoConfig,
-    ])
-);
+        },
+        {
+          '@context': 'https://schema.org',
+          '@type': 'WebSite',
+          name: siteName,
+          url: routeUrl('/', locale),
+          potentialAction: {
+            '@type': 'SearchAction',
+            target: `${routeUrl('/tools', locale)}?q={search_term_string}`,
+            'query-input': 'required name=search_term_string',
+          },
+        },
+      ],
+    },
+    products: {
+      title: m.seo.products.title,
+      description: m.seo.products.description,
+      canonicalPath: '/products',
+      ogImage: defaultImageOg,
+      locale,
+      jsonLd: [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: m.seo.products.itemListName,
+          itemListElement: products.map((product, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: product.name,
+          })),
+        },
+      ],
+    },
+    tools: {
+      title: m.seo.tools.title,
+      description: m.seo.tools.description,
+      canonicalPath: '/tools',
+      ogImage: defaultImageOg,
+      locale,
+      jsonLd: [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: m.seo.tools.itemListName,
+          itemListElement: tools.map((tool, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            ...(getPrimaryLink(tool)
+              ? { url: entryUrl(getPrimaryLink(tool)!, locale) }
+              : {}),
+            name: tool.name,
+          })),
+        },
+      ],
+    },
+    team: {
+      title: m.seo.team.title,
+      description: m.seo.team.description,
+      canonicalPath: '/team',
+      ogImage: defaultImageOg,
+      locale,
+      jsonLd: [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'AboutPage',
+          name: m.seo.team.pageName,
+          url: routeUrl('/team', locale),
+        },
+      ],
+    },
+    privacy: {
+      title: m.seo.privacy.title,
+      description: m.seo.privacy.description,
+      canonicalPath: '/privacy',
+      ogImage: defaultImageOg,
+      locale,
+    },
+    designSystem: {
+      title: m.seo.designSystem.title,
+      description: m.seo.designSystem.description,
+      canonicalPath: '/design-system',
+      ogImage: defaultImageOg,
+      locale,
+    },
+  };
+}
+
+export function getToolSeo(locale: Locale) {
+  const tools = getTools(locale);
+  return Object.fromEntries(
+    tools
+      .filter(tool => Boolean(tool.seo?.slug && getPrimaryLink(tool)))
+      .map(tool => [
+        tool.seo!.slug,
+        {
+          title: tool.seo!.title,
+          description: tool.seo!.description,
+          canonicalPath: getPrimaryLink(tool)!.href,
+          ogImage: tool.seo!.ogImage,
+          keywords: tool.seo!.keywords,
+          locale,
+          jsonLd: [
+            {
+              '@context': 'https://schema.org',
+              '@type': tool.seo!.schemaType ?? 'SoftwareApplication',
+              name: tool.name,
+              applicationCategory: tool.group,
+              operatingSystem: 'Web',
+              url: entryUrl(getPrimaryLink(tool)!, locale),
+              description: tool.seo!.description,
+              offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'USD',
+              },
+            },
+          ],
+        } satisfies SeoConfig,
+      ])
+  );
+}
+
+export const pageSeo = getPageSeo(defaultLocale);
+export const toolSeo = getToolSeo(defaultLocale);

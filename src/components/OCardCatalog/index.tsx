@@ -7,6 +7,7 @@ import {
   getStageLabel,
   getStageToneClass,
 } from '@/config/catalog-stages';
+import { useI18n } from '@/i18n';
 import type {
   CatalogEntry,
   CatalogIconName,
@@ -78,6 +79,8 @@ interface OCardCatalogProps {
 }
 
 export function OCardCatalog({ item }: OCardCatalogProps) {
+  const { locale, localizePath, messages } = useI18n();
+  const common = messages.common;
   const supportsMobileH5 = item.platform.includes('h5');
   const scannableEntries = item.entries.filter(
     entry =>
@@ -140,10 +143,13 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
           <span className='catalog-card-category'>{item.group}</span>
           <span
             className={`catalog-card-stage ${getStageToneClass(item.lifecycle.stage)}`}
-            title={catalogStages[item.lifecycle.stage].description}
+            title={
+              messages.catalogStages[item.lifecycle.stage]?.description ??
+              catalogStages[item.lifecycle.stage].description
+            }
           >
             <span aria-hidden='true' />
-            {getStageLabel(item.lifecycle.stage)}
+            {getStageLabel(item.lifecycle.stage, locale)}
           </span>
         </div>
       </div>
@@ -153,7 +159,10 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
         <p>{item.summary}</p>
       </div>
 
-      <div className='catalog-platform-track' aria-label='支持平台'>
+      <div
+        className='catalog-platform-track'
+        aria-label={common.platformAriaLabel}
+      >
         {item.platform.map(platform => {
           const Icon = platformMeta[platform].icon;
           return (
@@ -183,9 +192,12 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
         <div className='catalog-card-actions'>
           {primaryLink?.kind === 'link' ? (
             isInternalHref(primaryLink.href) ? (
-              <Link className='card-link interactive' to={primaryLink.href}>
+              <Link
+                className='card-link interactive'
+                to={localizePath(primaryLink.href)}
+              >
                 <LogIn size={15} aria-hidden='true' />
-                打开入口
+                {common.openEntry}
               </Link>
             ) : (
               <a
@@ -195,7 +207,7 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
                 rel='noreferrer'
               >
                 <LogIn size={15} aria-hidden='true' />
-                打开入口
+                {common.openEntry}
               </a>
             )
           ) : null}
@@ -217,7 +229,7 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
 
                   {scannableEntries.length > 1 ? (
                     <OTab
-                      ariaLabel={`${item.name} 扫码模式`}
+                      ariaLabel={`${item.name} ${common.qrMode}`}
                       className='catalog-entry-tabs'
                       options={scanTabOptions}
                       value={activeEntry.id}
@@ -232,7 +244,7 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
                         size={184}
                         level='M'
                         marginSize={2}
-                        title={`${item.name} ${activeEntry.label} 二维码`}
+                        title={`${item.name} ${activeEntry.label} ${common.qrTitle}`}
                       />
                     ) : (
                       <>
@@ -246,8 +258,8 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
                             />
                             <span>
                               {failedSunCodes[activeEntry.id]
-                                ? '太阳码待上传'
-                                : '太阳码加载中'}
+                                ? common.sunCodePending
+                                : common.sunCodeLoading}
                             </span>
                           </div>
                         ) : null}
@@ -257,7 +269,7 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
                               loadedSunCodes[activeEntry.id] ? '' : 'is-loading'
                             }
                             src={activeEntry.imageUrl}
-                            alt={`${item.name} ${activeEntry.label} 太阳码`}
+                            alt={`${item.name} ${activeEntry.label} ${common.sunCodeAlt}`}
                             width='184'
                             height='184'
                             loading='lazy'
@@ -282,14 +294,14 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
                   <div className='catalog-entry-hint'>
                     {activeEntry.kind === 'link' ? (
                       <>
-                        <span>手机扫码打开，也可以直接访问入口。</span>
+                        <span>{common.directScanHint}</span>
                         {isInternalHref(activeEntry.href) ? (
                           <Link
                             className='catalog-entry-direct interactive'
-                            to={activeEntry.href}
+                            to={localizePath(activeEntry.href)}
                           >
                             <ExternalLink size={14} aria-hidden='true' />
-                            打开链接
+                            {common.openLink}
                           </Link>
                         ) : (
                           <a
@@ -299,12 +311,12 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
                             rel='noreferrer'
                           >
                             <ExternalLink size={14} aria-hidden='true' />
-                            打开链接
+                            {common.openLink}
                           </a>
                         )}
                       </>
                     ) : (
-                      <span>使用微信扫描太阳码体验小程序。</span>
+                      <span>{common.wechatScanHint}</span>
                     )}
                   </div>
                 </div>
@@ -312,12 +324,12 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
             >
               <button className='catalog-scan-button interactive' type='button'>
                 <QrCode size={15} strokeWidth={2} aria-hidden='true' />
-                扫码体验
+                {common.scanExperience}
               </button>
             </OTooltip>
           ) : null}
           {!primaryLink && !defaultScanEntry ? (
-            <span className='catalog-card-muted'>筹备中</span>
+            <span className='catalog-card-muted'>{common.preparing}</span>
           ) : null}
         </div>
       </div>

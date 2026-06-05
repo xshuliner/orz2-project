@@ -1,9 +1,12 @@
 import { siteConfig } from '@/config';
-import { footerCopy, pageTitles } from '@/config/site';
+import { useI18n } from '@/i18n';
 import { Link } from 'react-router-dom';
 import './index.css';
 
 export function Footer() {
+  const { localizePath, messages } = useI18n();
+  const footerCopy = messages.footer;
+  const pageTitles = messages.pageTitles;
   return (
     <footer className='bg-footer text-footer-text'>
       <div className='footer-grid'>
@@ -26,37 +29,37 @@ export function Footer() {
           </h2>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to='/'
+            to={localizePath('/')}
           >
             {pageTitles.home}
           </Link>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to='/tools'
+            to={localizePath('/tools')}
           >
             {pageTitles.onlineTools}
           </Link>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to='/products'
+            to={localizePath('/products')}
           >
             {pageTitles.products}
           </Link>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to='/team'
+            to={localizePath('/team')}
           >
             {pageTitles.team}
           </Link>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to='/privacy'
+            to={localizePath('/privacy')}
           >
             {pageTitles.privacy}
           </Link>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to='/design-system'
+            to={localizePath('/design-system')}
           >
             {pageTitles.designSystem}
           </Link>
@@ -84,7 +87,7 @@ export function Footer() {
           </p>
           <Link
             className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to='/privacy'
+            to={localizePath('/privacy')}
           >
             {footerCopy.viewPrivacy}
           </Link>
