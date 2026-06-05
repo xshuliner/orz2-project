@@ -10,7 +10,39 @@ const mode = process.argv[2] || 'prod';
 const env = loadEnv(mode, rootDir, 'SITE_');
 const siteUrl = env.SITE_URL || 'https://orz2.com';
 
-const routeUrl = path => (path === '/' ? `${siteUrl}/` : `${siteUrl}${path}`);
+const locales = ['zh-CN', 'en', 'ja'];
+const defaultLocale = 'zh-CN';
+const localePrefixes = {
+  'zh-CN': '',
+  en: 'en',
+  ja: 'ja',
+};
+
+const stripTrailingSlash = value => value.replace(/\/$/, '');
+const normalizedSiteUrl = stripTrailingSlash(siteUrl);
+
+function localizePath(path, locale) {
+  const prefix = localePrefixes[locale];
+  if (!prefix) return path;
+  return path === '/' ? `/${prefix}` : `/${prefix}${path}`;
+}
+
+function routeUrl(path, locale = defaultLocale) {
+  const localizedPath = localizePath(path, locale);
+  return localizedPath === '/'
+    ? `${normalizedSiteUrl}/`
+    : `${normalizedSiteUrl}${localizedPath}`;
+}
+
+function escapeXml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
+}
+
 const pages = [
   { path: '/', changefreq: 'weekly', priority: '1.0' },
   { path: '/products', changefreq: 'weekly', priority: '0.9' },
@@ -41,12 +73,31 @@ const urls = [
     })),
 ];
 
+function alternateLinks(path) {
+  const alternates = [
+    ...locales.map(locale => ({
+      hrefLang: locale,
+      href: routeUrl(path, locale),
+    })),
+    { hrefLang: 'x-default', href: routeUrl(path, defaultLocale) },
+  ];
+
+  return alternates
+    .map(
+      alternate =>
+        `    <xhtml:link rel="alternate" hreflang="${escapeXml(alternate.hrefLang)}" href="${escapeXml(alternate.href)}" />`
+    )
+    .join('\n');
+}
+
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls
+  .flatMap(url => locales.map(locale => ({ ...url, locale })))
   .map(
     url => `  <url>
-    <loc>${routeUrl(url.path)}</loc>
+    <loc>${escapeXml(routeUrl(url.path, url.locale))}</loc>
+${alternateLinks(url.path)}
     <changefreq>${url.changefreq}</changefreq>
     <priority>${url.priority}</priority>
   </url>`
