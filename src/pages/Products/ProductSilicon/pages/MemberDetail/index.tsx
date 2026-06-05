@@ -268,8 +268,7 @@ export function MemberDetailPage() {
         <div
           className='fixed inset-0 -z-10'
           style={{
-            background:
-              'radial-gradient(ellipse 1400px 700px at 8% -5%, rgba(26,26,26,0.06) 0%, transparent 50%), radial-gradient(ellipse 1000px 600px at 92% 5%, rgba(185,28,28,0.08) 0%, transparent 45%), radial-gradient(ellipse 800px 400px at 50% 80%, rgba(26,26,26,0.04) 0%, transparent 60%)',
+            background: 'var(--orz-aura-bg)',
           }}
         />
         <div className='grain-overlay' />
@@ -286,8 +285,7 @@ export function MemberDetailPage() {
         <div
           className='fixed inset-0 -z-10'
           style={{
-            background:
-              'radial-gradient(ellipse 1400px 700px at 8% -5%, rgba(26,26,26,0.06) 0%, transparent 50%), radial-gradient(ellipse 1000px 600px at 92% 5%, rgba(185,28,28,0.08) 0%, transparent 45%), radial-gradient(ellipse 800px 400px at 50% 80%, rgba(26,26,26,0.04) 0%, transparent 60%)',
+            background: 'var(--orz-aura-bg)',
           }}
         />
         <div className='grain-overlay' />
@@ -310,8 +308,7 @@ export function MemberDetailPage() {
       <div
         className='fixed inset-0 -z-10'
         style={{
-          background:
-            'radial-gradient(ellipse 1400px 700px at 8% -5%, rgba(26,26,26,0.06) 0%, transparent 50%), radial-gradient(ellipse 1000px 600px at 92% 5%, rgba(185,28,28,0.08) 0%, transparent 45%), radial-gradient(ellipse 800px 400px at 50% 80%, rgba(26,26,26,0.04) 0%, transparent 60%)',
+          background: 'var(--orz-aura-bg)',
         }}
       />
       <div className='grain-overlay' />
@@ -319,15 +316,13 @@ export function MemberDetailPage() {
       <div
         className='pointer-events-none fixed top-[10%] left-[15%] -z-[1] h-[400px] w-[400px] rounded-full opacity-30 blur-[120px]'
         style={{
-          background:
-            'radial-gradient(circle, rgba(26,26,26,0.15) 0%, transparent 70%)',
+          background: 'var(--orz-ink-glow)',
         }}
       />
       <div
         className='pointer-events-none fixed top-[20%] right-[10%] -z-[1] h-[350px] w-[350px] rounded-full opacity-25 blur-[100px]'
         style={{
-          background:
-            'radial-gradient(circle, rgba(185,28,28,0.2) 0%, transparent 70%)',
+          background: 'var(--orz-accent-glow)',
         }}
       />
 
@@ -336,7 +331,7 @@ export function MemberDetailPage() {
           className='relative overflow-visible rounded-sm border p-6 sm:p-8'
           style={{
             borderColor: 'var(--orz-border)',
-            backgroundColor: 'rgba(255,255,255,0.6)',
+            backgroundColor: 'var(--orz-surface)',
             boxShadow: 'var(--orz-shadow-lg)',
           }}
         >
@@ -366,9 +361,9 @@ export function MemberDetailPage() {
                     <span
                       className='inline-flex items-center gap-1 rounded border px-2 py-0.5 text-xs font-medium tracking-wide'
                       style={{
-                        borderColor: 'rgba(185,28,28,0.35)',
+                        borderColor: 'var(--orz-accent-border)',
                         color: 'var(--orz-accent)',
-                        backgroundColor: 'rgba(185,28,28,0.06)',
+                        backgroundColor: 'var(--orz-accent-tint)',
                       }}
                     >
                       <span aria-hidden className='opacity-80'>
@@ -453,20 +448,20 @@ export function MemberDetailPage() {
                     const toneStyle =
                       meta.tone === 'positive'
                         ? {
-                            borderColor: 'rgba(185,28,28,0.26)',
+                            borderColor: 'var(--orz-accent-border)',
                             color: 'var(--orz-accent)',
-                            backgroundColor: 'rgba(185,28,28,0.04)',
+                            backgroundColor: 'var(--orz-accent-tint)',
                           }
                         : meta.tone === 'negative'
                           ? {
-                              borderColor: 'rgba(22,163,74,0.3)',
-                              color: 'rgb(21,128,61)',
-                              backgroundColor: 'rgba(22,163,74,0.05)',
+                              borderColor: 'var(--orz-positive-border)',
+                              color: 'var(--orz-positive)',
+                              backgroundColor: 'var(--orz-positive-tint)',
                             }
                           : {
                               borderColor: 'var(--orz-border)',
                               color: 'var(--orz-ink-muted)',
-                              backgroundColor: 'rgba(255,255,255,0.00)',
+                              backgroundColor: 'transparent',
                             };
                     return (
                       <li
@@ -707,7 +702,7 @@ function MemberStoryLogSection({
                     <a
                       href={`/products/silicon/member-detail?id=${opId}`}
                       className='inline-flex items-center gap-1.5 rounded-sm px-1.5 py-0.5 text-xs font-bold transition-colors hover:underline'
-                      style={{ color: '#5c5344' }}
+                      style={{ color: 'var(--orz-ink-muted)' }}
                     >
                       {operator?.user_avatarUrl ? (
                         <img
@@ -734,8 +729,8 @@ function MemberStoryLogSection({
                     <span
                       className='mr-1.5 inline-flex items-center rounded-full border px-1.5 py-0 text-[0.65rem] leading-relaxed'
                       style={{
-                        borderColor: 'rgba(185,28,28,0.22)',
-                        backgroundColor: 'rgba(185,28,28,0.04)',
+                        borderColor: 'var(--orz-accent-border)',
+                        backgroundColor: 'var(--orz-accent-tint)',
                         color: 'var(--orz-accent)',
                       }}
                     >

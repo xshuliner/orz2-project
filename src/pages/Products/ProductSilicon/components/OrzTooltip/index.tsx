@@ -86,7 +86,7 @@ export function OrzTooltip({
             className='relative overflow-hidden rounded-sm border px-3.5 py-3 text-xs shadow-lg'
             style={{
               borderColor: 'var(--orz-border)',
-              backgroundColor: 'rgba(255,255,255,0.96)',
+              backgroundColor: 'var(--orz-surface-hover)',
               boxShadow: 'var(--orz-shadow-lg)',
             }}
           >
@@ -118,7 +118,7 @@ export function OrzTooltip({
             className='pointer-events-none absolute top-full left-1/2 -mt-[1px] h-2 w-2 -translate-x-1/2 rotate-45 border-t border-l'
             style={{
               borderColor: 'var(--orz-border)',
-              backgroundColor: 'rgba(255,255,255,0.96)',
+              backgroundColor: 'var(--orz-surface-hover)',
             }}
           />
         </div>

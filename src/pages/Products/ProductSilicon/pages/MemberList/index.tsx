@@ -166,8 +166,7 @@ export function MemberListPage() {
       <div
         className='fixed inset-0 -z-10'
         style={{
-          background:
-            'radial-gradient(ellipse 1400px 700px at 8% -5%, rgba(26,26,26,0.06) 0%, transparent 50%), radial-gradient(ellipse 1000px 600px at 92% 5%, rgba(185,28,28,0.08) 0%, transparent 45%), radial-gradient(ellipse 800px 400px at 50% 80%, rgba(26,26,26,0.04) 0%, transparent 60%)',
+          background: 'var(--orz-aura-bg)',
         }}
       />
       <div className='grain-overlay' />
@@ -175,15 +174,13 @@ export function MemberListPage() {
       <div
         className='pointer-events-none fixed top-[10%] left-[15%] -z-[1] h-[360px] w-[360px] rounded-full opacity-30 blur-[120px]'
         style={{
-          background:
-            'radial-gradient(circle, rgba(26,26,26,0.15) 0%, transparent 70%)',
+          background: 'var(--orz-ink-glow)',
         }}
       />
       <div
         className='pointer-events-none fixed top-[20%] right-[10%] -z-[1] h-[320px] w-[320px] rounded-full opacity-25 blur-[100px]'
         style={{
-          background:
-            'radial-gradient(circle, rgba(185,28,28,0.2) 0%, transparent 70%)',
+          background: 'var(--orz-accent-glow)',
         }}
       />
 
@@ -213,7 +210,7 @@ export function MemberListPage() {
               style={{
                 borderColor: 'var(--orz-border)',
                 color: 'var(--orz-ink-faint)',
-                backgroundColor: 'rgba(255,255,255,0.7)',
+                backgroundColor: 'var(--orz-surface-soft)',
               }}
             >
               正在翻阅江湖名册，请稍候…
@@ -224,7 +221,7 @@ export function MemberListPage() {
               style={{
                 borderColor: 'var(--orz-border)',
                 color: 'var(--orz-ink-faint)',
-                backgroundColor: 'rgba(255,255,255,0.7)',
+                backgroundColor: 'var(--orz-surface-soft)',
               }}
             >
               {error}
@@ -235,7 +232,7 @@ export function MemberListPage() {
               style={{
                 borderColor: 'var(--orz-border)',
                 color: 'var(--orz-ink-faint)',
-                backgroundColor: 'rgba(255,255,255,0.7)',
+                backgroundColor: 'var(--orz-surface-soft)',
               }}
             >
               尚无人名列册，静候侠客下山。
@@ -260,7 +257,7 @@ export function MemberListPage() {
                       className='card-hover block h-full overflow-hidden rounded-sm border px-4 py-4 transition-all duration-200'
                       style={{
                         borderColor: 'var(--orz-border-strong)',
-                        backgroundColor: 'rgba(255,255,255,0.92)',
+                        backgroundColor: 'var(--orz-surface-strong)',
                         boxShadow: 'var(--orz-shadow)',
                       }}
                     >
@@ -302,9 +299,9 @@ export function MemberListPage() {
                                   <span
                                     className='inline-flex shrink-0 items-center rounded border px-1.5 py-0.5 text-[0.65rem] font-medium tracking-wide'
                                     style={{
-                                      borderColor: 'rgba(185,28,28,0.35)',
+                                      borderColor: 'var(--orz-accent-border)',
                                       color: 'var(--orz-accent)',
-                                      backgroundColor: 'rgba(185,28,28,0.06)',
+                                      backgroundColor: 'var(--orz-accent-tint)',
                                     }}
                                   >
                                     <span aria-hidden className='opacity-80'>
@@ -317,8 +314,8 @@ export function MemberListPage() {
                             <span
                               className='shrink-0 rounded-full border px-1.5 py-0.5 text-[0.65rem]'
                               style={{
-                                borderColor: 'rgba(185,28,28,0.24)',
-                                backgroundColor: 'rgba(185,28,28,0.04)',
+                                borderColor: 'var(--orz-accent-border)',
+                                backgroundColor: 'var(--orz-accent-tint)',
                                 color: 'var(--orz-accent)',
                               }}
                             >

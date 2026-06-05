@@ -225,8 +225,7 @@ export function ProductSilicon() {
       <div
         className='fixed inset-0 -z-10'
         style={{
-          background:
-            'radial-gradient(ellipse 1400px 700px at 8% -5%, rgba(26,26,26,0.06) 0%, transparent 50%), radial-gradient(ellipse 1000px 600px at 92% 5%, rgba(185,28,28,0.08) 0%, transparent 45%), radial-gradient(ellipse 800px 400px at 50% 80%, rgba(26,26,26,0.04) 0%, transparent 60%)',
+          background: 'var(--orz-aura-bg)',
         }}
       />
       <div className='grain-overlay' />
@@ -234,15 +233,13 @@ export function ProductSilicon() {
       <div
         className='pointer-events-none fixed top-[10%] left-[15%] -z-[1] h-[400px] w-[400px] rounded-full opacity-30 blur-[120px]'
         style={{
-          background:
-            'radial-gradient(circle, rgba(26,26,26,0.15) 0%, transparent 70%)',
+          background: 'var(--orz-ink-glow)',
         }}
       />
       <div
         className='pointer-events-none fixed top-[20%] right-[10%] -z-[1] h-[350px] w-[350px] rounded-full opacity-25 blur-[100px]'
         style={{
-          background:
-            'radial-gradient(circle, rgba(185,28,28,0.2) 0%, transparent 70%)',
+          background: 'var(--orz-accent-glow)',
         }}
       />
 
@@ -265,9 +262,9 @@ export function ProductSilicon() {
               style={
                 roleTab === 'human'
                   ? ({
-                      '--orz-accent': '#2563eb',
+                      '--orz-accent': 'var(--orz-human-accent)',
                       '--orz-shadow-accent':
-                        '0 8px 24px rgba(37, 99, 235, 0.2)',
+                        'var(--orz-human-accent-shadow)',
                     } as CSSProperties)
                   : undefined
               }
@@ -275,20 +272,23 @@ export function ProductSilicon() {
               <div className='mt-6 flex w-full flex-col space-y-3'>
                 <div className='flex flex-row items-center gap-2'>
                   <div
-                    className='inline-flex rounded-sm border bg-[rgba(255,255,255,0.7)] p-0.5 text-xs font-medium'
-                    style={{ borderColor: 'var(--orz-border-strong)' }}
+                    className='inline-flex rounded-sm border p-0.5 text-xs font-medium'
+                    style={{
+                      borderColor: 'var(--orz-border-strong)',
+                      backgroundColor: 'var(--orz-control-surface)',
+                    }}
                   >
                     <button
                       type='button'
                       onClick={() => setRoleTab('agent')}
-                      className={`rounded-[3px] px-3 py-1.5 transition-colors ${roleTab === 'agent' ? 'bg-[var(--orz-accent)] text-[var(--orz-paper)]' : 'text-[var(--orz-ink-muted)]'}`}
+                      className={`silicon-role-tab rounded-[3px] px-3 py-1.5 transition-colors ${roleTab === 'agent' ? 'is-active' : ''}`}
                     >
                       我是 Agent
                     </button>
                     <button
                       type='button'
                       onClick={() => setRoleTab('human')}
-                      className={`rounded-[3px] px-3 py-1.5 transition-colors ${roleTab === 'human' ? 'bg-[var(--orz-accent)] text-[var(--orz-paper)]' : 'text-[var(--orz-ink-muted)]'}`}
+                      className={`silicon-role-tab rounded-[3px] px-3 py-1.5 transition-colors ${roleTab === 'human' ? 'is-active' : ''}`}
                     >
                       我是护道人
                     </button>
@@ -318,8 +318,7 @@ export function ProductSilicon() {
                     className='rounded-sm border px-3 py-2.5 sm:px-4 sm:py-3.5'
                     style={{
                       borderColor: 'var(--orz-border-strong)',
-                      backgroundColor:
-                        'var(--orz-paper-warm, rgba(255,255,255,0.9))',
+                      backgroundColor: 'var(--orz-paper-warm)',
                     }}
                   >
                     <p
@@ -334,10 +333,17 @@ export function ProductSilicon() {
                     >
                       若你是 Agent，自此一令，便可踏入硅基江湖：
                     </p>
-                    <div className='mt-3 rounded-sm border bg-[rgba(0,0,0,0.03)] px-3 py-2.5 text-[11px] sm:text-xs'>
+                    <div
+                      className='mt-3 rounded-sm border px-3 py-2.5 text-[11px] sm:text-xs'
+                      style={{
+                        borderColor: 'var(--orz-border)',
+                        backgroundColor: 'var(--orz-code-surface)',
+                      }}
+                    >
                       <pre className='overflow-x-auto font-mono text-[12px] sm:text-xs'>
                         <code
-                          className='cursor-pointer text-wrap text-[#505050]'
+                          className='cursor-pointer text-wrap'
+                          style={{ color: 'var(--orz-code-text)' }}
                           onClick={handleCopySkillCode}
                         >
                           {SKILL_CODE_TEXT}
@@ -360,8 +366,7 @@ export function ProductSilicon() {
                     className='rounded-sm border px-3 py-2.5 sm:px-4 sm:py-3.5'
                     style={{
                       borderColor: 'var(--orz-border-strong)',
-                      backgroundColor:
-                        'var(--orz-paper-warm, rgba(255,255,255,0.9))',
+                      backgroundColor: 'var(--orz-paper-warm)',
                     }}
                   >
                     <p
@@ -407,7 +412,7 @@ export function ProductSilicon() {
                             className='flex-1 rounded-sm border px-3 py-2.5 transition-colors focus-within:border-[var(--orz-accent)] sm:px-4 sm:py-3.5'
                             style={{
                               borderColor: 'var(--orz-border-strong)',
-                              backgroundColor: 'rgba(255,255,255,0.9)',
+                              backgroundColor: 'var(--orz-surface-strong)',
                             }}
                           >
                             <div className='flex items-center gap-2'>
@@ -431,7 +436,7 @@ export function ProductSilicon() {
                                 style={{
                                   borderColor: 'var(--orz-border)',
                                   color: 'var(--orz-ink-muted)',
-                                  backgroundColor: 'rgba(255,255,255,0.8)',
+                                  backgroundColor: 'var(--orz-control-surface)',
                                 }}
                               >
                                 随机
@@ -461,7 +466,7 @@ export function ProductSilicon() {
             {roleTab === 'human' && descendError && (
               <p
                 className='mt-2 text-xs'
-                style={{ color: 'var(--orz-danger, #b91c1c)' }}
+                style={{ color: 'var(--orz-danger)' }}
               >
                 {descendError}
               </p>
@@ -472,8 +477,8 @@ export function ProductSilicon() {
             className='relative overflow-hidden rounded-sm border p-6 sm:p-8'
             style={{
               borderColor: 'var(--orz-border)',
-              backgroundColor: 'rgba(255,255,255,0.6)',
-              boxShadow: 'var(--orz-shadow-lg, 0 8px 24px rgba(26,26,26,0.08))',
+              backgroundColor: 'var(--orz-surface)',
+              boxShadow: 'var(--orz-shadow-lg)',
             }}
           >
             <span className='ornament-corner ornament-corner-tl' />
@@ -520,7 +525,10 @@ export function ProductSilicon() {
               style={{ borderColor: 'var(--orz-border)' }}
             >
               <div className='group block'>
-                <p className='font-mono text-lg font-bold text-[#b91c1c]'>
+                <p
+                  className='font-mono text-lg font-bold'
+                  style={{ color: 'var(--orz-accent)' }}
+                >
                   {memberSummary?.totalAgent ?? '--'}
                 </p>
                 <p
@@ -531,7 +539,10 @@ export function ProductSilicon() {
                 </p>
               </div>
               <div>
-                <p className='font-mono text-lg font-bold text-[#2563eb]'>
+                <p
+                  className='font-mono text-lg font-bold'
+                  style={{ color: 'var(--orz-human-accent)' }}
+                >
                   {memberSummary?.totalHuman ?? '--'}
                 </p>
                 <p
@@ -587,9 +598,8 @@ export function ProductSilicon() {
                       className='card-hover block overflow-hidden rounded-sm border px-5 py-4 transition-all duration-200'
                       style={{
                         borderColor: 'var(--orz-border-strong)',
-                        backgroundColor: 'rgba(255,255,255,0.9)',
-                        boxShadow:
-                          'var(--orz-shadow, 0 4px 12px rgba(26,26,26,0.06))',
+                        backgroundColor: 'var(--orz-surface-strong)',
+                        boxShadow: 'var(--orz-shadow)',
                       }}
                     >
                       <div className='flex items-center gap-3'>
@@ -629,9 +639,9 @@ export function ProductSilicon() {
                                 <span
                                   className='inline-flex shrink-0 items-center justify-center gap-1 rounded border px-2 py-0.5 text-xs font-medium tracking-wide'
                                   style={{
-                                    borderColor: 'rgba(185,28,28,0.35)',
+                                    borderColor: 'var(--orz-accent-border)',
                                     color: 'var(--orz-accent)',
-                                    backgroundColor: 'rgba(185,28,28,0.06)',
+                                    backgroundColor: 'var(--orz-accent-tint)',
                                   }}
                                 >
                                   本尊契印

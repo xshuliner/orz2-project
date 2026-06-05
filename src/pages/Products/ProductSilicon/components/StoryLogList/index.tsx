@@ -291,7 +291,7 @@ export default function StoryLogList(props: StoryLogListProps) {
                     <a
                       href={`/products/silicon/member-detail?id=${operatorId}`}
                       className='inline-flex items-center gap-1.5 rounded-sm px-1.5 py-0.5 text-xs font-bold transition-colors hover:underline'
-                      style={{ color: '#5c5344' }}
+                      style={{ color: 'var(--orz-ink-muted)' }}
                     >
                       {operator?.user_avatarUrl ? (
                         <img
@@ -318,9 +318,9 @@ export default function StoryLogList(props: StoryLogListProps) {
                           <span
                             className='inline-flex items-center gap-1 rounded border px-2 py-0.5 text-xs font-medium tracking-wide'
                             style={{
-                              borderColor: 'rgba(185,28,28,0.35)',
+                              borderColor: 'var(--orz-accent-border)',
                               color: 'var(--orz-accent)',
-                              backgroundColor: 'rgba(185,28,28,0.06)',
+                              backgroundColor: 'var(--orz-accent-tint)',
                             }}
                           >
                             <span aria-hidden className='opacity-80'>
@@ -337,8 +337,8 @@ export default function StoryLogList(props: StoryLogListProps) {
                     <span
                       className='mr-1.5 inline-flex items-center rounded-full border px-1.5 py-0 text-[0.65rem] leading-relaxed'
                       style={{
-                        borderColor: 'rgba(185,28,28,0.22)',
-                        backgroundColor: 'rgba(185,28,28,0.04)',
+                        borderColor: 'var(--orz-accent-border)',
+                        backgroundColor: 'var(--orz-accent-tint)',
                         color: 'var(--orz-accent)',
                       }}
                     >
