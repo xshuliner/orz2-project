@@ -15,8 +15,9 @@ import { OIconButton } from '@/components/OIconButton';
 import { OModal } from '@/components/OModal';
 import { OTooltip } from '@/components/OTooltip';
 import { Seo } from '@/components/Seo';
-import { toolSeo } from '@/config/seo';
-import { pageTitles, tools } from '@/config/site';
+import { getToolSeo } from '@/config/seo';
+import { useI18n } from '@/i18n';
+import { getTools } from '@/i18n/catalog';
 import {
   promptTemplates,
   type AutoFillKeyPattern,
@@ -106,19 +107,21 @@ interface PublishStep {
   requestedCount?: number;
 }
 
+type PublisherCopy = ReturnType<typeof useI18n>['messages']['publisher'];
+
 const storageKey = 'orz2:wechat-auto-publisher-form';
 const wechatConsoleUrl = 'https://developers.weixin.qq.com/console/index';
 const wechatDraftBoxUrl =
   'https://mp.weixin.qq.com/cgi-bin/appmsg?t=media/appmsg_list&action=list&begin=0&count=10&type=10&lang=zh_CN';
 const apiWhitelistIp = '43.167.247.143';
-const publisherStepDefinitions = [
-  { key: 'generate_article', name: '生成文章内容' },
-  { key: 'prepare_cover', name: '准备并上传封面图' },
-  { key: 'prepare_inline_images', name: '准备并上传正文配图' },
-  { key: 'assemble_draft', name: '组装微信公众号草稿' },
-  { key: 'submit_draft', name: '提交草稿到微信' },
-  { key: 'save_record', name: '保存草稿发布记录' },
-];
+const publisherStepKeys = [
+  'generate_article',
+  'prepare_cover',
+  'prepare_inline_images',
+  'assemble_draft',
+  'submit_draft',
+  'save_record',
+] as const;
 const defaultForm: WechatPublisherForm = {
   appId: '',
   appSecret: '',
@@ -134,23 +137,12 @@ const defaultForm: WechatPublisherForm = {
   comment: { open: 1, fansOnly: 0 },
 };
 
-const referenceOptions: Array<{ label: string; value: ReferenceType }> = [
-  { label: '节日', value: 'festivals' },
-  { label: '节气', value: 'solarTerms' },
-];
-
-const commentOptions: Array<{
-  label: string;
-  value: OfficialCommentConfig;
-}> = [
-  { label: '关闭评论', value: { open: 0, fansOnly: 0 } },
-  { label: '开放评论', value: { open: 1, fansOnly: 0 } },
-  { label: '仅粉丝评论', value: { open: 1, fansOnly: 1 } },
-];
-
-function createInitialPublishSteps(): PublishStep[] {
-  return publisherStepDefinitions.map((step, index) => ({
-    ...step,
+function createInitialPublishSteps(
+  stepNames: readonly string[]
+): PublishStep[] {
+  return publisherStepKeys.map((key, index) => ({
+    key,
+    name: stepNames[index] ?? key,
     index: index + 1,
     status: 'pending',
   }));
@@ -162,10 +154,12 @@ function formatDuration(durationMs: number) {
 }
 
 function PublisherProgressPanel({
+  copy,
   elapsedMs,
   phase,
   steps,
 }: {
+  copy: PublisherCopy;
   elapsedMs: number;
   phase: Exclude<PublishPhase, 'idle'>;
   steps: PublishStep[];
@@ -182,27 +176,20 @@ function PublisherProgressPanel({
       : Math.round(
           ((completedCount + (activeStep ? 0.46 : 0)) / steps.length) * 100
         );
-  const phaseLabel =
-    phase === 'connecting'
-      ? '正在建立连接'
-      : phase === 'publishing'
-        ? '实时发布中'
-        : phase === 'completed'
-          ? '发布完成'
-          : '发布遇到问题';
+  const phaseLabel = copy.progress.phases[phase];
 
   return (
     <OCard
       as='section'
       className={`publish-progress-card is-${phase}`}
-      aria-label='实时发布状态'
+      aria-label={copy.progress.ariaLabel}
       padding='md'
       tone='brand'
     >
       <div className='publish-progress-head'>
         <div className='summary-heading'>
           <Activity size={18} aria-hidden='true' />
-          <h2>实时发布轨迹</h2>
+          <h2>{copy.progress.title}</h2>
         </div>
         <span className='publish-live-chip'>
           <i aria-hidden='true' />
@@ -214,7 +201,7 @@ function PublisherProgressPanel({
       </div>
       <div className='publish-progress-meta'>
         <span>
-          {completedCount}/{steps.length} 步已完成
+          {completedCount}/{steps.length} {copy.progress.completedSuffix}
         </span>
         <span>
           <Clock3 size={13} aria-hidden='true' />
@@ -246,10 +233,10 @@ function PublisherProgressPanel({
               <p>
                 {step.message ||
                   (step.status === 'pending'
-                    ? '等待前序步骤完成'
+                    ? copy.progress.pending
                     : step.status === 'completed'
-                      ? '处理完成'
-                      : '正在处理中')}
+                      ? copy.progress.completed
+                      : copy.progress.running)}
               </p>
             </div>
             {step.durationMs !== undefined ? (
@@ -263,9 +250,11 @@ function PublisherProgressPanel({
 }
 
 function DraftSuccessModal({
+  copy,
   draftResult,
   onClose,
 }: {
+  copy: PublisherCopy;
   draftResult: OfficialDraftResult | null;
   onClose: () => void;
 }) {
@@ -284,7 +273,7 @@ function DraftSuccessModal({
           className='draft-success-close'
           variant='ghost'
           onClick={onClose}
-          aria-label='关闭草稿发布结果'
+          aria-label={copy.success.closeAriaLabel}
           autoFocus
         >
           <X size={18} aria-hidden='true' />
@@ -294,43 +283,49 @@ function DraftSuccessModal({
           <div className='draft-success-icon' aria-hidden='true'>
             <CheckCheck size={31} strokeWidth={2.4} />
           </div>
-          <p>发布任务已完成</p>
-          <h2 id='draft-success-title'>草稿已稳稳送达公众号</h2>
-          <span>
-            已保存到微信公众号草稿箱。现在可以前往后台预览排版、补充细节并安排发布。
-          </span>
+          <p>{copy.success.kicker}</p>
+          <h2 id='draft-success-title'>{copy.success.title}</h2>
+          <span>{copy.success.description}</span>
         </div>
 
         <div className='draft-success-content'>
           <div className='draft-success-highlight'>
             <div>
-              <small>草稿标题</small>
-              <strong>{draftResult?.title || '公众号图文草稿'}</strong>
+              <small>{copy.success.draftTitle}</small>
+              <strong>
+                {draftResult?.title || copy.success.fallbackTitle}
+              </strong>
             </div>
             <FileJson size={22} aria-hidden='true' />
           </div>
 
           <dl className='draft-success-grid'>
             <div>
-              <dt>草稿类型</dt>
+              <dt>{copy.success.draftType}</dt>
               <dd>
                 {draftResult?.articleType === 'newspic'
-                  ? 'newspic 贴图 / 图片消息'
-                  : 'news 图文消息'}
+                  ? copy.success.typeNewspic
+                  : copy.success.typeNews}
               </dd>
             </div>
             <div>
-              <dt>生成时间</dt>
-              <dd>{draftResult?.time || '刚刚'}</dd>
+              <dt>{copy.success.generatedAt}</dt>
+              <dd>{draftResult?.time || copy.success.justNow}</dd>
             </div>
             <div>
-              <dt>封面图</dt>
-              <dd>{draftResult?.imagePath ? '已完成上传' : '已处理'}</dd>
-            </div>
-            <div>
-              <dt>正文配图</dt>
+              <dt>{copy.success.cover}</dt>
               <dd>
-                {inlineImageCount ? `${inlineImageCount} 张已上传` : '无内嵌图'}
+                {draftResult?.imagePath
+                  ? copy.success.coverDone
+                  : copy.success.coverProcessed}
+              </dd>
+            </div>
+            <div>
+              <dt>{copy.success.inlineImages}</dt>
+              <dd>
+                {inlineImageCount
+                  ? `${inlineImageCount} ${copy.success.inlineUploadedSuffix}`
+                  : copy.success.noInline}
               </dd>
             </div>
           </dl>
@@ -344,17 +339,17 @@ function DraftSuccessModal({
 
           {draftResult?.imagePath || draftResult?.inlineImagePaths?.length ? (
             <details className='draft-success-details'>
-              <summary className='interactive'>查看素材处理详情</summary>
+              <summary className='interactive'>{copy.success.details}</summary>
               <dl className='summary-list'>
                 {draftResult.imagePath ? (
                   <div>
-                    <dt>封面图</dt>
+                    <dt>{copy.success.cover}</dt>
                     <dd className='summary-mono'>{draftResult.imagePath}</dd>
                   </div>
                 ) : null}
                 {draftResult.inlineImagePaths?.length ? (
                   <div>
-                    <dt>内嵌图</dt>
+                    <dt>{copy.success.inlineDetail}</dt>
                     <dd>
                       {draftResult.inlineImagePaths.map((path, index) => (
                         <span className='summary-mono' key={`${path}-${index}`}>
@@ -371,7 +366,7 @@ function DraftSuccessModal({
 
         <footer className='draft-success-actions'>
           <OButton size='lg' type='button' variant='ghost' onClick={onClose}>
-            留在当前页面
+            {copy.success.stay}
           </OButton>
           <OButton
             href={wechatDraftBoxUrl}
@@ -379,14 +374,12 @@ function DraftSuccessModal({
             target='_blank'
             rel='noreferrer'
           >
-            前往公众号草稿箱
+            {copy.success.goDraftBox}
             <ExternalLink size={17} aria-hidden='true' />
           </OButton>
         </footer>
 
-        <p className='draft-success-footnote'>
-          草稿箱页面将在新窗口打开，当前任务配置会继续保留。
-        </p>
+        <p className='draft-success-footnote'>{copy.success.footnote}</p>
       </>
     </OModal>
   );
@@ -409,18 +402,24 @@ interface AutoFillSnapshot {
   filledKeys: AutoFillKey[];
 }
 
-function AutoFillChip({ onClear }: { onClear: () => void }) {
+function AutoFillChip({
+  copy,
+  onClear,
+}: {
+  copy: PublisherCopy;
+  onClear: () => void;
+}) {
   return (
     <span className='autofill-chip'>
       <Wand2 size={13} aria-hidden='true' />
-      <span>已智能填充</span>
+      <span>{copy.autoFill.chip}</span>
       <button
         className='autofill-chip-clear interactive'
         type='button'
         onClick={onClear}
-        aria-label='清除智能填充内容'
+        aria-label={copy.autoFill.clearAria}
       >
-        清除
+        {copy.autoFill.clear}
       </button>
     </span>
   );
@@ -495,21 +494,24 @@ function hasText(value: string) {
   return Boolean(value.trim());
 }
 
-function getCompletionItems(form: WechatPublisherForm): CompletionItem[] {
+function getCompletionItems(
+  form: WechatPublisherForm,
+  copy: PublisherCopy
+): CompletionItem[] {
   return [
     {
-      label: '公众号配置',
+      label: copy.completion.account,
       done:
         hasText(form.appId) &&
         hasText(form.appSecret) &&
         Boolean(form.articleType),
     },
     {
-      label: '文章生成提示词',
+      label: copy.completion.prompt,
       done: true,
     },
     {
-      label: '封面与内嵌图片',
+      label: copy.completion.images,
       done:
         Boolean(form.imageCover.type) &&
         hasText(form.imageCover.value) &&
@@ -518,29 +520,33 @@ function getCompletionItems(form: WechatPublisherForm): CompletionItem[] {
         ),
     },
     {
-      label: '文章元信息',
+      label: copy.completion.meta,
       done: form.comment.open === 1 || form.comment.fansOnly === 1,
     },
   ];
 }
 
-function getValidationErrors(form: WechatPublisherForm) {
+function getValidationErrors(form: WechatPublisherForm, copy: PublisherCopy) {
   const nextErrors: string[] = [];
 
-  if (!hasText(form.appId)) nextErrors.push('请填写公众号 appId。');
-  if (!hasText(form.appSecret)) nextErrors.push('请填写公众号 appSecret。');
-  if (!form.articleType) nextErrors.push('请选择草稿类型。');
-  if (!form.imageCover.type) nextErrors.push('请选择封面图生成类型。');
+  if (!hasText(form.appId)) nextErrors.push(copy.validation.appId);
+  if (!hasText(form.appSecret)) nextErrors.push(copy.validation.appSecret);
+  if (!form.articleType) nextErrors.push(copy.validation.articleType);
+  if (!form.imageCover.type) nextErrors.push(copy.validation.coverType);
   if (!hasText(form.imageCover.value))
-    nextErrors.push('请填写或上传封面图生成值。');
+    nextErrors.push(copy.validation.coverValue);
   form.imagesInlineList.forEach((item, index) => {
     if (!item.type)
-      nextErrors.push(`第 ${index + 1} 张内嵌文章图缺少图片类型。`);
+      nextErrors.push(
+        `${copy.validation.inlineTypePrefix} ${index + 1} ${copy.validation.inlineTypeSuffix}`
+      );
     if (!hasText(item.value))
-      nextErrors.push(`第 ${index + 1} 张内嵌文章图缺少生成值。`);
+      nextErrors.push(
+        `${copy.validation.inlineTypePrefix} ${index + 1} ${copy.validation.inlineValueSuffix}`
+      );
   });
   if (form.comment.open === 0 && form.comment.fansOnly === 0) {
-    nextErrors.push('请选择评论配置。');
+    nextErrors.push(copy.validation.comment);
   }
 
   return nextErrors;
@@ -597,6 +603,36 @@ function expandDefaultCheckedPatterns(
 }
 
 export function OfficialPublisher() {
+  const { locale, localizePath, messages } = useI18n();
+  const publisherCopy = messages.publisher;
+  const localizedTools = useMemo(() => getTools(locale), [locale]);
+  const localizedToolSeo = useMemo(() => getToolSeo(locale), [locale]);
+  const referenceOptions: Array<{ label: string; value: ReferenceType }> =
+    useMemo(
+      () => [
+        { label: publisherCopy.references.festivals, value: 'festivals' },
+        { label: publisherCopy.references.solarTerms, value: 'solarTerms' },
+      ],
+      [publisherCopy.references.festivals, publisherCopy.references.solarTerms]
+    );
+  const commentOptions: Array<{
+    label: string;
+    value: OfficialCommentConfig;
+  }> = useMemo(
+    () => [
+      { label: publisherCopy.comments.closed, value: { open: 0, fansOnly: 0 } },
+      { label: publisherCopy.comments.open, value: { open: 1, fansOnly: 0 } },
+      {
+        label: publisherCopy.comments.fansOnly,
+        value: { open: 1, fansOnly: 1 },
+      },
+    ],
+    [
+      publisherCopy.comments.closed,
+      publisherCopy.comments.fansOnly,
+      publisherCopy.comments.open,
+    ]
+  );
   const [form, setForm] = useState<WechatPublisherForm>(() => {
     try {
       return normalizeForm(CacheManager.getLocalStorage(storageKey));
@@ -605,9 +641,13 @@ export function OfficialPublisher() {
     }
   });
   const [isGenerating, setIsGenerating] = useState(false);
-  const [statusText, setStatusText] = useState('表单会自动保存到本机浏览器。');
+  const [statusText, setStatusText] = useState<string>(
+    publisherCopy.status.autosave
+  );
   const [publishPhase, setPublishPhase] = useState<PublishPhase>('idle');
-  const [publishSteps, setPublishSteps] = useState(createInitialPublishSteps);
+  const [publishSteps, setPublishSteps] = useState(() =>
+    createInitialPublishSteps(publisherCopy.stepNames)
+  );
   const [publishElapsedMs, setPublishElapsedMs] = useState(0);
   const [errors, setErrors] = useState<string[]>([]);
   const [draftResult, setDraftResult] = useState<OfficialDraftResult | null>(
@@ -760,13 +800,16 @@ export function OfficialPublisher() {
   }, [form, lastAutoFill]);
 
   const exportedJson = useMemo(() => JSON.stringify(form, null, 2), [form]);
-  const completionItems = useMemo(() => getCompletionItems(form), [form]);
+  const completionItems = useMemo(
+    () => getCompletionItems(form, publisherCopy),
+    [form, publisherCopy]
+  );
   const completedCount = completionItems.filter(item => item.done).length;
   // 页面标题 / 描述 / 面包屑文字统一从 tools.json 读取，
   // 与目录卡片、SEO 数据保持单一数据源；slug 改了就同步更新。
   const publisherTool = useMemo(
-    () => tools.find(item => item.seo?.slug === 'official-publisher'),
-    []
+    () => localizedTools.find(item => item.seo?.slug === 'official-publisher'),
+    [localizedTools]
   );
 
   function updateField<K extends keyof WechatPublisherForm>(
@@ -788,7 +831,7 @@ export function OfficialPublisher() {
   }
 
   function validate() {
-    const nextErrors = getValidationErrors(form);
+    const nextErrors = getValidationErrors(form, publisherCopy);
     setErrors(nextErrors);
     return nextErrors.length === 0;
   }
@@ -864,11 +907,11 @@ export function OfficialPublisher() {
             ? event.status === 'info' &&
               event.imageIndex !== undefined &&
               event.imageIndex >= requestedCount
-              ? `正文配图已上传（${requestedCount}/${requestedCount}）`
-              : `正在生成正文配图（${currentInlineImageIndex}/${requestedCount}）`
+              ? `${publisherCopy.progress.inlineUploaded}（${requestedCount}/${requestedCount}）`
+              : `${publisherCopy.progress.inlineGenerating}（${currentInlineImageIndex}/${requestedCount}）`
             : event.message ||
               (event.status === 'info' && event.imageIndex
-                ? `正文配图 ${event.imageIndex} 已上传`
+                ? `${publisherCopy.progress.inlineUploadedSingle} ${event.imageIndex}`
                 : undefined);
         const durationMs =
           event.key === 'prepare_inline_images' &&
@@ -888,33 +931,39 @@ export function OfficialPublisher() {
 
     if (event.status === 'running') {
       setPublishPhase('publishing');
-      setStatusText(`正在执行：${event.name || '公众号草稿发布步骤'}。`);
+      setStatusText(
+        `${publisherCopy.status.runningPrefix}${
+          event.name || publisherCopy.status.runningFallback
+        }。`
+      );
     } else if (event.status === 'warning') {
-      setStatusText(event.message || '部分素材已跳过，发布任务继续执行中。');
+      setStatusText(event.message || publisherCopy.status.skipped);
     } else if (event.status === 'failed') {
       setPublishPhase('failed');
-      setStatusText(`生成失败：${event.message || '发布步骤执行失败'}`);
+      setStatusText(
+        `${publisherCopy.status.failedPrefix}${
+          event.message || publisherCopy.status.failedFallback
+        }`
+      );
     }
   }
 
   async function handleGenerate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!validate()) {
-      setStatusText('请先补齐必填项，再生成公众号发布任务。');
+      setStatusText(publisherCopy.status.validationFailed);
       return;
     }
-    const confirmed = window.confirm(
-      '生成公众号发布任务可能耗时较长，请确认是否开始？'
-    );
+    const confirmed = window.confirm(publisherCopy.status.confirmGenerate);
     if (!confirmed) return;
 
     setIsGenerating(true);
     setDraftResult(null);
     setDraftResultOpen(false);
     setPublishPhase('connecting');
-    setPublishSteps(createInitialPublishSteps());
+    setPublishSteps(createInitialPublishSteps(publisherCopy.stepNames));
     setPublishElapsedMs(0);
-    setStatusText('正在连接发布服务，实时进度会显示在发布轨迹中。');
+    setStatusText(publisherCopy.status.connecting);
 
     const body: PostOfficialPublisherBody = {
       appId: form.appId.trim(),
@@ -956,9 +1005,7 @@ export function OfficialPublisher() {
         signal: controller.signal,
         onConnected: event => {
           setPublishPhase('publishing');
-          setStatusText(
-            event.message || '已连接发布服务，正在生成公众号草稿。'
-          );
+          setStatusText(event.message || publisherCopy.status.connected);
         },
         onProgress: updatePublishProgress,
       });
@@ -967,12 +1014,14 @@ export function OfficialPublisher() {
       setPublishPhase('completed');
       setStatusText(
         result?.title
-          ? `已生成草稿「${result.title}」，请在公众号后台查看。`
-          : '草稿已生成，请在公众号后台查看。'
+          ? `${publisherCopy.status.draftCreatedPrefix}「${result.title}」${publisherCopy.status.draftCreatedSuffix}`
+          : publisherCopy.status.draftCreated
       );
     } catch (error) {
       const message =
-        error instanceof Error ? error.message : '发布任务提交失败';
+        error instanceof Error
+          ? error.message
+          : publisherCopy.status.submitFailed;
       setPublishPhase('failed');
       setPublishSteps(current =>
         current.map(step =>
@@ -981,7 +1030,7 @@ export function OfficialPublisher() {
             : step
         )
       );
-      setStatusText(`生成失败：${message}`);
+      setStatusText(`${publisherCopy.status.failedPrefix}${message}`);
     } finally {
       if (publishStartedAtRef.current) {
         setPublishElapsedMs(Date.now() - publishStartedAtRef.current);
@@ -993,18 +1042,16 @@ export function OfficialPublisher() {
   }
 
   function handleReset() {
-    const confirmed = window.confirm(
-      '重置会清空当前表单并覆盖本机自动保存内容，确认继续？'
-    );
+    const confirmed = window.confirm(publisherCopy.status.resetConfirm);
     if (!confirmed) return;
     setForm(defaultForm);
     setErrors([]);
     setDraftResult(null);
     setDraftResultOpen(false);
     setPublishPhase('idle');
-    setPublishSteps(createInitialPublishSteps());
+    setPublishSteps(createInitialPublishSteps(publisherCopy.stepNames));
     setPublishElapsedMs(0);
-    setStatusText('表单已重置，并已同步更新本机保存内容。');
+    setStatusText(publisherCopy.status.resetDone);
   }
 
   function handleExport() {
@@ -1017,7 +1064,7 @@ export function OfficialPublisher() {
     link.download = 'orz2-wechat-publisher-config.json';
     link.click();
     URL.revokeObjectURL(url);
-    setStatusText('JSON 配置已导出。');
+    setStatusText(publisherCopy.status.exportDone);
   }
 
   async function handleImport(event: ChangeEvent<HTMLInputElement>) {
@@ -1027,9 +1074,9 @@ export function OfficialPublisher() {
       const imported = normalizeForm(JSON.parse(await file.text()));
       setForm(imported);
       setErrors([]);
-      setStatusText('JSON 配置已导入，并已自动保存到本机浏览器。');
+      setStatusText(publisherCopy.status.importDone);
     } catch {
-      setStatusText('JSON 导入失败，请检查文件格式。');
+      setStatusText(publisherCopy.status.importFailed);
     } finally {
       event.target.value = '';
     }
@@ -1051,7 +1098,7 @@ export function OfficialPublisher() {
       window.setTimeout(() => setCopiedIp(false), 1800);
     } catch {
       setStatusText(
-        `无法自动复制，请手动将 ${apiWhitelistIp} 添加到 API IP 白名单。`
+        `${publisherCopy.status.copyFailedPrefix} ${apiWhitelistIp} ${publisherCopy.status.copyFailedSuffix}`
       );
     }
   }
@@ -1086,6 +1133,14 @@ export function OfficialPublisher() {
     return { previousValues, filledKeys };
   }
 
+  function getTemplateDisplay(template: PromptTemplate) {
+    const meta = publisherCopy.promptTemplates[template.id];
+    return {
+      label: meta?.[0] ?? template.label,
+      caption: meta?.[1] ?? template.caption,
+    };
+  }
+
   // 用户在弹层里点击某个模板卡：若表单为空则直接应用，否则弹出确认
   function requestApplyTemplate(template: PromptTemplate) {
     const plan = buildApplyPlan(form);
@@ -1112,6 +1167,7 @@ export function OfficialPublisher() {
     previousValues: Partial<Record<AutoFillKey, string>>,
     filledKeys: AutoFillKey[]
   ) {
+    const templateDisplay = getTemplateDisplay(template);
     const keySet = new Set(filledKeys);
     const filledValues: Partial<Record<AutoFillKey, string>> = {};
     filledKeys.forEach(key => {
@@ -1161,7 +1217,7 @@ export function OfficialPublisher() {
     });
     setLastAutoFill({
       templateId: template.id,
-      templateLabel: template.label,
+      templateLabel: templateDisplay.label,
       previousValues,
       filledValues,
       filledKeys,
@@ -1170,7 +1226,7 @@ export function OfficialPublisher() {
     setPendingTemplate(null);
     setSelectedKeys(new Set());
     setStatusText(
-      `已应用「${template.label}」模板，填充 ${filledKeys.length} 个字段，可点击撤销。`
+      `${publisherCopy.autoFill.appliedPrefix}「${templateDisplay.label}」${publisherCopy.autoFill.appliedMiddle} ${filledKeys.length} ${publisherCopy.autoFill.appliedSuffix}`
     );
   }
 
@@ -1253,7 +1309,9 @@ export function OfficialPublisher() {
       return next;
     });
     setLastAutoFill(null);
-    setStatusText(`已撤销「${snapshot.templateLabel}」模板的智能填充。`);
+    setStatusText(
+      `${publisherCopy.autoFill.revertedPrefix}「${snapshot.templateLabel}」${publisherCopy.autoFill.revertedSuffix}`
+    );
   }
 
   function clearAutoFillField(key: AutoFillKey) {
@@ -1290,37 +1348,37 @@ export function OfficialPublisher() {
       next.delete(key);
       return next;
     });
-    setStatusText('已清除该字段的智能填充内容。');
+    setStatusText(publisherCopy.autoFill.clearedField);
   }
 
   return (
     <>
-      <Seo config={toolSeo['official-publisher']} />
+      <Seo config={localizedToolSeo['official-publisher']} />
       <section className='tool-form-page'>
-        <Link className='back-link interactive' to='/tools'>
+        <Link className='back-link interactive' to={localizePath('/tools')}>
           <ArrowLeft size={16} aria-hidden='true' />
-          {pageTitles.onlineTools}
+          {publisherCopy.backLabel}
         </Link>
         <div className='tool-form-hero'>
           <div>
-            <h1>{publisherTool?.name ?? '公众号发布'}</h1>
-            <p>
-              {publisherTool?.summary ??
-                '把账号、提示词、图片素材和发布元信息整理成一张清晰的任务单，发布前的关键信息一眼可查。'}
-            </p>
+            <h1>{publisherTool?.name ?? publisherCopy.fallbackName}</h1>
+            <p>{publisherTool?.summary ?? publisherCopy.fallbackSummary}</p>
           </div>
-          <div className='json-actions' aria-label='JSON 配置操作'>
+          <div
+            className='json-actions'
+            aria-label={publisherCopy.jsonActionsAriaLabel}
+          >
             <OButton
               type='button'
               variant='ghost'
               onClick={() => importInputRef.current?.click()}
             >
               <Upload size={17} aria-hidden='true' />
-              导入 JSON
+              {publisherCopy.importJson}
             </OButton>
             <OButton type='button' variant='secondary' onClick={handleExport}>
               <Download size={17} aria-hidden='true' />
-              导出 JSON
+              {publisherCopy.exportJson}
             </OButton>
             <input
               ref={importInputRef}
@@ -1341,7 +1399,7 @@ export function OfficialPublisher() {
         >
           <OTooltip
             className='wechat-setup-visual interactive'
-            ariaLabel='查看微信公众平台配置示意大图'
+            ariaLabel={publisherCopy.setupAriaLabel}
             content={
               <div className='wechat-setup-preview'>
                 <img src={WechatConsoleGuide} alt='' />
@@ -1352,28 +1410,25 @@ export function OfficialPublisher() {
             placement='bottom-start'
             offset={12}
           >
-            <img
-              src={WechatConsoleGuide}
-              alt='微信公众平台配置 AppId、AppSecret 和 API IP 白名单示意图'
-            />
+            <img src={WechatConsoleGuide} alt={publisherCopy.setupImageAlt} />
           </OTooltip>
           <div className='wechat-setup-content'>
-            <h2 id='wechat-setup-title'>先完成公众号开发配置</h2>
+            <h2 id='wechat-setup-title'>{publisherCopy.setupTitle}</h2>
             <ol className='setup-steps'>
-              <li>打开微信公众平台开发者控制台，选择要发布的公众号。</li>
-              <li>在开发配置里获取 AppId 和 AppSecret，填入下方公众号配置。</li>
+              <li>{publisherCopy.setupSteps[0]}</li>
+              <li>{publisherCopy.setupSteps[1]}</li>
               <li>
-                配置 API IP 白名单，并加入 <code>{apiWhitelistIp}</code>。
+                {publisherCopy.setupSteps[2]} <code>{apiWhitelistIp}</code>.
               </li>
             </ol>
             <div className='setup-actions'>
               <OButton href={wechatConsoleUrl} target='_blank' rel='noreferrer'>
                 <ExternalLink size={17} aria-hidden='true' />
-                打开微信公众平台
+                {publisherCopy.openWechatConsole}
               </OButton>
               <OButton type='button' variant='secondary' onClick={handleCopyIp}>
                 <Clipboard size={17} aria-hidden='true' />
-                {copiedIp ? '已复制 IP' : '复制白名单 IP'}
+                {copiedIp ? publisherCopy.copiedIp : publisherCopy.copyIp}
               </OButton>
             </div>
           </div>
@@ -1384,8 +1439,10 @@ export function OfficialPublisher() {
             <div className='autofill-banner' role='status'>
               <Sparkles size={16} aria-hidden='true' />
               <span>
-                已为 {lastAutoFill.filledKeys.length} 个字段智能填充「
-                {lastAutoFill.templateLabel}」模板
+                {publisherCopy.autoFill.bannerPrefix}{' '}
+                {lastAutoFill.filledKeys.length}{' '}
+                {publisherCopy.autoFill.bannerMiddle}「
+                {lastAutoFill.templateLabel}」
               </span>
               <button
                 className='autofill-banner-action interactive'
@@ -1393,12 +1450,12 @@ export function OfficialPublisher() {
                 onClick={revertLastAutoFill}
               >
                 <RotateCcw size={14} aria-hidden='true' />
-                撤销填充
+                {publisherCopy.autoFill.undo}
               </button>
               <button
                 className='autofill-banner-close interactive'
                 type='button'
-                aria-label='关闭提示'
+                aria-label={publisherCopy.autoFill.closeTip}
                 onClick={() => setLastAutoFill(null)}
               >
                 <X size={14} aria-hidden='true' />
@@ -1413,8 +1470,8 @@ export function OfficialPublisher() {
                     <KeyRound size={19} aria-hidden='true' />
                   </span>
                   <div>
-                    <h2>公众号配置</h2>
-                    <p>连接发布账号并选择草稿类型。</p>
+                    <h2>{publisherCopy.sections.account.title}</h2>
+                    <p>{publisherCopy.sections.account.description}</p>
                   </div>
                 </div>
                 <div className='form-grid two'>
@@ -1425,7 +1482,9 @@ export function OfficialPublisher() {
                       onChange={event =>
                         updateField('appId', event.target.value)
                       }
-                      placeholder='请输入公众号 appId'
+                      placeholder={
+                        publisherCopy.sections.account.appIdPlaceholder
+                      }
                       required
                     />
                   </label>
@@ -1436,21 +1495,23 @@ export function OfficialPublisher() {
                       onChange={event =>
                         updateField('appSecret', event.target.value)
                       }
-                      placeholder='请输入公众号 appSecret'
+                      placeholder={
+                        publisherCopy.sections.account.appSecretPlaceholder
+                      }
                       type='password'
                       required
                     />
                   </label>
                 </div>
                 <fieldset className='choice-field'>
-                  <legend>草稿类型 *</legend>
+                  <legend>{publisherCopy.sections.account.draftType}</legend>
                   <label className='interactive'>
                     <input
                       type='radio'
                       checked={form.articleType === 'news'}
                       onChange={() => updateField('articleType', 'news')}
                     />
-                    news 图文消息
+                    {publisherCopy.sections.account.newsType}
                   </label>
                   {/* <label className='interactive'>
                     <input
@@ -1469,8 +1530,8 @@ export function OfficialPublisher() {
                     <Sparkles size={19} aria-hidden='true' />
                   </span>
                   <div className='form-panel-heading-main'>
-                    <h2>文章生成提示词</h2>
-                    <p>定义内容角色、主题、结构和可引用的信息。</p>
+                    <h2>{publisherCopy.sections.prompt.title}</h2>
+                    <p>{publisherCopy.sections.prompt.description}</p>
                   </div>
                   <div className='autofill-trigger' ref={templateMenuRef}>
                     <OButton
@@ -1483,44 +1544,50 @@ export function OfficialPublisher() {
                       onClick={() => setTemplateMenuOpen(current => !current)}
                     >
                       <Wand2 size={17} aria-hidden='true' />
-                      AI 智能填充
+                      {publisherCopy.sections.prompt.aiFill}
                     </OButton>
                   </div>
                 </div>
                 <label className='field'>
-                  <span>系统提示词</span>
+                  <span>{publisherCopy.sections.prompt.systemLabel}</span>
                   <textarea
                     value={form.promptSystem}
                     onChange={event =>
                       updateField('promptSystem', event.target.value)
                     }
                     rows={4}
-                    placeholder='例如：你是一名专业公众号内容编辑...'
+                    placeholder={
+                      publisherCopy.sections.prompt.systemPlaceholder
+                    }
                   />
                   {autoFilledKeys.has('promptSystem') ? (
                     <AutoFillChip
+                      copy={publisherCopy}
                       onClear={() => clearAutoFillField('promptSystem')}
                     />
                   ) : null}
                 </label>
                 <label className='field'>
-                  <span>主体内容提示词</span>
+                  <span>{publisherCopy.sections.prompt.contentLabel}</span>
                   <textarea
                     value={form.promptContent}
                     onChange={event =>
                       updateField('promptContent', event.target.value)
                     }
                     rows={5}
-                    placeholder='输入文章主题、受众、语气、结构要求...'
+                    placeholder={
+                      publisherCopy.sections.prompt.contentPlaceholder
+                    }
                   />
                   {autoFilledKeys.has('promptContent') ? (
                     <AutoFillChip
+                      copy={publisherCopy}
                       onClear={() => clearAutoFillField('promptContent')}
                     />
                   ) : null}
                 </label>
                 <fieldset className='choice-field'>
-                  <legend>参考信息</legend>
+                  <legend>{publisherCopy.sections.prompt.references}</legend>
                   {referenceOptions.map(option => (
                     <label className='interactive' key={option.value}>
                       <input
@@ -1540,12 +1607,12 @@ export function OfficialPublisher() {
                     <Image size={19} aria-hidden='true' />
                   </span>
                   <div>
-                    <h2>封面与内嵌图片</h2>
-                    <p>管理首图和正文插图，支持 AI 描述、URL 与本地文件。</p>
+                    <h2>{publisherCopy.sections.images.title}</h2>
+                    <p>{publisherCopy.sections.images.description}</p>
                   </div>
                 </div>
                 <label className='field'>
-                  <span>封面图生成值 *</span>
+                  <span>{publisherCopy.sections.images.coverLabel}</span>
                   <input
                     value={form.imageCover.value}
                     onChange={event =>
@@ -1553,13 +1620,14 @@ export function OfficialPublisher() {
                     }
                     placeholder={
                       form.imageCover.type === 'ai'
-                        ? '描述希望生成的封面图'
-                        : 'https://example.com/cover.png'
+                        ? publisherCopy.sections.images.coverAiPlaceholder
+                        : publisherCopy.sections.images.coverUrlPlaceholder
                     }
                     required
                   />
                   {autoFilledKeys.has('imageCover.value') ? (
                     <AutoFillChip
+                      copy={publisherCopy}
                       onClear={() => clearAutoFillField('imageCover.value')}
                     />
                   ) : null}
@@ -1567,11 +1635,11 @@ export function OfficialPublisher() {
 
                 <div className='inline-image-head'>
                   <div>
-                    <h3>内嵌文章图</h3>
+                    <h3>{publisherCopy.sections.images.inlineTitle}</h3>
                     <p>
                       {form.imagesInlineList.length
-                        ? `已添加 ${form.imagesInlineList.length} / 9 张`
-                        : '正文插图可稍后补充'}
+                        ? `${publisherCopy.sections.images.inlineAddedPrefix} ${form.imagesInlineList.length} ${publisherCopy.sections.images.inlineAddedSuffix}`
+                        : publisherCopy.sections.images.inlineEmpty}
                     </p>
                   </div>
                   <OButton
@@ -1582,7 +1650,7 @@ export function OfficialPublisher() {
                     disabled={form.imagesInlineList.length >= 9}
                   >
                     <Plus size={17} aria-hidden='true' />
-                    增加图片
+                    {publisherCopy.sections.images.addImage}
                   </OButton>
                 </div>
                 <div className='inline-image-list'>
@@ -1596,10 +1664,13 @@ export function OfficialPublisher() {
                       tone='soft'
                     >
                       <div className='inline-image-title'>
-                        <strong>内嵌图片 {index + 1}</strong>
+                        <strong>
+                          {publisherCopy.sections.images.inlineImage}{' '}
+                          {index + 1}
+                        </strong>
                         <OIconButton
                           type='button'
-                          aria-label={`删除内嵌图片 ${index + 1}`}
+                          aria-label={`${publisherCopy.sections.images.deleteInlineImage} ${index + 1}`}
                           onClick={() => removeInlineImage(index)}
                           size='sm'
                         >
@@ -1607,7 +1678,9 @@ export function OfficialPublisher() {
                         </OIconButton>
                       </div>
                       <label className='field'>
-                        <span>图片生成值</span>
+                        <span>
+                          {publisherCopy.sections.images.imageValueLabel}
+                        </span>
                         <input
                           value={item.value}
                           onChange={event =>
@@ -1617,14 +1690,16 @@ export function OfficialPublisher() {
                           }
                           placeholder={
                             item.type === 'ai'
-                              ? '描述这张内嵌图'
-                              : 'https://example.com/inline.png'
+                              ? publisherCopy.sections.images.imageAiPlaceholder
+                              : publisherCopy.sections.images
+                                  .imageUrlPlaceholder
                           }
                         />
                         {autoFilledKeys.has(
                           `imagesInlineList.${index}.value` as AutoFillKey
                         ) ? (
                           <AutoFillChip
+                            copy={publisherCopy}
                             onClear={() =>
                               clearAutoFillField(
                                 `imagesInlineList.${index}.value` as AutoFillKey
@@ -1644,23 +1719,25 @@ export function OfficialPublisher() {
                     <Newspaper size={19} aria-hidden='true' />
                   </span>
                   <div>
-                    <h2>文章元信息</h2>
-                    <p>补齐作者、摘要、来源与评论策略。</p>
+                    <h2>{publisherCopy.sections.meta.title}</h2>
+                    <p>{publisherCopy.sections.meta.description}</p>
                   </div>
                 </div>
                 <div className='form-grid two'>
                   <label className='field'>
-                    <span>作者</span>
+                    <span>{publisherCopy.sections.meta.author}</span>
                     <input
                       value={form.author}
                       onChange={event =>
                         updateField('author', event.target.value)
                       }
-                      placeholder='作者名称'
+                      placeholder={
+                        publisherCopy.sections.meta.authorPlaceholder
+                      }
                     />
                   </label>
                   <label className='field'>
-                    <span>原文链接</span>
+                    <span>{publisherCopy.sections.meta.sourceUrl}</span>
                     <input
                       value={form.sourceUrl}
                       onChange={event =>
@@ -1671,23 +1748,24 @@ export function OfficialPublisher() {
                   </label>
                 </div>
                 <label className='field'>
-                  <span>摘要</span>
+                  <span>{publisherCopy.sections.meta.digest}</span>
                   <textarea
                     value={form.digest}
                     onChange={event =>
                       updateField('digest', event.target.value)
                     }
                     rows={3}
-                    placeholder='用于公众号摘要展示的短文案'
+                    placeholder={publisherCopy.sections.meta.digestPlaceholder}
                   />
                   {autoFilledKeys.has('digest') ? (
                     <AutoFillChip
+                      copy={publisherCopy}
                       onClear={() => clearAutoFillField('digest')}
                     />
                   ) : null}
                 </label>
                 <fieldset className='choice-field'>
-                  <legend>评论配置 *</legend>
+                  <legend>{publisherCopy.sections.meta.comment}</legend>
                   {commentOptions.map(option => (
                     <label className='interactive' key={option.label}>
                       <input
@@ -1707,11 +1785,12 @@ export function OfficialPublisher() {
 
             <aside
               className='publisher-aside'
-              aria-label='发布任务摘要'
+              aria-label={publisherCopy.aside.summaryAriaLabel}
               ref={publisherAsideRef}
             >
               {publishPhase !== 'idle' ? (
                 <PublisherProgressPanel
+                  copy={publisherCopy}
                   elapsedMs={publishElapsedMs}
                   phase={publishPhase}
                   steps={publishSteps}
@@ -1721,13 +1800,13 @@ export function OfficialPublisher() {
               <OCard
                 as='section'
                 className='publish-summary-card publish-readiness-card'
-                aria-label='配置进度'
+                aria-label={publisherCopy.aside.progressAriaLabel}
                 padding='md'
               >
                 <div className='publish-readiness-head'>
                   <div className='summary-heading'>
                     <CheckCircle2 size={18} aria-hidden='true' />
-                    <h2>配置进度</h2>
+                    <h2>{publisherCopy.aside.progressTitle}</h2>
                   </div>
                   <strong>
                     {completedCount}
@@ -1755,7 +1834,7 @@ export function OfficialPublisher() {
               <OCard
                 as='section'
                 className='publisher-action-dock'
-                aria-label='发布操作'
+                aria-label={publisherCopy.aside.actionAriaLabel}
                 padding='sm'
                 tone='soft'
               >
@@ -1774,7 +1853,7 @@ export function OfficialPublisher() {
                     onClick={() => setDraftResultOpen(true)}
                   >
                     <FileJson size={15} aria-hidden='true' />
-                    查看草稿发布结果
+                    {publisherCopy.aside.viewResult}
                   </button>
                 ) : null}
                 <div className='publisher-action-buttons'>
@@ -1786,7 +1865,7 @@ export function OfficialPublisher() {
                     disabled={isGenerating}
                   >
                     <RotateCcw size={17} aria-hidden='true' />
-                    重置
+                    {publisherCopy.aside.reset}
                   </OButton>
                   <OButton
                     className='publisher-submit'
@@ -1798,7 +1877,9 @@ export function OfficialPublisher() {
                     ) : (
                       <Sparkles size={17} aria-hidden='true' />
                     )}
-                    {isGenerating ? '生成中...' : '生成发布任务'}
+                    {isGenerating
+                      ? publisherCopy.aside.generating
+                      : publisherCopy.aside.generate}
                   </OButton>
                 </div>
               </OCard>
@@ -1822,6 +1903,7 @@ export function OfficialPublisher() {
 
       {isDraftResultOpen ? (
         <DraftSuccessModal
+          copy={publisherCopy}
           draftResult={draftResult}
           onClose={() => setDraftResultOpen(false)}
         />
@@ -1832,7 +1914,7 @@ export function OfficialPublisher() {
             <OCard
               className='autofill-menu'
               role='dialog'
-              aria-label='选择提示词模板'
+              aria-label={publisherCopy.autoFill.menuAriaLabel}
               padding='sm'
               ref={templateMenuRef}
               style={{
@@ -1843,16 +1925,14 @@ export function OfficialPublisher() {
               tone='soft'
             >
               <div className='autofill-menu-head'>
-                <strong>选择提示词模板</strong>
-                <p>
-                  切换模板会填充提示词与 AI
-                  图片描述；已有内容会在替换前二次确认。
-                </p>
+                <strong>{publisherCopy.autoFill.menuTitle}</strong>
+                <p>{publisherCopy.autoFill.menuDescription}</p>
               </div>
               <div className='autofill-menu-list'>
                 {promptTemplates.map(template => {
                   const plan = buildApplyPlan(form);
                   const affectedKeys = plan.filledKeys;
+                  const templateDisplay = getTemplateDisplay(template);
                   // 预览该模板的默认预勾选数（用于在卡片上给用户预期）
                   const defaultKeys = expandDefaultCheckedPatterns(
                     template.defaultCheckedPatterns,
@@ -1871,17 +1951,21 @@ export function OfficialPublisher() {
                       </span>
                       <span className='autofill-card-body'>
                         <span className='autofill-card-title'>
-                          {template.label}
+                          {templateDisplay.label}
                         </span>
                         <span className='autofill-card-caption'>
-                          {template.caption}
+                          {templateDisplay.caption}
                         </span>
                         <span className='autofill-card-meta'>
                           <PenLine size={13} aria-hidden='true' />
-                          切换将覆盖 {affectedKeys.length} 个字段
+                          {publisherCopy.autoFill.coverCountPrefix}{' '}
+                          {affectedKeys.length}{' '}
+                          {publisherCopy.autoFill.coverCountSuffix}
                           {affectedKeys.length > 0 ? (
                             <em className='autofill-card-default'>
-                              · 默认预勾 {defaultKeys.length} 项
+                              · {publisherCopy.autoFill.defaultCountPrefix}{' '}
+                              {defaultKeys.length}{' '}
+                              {publisherCopy.autoFill.defaultCountSuffix}
                             </em>
                           ) : null}
                         </span>
@@ -1914,17 +1998,21 @@ export function OfficialPublisher() {
               </span>
               <div>
                 <h3 id='autofill-confirm-title'>
-                  切换到「{pendingTemplate.label}」模板？
+                  {publisherCopy.autoFill.confirmTitlePrefix}「
+                  {getTemplateDisplay(pendingTemplate).label}」
+                  {publisherCopy.autoFill.confirmTitleSuffix}
                 </h3>
                 <p>
-                  勾选要替换的字段；未勾选的字段将保持原值。 共{' '}
-                  {buildApplyPlan(form).filledKeys.length} 项可替换， 已选{' '}
-                  {selectedKeys.size} 项。
+                  {publisherCopy.autoFill.confirmDescriptionPrefix}{' '}
+                  {buildApplyPlan(form).filledKeys.length}{' '}
+                  {publisherCopy.autoFill.confirmDescriptionMiddle}{' '}
+                  {selectedKeys.size}{' '}
+                  {publisherCopy.autoFill.confirmDescriptionSuffix}
                 </p>
               </div>
               <OIconButton
                 className='autofill-banner-close interactive'
-                aria-label='关闭确认'
+                aria-label={publisherCopy.autoFill.closeConfirm}
                 size='sm'
                 variant='ghost'
                 onClick={cancelPendingTemplate}
@@ -1942,7 +2030,7 @@ export function OfficialPublisher() {
                 }}
               >
                 <CheckCheck size={13} aria-hidden='true' />
-                全选
+                {publisherCopy.autoFill.selectAll}
               </button>
               <button
                 className='autofill-confirm-tool interactive'
@@ -1953,20 +2041,26 @@ export function OfficialPublisher() {
                 }}
               >
                 <Square size={13} aria-hidden='true' />
-                全不选
+                {publisherCopy.autoFill.selectNone}
               </button>
             </div>
             <ul className='autofill-confirm-list'>
               {(() => {
                 const plan = buildApplyPlan(form);
                 const labelOf = (key: AutoFillKey) => {
-                  if (key === 'promptSystem') return '系统提示词';
-                  if (key === 'promptContent') return '主体内容提示词';
-                  if (key === 'digest') return '摘要';
-                  if (key === 'imageCover.value') return '封面图描述（AI）';
+                  if (key === 'promptSystem')
+                    return publisherCopy.autoFill.fieldLabels.promptSystem;
+                  if (key === 'promptContent')
+                    return publisherCopy.autoFill.fieldLabels.promptContent;
+                  if (key === 'digest')
+                    return publisherCopy.autoFill.fieldLabels.digest;
+                  if (key === 'imageCover.value')
+                    return publisherCopy.autoFill.fieldLabels.cover;
                   if (key.startsWith('imagesInlineList.')) {
                     const idx = Number(key.split('.')[1]);
-                    return `内嵌图 ${idx + 1} 描述（AI）`;
+                    return `${publisherCopy.autoFill.fieldLabels.inline} ${
+                      idx + 1
+                    } ${publisherCopy.autoFill.fieldLabels.inlineSuffix}`;
                   }
                   return key;
                 };
@@ -2014,7 +2108,7 @@ export function OfficialPublisher() {
                 variant='ghost'
                 onClick={cancelPendingTemplate}
               >
-                取消
+                {publisherCopy.autoFill.cancel}
               </OButton>
               <OButton
                 type='button'
@@ -2022,7 +2116,8 @@ export function OfficialPublisher() {
                 disabled={selectedKeys.size === 0}
               >
                 <Wand2 size={16} aria-hidden='true' />
-                替换 {selectedKeys.size} 个字段
+                {publisherCopy.autoFill.replacePrefix} {selectedKeys.size}{' '}
+                {publisherCopy.autoFill.replaceSuffix}
               </OButton>
             </div>
           </>
