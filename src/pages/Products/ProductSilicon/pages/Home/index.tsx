@@ -263,8 +263,7 @@ export function ProductSilicon() {
                 roleTab === 'human'
                   ? ({
                       '--orz-accent': 'var(--orz-human-accent)',
-                      '--orz-shadow-accent':
-                        'var(--orz-human-accent-shadow)',
+                      '--orz-shadow-accent': 'var(--orz-human-accent-shadow)',
                     } as CSSProperties)
                   : undefined
               }

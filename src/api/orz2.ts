@@ -56,7 +56,7 @@ export const postCreateMiniCodeLogin = async (): Promise<any> => {
     url: '/smart/v1/minicode/postCreateMiniCodeLogin',
     body: {
       page: 'LG',
-      third: 'LN',
+      third: 'ORZ2',
       brand: 'zero',
     },
   });

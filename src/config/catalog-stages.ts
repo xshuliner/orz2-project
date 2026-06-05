@@ -1,4 +1,4 @@
-import { getMessages, type Locale } from '@/i18n/messages';
+import { getMessages, type Locale } from '@/i18n';
 import type { CatalogStage } from '@/types';
 
 /**

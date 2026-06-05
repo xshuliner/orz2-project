@@ -1,5 +1,5 @@
 import { LayoutApp } from '@/components/LayoutApp';
-import { defaultLocale, localePrefixes, type Locale } from '@/i18n/messages';
+import { defaultLocale, localePrefixes, type Locale } from '@/i18n';
 import { PageHome } from '@/pages/PageHome';
 import { routesProductSilicon } from '@/pages/Products/ProductSilicon/routes';
 import { routesToolOfficialPublisher } from '@/pages/Tools/ToolOfficialPublisher/routes';

@@ -2,8 +2,7 @@ import { useAuth } from '@/components/ContextAuth';
 import { OIconButton } from '@/components/OIconButton';
 import { ORadio, type ORadioOption } from '@/components/ORadio';
 import { OSelector, type OSelectorOption } from '@/components/OSelector';
-import { useI18n } from '@/i18n';
-import { localeNames, type Locale } from '@/i18n/messages';
+import { localeNames, useI18n, type Locale } from '@/i18n';
 import { useTheme, type ThemePreference } from '@/theme';
 import { LogOut, Menu, Monitor, Moon, Sun, UserCircle, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -87,7 +86,9 @@ export function Header() {
               to={localizePath(item.to)}
               end={item.to === '/'}
               className={({ isActive }) =>
-                isActive ? 'nav-link active interactive' : 'nav-link interactive'
+                isActive
+                  ? 'nav-link active interactive'
+                  : 'nav-link interactive'
               }
             >
               {item.label}

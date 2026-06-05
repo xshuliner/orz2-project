@@ -1,7 +1,6 @@
 import { siteConfig } from '@/config';
+import { defaultLocale, getMessages, localizePath, type Locale } from '@/i18n';
 import { getProducts, getTools } from '@/i18n/catalog';
-import { defaultLocale, getMessages, type Locale } from '@/i18n/messages';
-import { localizePath } from '@/i18n/routes';
 import type { CatalogEntry, CatalogItem, SeoConfig } from '@/types';
 
 export const siteUrl = 'https://orz2.com';

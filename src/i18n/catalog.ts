@@ -1,6 +1,6 @@
 import productsData from '@/config/products.json';
 import toolsData from '@/config/tools.json';
-import { defaultLocale, type Locale } from '@/i18n/messages';
+import { defaultLocale, type Locale } from '@/i18n';
 import type {
   CatalogGroup,
   CatalogItem,

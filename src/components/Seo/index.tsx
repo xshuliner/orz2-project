@@ -3,9 +3,9 @@ import {
   defaultLocale,
   localeOpenGraph,
   locales,
+  localizePath,
   type Locale,
-} from '@/i18n/messages';
-import { localizePath } from '@/i18n/routes';
+} from '@/i18n';
 import type { SeoConfig } from '@/types';
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';

@@ -9,12 +9,11 @@
   padding: 3px;
   border: 1px solid color-mix(in srgb, var(--color-line) 86%, transparent);
   border-radius: var(--radius-control);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--color-panel) 74%, transparent),
-      color-mix(in srgb, var(--color-green-soft-surface) 88%, var(--color-panel))
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-panel) 74%, transparent),
+    color-mix(in srgb, var(--color-green-soft-surface) 88%, var(--color-panel))
+  );
   box-shadow:
     inset 0 1px 0 color-mix(in srgb, var(--color-panel) 76%, transparent),
     inset 0 -1px 0 color-mix(in srgb, var(--color-ink) 4%, transparent);
@@ -29,14 +28,14 @@
   left: 3px;
   z-index: 0;
   width: calc((100% - 6px) / var(--o-radio-count));
-  border: 1px solid color-mix(in srgb, var(--color-green) 20%, var(--color-line));
+  border: 1px solid
+    color-mix(in srgb, var(--color-green) 20%, var(--color-line));
   border-radius: 7px;
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--color-panel) 98%, transparent),
-      color-mix(in srgb, var(--color-green-soft-active) 76%, var(--color-panel))
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-panel) 98%, transparent),
+    color-mix(in srgb, var(--color-green-soft-active) 76%, var(--color-panel))
+  );
   box-shadow:
     0 8px 20px color-mix(in srgb, var(--color-ink) 8%, transparent),
     0 1px 0 color-mix(in srgb, var(--color-panel) 90%, transparent) inset;

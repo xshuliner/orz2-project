@@ -195,7 +195,9 @@ export function OSelector<TValue extends string>({
                 </span>
                 <span className='o-selector-option-copy'>
                   <span>{option.label}</span>
-                  {option.description ? <small>{option.description}</small> : null}
+                  {option.description ? (
+                    <small>{option.description}</small>
+                  ) : null}
                 </span>
                 <Check
                   className='o-selector-check'

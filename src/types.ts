@@ -104,6 +104,6 @@ export interface SeoConfig {
   canonicalPath: string;
   ogImage?: string;
   keywords?: string[];
-  locale?: import('@/i18n/messages').Locale;
+  locale?: import('@/i18n').Locale;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
