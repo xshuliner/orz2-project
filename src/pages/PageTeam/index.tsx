@@ -1,20 +1,22 @@
 import { OCard } from '@/components/OCard';
 import { OPageHero } from '@/components/OPageHero';
 import { Seo } from '@/components/Seo';
-import { pageSeo } from '@/config/seo';
-import { teamMembers } from '@/config/site';
+import { getPageSeo } from '@/config/seo';
+import { useI18n } from '@/i18n';
+import { getTeamMembers } from '@/i18n/catalog';
 import type { CSSProperties } from 'react';
 import './index.css';
 
 export function PageTeam() {
+  const { locale, messages } = useI18n();
+  const pageSeo = getPageSeo(locale);
+  const teamMembers = getTeamMembers(locale);
+  const copy = messages.teamPage;
   return (
     <>
       <Seo config={pageSeo.team} />
-      <OPageHero
-        title='核心团队'
-        description='ORZ2 团队横跨产品、研发、设计、商业和组织协作，让工具站从想法走到长期运营。'
-      />
-      <section className='team-grid' aria-label='ORZ2 团队成员'>
+      <OPageHero title={copy.heroTitle} description={copy.heroDescription} />
+      <section className='team-grid' aria-label={copy.gridAriaLabel}>
         {teamMembers.map(member => (
           <OCard
             as='article'
@@ -27,7 +29,7 @@ export function PageTeam() {
             <img
               className='team-avatar'
               src={member.avatarUrl}
-              alt={`${member.name} ${member.role} 头像`}
+              alt={`${member.name} ${member.role} ${copy.avatarAlt}`}
             />
             <div>
               <h2 className='!m-0 !mb-1 text-[22px]'>{member.name}</h2>

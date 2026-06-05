@@ -1,5 +1,6 @@
 import { OSectionHeading } from '@/components/OSectionHeading';
-import { homeSections, testimonials } from '@/config/site';
+import { useI18n } from '@/i18n';
+import { getTestimonials } from '@/i18n/catalog';
 import { prefersReducedMotion } from '@/utils/motion';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
@@ -234,9 +235,11 @@ export function SectionTestimonial({
   subtitle,
   title,
 }: SectionTestimonialProps) {
+  const { locale, messages } = useI18n();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const items = useMemo(() => {
+    const testimonials = getTestimonials(locale);
     const topPercents = createBalancedTopPercents(MAX_VISIBLE_ITEMS);
     const cycleDuration = MAX_CYCLE_DURATION_SECONDS;
     const spawnInterval = cycleDuration / MAX_VISIBLE_ITEMS;
@@ -256,12 +259,12 @@ export function SectionTestimonial({
         index: i,
       };
     });
-  }, []);
+  }, [locale]);
 
   return (
     <section
       className='testimonial-section'
-      aria-label={homeSections.testimonials.ariaLabel}
+      aria-label={messages.homeSections.testimonials.ariaLabel}
     >
       {title ? <OSectionHeading description={subtitle} title={title} /> : null}
       <div className='danmaku-container' ref={containerRef} aria-hidden='true'>

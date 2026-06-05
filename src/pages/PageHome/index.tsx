@@ -2,8 +2,8 @@ import { SectionHero } from '@/components/SectionHero';
 import { SectionProducts } from '@/components/SectionProducts';
 import { SectionTools } from '@/components/SectionTools';
 import { Seo } from '@/components/Seo';
-import { pageSeo } from '@/config/seo';
-import { homeSections } from '@/config/site';
+import { getPageSeo } from '@/config/seo';
+import { useI18n } from '@/i18n';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 
 const SectionTestimonial = lazy(() =>
@@ -13,6 +13,8 @@ const SectionTestimonial = lazy(() =>
 );
 
 function LazySectionTestimonial() {
+  const { messages } = useI18n();
+  const testimonialsCopy = messages.homeSections.testimonials;
   const [isVisible, setIsVisible] = useState(false);
   const placeholderRef = useRef<HTMLDivElement>(null);
 
@@ -38,8 +40,8 @@ function LazySectionTestimonial() {
       {isVisible ? (
         <Suspense fallback={null}>
           <SectionTestimonial
-            title={homeSections.testimonials.title}
-            subtitle={homeSections.testimonials.subtitle}
+            title={testimonialsCopy.title}
+            subtitle={testimonialsCopy.subtitle}
           />
         </Suspense>
       ) : null}
@@ -48,18 +50,22 @@ function LazySectionTestimonial() {
 }
 
 export function PageHome() {
+  const { locale, messages } = useI18n();
+  const pageSeo = getPageSeo(locale);
+  const homeSections = messages.homeSections;
+  const pageTitles = messages.pageTitles;
   return (
     <>
       <Seo config={pageSeo.home} />
       <SectionHero />
       <SectionTools
         compact
-        title={homeSections.tools.title}
+        title={pageTitles.onlineTools}
         subtitle={homeSections.tools.subtitle}
       />
       <SectionProducts
         compact
-        title={homeSections.products.title}
+        title={pageTitles.products}
         subtitle={homeSections.products.subtitle}
       />
       <LazySectionTestimonial />

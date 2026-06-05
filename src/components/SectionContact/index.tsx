@@ -1,12 +1,13 @@
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { siteConfig } from '@/config';
-import { homeSections } from '@/config/site';
+import { useI18n } from '@/i18n';
 import { ArrowUpRight, Mail, Sparkles } from 'lucide-react';
 import './index.css';
 
 export function SectionContact() {
-  const contactCopy = homeSections.contact;
+  const { messages } = useI18n();
+  const contactCopy = messages.homeSections.contact;
   return (
     <OCard
       as='section'

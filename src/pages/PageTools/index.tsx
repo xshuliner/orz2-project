@@ -1,15 +1,19 @@
 import { OPageHero } from '@/components/OPageHero';
 import { SectionTools } from '@/components/SectionTools';
 import { Seo } from '@/components/Seo';
-import { pageSeo } from '@/config/seo';
-import { homeSections } from '@/config/site';
+import { getPageSeo } from '@/config/seo';
+import { useI18n } from '@/i18n';
 
 export function PageTools() {
+  const { locale, messages } = useI18n();
+  const pageSeo = getPageSeo(locale);
+  const homeSections = messages.homeSections;
+  const pageTitles = messages.pageTitles;
   return (
     <>
       <Seo config={pageSeo.tools} />
       <OPageHero
-        title={homeSections.tools.title}
+        title={pageTitles.onlineTools}
         description={homeSections.tools.subtitle}
       />
       <SectionTools />

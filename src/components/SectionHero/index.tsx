@@ -1,6 +1,7 @@
 import { OButton } from '@/components/OButton';
 import { siteConfig } from '@/config';
-import { heroMedia, homeSections } from '@/config/site';
+import { useI18n } from '@/i18n';
+import { getHeroMedia } from '@/i18n/catalog';
 import type { HeroMedia } from '@/types';
 import { prefersReducedMotion } from '@/utils/motion';
 import { ArrowRight, ShieldCheck, Zap } from 'lucide-react';
@@ -45,6 +46,8 @@ function waitForVideoReady(video: HTMLVideoElement) {
 }
 
 function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
+  const { messages } = useI18n();
+  const heroCopy = messages.homeSections.hero;
   const initialIndex = 0;
   const [reducedMotion, setReducedMotion] = useState(prefersReducedMotion);
   const [shouldLoadVideos, setShouldLoadVideos] = useState(false);
@@ -242,10 +245,13 @@ function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
   if (reducedMotion) {
     const current = media[initialIndex];
     return (
-      <figure className='hero-video-frame static' aria-label='ORZ2 视频封面'>
+      <figure
+        className='hero-video-frame static'
+        aria-label={heroCopy.videoFrameLabel}
+      >
         <img
           src={current.posterSrc}
-          alt={`${current.label} 视频封面`}
+          alt={`${current.label} ${heroCopy.videoPosterAlt}`}
           {...{ fetchpriority: 'high' }}
         />
       </figure>
@@ -258,7 +264,7 @@ function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
       className={
         playbackAllowed ? 'hero-video-frame' : 'hero-video-frame is-paused'
       }
-      aria-label='ORZ2 自动随机视频展示'
+      aria-label={heroCopy.videoShowcaseLabel}
     >
       <img
         className='hero-poster-fallback'
@@ -287,7 +293,7 @@ function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
                 autoPlay={isActive}
                 preload={isActive ? 'auto' : 'metadata'}
                 poster={item.posterSrc}
-                aria-label={`${item.label} 背景视频`}
+                aria-label={`${item.label} ${heroCopy.videoBackgroundLabel}`}
               >
                 <source src={item.videoSrc} type='video/mp4' />
               </video>
@@ -300,7 +306,9 @@ function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
 }
 
 export function SectionHero() {
-  const heroCopy = homeSections.hero;
+  const { locale, messages } = useI18n();
+  const heroCopy = messages.homeSections.hero;
+  const heroMedia = getHeroMedia(locale);
   return (
     <section className='hero-section'>
       <div className='hero-copy'>

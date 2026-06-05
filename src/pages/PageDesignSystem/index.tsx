@@ -8,20 +8,21 @@ import { OModal } from '@/components/OModal';
 import { OPageHero } from '@/components/OPageHero';
 import { OSectionHeading } from '@/components/OSectionHeading';
 import { Seo } from '@/components/Seo';
-import { pageSeo } from '@/config/seo';
-import { products, tools } from '@/config/site';
+import { getPageSeo } from '@/config/seo';
+import { useI18n } from '@/i18n';
+import { getProducts, getTools } from '@/i18n/catalog';
 import type { CatalogItem } from '@/types';
 import { ArrowUpRight, Plus, Sparkles, X } from 'lucide-react';
 import { useState } from 'react';
 import './index.css';
 
 const colors = [
-  { name: 'Brand', value: 'var(--color-green)' },
-  { name: 'Brand Dark', value: 'var(--color-green-dark)' },
-  { name: 'Ink', value: 'var(--color-ink)' },
-  { name: 'Muted', value: 'var(--color-muted)' },
-  { name: 'Line', value: 'var(--color-line)' },
-  { name: 'Soft', value: 'var(--color-green-soft)' },
+  { value: 'var(--color-green)' },
+  { value: 'var(--color-green-dark)' },
+  { value: 'var(--color-ink)' },
+  { value: 'var(--color-muted)' },
+  { value: 'var(--color-line)' },
+  { value: 'var(--color-green-soft)' },
 ];
 
 const spacingScale = [
@@ -33,74 +34,60 @@ const spacingScale = [
   ['32', 'var(--space-8)'],
 ] as const;
 
-const typeScale = [
-  ['Caption', 'var(--text-caption)', '辅助说明与状态时间'],
-  ['Body small', 'var(--text-body-sm)', '工具页正文与控件文字'],
-  ['Body', 'var(--text-body)', '页面常规正文'],
-  ['Lead', 'var(--text-lead)', '页面描述与重点说明'],
-  ['Heading', 'var(--text-heading-md)', '弹窗和文章章节标题'],
-] as const;
-
-const cardTones = [
-  ['default', '默认面板', '适合列表、摘要和常规内容。'],
-  ['soft', '柔和面板', '适合次级信息和轻量分组。'],
-  ['brand', '品牌面板', '适合进度、亮点和关键提示。'],
-  ['warm', '暖色面板', '适合操作前的准备说明。'],
-  ['danger', '危险面板', '适合错误信息和阻断性提醒。'],
-] as const;
-
-const catalogFeatureGroups = [
-  ['信息', 'logo/icon、分组、阶段、版本、更新日期'],
-  ['平台', 'WEB、H5、WEAPP、APP、EXTENSION'],
-  ['入口', '主链接、动态二维码、微信太阳码、筹备态'],
-  ['交互', '多入口切换、扫码 Tooltip、固定尺寸切换面板'],
+const typeScaleValues = [
+  'var(--text-caption)',
+  'var(--text-body-sm)',
+  'var(--text-body)',
+  'var(--text-lead)',
+  'var(--text-heading-md)',
 ] as const;
 
 function isCatalogItem(item: CatalogItem | undefined): item is CatalogItem {
   return Boolean(item);
 }
 
-const catalogShowcaseItems = [
-  products.find(item => item.id === 'weather'),
-  products.find(item => item.id === 'silicon'),
-  products.find(item => item.id === 'fiveball'),
-  products.find(item => item.id === 'orz2-blog'),
-  tools.find(item => item.id === 'tool-wechat-publisher'),
-  products.find(item => item.id === 'chrome-maker'),
-].filter(isCatalogItem);
-
 export function PageDesignSystem() {
+  const { locale, messages } = useI18n();
+  const pageSeo = getPageSeo(locale);
+  const copy = messages.designSystem;
+  const products = getProducts(locale);
+  const tools = getTools(locale);
+  const catalogShowcaseItems = [
+    products.find(item => item.id === 'weather'),
+    products.find(item => item.id === 'silicon'),
+    products.find(item => item.id === 'fiveball'),
+    products.find(item => item.id === 'orz2-blog'),
+    tools.find(item => item.id === 'tool-wechat-publisher'),
+    products.find(item => item.id === 'chrome-maker'),
+  ].filter(isCatalogItem);
   const [isModalOpen, setModalOpen] = useState(false);
 
   return (
     <>
       <Seo config={pageSeo.designSystem} />
-      <OPageHero
-        title='设计系统'
-        description='ORZ2 公共组件、视觉 token 与交互状态的公开参考页。页面保持克制、清晰，也为工具扩展留下稳定的基础。'
-      />
+      <OPageHero title={copy.heroTitle} description={copy.heroDescription} />
       <div className='design-system-page'>
         <section className='design-system-section'>
           <OSectionHeading
-            title='视觉基础'
-            description='颜色、圆角和阴影构成 ORZ2 绿色工具风格的基础语汇。'
+            title={copy.sections.visual.title}
+            description={copy.sections.visual.description}
           />
           <div className='design-token-grid'>
-            {colors.map(color => (
+            {colors.map((color, index) => (
               <OCard
                 className='design-color-card'
-                key={color.name}
+                key={copy.colors[index]}
                 padding='sm'
               >
                 <span style={{ background: color.value }} />
-                <strong>{color.name}</strong>
+                <strong>{copy.colors[index]}</strong>
                 <code>{color.value}</code>
               </OCard>
             ))}
           </div>
           <div className='design-foundation-grid'>
             <OCard className='design-foundation-card' padding='md'>
-              <strong>圆角</strong>
+              <strong>{copy.labels.radius}</strong>
               <div className='design-radius-row'>
                 <span>Control · 8px</span>
                 <span>Card · 8px</span>
@@ -108,7 +95,7 @@ export function PageDesignSystem() {
               </div>
             </OCard>
             <OCard className='design-foundation-card' padding='md'>
-              <strong>阴影</strong>
+              <strong>{copy.labels.shadow}</strong>
               <div className='design-shadow-row'>
                 <span>Small</span>
                 <span>Hover</span>
@@ -118,7 +105,7 @@ export function PageDesignSystem() {
           </div>
           <div className='design-foundation-grid'>
             <OCard className='design-foundation-card' padding='md'>
-              <strong>间距层级</strong>
+              <strong>{copy.labels.spacing}</strong>
               <div className='design-spacing-list'>
                 {spacingScale.map(([label, value]) => (
                   <span key={label}>
@@ -129,10 +116,13 @@ export function PageDesignSystem() {
               </div>
             </OCard>
             <OCard className='design-foundation-card' padding='md'>
-              <strong>排版层级</strong>
+              <strong>{copy.labels.typography}</strong>
               <div className='design-type-list'>
-                {typeScale.map(([label, value, description]) => (
-                  <span key={label} style={{ fontSize: value }}>
+                {copy.typography.map(([label, description], index) => (
+                  <span
+                    key={label}
+                    style={{ fontSize: typeScaleValues[index] }}
+                  >
                     <b>{label}</b>
                     <small>{description}</small>
                   </span>
@@ -144,33 +134,35 @@ export function PageDesignSystem() {
 
         <section className='design-system-section'>
           <OSectionHeading
-            title='按钮与标签'
-            description='统一动作层级，同时保留适合信息密度较高工具页的紧凑表达。'
+            title={copy.sections.buttons.title}
+            description={copy.sections.buttons.description}
           />
           <OCard className='design-component-panel' padding='md' tone='soft'>
             <div className='design-action-row'>
               <OButton size='sm' variant='ghost'>
-                紧凑按钮
+                {copy.labels.compactButton}
               </OButton>
               <OButton>
-                主操作
+                {copy.labels.primaryAction}
                 <ArrowUpRight size={17} aria-hidden='true' />
               </OButton>
-              <OButton size='lg'>关键操作</OButton>
-              <OButton variant='secondary'>次级操作</OButton>
-              <OButton variant='ghost'>轻量操作</OButton>
-              <OButton disabled>禁用状态</OButton>
-              <OIconButton aria-label='增加项目'>
+              <OButton size='lg'>{copy.labels.keyAction}</OButton>
+              <OButton variant='secondary'>
+                {copy.labels.secondaryAction}
+              </OButton>
+              <OButton variant='ghost'>{copy.labels.ghostAction}</OButton>
+              <OButton disabled>{copy.labels.disabledState}</OButton>
+              <OIconButton aria-label={copy.labels.addItem}>
                 <Plus size={18} aria-hidden='true' />
               </OIconButton>
             </div>
             <div className='design-action-row'>
-              <OBadge>默认标签</OBadge>
-              <OBadge tone='brand'>品牌标签</OBadge>
-              <OBadge tone='warning'>提醒标签</OBadge>
-              <OBadge tone='danger'>危险标签</OBadge>
+              <OBadge>{copy.labels.defaultBadge}</OBadge>
+              <OBadge tone='brand'>{copy.labels.brandBadge}</OBadge>
+              <OBadge tone='warning'>{copy.labels.warningBadge}</OBadge>
+              <OBadge tone='danger'>{copy.labels.dangerBadge}</OBadge>
               <OBadge pill tone='brand'>
-                胶囊标签
+                {copy.labels.pillBadge}
               </OBadge>
             </div>
           </OCard>
@@ -178,11 +170,11 @@ export function PageDesignSystem() {
 
         <section className='design-system-section'>
           <OSectionHeading
-            title='卡片与面板'
-            description='OCard 统一容器质感，业务模块只需要选择语义明确的 tone。'
+            title={copy.sections.cards.title}
+            description={copy.sections.cards.description}
           />
           <div className='design-card-grid'>
-            {cardTones.map(([tone, title, description]) => (
+            {copy.cardTones.map(([tone, title, description]) => (
               <OCard
                 className='design-tone-card'
                 interactive
@@ -199,19 +191,19 @@ export function PageDesignSystem() {
             ))}
             <OCard accentBar className='design-tone-card' padding='md'>
               <OBadge tone='brand'>accentBar</OBadge>
-              <h3>强调边栏</h3>
-              <p>用于表单面板和需要强化节奏的业务分组。</p>
+              <h3>{copy.labels.accentBar}</h3>
+              <p>{copy.labels.accentBarDescription}</p>
             </OCard>
           </div>
         </section>
 
         <section className='design-system-section'>
           <OSectionHeading
-            title='目录卡片'
-            description='OCardCatalog 用统一 CatalogItem 模型承载产品、工具、博客、小游戏与多端项目。'
+            title={copy.sections.catalog.title}
+            description={copy.sections.catalog.description}
           />
           <div className='design-catalog-feature-grid'>
-            {catalogFeatureGroups.map(([title, description]) => (
+            {copy.catalogFeatureGroups.map(([title, description]) => (
               <OCard
                 className='design-catalog-feature-card'
                 key={title}
@@ -232,12 +224,14 @@ export function PageDesignSystem() {
 
         <section className='design-system-section'>
           <OSectionHeading
-            title='状态与弹窗'
-            description='空状态和弹窗采用同一套视觉语言，保持反馈直接而温和。'
+            title={copy.sections.states.title}
+            description={copy.sections.states.description}
           />
-          <OEmptyState>暂时没有匹配结果，调整条件后再试一次。</OEmptyState>
+          <OEmptyState>{copy.labels.emptyState}</OEmptyState>
           <div className='design-modal-action'>
-            <OButton onClick={() => setModalOpen(true)}>查看弹窗实例</OButton>
+            <OButton onClick={() => setModalOpen(true)}>
+              {copy.labels.openModal}
+            </OButton>
           </div>
         </section>
       </div>
@@ -250,7 +244,7 @@ export function PageDesignSystem() {
       >
         <OIconButton
           className='design-example-modal-close'
-          aria-label='关闭示例弹窗'
+          aria-label={copy.labels.closeModal}
           onClick={() => setModalOpen(false)}
           size='sm'
           variant='ghost'
@@ -260,16 +254,15 @@ export function PageDesignSystem() {
         <span className='design-example-modal-icon' aria-hidden='true'>
           <Sparkles size={22} />
         </span>
-        <h2 id='design-example-modal-title'>统一的弹窗容器</h2>
-        <p>
-          OModal 已封装遮罩、Esc
-          关闭、点击遮罩关闭、页面滚动锁定和关闭后的焦点恢复。
-        </p>
+        <h2 id='design-example-modal-title'>{copy.labels.modalTitle}</h2>
+        <p>{copy.labels.modalDescription}</p>
         <div className='design-action-row'>
           <OButton variant='ghost' onClick={() => setModalOpen(false)}>
-            取消
+            {copy.labels.cancel}
           </OButton>
-          <OButton onClick={() => setModalOpen(false)}>确认</OButton>
+          <OButton onClick={() => setModalOpen(false)}>
+            {copy.labels.confirm}
+          </OButton>
         </div>
       </OModal>
     </>

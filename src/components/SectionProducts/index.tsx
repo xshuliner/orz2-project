@@ -4,7 +4,8 @@ import { OEmptyState } from '@/components/OEmptyState';
 import { OSectionHeading } from '@/components/OSectionHeading';
 import { OTab } from '@/components/OTab';
 import { getStageLabel } from '@/config/catalog-stages';
-import { homeSections, productGroups, products } from '@/config/site';
+import { useI18n } from '@/i18n';
+import { getProductGroups, getProducts } from '@/i18n/catalog';
 import { Search } from 'lucide-react';
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -21,39 +22,45 @@ export function SectionProducts({
   subtitle,
   title,
 }: SectionProductsProps) {
+  const { locale, messages } = useI18n();
+  const sectionCopy = messages.homeSections.products;
+  const products = useMemo(() => getProducts(locale), [locale]);
+  const productGroups = useMemo(() => getProductGroups(locale), [locale]);
   const [searchParams, setSearchParams] = useSearchParams();
   const showFilters = !compact;
   const query = showFilters ? (searchParams.get('q') ?? '') : '';
   const category = showFilters
-    ? (searchParams.get('category') ?? '全部')
-    : '全部';
+    ? (searchParams.get('category') ?? messages.common.all)
+    : messages.common.all;
   const baseProducts = useMemo(
     () => (compact ? products.filter(product => product.compact) : products),
-    [compact]
+    [compact, products]
   );
   const groupMeta = new Map(productGroups.map(group => [group.name, group]));
   const categoryOptions = [
-    { label: '全部', value: '全部' },
+    { label: messages.common.all, value: messages.common.all },
     ...productGroups.map(group => ({ label: group.name, value: group.name })),
   ];
 
   function updateFilters(nextQuery: string, nextCategory = category) {
     const next = new URLSearchParams();
     if (nextQuery.trim()) next.set('q', nextQuery.trim());
-    if (nextCategory !== '全部') next.set('category', nextCategory);
+    if (nextCategory !== messages.common.all)
+      next.set('category', nextCategory);
     setSearchParams(next, { replace: true });
   }
 
   const visibleProducts = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return baseProducts.filter(product => {
-      const matchesCategory = category === '全部' || product.group === category;
+      const matchesCategory =
+        category === messages.common.all || product.group === category;
       const haystack = [
         product.id,
         product.name,
         product.group,
         product.summary,
-        getStageLabel(product.lifecycle.stage),
+        getStageLabel(product.lifecycle.stage, locale),
         ...product.badges,
         ...product.platform,
       ]
@@ -61,7 +68,7 @@ export function SectionProducts({
         .toLowerCase();
       return matchesCategory && (!normalized || haystack.includes(normalized));
     });
-  }, [baseProducts, category, query]);
+  }, [baseProducts, category, locale, messages.common.all, query]);
 
   const categories = productGroups
     .map(group => group.name)
@@ -70,24 +77,22 @@ export function SectionProducts({
   return (
     <section
       className={compact ? 'product-directory compact' : 'product-directory'}
-      aria-label={homeSections.products.ariaLabel}
+      aria-label={sectionCopy.ariaLabel}
     >
       {title ? <OSectionHeading description={subtitle} title={title} /> : null}
       {showFilters ? (
         <div className='directory-controls'>
           <label className='search-box'>
             <Search size={18} aria-hidden='true' />
-            <span className='sr-only'>
-              {homeSections.products.searchAriaLabel}
-            </span>
+            <span className='sr-only'>{sectionCopy.searchAriaLabel}</span>
             <input
               value={query}
               onChange={event => updateFilters(event.target.value)}
-              placeholder={homeSections.products.searchPlaceholder}
+              placeholder={sectionCopy.searchPlaceholder}
             />
           </label>
           <OTab
-            ariaLabel={homeSections.products.categoryAriaLabel}
+            ariaLabel={sectionCopy.categoryAriaLabel}
             className='category-tabs'
             options={categoryOptions}
             value={category}
@@ -120,11 +125,11 @@ export function SectionProducts({
         })}
       </div>
       {!visibleProducts.length ? (
-        <OEmptyState>{homeSections.products.emptyState}</OEmptyState>
+        <OEmptyState>{sectionCopy.emptyState}</OEmptyState>
       ) : null}
       {compact ? (
         <div className='section-action'>
-          <OButton to='/products'>{homeSections.products.allButton}</OButton>
+          <OButton to='/products'>{sectionCopy.allButton}</OButton>
         </div>
       ) : null}
     </section>

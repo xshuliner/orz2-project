@@ -4,7 +4,8 @@ import { OEmptyState } from '@/components/OEmptyState';
 import { OSectionHeading } from '@/components/OSectionHeading';
 import { OTab } from '@/components/OTab';
 import { getStageLabel } from '@/config/catalog-stages';
-import { homeSections, toolCategories, toolGroups, tools } from '@/config/site';
+import { useI18n } from '@/i18n';
+import { getToolCategories, getToolGroups, getTools } from '@/i18n/catalog';
 import { Search } from 'lucide-react';
 import { useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -21,15 +22,23 @@ export function SectionTools({
   subtitle,
   title,
 }: SectionToolsProps) {
+  const { locale, messages } = useI18n();
+  const sectionCopy = messages.homeSections.tools;
+  const tools = useMemo(() => getTools(locale), [locale]);
+  const toolGroups = useMemo(() => getToolGroups(locale), [locale]);
+  const toolCategories = useMemo(
+    () => getToolCategories(locale, messages.common.all),
+    [locale, messages.common.all]
+  );
   const [searchParams, setSearchParams] = useSearchParams();
   const showFilters = !compact;
   const query = showFilters ? (searchParams.get('q') ?? '') : '';
   const category = showFilters
-    ? (searchParams.get('category') ?? '全部')
-    : '全部';
+    ? (searchParams.get('category') ?? messages.common.all)
+    : messages.common.all;
   const baseTools = useMemo(
     () => (compact ? tools.filter(tool => tool.compact) : tools),
-    [compact]
+    [compact, tools]
   );
   const groupMeta = new Map(toolGroups.map(group => [group.name, group]));
   const categoryOptions = toolCategories.map(item => ({
@@ -40,20 +49,22 @@ export function SectionTools({
   function updateFilters(nextQuery: string, nextCategory = category) {
     const next = new URLSearchParams();
     if (nextQuery.trim()) next.set('q', nextQuery.trim());
-    if (nextCategory !== '全部') next.set('category', nextCategory);
+    if (nextCategory !== messages.common.all)
+      next.set('category', nextCategory);
     setSearchParams(next, { replace: true });
   }
 
   const visibleTools = useMemo(() => {
     const normalized = query.trim().toLowerCase();
     return baseTools.filter(tool => {
-      const matchesCategory = category === '全部' || tool.group === category;
+      const matchesCategory =
+        category === messages.common.all || tool.group === category;
       const haystack = [
         tool.id,
         tool.name,
         tool.group,
         tool.summary,
-        getStageLabel(tool.lifecycle.stage),
+        getStageLabel(tool.lifecycle.stage, locale),
         ...tool.badges,
         ...tool.platform,
       ]
@@ -61,7 +72,7 @@ export function SectionTools({
         .toLowerCase();
       return matchesCategory && (!normalized || haystack.includes(normalized));
     });
-  }, [baseTools, category, query]);
+  }, [baseTools, category, locale, messages.common.all, query]);
   const groups = toolGroups
     .map(group => group.name)
     .filter(group => visibleTools.some(tool => tool.group === group));
@@ -69,24 +80,22 @@ export function SectionTools({
   return (
     <section
       className={compact ? 'tool-directory compact' : 'tool-directory'}
-      aria-label={homeSections.tools.ariaLabel}
+      aria-label={sectionCopy.ariaLabel}
     >
       {title ? <OSectionHeading description={subtitle} title={title} /> : null}
       {showFilters ? (
         <div className='directory-controls'>
           <label className='search-box'>
             <Search size={18} aria-hidden='true' />
-            <span className='sr-only'>
-              {homeSections.tools.searchAriaLabel}
-            </span>
+            <span className='sr-only'>{sectionCopy.searchAriaLabel}</span>
             <input
               value={query}
               onChange={event => updateFilters(event.target.value)}
-              placeholder={homeSections.tools.searchPlaceholder}
+              placeholder={sectionCopy.searchPlaceholder}
             />
           </label>
           <OTab
-            ariaLabel={homeSections.tools.categoryAriaLabel}
+            ariaLabel={sectionCopy.categoryAriaLabel}
             className='category-tabs'
             options={categoryOptions}
             value={category}
@@ -117,11 +126,11 @@ export function SectionTools({
         })}
       </div>
       {!visibleTools.length ? (
-        <OEmptyState>{homeSections.tools.emptyState}</OEmptyState>
+        <OEmptyState>{sectionCopy.emptyState}</OEmptyState>
       ) : null}
       {compact ? (
         <div className='section-action'>
-          <OButton to='/tools'>{homeSections.tools.allButton}</OButton>
+          <OButton to='/tools'>{sectionCopy.allButton}</OButton>
         </div>
       ) : null}
     </section>
