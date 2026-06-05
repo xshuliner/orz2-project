@@ -116,6 +116,31 @@
   background: color-mix(in srgb, var(--color-ink) 52%, transparent);
 }
 
+/* 暗色模式：保持二维码 / 小程序码所在区域为纯白底，确保扫码识别率
+ * - panel 用稍亮的暗绿底，让内部白色卡片不突兀
+ * - image-wrap 提供 padding 作为额外 quiet zone
+ * - image 背景固定纯白，contain 留白区域也是白色
+ * - expired 遮罩切换成浅色蒙版 + 深色文字，与白底协调 */
+[data-theme='dark'] .login-qr-panel {
+  background: var(--color-green-soft-feature);
+  border-color: color-mix(in srgb, var(--color-line) 60%, transparent);
+}
+
+[data-theme='dark'] .login-qr-image-wrap {
+  padding: 12px;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='dark'] .login-qr-image {
+  background: #ffffff;
+}
+
+[data-theme='dark'] .login-qr-expired {
+  color: #142b1e;
+  background: color-mix(in srgb, #ffffff 82%, transparent);
+}
+
 .login-modal-hint {
   margin: -4px 0 0 !important;
   font-size: 13px;
