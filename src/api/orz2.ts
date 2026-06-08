@@ -231,11 +231,22 @@ export async function postTinifyImage(params: {
   image: Blob;
   filename: string;
 }): Promise<TinifyImageResult> {
+  const filename =
+    params.filename ||
+    (params.image instanceof File ? params.image.name : '') ||
+    'image.png';
+  const uploadFile =
+    params.image instanceof File
+      ? params.image
+      : new File([params.image], filename, {
+          lastModified: Date.now(),
+          type: params.image.type || 'application/octet-stream',
+        });
   const response = await FetchManager.upload({
     file: {
-      blob: params.image,
+      blob: uploadFile,
       fieldName: 'image',
-      filename: params.filename,
+      filename,
     },
     method: 'POST',
     signPath: TINIFY_IMAGE_SIGN_PATH,
@@ -248,9 +259,16 @@ export async function postTinifyImage(params: {
     message?: string;
     content?: string;
   };
+  const body = data?.body;
 
-  if (data?.code === 200 && data?.body?.data) {
-    return data.body;
+  if (data?.code === 200 && body?.errcode && body.errcode !== 0) {
+    throw new Error(
+      body.errmsg || data.message || data.content || 'TinyPNG 压缩失败'
+    );
+  }
+
+  if (data?.code === 200 && body?.data) {
+    return body;
   }
 
   const message =

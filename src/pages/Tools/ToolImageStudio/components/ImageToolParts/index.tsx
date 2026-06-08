@@ -1,4 +1,3 @@
-import { OButton } from '@/components/OButton';
 import { OIconButton } from '@/components/OIconButton';
 import { Clipboard, ClipboardCheck, Code2 } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -6,11 +5,7 @@ import type { ReactNode } from 'react';
 interface Base64Copy {
   copied: string;
   copy: string;
-  import: string;
-  inputLabel: string;
   inputPlaceholder: string;
-  outputLabel: string;
-  outputPlaceholder: string;
   subtitle: string;
   title: string;
 }
@@ -19,11 +14,9 @@ interface Base64TransferProps {
   copied: boolean;
   copy: Base64Copy;
   error?: string;
-  inputValue: string;
-  outputValue: string;
+  value: string;
   onCopy: () => void;
-  onImport: () => void;
-  onInputChange: (value: string) => void;
+  onChange: (value: string) => void;
 }
 
 export function ToggleRow({
@@ -74,11 +67,9 @@ export function Base64Transfer({
   copied,
   copy,
   error,
-  inputValue,
-  outputValue,
+  value,
   onCopy,
-  onImport,
-  onInputChange,
+  onChange,
 }: Base64TransferProps) {
   return (
     <div className='image-base64-panel'>
@@ -90,50 +81,35 @@ export function Base64Transfer({
           <strong>{copy.title}</strong>
           <small>{copy.subtitle}</small>
         </div>
+        <OIconButton
+          aria-label={copied ? copy.copied : copy.copy}
+          disabled={!value}
+          size='sm'
+          variant='ghost'
+          onClick={onCopy}
+        >
+          {copied ? (
+            <ClipboardCheck size={15} aria-hidden='true' />
+          ) : (
+            <Clipboard size={15} aria-hidden='true' />
+          )}
+        </OIconButton>
       </div>
 
       <label className='image-base64-input'>
-        <span>{copy.inputLabel}</span>
         <textarea
-          value={inputValue}
+          value={value}
           placeholder={copy.inputPlaceholder}
           spellCheck={false}
-          onChange={event => onInputChange(event.target.value)}
+          onChange={event => onChange(event.target.value)}
         />
       </label>
 
-      <div className='image-base64-actions'>
-        <OButton size='sm' type='button' variant='secondary' onClick={onImport}>
-          <Code2 size={15} aria-hidden='true' />
-          {copy.import}
-        </OButton>
-        {error ? <span role='alert'>{error}</span> : null}
-      </div>
-
-      <label className='image-base64-output'>
-        <span>{copy.outputLabel}</span>
-        <div>
-          <input
-            readOnly
-            value={outputValue}
-            placeholder={copy.outputPlaceholder}
-            spellCheck={false}
-          />
-          <OIconButton
-            aria-label={copied ? copy.copied : copy.copy}
-            disabled={!outputValue}
-            size='sm'
-            variant='ghost'
-            onClick={onCopy}
-          >
-            {copied ? (
-              <ClipboardCheck size={15} aria-hidden='true' />
-            ) : (
-              <Clipboard size={15} aria-hidden='true' />
-            )}
-          </OIconButton>
-        </div>
-      </label>
+      {error ? (
+        <span className='image-base64-error' role='alert'>
+          {error}
+        </span>
+      ) : null}
     </div>
   );
 }

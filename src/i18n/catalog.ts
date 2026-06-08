@@ -79,21 +79,21 @@ const toolTranslations: Record<NonDefaultLocale, CatalogTranslations> = {
       },
     },
     'tool-image': {
-      name: 'Image Preview Studio',
+      name: 'Batch Image Studio',
       summary:
-        'Upload an image to preview dimensions, size, and format, then convert, resize, and compress it with TinyPNG.',
-      badges: ['Image', 'Preview', 'Convert', 'Resize', 'TinyPNG'],
+        'Upload multiple images, apply one conversion, resize, and TinyPNG compression setup, then download the results as a ZIP.',
+      badges: ['Image', 'Batch', 'Convert', 'Resize', 'ZIP'],
       entries: { web: 'Tool entry' },
       seo: {
-        title: 'Image Preview Studio - ORZ2 Online Image Tool',
+        title: 'Batch Image Studio - ORZ2 Online Image Tool',
         description:
-          'ORZ2 Image Preview Studio supports image upload previews, size and dimension reading, format conversion, resizing, and TinyPNG compression.',
+          'ORZ2 Batch Image Studio supports multi-image upload previews, unified format conversion, resizing, TinyPNG compression, and ZIP downloads.',
         keywords: [
-          'image preview',
+          'batch image processing',
           'image compression',
           'format conversion',
           'image resize',
-          'online image tool',
+          'ZIP download',
         ],
       },
     },
@@ -176,21 +176,21 @@ const toolTranslations: Record<NonDefaultLocale, CatalogTranslations> = {
       },
     },
     'tool-image': {
-      name: '画像プレビュースタジオ',
+      name: '一括画像処理スタジオ',
       summary:
-        '画像をアップロードしてサイズ、容量、形式を確認し、変換、リサイズ、TinyPNG 圧縮まで行えます。',
-      badges: ['画像', 'プレビュー', '変換', 'リサイズ', 'TinyPNG'],
+        '複数画像をアップロードし、同じ変換、リサイズ、TinyPNG 圧縮設定を適用して ZIP でダウンロードできます。',
+      badges: ['画像', '一括', '変換', 'リサイズ', 'ZIP'],
       entries: { web: 'ツール入口' },
       seo: {
-        title: '画像プレビュースタジオ - ORZ2 オンライン画像ツール',
+        title: '一括画像処理スタジオ - ORZ2 オンライン画像ツール',
         description:
-          'ORZ2 画像プレビュースタジオは、アップロードプレビュー、寸法と容量の確認、形式変換、リサイズ、TinyPNG 圧縮に対応します。',
+          'ORZ2 一括画像処理スタジオは、複数画像アップロード、統一形式変換、リサイズ、TinyPNG 圧縮、ZIP ダウンロードに対応します。',
         keywords: [
-          '画像プレビュー',
+          '一括画像処理',
           '画像圧縮',
           '形式変換',
           '画像リサイズ',
-          'オンライン画像ツール',
+          'ZIP ダウンロード',
         ],
       },
     },

@@ -332,8 +332,7 @@ class FetchManager {
         showLoading();
       }
 
-      const response: AxiosResponse =
-        await this.axiosInstance.request(axiosConfig);
+      const response: AxiosResponse = await axios.request(axiosConfig);
 
       result = {
         statusCode: response.status,

@@ -42,14 +42,14 @@
   },
   {
     "id": "tool-image",
-    "name": "图片预览与处理",
+    "name": "批量图片处理",
     "group": "图片处理",
-    "summary": "上传图片后即时预览尺寸、体积和格式，并完成转换、缩放与 TinyPNG 压缩。",
+    "summary": "一次上传多张图片，统一完成格式转换、尺寸缩放、TinyPNG 压缩，并打包下载结果。",
     "media": {
       "kind": "icon",
       "name": "ImageDown"
     },
-    "badges": ["图片", "预览", "转换", "缩放", "TinyPNG"],
+    "badges": ["图片", "批量", "转换", "缩放", "ZIP"],
     "lifecycle": {
       "stage": "BETA",
       "version": "0.2.0",
@@ -68,9 +68,15 @@
     ],
     "seo": {
       "slug": "smart-image-compressor",
-      "title": "图片预览与处理工具 - ORZ2 在线图片工具",
-      "description": "ORZ2 图片预览与处理工具支持上传预览、尺寸体积读取、格式转换、缩放和 TinyPNG 图片压缩。",
-      "keywords": ["图片预览", "图片压缩", "格式转换", "图片缩放", "在线图片工具"],
+      "title": "批量图片处理工具 - ORZ2 在线图片工具",
+      "description": "ORZ2 批量图片处理工具支持多图上传预览、统一格式转换、尺寸缩放、TinyPNG 压缩和 ZIP 打包下载。",
+      "keywords": [
+        "批量图片处理",
+        "图片压缩",
+        "格式转换",
+        "图片缩放",
+        "ZIP 下载"
+      ],
       "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
       "schemaType": "SoftwareApplication"
     },

@@ -4,7 +4,6 @@ import { OCard } from '@/components/OCard';
 import { OIconButton } from '@/components/OIconButton';
 import { OPageHero } from '@/components/OPageHero';
 import { OSelector, type OSelectorOption } from '@/components/OSelector';
-import { OTab } from '@/components/OTab';
 import { Seo } from '@/components/Seo';
 import { getToolSeo } from '@/config/seo';
 import { useI18n } from '@/i18n';
@@ -14,17 +13,23 @@ import {
   MetricItem,
   ToggleRow,
 } from '@/pages/Tools/ToolImageStudio/components/ImageToolParts';
+import JSZip from 'jszip';
 import {
   ArrowLeft,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Download,
   FileImage,
   ImageDown,
+  Images,
   Info,
   Loader2,
+  Lock,
   Maximize2,
   RefreshCcw,
   RotateCcw,
+  Unlock,
   UploadCloud,
   Wand2,
   X,
@@ -42,8 +47,9 @@ import { Link } from 'react-router-dom';
 import './index.css';
 
 type OutputFormat = 'original' | 'image/png' | 'image/jpeg' | 'image/webp';
-type ResizeMode = 'scale' | 'dimensions';
 type ProcessPhase = 'idle' | 'processing' | 'compressing' | 'done' | 'error';
+type BatchItemPhase = 'idle' | 'processing' | 'compressing' | 'done' | 'error';
+type ResizeIntent = 'dimensions' | 'scale';
 
 interface ImageInfo {
   aspectRatio: string;
@@ -72,11 +78,53 @@ interface ProcessState {
   phase: ProcessPhase;
 }
 
+interface BatchProcessItem {
+  message: string;
+  name: string;
+  phase: BatchItemPhase;
+  result?: ProcessResult;
+}
+
+interface ReadImageFileResult {
+  file: File;
+  info: ImageInfo;
+  previewUrl: string;
+}
+
 const uploadAccept = 'image/png,image/jpeg,image/webp,image/avif';
 const canvasFormats = new Set(['image/png', 'image/jpeg', 'image/webp']);
+const defaultScale = 100;
+const minScale = 10;
+const maxScale = 200;
 
 function clampDimension(value: number) {
   return Math.max(1, Math.round(value));
+}
+
+function clampScale(value: number) {
+  return Math.min(maxScale, Math.max(minScale, Math.round(value)));
+}
+
+function sanitizeDimensionInput(value: string) {
+  const sanitized = value.replace(/[^\d]/g, '');
+  if (!sanitized) return '';
+  return String(Math.max(1, Number(sanitized)));
+}
+
+function getWidthFromScale(imageInfo: ImageInfo, nextScale: number) {
+  return clampDimension((imageInfo.width * nextScale) / 100);
+}
+
+function getHeightFromScale(imageInfo: ImageInfo, nextScale: number) {
+  return clampDimension((imageInfo.height * nextScale) / 100);
+}
+
+function getHeightFromWidth(imageInfo: ImageInfo, width: number) {
+  return clampDimension((width * imageInfo.height) / imageInfo.width);
+}
+
+function getWidthFromHeight(imageInfo: ImageInfo, height: number) {
+  return clampDimension((height * imageInfo.width) / imageInfo.height);
 }
 
 function formatBytes(bytes: number) {
@@ -106,9 +154,53 @@ function getExtension(type: string) {
   return 'png';
 }
 
+function getMimeFromFilename(fileName: string) {
+  const extension = fileName.split('.').pop()?.toLowerCase();
+  if (extension === 'jpg' || extension === 'jpeg') return 'image/jpeg';
+  if (extension === 'webp') return 'image/webp';
+  if (extension === 'png') return 'image/png';
+  if (extension === 'avif') return 'image/avif';
+  return '';
+}
+
+function replaceFileExtension(fileName: string, type: string) {
+  const extension = getExtension(type);
+  if (/\.[^.]+$/.test(fileName)) {
+    return fileName.replace(/\.[^.]+$/, `.${extension}`);
+  }
+  return `${fileName}.${extension}`;
+}
+
 function createOutputName(fileName: string, type: string, source: string) {
   const baseName = fileName.replace(/\.[^.]+$/, '') || 'orz2-image';
   return `${baseName}-${source}.${getExtension(type)}`;
+}
+
+function createArchiveName() {
+  const timestamp = new Date()
+    .toISOString()
+    .replace(/[-:]/g, '')
+    .replace(/\.\d{3}Z$/, '');
+  return `orz2-images-${timestamp}.zip`;
+}
+
+function getUniqueArchiveName(fileName: string, usedNames: Set<string>) {
+  if (!usedNames.has(fileName)) {
+    usedNames.add(fileName);
+    return fileName;
+  }
+
+  const extensionMatch = fileName.match(/(\.[^.]+)$/);
+  const extension = extensionMatch?.[1] ?? '';
+  const baseName = extension ? fileName.slice(0, -extension.length) : fileName;
+  let index = 2;
+  let nextName = `${baseName}-${index}${extension}`;
+  while (usedNames.has(nextName)) {
+    index += 1;
+    nextName = `${baseName}-${index}${extension}`;
+  }
+  usedNames.add(nextName);
+  return nextName;
 }
 
 function getMimeFromDataUrl(dataUrl: string) {
@@ -116,7 +208,10 @@ function getMimeFromDataUrl(dataUrl: string) {
 }
 
 function normalizeBase64Payload(value: string) {
-  const payload = value.replace(/\s/g, '').replace(/-/g, '+').replace(/_/g, '/');
+  const payload = value
+    .replace(/\s/g, '')
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
   const withoutPadding = payload.replace(/=+$/, '');
   const remainder = withoutPadding.length % 4;
   return remainder
@@ -251,6 +346,10 @@ function estimateSize(
   );
 }
 
+function getTotalBytes(items: readonly { size: number }[]) {
+  return items.reduce((total, item) => total + item.size, 0);
+}
+
 async function renderToBlob(
   imageUrl: string,
   width: number,
@@ -286,12 +385,26 @@ async function renderToBlob(
 }
 
 async function tinypngCompress(blob: Blob, filename: string) {
-  const result = await postTinifyImage({ filename, image: blob });
-  const compressedBlob = dataUrlToBlob(result.data);
+  const uploadType = blob.type || getMimeFromFilename(filename) || 'image/png';
+  const uploadName = replaceFileExtension(filename, uploadType);
+  const uploadFile = new File([blob], uploadName, {
+    lastModified: Date.now(),
+    type: uploadType,
+  });
+  const result = await postTinifyImage({
+    filename: uploadFile.name,
+    image: uploadFile,
+  });
+  if (result.errcode && result.errcode !== 0) {
+    throw new Error(result.errmsg || 'TinyPNG 压缩失败');
+  }
+  const dataUrl = normalizeBase64Image(result.data);
+  const compressedBlob = dataUrlToBlob(dataUrl);
+  const compressedType = compressedBlob.type || getMimeFromDataUrl(dataUrl);
   return {
     blob: compressedBlob,
-    filename: result.filename,
-    type: compressedBlob.type || getMimeFromDataUrl(result.data) || blob.type,
+    filename: result.filename || uploadName,
+    type: compressedType || uploadType,
   };
 }
 
@@ -299,36 +412,133 @@ export function ImageStudio() {
   const { locale, localizePath, messages } = useI18n();
   const copy = messages.imageTool;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const base64ParseIdRef = useRef(0);
+  const skipNextBase64ParseRef = useRef(false);
+  const previewStripRef = useRef<HTMLDivElement>(null);
+  const previewButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const batchResultUrlsRef = useRef<Set<string>>(new Set());
   const toolSeo = getToolSeo(locale);
   const tools = useMemo(() => getTools(locale), [locale]);
   const tool = tools.find(item => item.id === 'tool-image');
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState('');
-  const [base64Input, setBase64Input] = useState('');
-  const [imageBase64, setImageBase64] = useState('');
+  const batchImagesRef = useRef<ReadImageFileResult[]>([]);
+  const [batchImages, setBatchImages] = useState<ReadImageFileResult[]>([]);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [base64Value, setBase64Value] = useState('');
   const [base64Error, setBase64Error] = useState('');
   const [copiedBase64, setCopiedBase64] = useState(false);
-  const [imageInfo, setImageInfo] = useState<ImageInfo | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [convertEnabled, setConvertEnabled] = useState(false);
   const [outputFormat, setOutputFormat] = useState<OutputFormat>('image/webp');
   const [resizeEnabled, setResizeEnabled] = useState(false);
-  const [resizeMode, setResizeMode] = useState<ResizeMode>('scale');
-  const [scale, setScale] = useState(50);
+  const [resizeIntent, setResizeIntent] = useState<ResizeIntent>('dimensions');
+  const [keepAspectRatio, setKeepAspectRatio] = useState(true);
+  const [scale, setScale] = useState(defaultScale);
   const [targetWidth, setTargetWidth] = useState('');
   const [targetHeight, setTargetHeight] = useState('');
   const [compressEnabled, setCompressEnabled] = useState(false);
   const [result, setResult] = useState<ProcessResult | null>(null);
+  const [batchResults, setBatchResults] = useState<ProcessResult[]>([]);
+  const [batchProcessItems, setBatchProcessItems] = useState<
+    BatchProcessItem[]
+  >([]);
+  const [isZipping, setIsZipping] = useState(false);
   const [processState, setProcessState] = useState<ProcessState>({
     message: copy.status.idle,
     phase: 'idle',
   });
 
+  const batchFiles = useMemo(
+    () => batchImages.map(item => item.file),
+    [batchImages]
+  );
+  const batchInfos = useMemo(
+    () => batchImages.map(item => item.info),
+    [batchImages]
+  );
+  const activeImage = batchImages[activeImageIndex] ?? null;
+  const file = activeImage?.file ?? null;
+  const imageInfo = activeImage?.info ?? null;
+  const previewUrl = activeImage?.previewUrl ?? '';
+  const isBatchMode = batchImages.length > 1;
+  const previewPosition = imageInfo
+    ? `${activeImageIndex + 1}/${batchImages.length}`
+    : '';
+
+  function replaceBatchImages(
+    nextImages: ReadImageFileResult[],
+    nextActiveIndex = 0
+  ) {
+    setBatchImages(currentImages => {
+      const retainedUrls = new Set(nextImages.map(item => item.previewUrl));
+      currentImages.forEach(item => {
+        if (!retainedUrls.has(item.previewUrl)) {
+          URL.revokeObjectURL(item.previewUrl);
+        }
+      });
+      return nextImages;
+    });
+    setActiveImageIndex(
+      nextImages.length
+        ? Math.min(Math.max(nextActiveIndex, 0), nextImages.length - 1)
+        : 0
+    );
+  }
+
+  function showPreviewAt(nextIndex: number) {
+    if (!batchImages.length) return;
+    setActiveImageIndex(
+      Math.min(Math.max(nextIndex, 0), batchImages.length - 1)
+    );
+    setCopiedBase64(false);
+    setBase64Error('');
+  }
+
+  function showPreviousPreview() {
+    if (!batchImages.length) return;
+    showPreviewAt(
+      activeImageIndex === 0 ? batchImages.length - 1 : activeImageIndex - 1
+    );
+  }
+
+  function showNextPreview() {
+    if (!batchImages.length) return;
+    showPreviewAt((activeImageIndex + 1) % batchImages.length);
+  }
+
   useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
+    batchImagesRef.current = batchImages;
+    previewButtonRefs.current.length = batchImages.length;
+  }, [batchImages]);
+
+  useEffect(() => {
+    if (!batchImages.length) return;
+
+    const strip = previewStripRef.current;
+    const activeButton = previewButtonRefs.current[activeImageIndex];
+    if (!strip || !activeButton) return;
+
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+    const nextLeft =
+      activeButton.offsetLeft -
+      strip.clientWidth / 2 +
+      activeButton.clientWidth / 2;
+
+    strip.scrollTo({
+      behavior: reduceMotion ? 'auto' : 'smooth',
+      left: Math.max(0, nextLeft),
+    });
+  }, [activeImageIndex, batchImages.length]);
+
+  useEffect(
+    () => () => {
+      batchImagesRef.current.forEach(item =>
+        URL.revokeObjectURL(item.previewUrl)
+      );
+    },
+    []
+  );
 
   useEffect(() => {
     return () => {
@@ -337,16 +547,129 @@ export function ImageStudio() {
   }, [result?.url]);
 
   useEffect(() => {
+    const currentUrls = new Set(batchResults.map(item => item.url));
+    batchResultUrlsRef.current.forEach(url => {
+      if (!currentUrls.has(url)) {
+        URL.revokeObjectURL(url);
+      }
+    });
+    batchResultUrlsRef.current = currentUrls;
+  }, [batchResults]);
+
+  useEffect(
+    () => () => {
+      batchResultUrlsRef.current.forEach(url => URL.revokeObjectURL(url));
+    },
+    []
+  );
+
+  useEffect(() => {
     if (!copiedBase64) return;
     const timer = window.setTimeout(() => setCopiedBase64(false), 1600);
     return () => window.clearTimeout(timer);
   }, [copiedBase64]);
 
   useEffect(() => {
+    if (!activeImage) return;
+    const requestId = base64ParseIdRef.current + 1;
+    base64ParseIdRef.current = requestId;
+    setCopiedBase64(false);
+    setBase64Error('');
+
+    void readFileAsDataUrl(activeImage.file)
+      .then(dataUrl => {
+        if (requestId !== base64ParseIdRef.current) return;
+        skipNextBase64ParseRef.current = true;
+        setBase64Value(dataUrl);
+      })
+      .catch(() => {
+        if (requestId !== base64ParseIdRef.current) return;
+        setBase64Error(copy.validation.invalidBase64);
+      });
+  }, [activeImage, copy.validation.invalidBase64]);
+
+  useEffect(() => {
     if (!imageInfo) return;
+    setScale(defaultScale);
     setTargetWidth(String(imageInfo.width));
     setTargetHeight(String(imageInfo.height));
   }, [imageInfo]);
+
+  useEffect(() => {
+    const requestId = base64ParseIdRef.current + 1;
+    base64ParseIdRef.current = requestId;
+
+    if (skipNextBase64ParseRef.current) {
+      skipNextBase64ParseRef.current = false;
+      return;
+    }
+
+    const trimmed = base64Value.trim();
+    if (!trimmed) {
+      replaceBatchImages([]);
+      setResult(null);
+      setBatchResults([]);
+      setBatchProcessItems([]);
+      setBase64Error('');
+      setProcessState({ message: copy.status.idle, phase: 'idle' });
+      return;
+    }
+
+    const timer = window.setTimeout(async () => {
+      setResult(null);
+      setBatchResults([]);
+      setBatchProcessItems([]);
+      setBase64Error('');
+      setProcessState({ message: copy.status.reading, phase: 'processing' });
+
+      let nextPreviewUrl = '';
+      try {
+        const dataUrl = normalizeBase64Image(trimmed);
+        const blob = dataUrlToBlob(dataUrl);
+        const mime = blob.type || getMimeFromDataUrl(dataUrl);
+        const nextFile = new File(
+          [blob],
+          `base64-image.${getExtension(mime)}`,
+          {
+            lastModified: Date.now(),
+            type: mime,
+          }
+        );
+        nextPreviewUrl = URL.createObjectURL(nextFile);
+        const nextInfo = await readImageInfo(nextFile, nextPreviewUrl);
+
+        if (requestId !== base64ParseIdRef.current) {
+          URL.revokeObjectURL(nextPreviewUrl);
+          return;
+        }
+
+        replaceBatchImages([
+          {
+            file: nextFile,
+            info: nextInfo,
+            previewUrl: nextPreviewUrl,
+          },
+        ]);
+        setProcessState({ message: copy.status.ready, phase: 'idle' });
+      } catch {
+        if (nextPreviewUrl) URL.revokeObjectURL(nextPreviewUrl);
+        if (requestId !== base64ParseIdRef.current) return;
+        setBase64Error(copy.validation.invalidBase64);
+        setProcessState({
+          message: copy.validation.invalidBase64,
+          phase: 'error',
+        });
+      }
+    }, 450);
+
+    return () => window.clearTimeout(timer);
+  }, [
+    base64Value,
+    copy.status.idle,
+    copy.status.ready,
+    copy.status.reading,
+    copy.validation.invalidBase64,
+  ]);
 
   const formatOptions = useMemo<readonly OSelectorOption<OutputFormat>[]>(
     () => [
@@ -358,30 +681,29 @@ export function ImageStudio() {
     [copy.convert.jpeg, copy.convert.keep, copy.convert.png, copy.convert.webp]
   );
 
-  const resizeOptions = useMemo(
-    () => [
-      { label: copy.resize.modeScale, value: 'scale' },
-      { label: copy.resize.modeDimensions, value: 'dimensions' },
-    ],
-    [copy.resize.modeDimensions, copy.resize.modeScale]
-  );
-
   const targetDimensions = useMemo(() => {
     if (!imageInfo) return null;
     if (!resizeEnabled) {
       return { height: imageInfo.height, width: imageInfo.width };
     }
-    if (resizeMode === 'scale') {
+    if (resizeIntent === 'scale') {
       return {
-        height: clampDimension((imageInfo.height * scale) / 100),
-        width: clampDimension((imageInfo.width * scale) / 100),
+        height: getHeightFromScale(imageInfo, scale),
+        width: getWidthFromScale(imageInfo, scale),
       };
     }
     return {
       height: clampDimension(Number(targetHeight) || imageInfo.height),
       width: clampDimension(Number(targetWidth) || imageInfo.width),
     };
-  }, [imageInfo, resizeEnabled, resizeMode, scale, targetHeight, targetWidth]);
+  }, [
+    imageInfo,
+    resizeEnabled,
+    resizeIntent,
+    scale,
+    targetHeight,
+    targetWidth,
+  ]);
 
   const estimatedSize = useMemo(() => {
     if (!imageInfo || !targetDimensions) return null;
@@ -404,89 +726,175 @@ export function ImageStudio() {
   ]);
 
   const canProcess =
-    Boolean(file && previewUrl && imageInfo && targetDimensions) &&
+    Boolean(
+      batchFiles.length && file && previewUrl && imageInfo && targetDimensions
+    ) &&
     processState.phase !== 'processing' &&
     processState.phase !== 'compressing';
 
-  async function handleFile(nextFile: File | undefined) {
-    if (!nextFile) return false;
+  const totalInputSize = useMemo(() => getTotalBytes(batchInfos), [batchInfos]);
+  const totalResultSize = useMemo(
+    () => getTotalBytes(batchResults),
+    [batchResults]
+  );
+  const completedBatchItemCount = useMemo(
+    () =>
+      batchProcessItems.filter(
+        item => item.phase === 'done' || item.phase === 'error'
+      ).length,
+    [batchProcessItems]
+  );
+  const failedBatchItemCount = useMemo(
+    () => batchProcessItems.filter(item => item.phase === 'error').length,
+    [batchProcessItems]
+  );
+  const batchSuccessCount = batchResults.length;
+  const hasBatchFeedback = batchProcessItems.length > 1;
+  const isBatchFinished =
+    batchProcessItems.length > 0 &&
+    completedBatchItemCount === batchProcessItems.length;
+  const batchSavingsRatio =
+    totalInputSize > 0 && totalResultSize > 0
+      ? 1 - totalResultSize / totalInputSize
+      : null;
+  const outputMessage = useMemo(() => {
+    if (hasBatchFeedback) {
+      if (
+        processState.phase === 'processing' ||
+        processState.phase === 'compressing'
+      ) {
+        return processState.message;
+      }
+      if (isBatchFinished && failedBatchItemCount === 0) {
+        return copy.output.batchReady;
+      }
+      if (isBatchFinished && batchSuccessCount > 0) {
+        return copy.output.batchPartial;
+      }
+      if (isBatchFinished) {
+        return copy.output.batchFailed;
+      }
+      return `${copy.output.batchProgressPrefix}${completedBatchItemCount}/${batchProcessItems.length}`;
+    }
+
+    if (result) return copy.output.ready;
+    if (
+      processState.phase === 'processing' ||
+      processState.phase === 'compressing'
+    ) {
+      return processState.message;
+    }
+    if (processState.phase === 'error') return processState.message;
+    return copy.output.empty;
+  }, [
+    batchProcessItems.length,
+    batchSuccessCount,
+    completedBatchItemCount,
+    copy.output.batchFailed,
+    copy.output.batchPartial,
+    copy.output.batchProgressPrefix,
+    copy.output.batchReady,
+    copy.output.empty,
+    copy.output.ready,
+    failedBatchItemCount,
+    hasBatchFeedback,
+    isBatchFinished,
+    processState.message,
+    processState.phase,
+    result,
+  ]);
+
+  function getOutputDimensions(info: ImageInfo) {
+    if (!resizeEnabled) return { height: info.height, width: info.width };
+    if (resizeIntent === 'scale') {
+      return {
+        height: getHeightFromScale(info, scale),
+        width: getWidthFromScale(info, scale),
+      };
+    }
+    return {
+      height: clampDimension(Number(targetHeight) || info.height),
+      width: clampDimension(Number(targetWidth) || info.width),
+    };
+  }
+
+  async function readImageFile(nextFile: File): Promise<ReadImageFileResult> {
+    const nextPreviewUrl = URL.createObjectURL(nextFile);
+    try {
+      const nextInfo = await readImageInfo(nextFile, nextPreviewUrl);
+      return {
+        file: nextFile,
+        info: nextInfo,
+        previewUrl: nextPreviewUrl,
+      };
+    } catch (error) {
+      URL.revokeObjectURL(nextPreviewUrl);
+      throw error;
+    }
+  }
+
+  async function handleFiles(nextFiles: FileList | File[] | undefined) {
+    const candidates = Array.from(nextFiles ?? []);
+    if (!candidates.length) return false;
+    base64ParseIdRef.current += 1;
     setResult(null);
-    setFile(null);
-    setPreviewUrl('');
-    setImageBase64('');
-    setImageInfo(null);
+    setBatchResults([]);
+    setBatchProcessItems([]);
+    setIsZipping(false);
+    replaceBatchImages([]);
+    skipNextBase64ParseRef.current = true;
+    setBase64Value('');
     setCopiedBase64(false);
     setBase64Error('');
     setProcessState({ message: copy.status.reading, phase: 'processing' });
-    const nextPreviewUrl = URL.createObjectURL(nextFile);
     try {
-      const [nextInfo, nextBase64] = await Promise.all([
-        readImageInfo(nextFile, nextPreviewUrl),
-        readFileAsDataUrl(nextFile),
-      ]);
-      setFile(nextFile);
-      setPreviewUrl(nextPreviewUrl);
-      setImageBase64(nextBase64);
-      setImageInfo(nextInfo);
+      const loadedImages = (
+        await Promise.all(
+          candidates.map(async candidate => {
+            try {
+              return await readImageFile(candidate);
+            } catch {
+              return null;
+            }
+          })
+        )
+      ).filter((item): item is ReadImageFileResult => Boolean(item));
+      const primaryImage = loadedImages[0];
+      if (!primaryImage) {
+        setProcessState({
+          message: copy.validation.unsupported,
+          phase: 'error',
+        });
+        return false;
+      }
+      replaceBatchImages(loadedImages);
       setProcessState({ message: copy.status.ready, phase: 'idle' });
       return true;
     } catch {
-      URL.revokeObjectURL(nextPreviewUrl);
       setProcessState({ message: copy.validation.unsupported, phase: 'error' });
       return false;
     }
   }
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
-    void handleFile(event.target.files?.[0]);
+    void handleFiles(event.target.files ?? undefined);
     event.target.value = '';
   }
 
-  function handleDrop(event: DragEvent<HTMLLabelElement>) {
+  function handleDrop(event: DragEvent<HTMLElement>) {
     event.preventDefault();
     setIsDragging(false);
-    void handleFile(event.dataTransfer.files?.[0]);
-  }
-
-  async function handleBase64Import() {
-    if (!base64Input.trim()) {
-      setBase64Error(copy.validation.noBase64);
-      setProcessState({ message: copy.validation.noBase64, phase: 'error' });
-      return;
-    }
-
-    setResult(null);
-    setCopiedBase64(false);
-    setBase64Error('');
-    setProcessState({ message: copy.status.reading, phase: 'processing' });
-
-    try {
-      const dataUrl = normalizeBase64Image(base64Input);
-      const blob = dataUrlToBlob(dataUrl);
-      const mime = blob.type || getMimeFromDataUrl(dataUrl);
-      const nextFile = new File([blob], `base64-image.${getExtension(mime)}`, {
-        lastModified: Date.now(),
-        type: mime,
-      });
-      const imported = await handleFile(nextFile);
-      if (imported) setImageBase64(dataUrl);
-    } catch {
-      setBase64Error(copy.validation.invalidBase64);
-      setProcessState({
-        message: copy.validation.invalidBase64,
-        phase: 'error',
-      });
-    }
+    void handleFiles(event.dataTransfer.files);
   }
 
   async function copyImageBase64() {
-    if (!imageBase64) return;
+    if (!base64Value) return;
     try {
       if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(imageBase64);
+        await navigator.clipboard.writeText(base64Value);
       } else {
         const textarea = document.createElement('textarea');
-        textarea.value = imageBase64;
+        textarea.value = base64Value;
         textarea.style.position = 'fixed';
         textarea.style.opacity = '0';
         document.body.appendChild(textarea);
@@ -502,93 +910,309 @@ export function ImageStudio() {
   }
 
   function resetAll() {
-    setFile(null);
-    setPreviewUrl('');
-    setBase64Input('');
-    setImageBase64('');
+    base64ParseIdRef.current += 1;
+    replaceBatchImages([]);
+    setBase64Value('');
     setBase64Error('');
     setCopiedBase64(false);
-    setImageInfo(null);
     setResult(null);
+    setBatchResults([]);
+    setBatchProcessItems([]);
+    setIsZipping(false);
     setConvertEnabled(false);
     setOutputFormat('image/webp');
     setResizeEnabled(false);
-    setResizeMode('scale');
-    setScale(50);
+    setResizeIntent('dimensions');
+    setKeepAspectRatio(true);
+    setScale(defaultScale);
     setTargetWidth('');
     setTargetHeight('');
     setCompressEnabled(false);
     setProcessState({ message: copy.status.idle, phase: 'idle' });
   }
 
-  async function processImage() {
-    if (!file || !imageInfo || !targetDimensions) {
-      setProcessState({ message: copy.validation.noFile, phase: 'error' });
-      return;
-    }
+  async function processImageFile(
+    nextFile: File,
+    nextInfo: ImageInfo,
+    imageUrl?: string
+  ) {
+    const nextDimensions = getOutputDimensions(nextInfo);
+    const needsCanvas =
+      convertEnabled ||
+      resizeEnabled ||
+      !canvasFormats.has(nextFile.type || nextInfo.type);
+    let workingBlob: Blob = nextFile;
+    let workingType = nextFile.type || nextInfo.type;
+    let workingWidth = nextInfo.width;
+    let workingHeight = nextInfo.height;
+    let temporaryUrl = '';
 
     try {
-      setProcessState({ message: copy.status.processing, phase: 'processing' });
-      const needsCanvas =
-        convertEnabled ||
-        resizeEnabled ||
-        !canvasFormats.has(file.type || imageInfo.type);
-      let workingBlob: Blob = file;
-      let workingType = file.type || imageInfo.type;
-      let workingWidth = imageInfo.width;
-      let workingHeight = imageInfo.height;
-
       if (needsCanvas) {
         workingType = resolveCanvasMime(
           convertEnabled ? outputFormat : 'original',
           workingType
         );
+        temporaryUrl = imageUrl || URL.createObjectURL(nextFile);
         workingBlob = await renderToBlob(
-          previewUrl,
-          targetDimensions.width,
-          targetDimensions.height,
+          temporaryUrl,
+          nextDimensions.width,
+          nextDimensions.height,
           workingType
         );
-        workingWidth = targetDimensions.width;
-        workingHeight = targetDimensions.height;
+        workingWidth = nextDimensions.width;
+        workingHeight = nextDimensions.height;
       }
 
       let source: ProcessResult['source'] = 'browser';
-      let resultName = createOutputName(file.name, workingType, source);
+      let resultName = createOutputName(nextFile.name, workingType, source);
       if (compressEnabled) {
-        setProcessState({
-          message: copy.status.compressing,
-          phase: 'compressing',
-        });
         const compressed = await tinypngCompress(workingBlob, resultName);
         workingBlob = compressed.blob;
         workingType = compressed.type || workingBlob.type || workingType;
         source = 'tinypng';
         resultName =
           compressed.filename ||
-          createOutputName(file.name, workingType, source);
+          createOutputName(nextFile.name, workingType, source);
       }
 
-      const nextUrl = URL.createObjectURL(workingBlob);
-      setResult({
+      return {
         blob: workingBlob,
         height: workingHeight,
         name: resultName,
-        savingsRatio: 1 - workingBlob.size / file.size,
+        savingsRatio: 1 - workingBlob.size / nextFile.size,
         size: workingBlob.size,
         source,
         type: workingType,
-        url: nextUrl,
+        url: URL.createObjectURL(workingBlob),
         width: workingWidth,
-      });
+      } satisfies ProcessResult;
+    } finally {
+      if (temporaryUrl && temporaryUrl !== imageUrl) {
+        URL.revokeObjectURL(temporaryUrl);
+      }
+    }
+  }
+
+  function createBatchProcessItems() {
+    return batchImages.map(item => ({
+      message: copy.status.pending,
+      name: item.info.name,
+      phase: 'idle' as const,
+    }));
+  }
+
+  function updateBatchProcessItem(
+    index: number,
+    nextPatch: Partial<BatchProcessItem>
+  ) {
+    setBatchProcessItems(currentItems =>
+      currentItems.map((item, itemIndex) =>
+        itemIndex === index ? { ...item, ...nextPatch } : item
+      )
+    );
+  }
+
+  function getErrorMessage(error: unknown) {
+    return error instanceof Error ? error.message : copy.validation.failed;
+  }
+
+  async function processImage() {
+    if (!batchFiles.length || !imageInfo || !targetDimensions) {
+      setProcessState({ message: copy.validation.noFile, phase: 'error' });
+      return;
+    }
+
+    setResult(null);
+    setBatchResults([]);
+    setBatchProcessItems(createBatchProcessItems());
+    setIsZipping(false);
+
+    const nextResults: ProcessResult[] = [];
+    let failedCount = 0;
+    let firstErrorMessage = '';
+
+    for (const [index, nextFile] of batchFiles.entries()) {
+      const nextInfo = batchInfos[index];
+      if (!nextInfo) continue;
+
+      try {
+        setProcessState({
+          message:
+            batchFiles.length > 1
+              ? `${copy.status.batchProcessingPrefix}${index + 1}/${batchFiles.length}`
+              : copy.status.processing,
+          phase: 'processing',
+        });
+        updateBatchProcessItem(index, {
+          message: copy.status.itemProcessing,
+          phase: 'processing',
+        });
+        if (compressEnabled) {
+          setProcessState({
+            message:
+              batchFiles.length > 1
+                ? `${copy.status.batchCompressingPrefix}${index + 1}/${batchFiles.length}`
+                : copy.status.compressing,
+            phase: 'compressing',
+          });
+          updateBatchProcessItem(index, {
+            message: copy.status.itemCompressing,
+            phase: 'compressing',
+          });
+        }
+        const nextResult = await processImageFile(
+          nextFile,
+          nextInfo,
+          batchImages[index]?.previewUrl
+        );
+        nextResults.push(nextResult);
+        setBatchResults(currentResults => [...currentResults, nextResult]);
+        setResult(currentResult => currentResult ?? nextResult);
+        updateBatchProcessItem(index, {
+          message: copy.status.itemDone,
+          phase: 'done',
+          result: nextResult,
+        });
+      } catch (error) {
+        const errorMessage = getErrorMessage(error);
+        failedCount += 1;
+        if (!firstErrorMessage) {
+          firstErrorMessage = errorMessage;
+        }
+        updateBatchProcessItem(index, {
+          message: errorMessage,
+          phase: 'error',
+        });
+      }
+    }
+
+    if (nextResults.length && failedCount === 0) {
       setProcessState({ message: copy.status.done, phase: 'done' });
-    } catch (error) {
-      const detail =
-        error instanceof Error ? error.message : copy.validation.failed;
+      return;
+    }
+
+    if (nextResults.length) {
       setProcessState({
-        message: `${copy.validation.failedPrefix}${detail}`,
+        message: copy.output.batchPartial,
+        phase: 'done',
+      });
+      return;
+    }
+
+    if (failedCount > 0) {
+      setProcessState({
+        message:
+          batchFiles.length > 1
+            ? copy.output.batchFailed
+            : `${copy.validation.failedPrefix}${firstErrorMessage || copy.validation.failed}`,
         phase: 'error',
       });
+      return;
+    }
+
+    setProcessState({
+      message: copy.validation.failed,
+      phase: 'error',
+    });
+  }
+
+  function handleScaleChange(value: string) {
+    const nextScale = clampScale(Number(value));
+    setResizeIntent('scale');
+    setScale(nextScale);
+    if (!imageInfo) return;
+    setTargetWidth(String(getWidthFromScale(imageInfo, nextScale)));
+    setTargetHeight(String(getHeightFromScale(imageInfo, nextScale)));
+  }
+
+  function handleDimensionChange(axis: 'height' | 'width', value: string) {
+    const nextValue = sanitizeDimensionInput(value);
+    setResizeIntent('dimensions');
+
+    if (axis === 'width') {
+      setTargetWidth(nextValue);
+    } else {
+      setTargetHeight(nextValue);
+    }
+
+    if (!imageInfo || !nextValue) return;
+
+    const numericValue = Number(nextValue);
+    const nextScale =
+      axis === 'width'
+        ? (numericValue / imageInfo.width) * 100
+        : (numericValue / imageInfo.height) * 100;
+    setScale(clampScale(nextScale));
+
+    if (!keepAspectRatio) return;
+
+    if (axis === 'width') {
+      setTargetHeight(String(getHeightFromWidth(imageInfo, numericValue)));
+    } else {
+      setTargetWidth(String(getWidthFromHeight(imageInfo, numericValue)));
+    }
+  }
+
+  function handleAspectRatioToggle() {
+    setResizeIntent('dimensions');
+    setKeepAspectRatio(current => {
+      const nextValue = !current;
+      if (!nextValue || !imageInfo) return nextValue;
+
+      const width = Number(targetWidth);
+      const height = Number(targetHeight);
+      if (width > 0) {
+        setTargetHeight(String(getHeightFromWidth(imageInfo, width)));
+        setScale(clampScale((width / imageInfo.width) * 100));
+      } else if (height > 0) {
+        setTargetWidth(String(getWidthFromHeight(imageInfo, height)));
+        setScale(clampScale((height / imageInfo.height) * 100));
+      } else {
+        setTargetWidth(String(imageInfo.width));
+        setTargetHeight(String(imageInfo.height));
+        setScale(defaultScale);
+      }
+
+      return nextValue;
+    });
+  }
+
+  function downloadResult(nextResult: ProcessResult) {
+    const anchor = document.createElement('a');
+    anchor.href = nextResult.url;
+    anchor.download = nextResult.name;
+    anchor.rel = 'noopener';
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+  }
+
+  async function downloadAllResults() {
+    if (!batchResults.length) return;
+    setIsZipping(true);
+    try {
+      const archive = new JSZip();
+      const usedNames = new Set<string>();
+      batchResults.forEach(item => {
+        archive.file(getUniqueArchiveName(item.name, usedNames), item.blob);
+      });
+      const archiveBlob = await archive.generateAsync({ type: 'blob' });
+      const archiveUrl = URL.createObjectURL(archiveBlob);
+      downloadResult({
+        blob: archiveBlob,
+        height: 0,
+        name: createArchiveName(),
+        savingsRatio: 0,
+        size: archiveBlob.size,
+        source: 'browser',
+        type: 'application/zip',
+        url: archiveUrl,
+        width: 0,
+      });
+      window.setTimeout(() => URL.revokeObjectURL(archiveUrl), 1000);
+    } finally {
+      setIsZipping(false);
     }
   }
 
@@ -611,7 +1235,7 @@ export function ImageStudio() {
         >
           <div className='image-hero-strip' aria-label={copy.heroAriaLabel}>
             {copy.heroHighlights.map((highlight, index) => {
-              const Icon = [FileImage, Maximize2, Zap][index] ?? CheckCircle2;
+              const Icon = [Images, Maximize2, Zap][index] ?? CheckCircle2;
               return (
                 <span key={highlight}>
                   <Icon size={15} aria-hidden='true' />
@@ -645,7 +1269,8 @@ export function ImageStudio() {
               ) : null}
             </div>
 
-            <label
+            <div
+              aria-label={copy.upload.dropzoneAriaLabel}
               className={[
                 'image-dropzone',
                 isDragging ? 'is-dragging' : '',
@@ -653,6 +1278,9 @@ export function ImageStudio() {
               ]
                 .filter(Boolean)
                 .join(' ')}
+              role='button'
+              tabIndex={0}
+              onClick={() => fileInputRef.current?.click()}
               onDragEnter={event => {
                 event.preventDefault();
                 setIsDragging(true);
@@ -663,15 +1291,58 @@ export function ImageStudio() {
               }}
               onDragOver={event => event.preventDefault()}
               onDrop={handleDrop}
+              onKeyDown={event => {
+                if (event.key !== 'Enter' && event.key !== ' ') return;
+                event.preventDefault();
+                fileInputRef.current?.click();
+              }}
             >
               <input
                 ref={fileInputRef}
                 accept={uploadAccept}
+                multiple
                 type='file'
                 onChange={handleInputChange}
               />
               {previewUrl && imageInfo ? (
-                <img src={previewUrl} alt={copy.upload.previewAlt} />
+                <div className='image-preview-frame'>
+                  <img src={previewUrl} alt={copy.upload.previewAlt} />
+                  {isBatchMode ? (
+                    <>
+                      <OIconButton
+                        aria-label={copy.upload.previousPreview}
+                        className='image-preview-nav image-preview-nav--prev'
+                        hoverTranslate={false}
+                        size='sm'
+                        variant='ghost'
+                        onClick={event => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          showPreviousPreview();
+                        }}
+                      >
+                        <ChevronLeft size={16} aria-hidden='true' />
+                      </OIconButton>
+                      <OIconButton
+                        aria-label={copy.upload.nextPreview}
+                        className='image-preview-nav image-preview-nav--next'
+                        hoverTranslate={false}
+                        size='sm'
+                        variant='ghost'
+                        onClick={event => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          showNextPreview();
+                        }}
+                      >
+                        <ChevronRight size={16} aria-hidden='true' />
+                      </OIconButton>
+                      <span className='image-preview-counter'>
+                        {previewPosition}
+                      </span>
+                    </>
+                  ) : null}
+                </div>
               ) : (
                 <span className='image-empty-state'>
                   <UploadCloud size={34} strokeWidth={1.7} aria-hidden='true' />
@@ -679,30 +1350,81 @@ export function ImageStudio() {
                   <small>{copy.upload.emptyDescription}</small>
                 </span>
               )}
-            </label>
-
-            <div className='image-upload-actions'>
-              <OButton
-                size='sm'
-                type='button'
-                variant='secondary'
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <UploadCloud size={16} aria-hidden='true' />
-                {imageInfo ? copy.upload.replace : copy.upload.browse}
-              </OButton>
-              <span>{processState.message}</span>
             </div>
+
+            {batchImages.length ? (
+              <div
+                ref={previewStripRef}
+                className='image-preview-strip'
+                aria-label={copy.batch.title}
+              >
+                {batchImages.map((item, index) => (
+                  <button
+                    ref={node => {
+                      previewButtonRefs.current[index] = node;
+                    }}
+                    key={`${item.info.name}-${item.info.lastModified}-${index}`}
+                    className={[
+                      'interactive',
+                      index === activeImageIndex ? 'is-active' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    type='button'
+                    onClick={() => showPreviewAt(index)}
+                  >
+                    <img src={item.previewUrl} alt='' aria-hidden='true' />
+                    <span>
+                      <strong>{item.info.name}</strong>
+                      <small>
+                        {item.info.width} x {item.info.height} ·{' '}
+                        {formatBytes(item.info.size)}
+                      </small>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+
+            {batchFiles.length ? (
+              <div
+                className='image-batch-summary'
+                aria-label={copy.batch.title}
+              >
+                <div className='image-batch-summary-head'>
+                  <span aria-hidden='true'>
+                    <Images size={16} />
+                  </span>
+                  <div>
+                    <strong>
+                      {batchFiles.length}
+                      {copy.batch.countSuffix}
+                    </strong>
+                    <small>{copy.batch.unifiedNote}</small>
+                  </div>
+                </div>
+                <div className='image-batch-stats'>
+                  <span>
+                    {copy.batch.totalSize}: {formatBytes(totalInputSize)}
+                  </span>
+                  <span>
+                    {copy.batch.primary}: {previewPosition || copy.info.unknown}
+                  </span>
+                </div>
+              </div>
+            ) : null}
 
             <Base64Transfer
               copied={copiedBase64}
               copy={copy.base64}
               error={base64Error}
-              inputValue={base64Input}
-              outputValue={imageBase64}
+              value={base64Value}
               onCopy={() => void copyImageBase64()}
-              onImport={() => void handleBase64Import()}
-              onInputChange={setBase64Input}
+              onChange={value => {
+                setCopiedBase64(false);
+                setBase64Error('');
+                setBase64Value(value);
+              }}
             />
 
             <div className='image-info-grid' aria-label={copy.info.title}>
@@ -773,55 +1495,100 @@ export function ImageStudio() {
               >
                 {copy.resize.description}
               </ToggleRow>
-              <OTab
-                ariaLabel={copy.resize.modeAriaLabel}
-                className='image-resize-tabs'
-                options={resizeOptions}
-                value={resizeMode}
-                onChange={value => setResizeMode(value as ResizeMode)}
-              />
-              {resizeMode === 'scale' ? (
+              <div className='image-resize-panel'>
+                <div className='image-resize-heading'>
+                  <span>
+                    <Maximize2 size={15} aria-hidden='true' />
+                    {copy.resize.dimensionTitle}
+                  </span>
+                  <span
+                    className={[
+                      'image-aspect-status',
+                      keepAspectRatio ? 'is-locked' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                  >
+                    {keepAspectRatio
+                      ? copy.resize.aspectLocked
+                      : copy.resize.aspectUnlocked}
+                  </span>
+                </div>
+                <div className='image-dimension-controls'>
+                  <label>
+                    <span>{copy.resize.width}</span>
+                    <input
+                      disabled={!resizeEnabled || !imageInfo}
+                      inputMode='numeric'
+                      min='1'
+                      type='number'
+                      value={targetWidth}
+                      onChange={event =>
+                        handleDimensionChange('width', event.target.value)
+                      }
+                    />
+                  </label>
+                  <OIconButton
+                    aria-label={
+                      keepAspectRatio
+                        ? copy.resize.aspectLocked
+                        : copy.resize.aspectUnlocked
+                    }
+                    aria-pressed={keepAspectRatio}
+                    className={[
+                      'image-aspect-button',
+                      keepAspectRatio ? 'is-active' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ')}
+                    disabled={!resizeEnabled || !imageInfo}
+                    hoverTranslate={false}
+                    size='md'
+                    title={copy.resize.aspectToggleLabel}
+                    variant='ghost'
+                    onClick={handleAspectRatioToggle}
+                  >
+                    {keepAspectRatio ? (
+                      <Lock size={16} aria-hidden='true' />
+                    ) : (
+                      <Unlock size={16} aria-hidden='true' />
+                    )}
+                  </OIconButton>
+                  <label>
+                    <span>{copy.resize.height}</span>
+                    <input
+                      disabled={!resizeEnabled || !imageInfo}
+                      inputMode='numeric'
+                      min='1'
+                      type='number'
+                      value={targetHeight}
+                      onChange={event =>
+                        handleDimensionChange('height', event.target.value)
+                      }
+                    />
+                  </label>
+                </div>
                 <label className='image-range-control'>
                   <span>
                     {copy.resize.scaleLabel}
                     <strong>{scale}%</strong>
                   </span>
                   <input
-                    disabled={!resizeEnabled}
-                    max='200'
-                    min='10'
+                    disabled={!resizeEnabled || !imageInfo}
+                    max={maxScale}
+                    min={minScale}
                     step='5'
                     type='range'
                     value={scale}
-                    onChange={event => setScale(Number(event.target.value))}
+                    onChange={event => handleScaleChange(event.target.value)}
                   />
+                  <small>
+                    <span>{minScale}%</span>
+                    <span>{maxScale}%</span>
+                  </small>
                 </label>
-              ) : (
-                <div className='image-dimension-controls'>
-                  <label>
-                    <span>{copy.resize.width}</span>
-                    <input
-                      disabled={!resizeEnabled}
-                      inputMode='numeric'
-                      min='1'
-                      type='number'
-                      value={targetWidth}
-                      onChange={event => setTargetWidth(event.target.value)}
-                    />
-                  </label>
-                  <label>
-                    <span>{copy.resize.height}</span>
-                    <input
-                      disabled={!resizeEnabled}
-                      inputMode='numeric'
-                      min='1'
-                      type='number'
-                      value={targetHeight}
-                      onChange={event => setTargetHeight(event.target.value)}
-                    />
-                  </label>
-                </div>
-              )}
+                <p className='image-resize-help'>{copy.resize.batchHint}</p>
+              </div>
             </div>
 
             <div className='image-setting-group'>
@@ -880,7 +1647,9 @@ export function ImageStudio() {
                   ? copy.output.compressing
                   : processState.phase === 'processing'
                     ? copy.output.processing
-                    : copy.output.process}
+                    : isBatchMode
+                      ? copy.output.processBatch
+                      : copy.output.process}
               </OButton>
               <OButton type='button' variant='ghost' onClick={resetAll}>
                 <RotateCcw size={16} aria-hidden='true' />
@@ -914,49 +1683,83 @@ export function ImageStudio() {
             </span>
             <div>
               <h2>{copy.output.title}</h2>
-              <p>
-                {result
-                  ? copy.output.ready
-                  : processState.phase === 'error'
-                    ? processState.message
-                    : copy.output.empty}
-              </p>
+              <p>{outputMessage}</p>
             </div>
           </div>
 
           <div className='image-result-grid'>
             <MetricItem
-              label={copy.output.processedDimensions}
+              label={
+                hasBatchFeedback
+                  ? copy.output.processedCount
+                  : copy.output.processedDimensions
+              }
               value={
-                result
-                  ? `${result.width} x ${result.height}`
-                  : copy.info.unknown
+                hasBatchFeedback
+                  ? `${completedBatchItemCount}/${batchProcessItems.length}`
+                  : result
+                    ? `${result.width} x ${result.height}`
+                    : copy.info.unknown
               }
             />
             <MetricItem
-              label={copy.output.processedSize}
-              value={result ? formatBytes(result.size) : copy.info.unknown}
+              label={
+                hasBatchFeedback
+                  ? copy.output.outputTotalSize
+                  : copy.output.processedSize
+              }
+              value={
+                hasBatchFeedback
+                  ? formatBytes(totalResultSize)
+                  : result
+                    ? formatBytes(result.size)
+                    : copy.info.unknown
+              }
             />
             <MetricItem
               label={copy.output.savings}
               value={
-                result
-                  ? `${Math.max(0, result.savingsRatio * 100).toFixed(1)}%`
-                  : copy.info.unknown
+                hasBatchFeedback && batchSavingsRatio !== null
+                  ? `${Math.max(0, batchSavingsRatio * 100).toFixed(1)}%`
+                  : result
+                    ? `${Math.max(0, result.savingsRatio * 100).toFixed(1)}%`
+                    : copy.info.unknown
               }
             />
             <MetricItem
-              label={copy.output.engine}
+              label={
+                hasBatchFeedback ? copy.output.failedCount : copy.output.engine
+              }
               value={
-                result?.source === 'tinypng'
-                  ? copy.compress.provider
-                  : copy.output.localEngine
+                hasBatchFeedback
+                  ? String(failedBatchItemCount)
+                  : result?.source === 'tinypng'
+                    ? copy.compress.provider
+                    : copy.output.localEngine
               }
             />
           </div>
 
           <div className='image-result-actions'>
-            {result ? (
+            {isBatchMode && batchResults.length ? (
+              <OButton
+                disabled={isZipping}
+                type='button'
+                variant='secondary'
+                onClick={() => void downloadAllResults()}
+              >
+                {isZipping ? (
+                  <Loader2 className='spin' size={16} aria-hidden='true' />
+                ) : (
+                  <Download size={16} aria-hidden='true' />
+                )}
+                {isZipping
+                  ? copy.output.zipping
+                  : failedBatchItemCount
+                    ? copy.output.downloadSuccessfulZip
+                    : copy.output.downloadZip}
+              </OButton>
+            ) : result ? (
               <OButton
                 download={result.name}
                 href={result.url}
@@ -967,6 +1770,64 @@ export function ImageStudio() {
               </OButton>
             ) : null}
           </div>
+
+          {hasBatchFeedback ? (
+            <div
+              className='image-result-items'
+              aria-label={copy.output.batchItemsTitle}
+            >
+              {batchProcessItems.map((item, index) => {
+                const icon =
+                  item.phase === 'done' ? (
+                    <CheckCircle2 size={14} aria-hidden='true' />
+                  ) : item.phase === 'processing' ||
+                    item.phase === 'compressing' ? (
+                    <Loader2 className='spin' size={14} aria-hidden='true' />
+                  ) : item.phase === 'error' ? (
+                    <Info size={14} aria-hidden='true' />
+                  ) : (
+                    <FileImage size={14} aria-hidden='true' />
+                  );
+                const statusDetail = item.result
+                  ? `${item.message} · ${formatBytes(item.result.size)}`
+                  : item.message;
+                const className = [
+                  'image-result-item',
+                  `is-${item.phase}`,
+                  item.result ? 'interactive' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ');
+                const content = (
+                  <>
+                    {icon}
+                    <span>
+                      <strong>{item.result?.name || item.name}</strong>
+                      <small>{statusDetail}</small>
+                    </span>
+                    <small>
+                      {index + 1}/{batchProcessItems.length}
+                    </small>
+                  </>
+                );
+
+                return item.result ? (
+                  <a
+                    key={`${item.name}-${index}`}
+                    className={className}
+                    download={item.result.name}
+                    href={item.result.url}
+                  >
+                    {content}
+                  </a>
+                ) : (
+                  <div key={`${item.name}-${index}`} className={className}>
+                    {content}
+                  </div>
+                );
+              })}
+            </div>
+          ) : null}
         </OCard>
       </main>
     </>

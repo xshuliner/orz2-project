@@ -211,6 +211,7 @@ export interface OfficialPublisherProgressEvent {
 
 export interface TinifyImageResult {
   errcode?: number;
+  errmsg?: string;
   filename?: string;
   data: string;
 }
