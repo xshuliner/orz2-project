@@ -16,3 +16,7 @@
   min-height: var(--control-height-lg);
   padding-inline: var(--control-padding-lg);
 }
+
+.button.o-button--no-hover-translate:hover {
+  transform: none;
+}

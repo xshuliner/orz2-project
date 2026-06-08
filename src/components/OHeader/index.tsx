@@ -1,19 +1,14 @@
 import { useAuth } from '@/components/ContextAuth';
 import { OIconButton } from '@/components/OIconButton';
 import { ORadio, type ORadioOption } from '@/components/ORadio';
-import {
-  localeNames,
-  localeShortNames,
-  useI18n,
-  type Locale,
-} from '@/i18n';
+import { localeNames, localeShortNames, useI18n, type Locale } from '@/i18n';
 import { useTheme, type ThemePreference } from '@/theme';
 import { LogOut, Menu, Monitor, Moon, Sun, UserCircle, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import './index.css';
 
-export function Header() {
+export function OHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const { isAuthenticated, openLogin, logout, user } = useAuth();
@@ -59,7 +54,7 @@ export function Header() {
           </NavLink>
         ))}
       </nav>
-      <HeaderPreferenceControls
+      <OHeaderPreferenceControls
         locale={locale}
         locales={locales}
         onLocaleChange={switchLocale}
@@ -100,7 +95,7 @@ export function Header() {
           ))}
         </nav>
         <div className='mobile-nav-panel'>
-          <HeaderPreferenceControls
+          <OHeaderPreferenceControls
             locale={locale}
             locales={locales}
             onLocaleChange={switchLocale}
@@ -121,7 +116,7 @@ export function Header() {
   );
 }
 
-function HeaderPreferenceControls({
+function OHeaderPreferenceControls({
   locale,
   locales,
   onLocaleChange,
@@ -183,7 +178,9 @@ function HeaderPreferenceControls({
           {desktopLocaleOptions.map(option => (
             <button
               key={option.value}
-              className={option.value === locale ? 'active interactive' : 'interactive'}
+              className={
+                option.value === locale ? 'active interactive' : 'interactive'
+              }
               type='button'
               aria-pressed={option.value === locale}
               onClick={() => onLocaleChange(option.value)}
@@ -195,6 +192,7 @@ function HeaderPreferenceControls({
         <OIconButton
           aria-label={currentThemeOption.ariaLabel ?? messages.theme.ariaLabel}
           className='theme-cycle-button'
+          hoverTranslate={false}
           onClick={cycleThemePreference}
           size='sm'
           title={currentThemeOption.label}

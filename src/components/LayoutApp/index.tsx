@@ -1,5 +1,5 @@
-import { Footer } from '@/components/Footer';
-import { Header } from '@/components/Header';
+import { OFooter } from '@/components/OFooter';
+import { OHeader } from '@/components/OHeader';
 import { useCallback, useEffect, useLayoutEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
@@ -46,11 +46,11 @@ export function LayoutApp() {
 
   return (
     <div className='app-shell'>
-      <Header />
+      <OHeader />
       <main>
         <Outlet />
       </main>
-      <Footer />
+      <OFooter />
     </div>
   );
 }

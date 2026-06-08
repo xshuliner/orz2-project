@@ -3,7 +3,7 @@ import { useI18n } from '@/i18n';
 import { Link } from 'react-router-dom';
 import './index.css';
 
-export function Footer() {
+export function OFooter() {
   const { localizePath, messages } = useI18n();
   const footerCopy = messages.footer;
   const pageTitles = messages.pageTitles;

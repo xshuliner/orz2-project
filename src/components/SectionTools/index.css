@@ -1,11 +1,11 @@
 .tool-directory {
   width: var(--page-content-width);
   margin: 0 auto;
-  padding: var(--space-20) 0;
+  padding: var(--space-16) 0;
 }
 
 .tool-directory.compact {
-  padding-top: var(--space-10);
+  padding-top: var(--space-8);
 }
 
 .directory-controls {
@@ -13,7 +13,7 @@
   grid-template-columns: minmax(260px, 360px) 1fr;
   gap: var(--space-4);
   align-items: center;
-  margin: var(--space-8) 0;
+  margin: var(--space-6) 0;
 }
 
 .search-box {
@@ -45,7 +45,7 @@
 
 .tool-groups {
   display: grid;
-  gap: var(--space-16);
+  gap: var(--space-12);
 }
 
 .tool-group-heading {

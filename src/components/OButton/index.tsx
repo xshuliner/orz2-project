@@ -15,6 +15,7 @@ export type OButtonSize = 'sm' | 'md' | 'lg';
 type OButtonCommonProps = {
   children: ReactNode;
   className?: string;
+  hoverTranslate?: boolean;
   size?: OButtonSize;
   variant?: OButtonVariant;
 };
@@ -45,11 +46,13 @@ export type OButtonProps =
 function buttonClassName(
   size: OButtonSize,
   variant: OButtonVariant,
+  hoverTranslate: boolean,
   className: string | undefined
 ) {
   return [
     'o-button',
     `o-button--${size}`,
+    !hoverTranslate && 'o-button--no-hover-translate',
     'button',
     variant,
     'interactive',
@@ -63,14 +66,25 @@ export const OButton = forwardRef<
   HTMLButtonElement | HTMLAnchorElement,
   OButtonProps
 >(function OButton(props, ref) {
-  const { className, size = 'md', variant = 'primary' } = props;
+  const {
+    className,
+    hoverTranslate = true,
+    size = 'md',
+    variant = 'primary',
+  } = props;
   const { localizePath } = useI18n();
-  const resolvedClassName = buttonClassName(size, variant, className);
+  const resolvedClassName = buttonClassName(
+    size,
+    variant,
+    hoverTranslate,
+    className
+  );
 
   if ('to' in props && props.to) {
     const {
       children: linkChildren,
       className: _className,
+      hoverTranslate: _hoverTranslate,
       size: _size,
       to,
       variant: _variant,
@@ -93,6 +107,7 @@ export const OButton = forwardRef<
       children: anchorChildren,
       className: _className,
       href,
+      hoverTranslate: _hoverTranslate,
       size: _size,
       variant: _variant,
       ...anchorProps
@@ -112,6 +127,7 @@ export const OButton = forwardRef<
   const {
     children: buttonChildren,
     className: _className,
+    hoverTranslate: _hoverTranslate,
     size: _size,
     variant: _variant,
     ...buttonProps

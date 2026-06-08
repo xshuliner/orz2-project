@@ -308,7 +308,7 @@
   position: relative;
   width: var(--page-content-width);
   margin: 0 auto;
-  padding: var(--space-20) 0 var(--space-12);
+  padding: var(--space-12) 0 var(--space-8);
 }
 
 .page-hero::after {
@@ -414,6 +414,10 @@
   .page-hero h1 {
     line-height: 1.04;
     white-space: normal;
+  }
+
+  .page-hero {
+    padding: var(--space-8) 0 var(--space-6);
   }
 
   .page-hero p,

@@ -1,9 +1,9 @@
 .design-system-page {
   display: grid;
-  gap: 78px;
+  gap: var(--space-12);
   width: var(--page-content-width);
   margin: 0 auto;
-  padding: 34px 0 104px;
+  padding: var(--space-6) 0 var(--space-20);
 }
 
 .design-token-grid,
@@ -200,7 +200,7 @@
 
 @media (max-width: 640px) {
   .design-system-page {
-    gap: 56px;
+    gap: var(--space-10);
   }
 
   .design-token-grid,

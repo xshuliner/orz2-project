@@ -41,7 +41,11 @@ interface RequestConfig {
 }
 
 interface UploadConfig extends RequestConfig {
+  signPath?: string;
   file?: {
+    blob?: Blob;
+    fieldName?: string;
+    filename?: string;
     filePath?: string;
     [key: string]: any;
   };
@@ -229,6 +233,7 @@ class FetchManager {
 
     const {
       method = 'POST',
+      signPath,
       url,
       header = {},
       query = {},
@@ -240,16 +245,29 @@ class FetchManager {
       ...otherConfig
     } = objConfig || {};
 
-    const { filePath, ...otherParams } = file || {};
+    const {
+      blob,
+      fieldName = 'file',
+      filename,
+      filePath,
+      ...otherParams
+    } = file || {};
 
     const token = CacheManager.getLocalStorage<string>('token') || '';
 
-    const { urlAndQuery, t, k, requestid } = await getApiHeaders({
-      path: url,
+    const { t, k, requestid } = await getApiHeaders({
+      path: signPath || url,
       query,
       body: {},
       token,
     });
+    const queryReqReal = Utils.traverseObject({
+      obj: query,
+      modifier: (key, value) => {
+        return String(value);
+      },
+    });
+    const urlAndQuery = Utils.router2url(url, queryReqReal) as string;
 
     console.log('verifyLegal', {
       requestid,
@@ -278,10 +296,12 @@ class FetchManager {
 
     const formData = new FormData();
 
-    if (filePath) {
+    if (blob) {
+      formData.append(fieldName, blob, filename);
+    } else if (filePath) {
       try {
         const fileBlob = await fetch(filePath).then(r => r.blob());
-        formData.append('file', fileBlob);
+        formData.append(fieldName, fileBlob, filename);
       } catch (error) {
         console.error('Failed to load file:', error);
       }

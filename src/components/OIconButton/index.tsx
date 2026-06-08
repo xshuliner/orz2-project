@@ -10,6 +10,7 @@ interface OIconButtonProps extends Omit<
 > {
   'aria-label': string;
   children: ReactNode;
+  hoverTranslate?: boolean;
   size?: OIconButtonSize;
   variant?: OIconButtonVariant;
 }
@@ -17,6 +18,7 @@ interface OIconButtonProps extends Omit<
 export function OIconButton({
   children,
   className,
+  hoverTranslate = true,
   size = 'md',
   type = 'button',
   variant = 'default',
@@ -31,6 +33,7 @@ export function OIconButton({
         'interactive',
         `o-icon-button--${variant}`,
         `o-icon-button--${size}`,
+        !hoverTranslate && 'o-icon-button--no-hover-translate',
         className,
       ]
         .filter(Boolean)

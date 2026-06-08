@@ -86,6 +86,11 @@
   --header-height: 76px;
   --header-height-compact: 64px;
   --publisher-sticky-top: 92px;
+  --z-header: 20;
+  --z-popover: 50;
+  --z-tooltip: 70;
+  --z-modal: 90;
+  --z-modal-critical: 120;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;

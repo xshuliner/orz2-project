@@ -22,3 +22,7 @@
   background: transparent;
   box-shadow: none;
 }
+
+.icon-button.o-icon-button--no-hover-translate:hover {
+  transform: none;
+}

@@ -1,10 +1,10 @@
 .privacy-layout {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
-  gap: var(--space-10);
+  gap: var(--space-8);
   width: var(--page-content-width);
   margin: 0 auto;
-  padding: var(--space-8) 0 var(--space-24);
+  padding: var(--space-6) 0 var(--space-20);
 }
 
 .privacy-toc {

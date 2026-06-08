@@ -82,7 +82,7 @@
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
-  z-index: 40;
+  z-index: var(--z-popover);
   display: grid;
   gap: 4px;
   min-width: max(100%, 168px);
