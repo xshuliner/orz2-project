@@ -79,15 +79,22 @@ const toolTranslations: Record<NonDefaultLocale, CatalogTranslations> = {
       },
     },
     'tool-image': {
-      name: 'Smart Image Compressor',
+      name: 'Image Preview Studio',
       summary:
-        'Compress image size while preserving clarity for web pages and social media assets.',
-      badges: ['Image', 'Compression', 'Performance'],
+        'Upload an image to preview dimensions, size, and format, then convert, resize, and compress it with TinyPNG.',
+      badges: ['Image', 'Preview', 'Convert', 'Resize', 'TinyPNG'],
+      entries: { web: 'Tool entry' },
       seo: {
-        title: 'Smart Image Compressor - ORZ2 Online Image Tool',
+        title: 'Image Preview Studio - ORZ2 Online Image Tool',
         description:
-          'ORZ2 Smart Image Compressor helps web, blog, and social assets reduce size while preserving visual quality.',
-        keywords: ['image compression', 'online image tool', 'web performance'],
+          'ORZ2 Image Preview Studio supports image upload previews, size and dimension reading, format conversion, resizing, and TinyPNG compression.',
+        keywords: [
+          'image preview',
+          'image compression',
+          'format conversion',
+          'image resize',
+          'online image tool',
+        ],
       },
     },
     'tool-json': {
@@ -169,15 +176,22 @@ const toolTranslations: Record<NonDefaultLocale, CatalogTranslations> = {
       },
     },
     'tool-image': {
-      name: 'スマート画像圧縮',
+      name: '画像プレビュースタジオ',
       summary:
-        '鮮明さを保ちながら画像サイズを圧縮し、Web や SNS 素材に適した状態にします。',
-      badges: ['画像', '圧縮', '性能'],
+        '画像をアップロードしてサイズ、容量、形式を確認し、変換、リサイズ、TinyPNG 圧縮まで行えます。',
+      badges: ['画像', 'プレビュー', '変換', 'リサイズ', 'TinyPNG'],
+      entries: { web: 'ツール入口' },
       seo: {
-        title: 'スマート画像圧縮 - ORZ2 オンライン画像ツール',
+        title: '画像プレビュースタジオ - ORZ2 オンライン画像ツール',
         description:
-          'ORZ2 スマート画像圧縮は Web、ブログ、SNS 素材の容量を下げ、視覚品質を保ちます。',
-        keywords: ['画像圧縮', 'オンライン画像ツール', 'Web 性能'],
+          'ORZ2 画像プレビュースタジオは、アップロードプレビュー、寸法と容量の確認、形式変換、リサイズ、TinyPNG 圧縮に対応します。',
+        keywords: [
+          '画像プレビュー',
+          '画像圧縮',
+          '形式変換',
+          '画像リサイズ',
+          'オンライン画像ツール',
+        ],
       },
     },
     'tool-json': {

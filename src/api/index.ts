@@ -4,7 +4,11 @@ export default {
   Orz2,
 };
 
-export { postOfficialPublisher, streamPostOfficialPublisher } from './orz2';
+export {
+  postOfficialPublisher,
+  postTinifyImage,
+  streamPostOfficialPublisher,
+} from './orz2';
 export { getAvatarBorderColor, ossAvatarUrl } from './orz2.modal';
 export type {
   BackpackItem,
@@ -25,5 +29,6 @@ export type {
   PostOfficialPublisherBody,
   StoryItem,
   StoryListResult,
+  TinifyImageResult,
   TopRankItem,
 } from './orz2.modal';

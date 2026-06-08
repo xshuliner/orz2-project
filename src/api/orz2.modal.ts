@@ -206,3 +206,11 @@ export interface OfficialPublisherProgressEvent {
   mediaId?: string;
   skippedInlineImageCount?: number;
 }
+
+// ===== 工具 API =====
+
+export interface TinifyImageResult {
+  errcode?: number;
+  filename?: string;
+  data: string;
+}

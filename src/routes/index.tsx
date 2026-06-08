@@ -2,6 +2,7 @@ import { LayoutApp } from '@/components/LayoutApp';
 import { defaultLocale, localePrefixes, type Locale } from '@/i18n';
 import { PageHome } from '@/pages/PageHome';
 import { routesProductSilicon } from '@/pages/Products/ProductSilicon/routes';
+import { routesToolImageStudio } from '@/pages/Tools/ToolImageStudio/routes';
 import { routesToolOfficialPublisher } from '@/pages/Tools/ToolOfficialPublisher/routes';
 import { lazy } from 'react';
 import { Navigate, RouteObject, useParams } from 'react-router-dom';
@@ -57,6 +58,7 @@ function createAppChildren(): RouteObject[] {
           index: true,
           element: <PageTools />,
         },
+        ...routesToolImageStudio,
         ...routesToolOfficialPublisher,
       ],
     },

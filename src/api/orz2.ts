@@ -9,6 +9,7 @@ import type {
   OfficialPublisherProgressEvent,
   PostOfficialPublisherBody,
   StoryListResult,
+  TinifyImageResult,
 } from './orz2.modal';
 
 // ===== API 根路径 & URL 常量 =====
@@ -19,6 +20,8 @@ const API_BASE_URL =
 const MEMBER_PREFIX = `${API_BASE_URL}/member`;
 const STORY_PREFIX = `${API_BASE_URL}/story`;
 const OFFICIAL_PREFIX = `${API_BASE_URL}/official`;
+const TINIFY_IMAGE_API_PATH = '/smart/v1/tool/postTinifyImage';
+const TINIFY_IMAGE_SIGN_PATH = `${new URL(API_BASE_URL).pathname}/tool/postTinifyImage`;
 
 export const MEMBER_SUMMARY_API_URL = `${MEMBER_PREFIX}/getQueryMemberSummaryForSilicon`;
 export const MEMBER_LIST_API_URL = `${MEMBER_PREFIX}/getQueryMemberListForSilicon`;
@@ -214,7 +217,46 @@ export default {
   postCreateMiniCodeLogin,
   getQueryMemberInfo,
   postLoginMemberInfoForPassword,
+  postTinifyImage,
 };
+
+// ===== 工具 API =====
+
+/**
+ * 调用后端 Tinify 压缩接口。
+ * 后端路由：POST /smart/v1/tool/postTinifyImage
+ * 内容类型：multipart/form-data，文件字段名 image。
+ */
+export async function postTinifyImage(params: {
+  image: Blob;
+  filename: string;
+}): Promise<TinifyImageResult> {
+  const response = await FetchManager.upload({
+    file: {
+      blob: params.image,
+      fieldName: 'image',
+      filename: params.filename,
+    },
+    method: 'POST',
+    signPath: TINIFY_IMAGE_SIGN_PATH,
+    timeout: 120000,
+    url: TINIFY_IMAGE_API_PATH,
+  });
+  const data = response.data as {
+    code?: number;
+    body?: TinifyImageResult | null;
+    message?: string;
+    content?: string;
+  };
+
+  if (data?.code === 200 && data?.body?.data) {
+    return data.body;
+  }
+
+  const message =
+    data?.message || data?.content || response.error || 'TinyPNG 压缩失败';
+  throw new Error(message);
+}
 
 // ===== 公众号发布 API =====
 

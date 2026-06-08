@@ -42,29 +42,39 @@
   },
   {
     "id": "tool-image",
-    "name": "智能图片压缩",
+    "name": "图片预览与处理",
     "group": "图片处理",
-    "summary": "在保持清晰度的同时压缩图片体积，适合网页和社媒素材。",
+    "summary": "上传图片后即时预览尺寸、体积和格式，并完成转换、缩放与 TinyPNG 压缩。",
     "media": {
       "kind": "icon",
       "name": "ImageDown"
     },
-    "badges": ["图片", "压缩", "性能"],
+    "badges": ["图片", "预览", "转换", "缩放", "TinyPNG"],
     "lifecycle": {
-      "stage": "PLANNING",
-      "version": "0.1.0",
-      "updatedAt": "2026-06-03"
+      "stage": "BETA",
+      "version": "0.2.0",
+      "updatedAt": "2026-06-08"
     },
     "platform": ["web"],
-    "entries": [],
+    "entries": [
+      {
+        "id": "web",
+        "kind": "link",
+        "label": "工具入口",
+        "href": "/tools/smart-image-compressor",
+        "qrValue": "https://orz2.com/tools/smart-image-compressor",
+        "primary": true
+      }
+    ],
     "seo": {
       "slug": "smart-image-compressor",
-      "title": "智能图片压缩 - ORZ2 在线图片工具",
-      "description": "ORZ2 智能图片压缩工具帮助网页、博客和社媒素材降低体积并保持视觉质量。",
-      "keywords": ["图片压缩", "在线图片工具", "网页性能"],
+      "title": "图片预览与处理工具 - ORZ2 在线图片工具",
+      "description": "ORZ2 图片预览与处理工具支持上传预览、尺寸体积读取、格式转换、缩放和 TinyPNG 图片压缩。",
+      "keywords": ["图片预览", "图片压缩", "格式转换", "图片缩放", "在线图片工具"],
       "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
       "schemaType": "SoftwareApplication"
-    }
+    },
+    "compact": true
   },
   {
     "id": "tool-json",
