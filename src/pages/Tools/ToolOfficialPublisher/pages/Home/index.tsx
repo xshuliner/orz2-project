@@ -1,11 +1,11 @@
 import {
   streamPostOfficialPublisher,
-  type OfficialArticleType,
   type OfficialCommentConfig,
   type OfficialDraftResult,
   type OfficialImageConfig,
   type OfficialImageSourceType,
   type OfficialPublisherProgressEvent,
+  type OfficialPublisherProvider,
   type PostOfficialPublisherBody,
 } from '@/api';
 import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
@@ -63,14 +63,12 @@ import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import './index.css';
 
-type ReferenceType = 'festivals' | 'solarTerms';
 interface WechatPublisherForm {
   appId: string;
   appSecret: string;
-  articleType: OfficialArticleType;
+  provider: OfficialPublisherProvider;
   promptSystem: string;
   promptContent: string;
-  promptReferences: ReferenceType[];
   imageCover: OfficialImageConfig;
   imagesInlineList: OfficialImageConfig[];
   author: string;
@@ -122,13 +120,16 @@ const publisherStepKeys = [
   'submit_draft',
   'save_record',
 ] as const;
+const officialPublisherProviders: OfficialPublisherProvider[] = [
+  'AGNES',
+  'MINIMAX',
+];
 const defaultForm: WechatPublisherForm = {
   appId: '',
   appSecret: '',
-  articleType: 'news',
+  provider: 'AGNES',
   promptSystem: '',
   promptContent: '',
-  promptReferences: [],
   imageCover: { type: 'ai', value: '' },
   imagesInlineList: [],
   author: '',
@@ -425,6 +426,18 @@ function AutoFillChip({
   );
 }
 
+function normalizeOfficialPublisherProvider(
+  value: unknown
+): OfficialPublisherProvider {
+  const normalized =
+    typeof value === 'string' ? value.trim().toUpperCase() : '';
+  return officialPublisherProviders.includes(
+    normalized as OfficialPublisherProvider
+  )
+    ? (normalized as OfficialPublisherProvider)
+    : 'AGNES';
+}
+
 function normalizeForm(input: unknown): WechatPublisherForm {
   const source =
     typeof input === 'object' && input
@@ -474,13 +487,9 @@ function normalizeForm(input: unknown): WechatPublisherForm {
   return {
     ...defaultForm,
     ...source,
-    articleType: source.articleType === 'newspic' ? 'newspic' : 'news',
-    promptReferences: Array.isArray(source.promptReferences)
-      ? source.promptReferences.filter(
-          (item): item is ReferenceType =>
-            item === 'festivals' || item === 'solarTerms'
-        )
-      : [],
+    provider: normalizeOfficialPublisherProvider(
+      source.provider ?? source.aiProvider ?? source.ai?.provider
+    ),
     imageCover: { type: coverType, value: coverValue },
     imagesInlineList: inlineList.slice(0, 9).map(item => ({
       type: item?.type === 'url' || item?.type === 'base64' ? item.type : 'ai',
@@ -504,7 +513,7 @@ function getCompletionItems(
       done:
         hasText(form.appId) &&
         hasText(form.appSecret) &&
-        Boolean(form.articleType),
+        Boolean(form.provider),
     },
     {
       label: copy.completion.prompt,
@@ -531,7 +540,7 @@ function getValidationErrors(form: WechatPublisherForm, copy: PublisherCopy) {
 
   if (!hasText(form.appId)) nextErrors.push(copy.validation.appId);
   if (!hasText(form.appSecret)) nextErrors.push(copy.validation.appSecret);
-  if (!form.articleType) nextErrors.push(copy.validation.articleType);
+  if (!form.provider) nextErrors.push(copy.validation.provider);
   if (!form.imageCover.type) nextErrors.push(copy.validation.coverType);
   if (!hasText(form.imageCover.value))
     nextErrors.push(copy.validation.coverValue);
@@ -607,14 +616,6 @@ export function OfficialPublisher() {
   const publisherCopy = messages.publisher;
   const localizedTools = useMemo(() => getTools(locale), [locale]);
   const localizedToolSeo = useMemo(() => getToolSeo(locale), [locale]);
-  const referenceOptions: Array<{ label: string; value: ReferenceType }> =
-    useMemo(
-      () => [
-        { label: publisherCopy.references.festivals, value: 'festivals' },
-        { label: publisherCopy.references.solarTerms, value: 'solarTerms' },
-      ],
-      [publisherCopy.references.festivals, publisherCopy.references.solarTerms]
-    );
   const commentOptions: Array<{
     label: string;
     value: OfficialCommentConfig;
@@ -632,6 +633,14 @@ export function OfficialPublisher() {
       publisherCopy.comments.fansOnly,
       publisherCopy.comments.open,
     ]
+  );
+  const providerOptions = useMemo(
+    () =>
+      officialPublisherProviders.map(provider => ({
+        value: provider,
+        label: publisherCopy.providers[provider],
+      })),
+    [publisherCopy.providers]
   );
   const [form, setForm] = useState<WechatPublisherForm>(() => {
     try {
@@ -968,7 +977,8 @@ export function OfficialPublisher() {
     const body: PostOfficialPublisherBody = {
       appId: form.appId.trim(),
       appSecret: form.appSecret.trim(),
-      articleType: form.articleType,
+      articleType: 'news',
+      provider: form.provider,
       imageCover: {
         type: form.imageCover.type,
         value: form.imageCover.value,
@@ -989,9 +999,6 @@ export function OfficialPublisher() {
     const sourceUrl = form.sourceUrl.trim();
     if (promptSystem) body.promptSystem = promptSystem;
     if (promptContent) body.promptContent = promptContent;
-    if (form.promptReferences.length) {
-      body.promptReferences = [...form.promptReferences];
-    }
     if (author) body.author = author;
     if (digest) body.digest = digest;
     if (sourceUrl) body.sourceUrl = sourceUrl;
@@ -1080,15 +1087,6 @@ export function OfficialPublisher() {
     } finally {
       event.target.value = '';
     }
-  }
-
-  function toggleReference(value: ReferenceType) {
-    updateField(
-      'promptReferences',
-      form.promptReferences.includes(value)
-        ? form.promptReferences.filter(item => item !== value)
-        : [...form.promptReferences, value]
-    );
   }
 
   async function handleCopyIp() {
@@ -1504,23 +1502,17 @@ export function OfficialPublisher() {
                   </label>
                 </div>
                 <fieldset className='choice-field'>
-                  <legend>{publisherCopy.sections.account.draftType}</legend>
-                  <label className='interactive'>
-                    <input
-                      type='radio'
-                      checked={form.articleType === 'news'}
-                      onChange={() => updateField('articleType', 'news')}
-                    />
-                    {publisherCopy.sections.account.newsType}
-                  </label>
-                  {/* <label className='interactive'>
-                    <input
-                      type='radio'
-                      checked={form.articleType === 'newspic'}
-                      onChange={() => updateField('articleType', 'newspic')}
-                    />
-                    newspic 贴图/图片消息
-                  </label> */}
+                  <legend>{publisherCopy.sections.account.provider}</legend>
+                  {providerOptions.map(option => (
+                    <label className='interactive' key={option.value}>
+                      <input
+                        type='radio'
+                        checked={form.provider === option.value}
+                        onChange={() => updateField('provider', option.value)}
+                      />
+                      {option.label}
+                    </label>
+                  ))}
                 </fieldset>
               </OCard>
 
@@ -1586,19 +1578,6 @@ export function OfficialPublisher() {
                     />
                   ) : null}
                 </label>
-                <fieldset className='choice-field'>
-                  <legend>{publisherCopy.sections.prompt.references}</legend>
-                  {referenceOptions.map(option => (
-                    <label className='interactive' key={option.value}>
-                      <input
-                        type='checkbox'
-                        checked={form.promptReferences.includes(option.value)}
-                        onChange={() => toggleReference(option.value)}
-                      />
-                      {option.label}
-                    </label>
-                  ))}
-                </fieldset>
               </OCard>
 
               <OCard as='section' accentBar className='form-panel' padding='lg'>

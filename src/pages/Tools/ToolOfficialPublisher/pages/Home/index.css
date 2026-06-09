@@ -1739,12 +1739,32 @@
   flex: 0 0 auto;
   grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
   gap: 10px;
-  padding: 18px 24px 0;
+  padding: 16px 24px 18px;
+  border-top: 1px solid var(--color-line-soft);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--color-green-soft-surface) 70%, transparent),
+      var(--color-panel) 88%
+    );
+}
+
+.draft-success-actions .button {
+  width: 100%;
+  min-width: 0;
+}
+
+.draft-success-actions .button.ghost {
+  border-color: color-mix(in srgb, var(--color-green) 20%, var(--color-line));
+  background: var(--color-green-soft-button);
+  color: var(--color-green-deep);
 }
 
 .draft-success-footnote {
   flex: 0 0 auto;
-  margin: 11px 24px 20px;
+  margin: 0;
+  padding: 0 24px 20px;
+  background: var(--color-panel);
   color: var(--color-muted);
   font-size: 12px;
   line-height: 1.5;
@@ -1928,7 +1948,7 @@
 
   .draft-success-actions {
     grid-template-columns: 1fr;
-    padding: 16px 16px 0;
+    padding: 16px;
   }
 
   .draft-success-actions .button:first-child {
@@ -1936,7 +1956,7 @@
   }
 
   .draft-success-footnote {
-    margin: 10px 16px 16px;
+    padding: 0 16px 16px;
   }
 }
 

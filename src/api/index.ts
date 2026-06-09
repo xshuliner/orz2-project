@@ -23,6 +23,7 @@ export type {
   OfficialDraftResult,
   OfficialImageConfig,
   OfficialImageSourceType,
+  OfficialPublisherProvider,
   OfficialPublisherProgressEvent,
   OfficialPublisherProgressStatus,
   OperatorMemberInfo,

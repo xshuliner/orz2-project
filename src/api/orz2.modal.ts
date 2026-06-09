@@ -147,6 +147,7 @@ export type StoryListResult = {
 // ===== 公众号发布 =====
 
 export type OfficialArticleType = 'news' | 'newspic';
+export type OfficialPublisherProvider = 'AGNES' | 'MINIMAX';
 export type OfficialImageSourceType = 'ai' | 'url' | 'base64';
 
 export interface OfficialImageConfig {
@@ -163,6 +164,7 @@ export interface PostOfficialPublisherBody {
   appId: string;
   appSecret: string;
   articleType: OfficialArticleType;
+  provider?: OfficialPublisherProvider;
   promptSystem?: string;
   promptContent?: string | string[];
   promptReferences?: string[];
