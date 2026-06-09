@@ -13,7 +13,7 @@ export function OFooter() {
         <div>
           <img
             className='h-[46px] w-[46px] overflow-hidden rounded-[10px] object-contain'
-            src='https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp'
+            src='https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp'
             alt='ORZ2'
           />
           <p className='mt-2 text-sm leading-relaxed text-footer-copy'>

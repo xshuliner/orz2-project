@@ -35,7 +35,7 @@ export function OHeader() {
         aria-label={headerCopy.brandAriaLabel}
       >
         <img
-          src='https://cos.orz2.online/Orz2/Logo/logo_light_320x320.webp'
+          src='https://cos.orz2.online/Logo/orz2/logo_light_320x320.webp'
           alt='ORZ2'
           className='brand-logo'
         />

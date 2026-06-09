@@ -35,7 +35,7 @@
         "AI文章生成",
         "内容运营工具"
       ],
-      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "ogImage": "https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp",
       "schemaType": "SoftwareApplication"
     },
     "compact": true
@@ -77,7 +77,7 @@
         "图片缩放",
         "ZIP 下载"
       ],
-      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "ogImage": "https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp",
       "schemaType": "SoftwareApplication"
     },
     "compact": true
@@ -104,7 +104,7 @@
       "title": "JSON 格式化工具 - ORZ2 开发者工具",
       "description": "使用 ORZ2 JSON 格式化工具在线整理、校验和查看 JSON 数据。",
       "keywords": ["JSON格式化", "开发者工具", "JSON校验"],
-      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "ogImage": "https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp",
       "schemaType": "SoftwareApplication"
     }
   },
@@ -130,7 +130,7 @@
       "title": "配色实验室 - ORZ2 在线设计工具",
       "description": "ORZ2 配色实验室帮助设计师和开发者生成品牌色、检查对比度并导出色值。",
       "keywords": ["在线配色", "设计工具", "颜色对比度"],
-      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "ogImage": "https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp",
       "schemaType": "SoftwareApplication"
     }
   },
@@ -156,7 +156,7 @@
       "title": "Base64 转换器 - ORZ2 开发者工具",
       "description": "ORZ2 Base64 转换器支持文本与文件的 Base64 编码解码，方便开发与调试。",
       "keywords": ["Base64转换", "编码解码", "开发者工具"],
-      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "ogImage": "https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp",
       "schemaType": "SoftwareApplication"
     }
   },
@@ -182,7 +182,7 @@
       "title": "Markdown 编辑器 - ORZ2 开发者工具",
       "description": "ORZ2 Markdown 编辑器提供实时预览、导出 HTML、文件导入等丰富的编辑能力。",
       "keywords": ["Markdown编辑器", "在线编辑", "HTML导出"],
-      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "ogImage": "https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp",
       "schemaType": "SoftwareApplication"
     }
   },
@@ -208,7 +208,7 @@
       "title": "二维码生成器 - ORZ2 在线工具",
       "description": "ORZ2 二维码生成器可创建 URL、文本与联系信息的二维码，支持自定义尺寸。",
       "keywords": ["二维码生成", "QR Code", "在线工具"],
-      "ogImage": "https://cos.orz2.online/Orz2/Logo/logo_dark_320x320.webp",
+      "ogImage": "https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp",
       "schemaType": "SoftwareApplication"
     }
   }

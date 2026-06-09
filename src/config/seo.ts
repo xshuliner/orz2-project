@@ -6,9 +6,9 @@ import type { CatalogEntry, CatalogItem, SeoConfig } from '@/types';
 export const siteUrl = 'https://orz2.com';
 export const siteName = 'ORZ2';
 export const defaultImageOg =
-  'https://cos.orz2.online/Orz2/Logo/logo_light_320x320.webp';
+  'https://cos.orz2.online/Logo/orz2/logo_light_320x320.webp';
 export const defaultImageLogo =
-  'https://cos.orz2.online/Orz2/Logo/logo_light_320x320.webp';
+  'https://cos.orz2.online/Logo/orz2/logo_light_320x320.webp';
 
 export function routeUrl(path: string, locale: Locale = defaultLocale) {
   const localized = localizePath(path, locale);
