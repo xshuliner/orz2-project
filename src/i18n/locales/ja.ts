@@ -104,6 +104,13 @@ export const messages = {
       emptyState:
         '一致するツールがありません。別のキーワードを試してください。',
       allButton: 'すべてのツールを見る',
+      recent: {
+        title: '最近使用',
+        description:
+          '最近開いた、またはスキャンしたツールを保存し、次回すぐ戻れるようにします。',
+        emptyState:
+          '最近使用したツールはまだありません。任意のツールを開くとここに表示されます。',
+      },
     },
     products: {
       subtitle:
@@ -115,6 +122,13 @@ export const messages = {
       emptyState:
         '一致するプロダクトがありません。別のキーワードを試してください。',
       allButton: 'すべてのプロダクトを見る',
+      recent: {
+        title: '最近使用',
+        description:
+          '最近訪問した、またはスキャンしたプロダクトを保存し、次回すぐ戻れるようにします。',
+        emptyState:
+          '最近使用したプロダクトはまだありません。任意のプロダクトを開くとここに表示されます。',
+      },
     },
     testimonials: {
       title: 'ユーザーの声',
@@ -492,6 +506,10 @@ export const messages = {
     openWechatConsole: 'WeChat コンソールを開く',
     copiedIp: 'IP コピー済み',
     copyIp: 'ホワイトリスト IP をコピー',
+    providers: {
+      AGNES: 'AGNES',
+      MINIMAX: 'MINIMAX',
+    },
     autoFill: {
       chip: '自動入力済み',
       clear: 'クリア',
@@ -543,6 +561,7 @@ export const messages = {
         appSecretPlaceholder: '公众号 appSecret を入力',
         draftType: '草稿タイプ *',
         newsType: 'news 图文消息',
+        provider: 'AI プロバイダー *',
       },
       prompt: {
         title: '記事生成プロンプト',
@@ -650,6 +669,7 @@ export const messages = {
       appId: '公众号 appId を入力してください。',
       appSecret: '公众号 appSecret を入力してください。',
       articleType: '草稿タイプを選択してください。',
+      provider: 'AI プロバイダーを選択してください。',
       coverType: 'カバー画像生成タイプを選択してください。',
       coverValue: 'カバー画像生成値を入力またはアップロードしてください。',
       inlineTypePrefix: '本文画像',

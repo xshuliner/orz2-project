@@ -37,6 +37,7 @@ interface OTooltipProps {
   interactive?: boolean;
   maxWidth?: number;
   offset?: number;
+  onTriggerClick?: () => void;
   placement?: OTooltipPlacement;
 }
 
@@ -112,6 +113,7 @@ export function OTooltip({
   interactive = false,
   maxWidth = 320,
   offset = 10,
+  onTriggerClick,
   placement = 'top',
 }: OTooltipProps) {
   const tooltipId = useId();
@@ -225,6 +227,11 @@ export function OTooltip({
     }
   }
 
+  function handleTriggerClick() {
+    onTriggerClick?.();
+    showTooltip();
+  }
+
   const tooltipStyle: CSSProperties = {
     left: position?.left ?? -9999,
     maxWidth: `min(${maxWidth}px, calc(100vw - 32px))`,
@@ -239,7 +246,7 @@ export function OTooltip({
       aria-describedby={open ? tooltipId : undefined}
       aria-label={ariaLabel}
       onBlur={handleBlur}
-      onClick={showTooltip}
+      onClick={handleTriggerClick}
       onFocus={showTooltip}
       onMouseEnter={showTooltip}
       onMouseLeave={hideTooltip}

@@ -99,6 +99,11 @@ export const messages = {
       categoryAriaLabel: '工具分类',
       emptyState: '暂时没有匹配的工具，换个关键词试试。',
       allButton: '查看全部工具',
+      recent: {
+        title: '最近使用',
+        description: '自动记录你刚打开或扫码体验过的工具，方便下次快速进入。',
+        emptyState: '暂无最近使用的工具，打开任意工具后会显示在这里。',
+      },
     },
     products: {
       subtitle: '记录已经落地的产品实践，也保留每个项目独立而清晰的入口。',
@@ -108,6 +113,11 @@ export const messages = {
       categoryAriaLabel: '产品分类',
       emptyState: '暂时没有匹配的产品，换个关键词试试。',
       allButton: '查看全部产品',
+      recent: {
+        title: '最近使用',
+        description: '自动记录你刚访问或扫码体验过的产品，方便下次快速进入。',
+        emptyState: '暂无最近使用的产品，访问任意产品后会显示在这里。',
+      },
     },
     testimonials: {
       title: '用户反馈',
@@ -465,6 +475,10 @@ export const messages = {
     openWechatConsole: '打开微信公众平台',
     copiedIp: '已复制 IP',
     copyIp: '复制白名单 IP',
+    providers: {
+      AGNES: 'AGNES',
+      MINIMAX: 'MINIMAX',
+    },
     autoFill: {
       chip: '已智能填充',
       clear: '清除',
@@ -515,6 +529,7 @@ export const messages = {
         appSecretPlaceholder: '请输入公众号 appSecret',
         draftType: '草稿类型 *',
         newsType: 'news 图文消息',
+        provider: 'AI 提供商 *',
       },
       prompt: {
         title: '文章生成提示词',
@@ -621,6 +636,7 @@ export const messages = {
       appId: '请填写公众号 appId。',
       appSecret: '请填写公众号 appSecret。',
       articleType: '请选择草稿类型。',
+      provider: '请选择 AI 提供商。',
       coverType: '请选择封面图生成类型。',
       coverValue: '请填写或上传封面图生成值。',
       inlineTypePrefix: '第',

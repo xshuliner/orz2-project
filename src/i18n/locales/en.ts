@@ -102,6 +102,13 @@ export const messages = {
       categoryAriaLabel: 'Tool categories',
       emptyState: 'No matching tools yet. Try another keyword.',
       allButton: 'View all tools',
+      recent: {
+        title: 'Recently Used',
+        description:
+          'Tools you opened or scanned recently are saved here for a faster return.',
+        emptyState:
+          'No recently used tools yet. Open any tool and it will appear here.',
+      },
     },
     products: {
       subtitle:
@@ -112,6 +119,13 @@ export const messages = {
       categoryAriaLabel: 'Product categories',
       emptyState: 'No matching products yet. Try another keyword.',
       allButton: 'View all products',
+      recent: {
+        title: 'Recently Used',
+        description:
+          'Products you visited or scanned recently are saved here for a faster return.',
+        emptyState:
+          'No recently used products yet. Visit any product and it will appear here.',
+      },
     },
     testimonials: {
       title: 'User Feedback',
@@ -493,6 +507,10 @@ export const messages = {
     openWechatConsole: 'Open WeChat console',
     copiedIp: 'IP copied',
     copyIp: 'Copy whitelist IP',
+    providers: {
+      AGNES: 'AGNES',
+      MINIMAX: 'MINIMAX',
+    },
     autoFill: {
       chip: 'Auto-filled',
       clear: 'Clear',
@@ -545,6 +563,7 @@ export const messages = {
         appSecretPlaceholder: 'Enter official account appSecret',
         draftType: 'Draft type *',
         newsType: 'news article message',
+        provider: 'AI provider *',
       },
       prompt: {
         title: 'Article Generation Prompts',
@@ -656,6 +675,7 @@ export const messages = {
       appId: 'Enter the official account appId.',
       appSecret: 'Enter the official account appSecret.',
       articleType: 'Choose a draft type.',
+      provider: 'Choose an AI provider.',
       coverType: 'Choose a cover image source type.',
       coverValue: 'Enter or upload the cover image value.',
       inlineTypePrefix: 'Inline image',
