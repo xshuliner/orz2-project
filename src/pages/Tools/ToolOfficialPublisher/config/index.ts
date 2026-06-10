@@ -17,6 +17,7 @@
 
 export type PromptTemplateId =
   | 'general'
+  | 'insurance_advisor'
   | 'culture'
   | 'tech'
   | 'lifestyle'
@@ -112,6 +113,47 @@ export const promptTemplates: PromptTemplate[] = [
         'wide establishing shot related to【事件发生地点】, realistic urban documentary photography, atmospheric sky, calm but serious tone, 16:9, no text, no watermark',
         'editorial data visualization about【趋势变化】, abstract bars, curves or map elements, clean premium news design, restrained palette, 16:9, no text, no watermark',
         'symbolic editorial image about【深层变化/社会影响】, realistic metaphor, restrained emotion, cinematic composition, premium publication style, 16:9, no text, no watermark',
+      ],
+    },
+  },
+
+  {
+    id: 'insurance_advisor',
+    label: '保险顾问',
+    caption: '人身保障、家庭财务与资产管理，强调理性决策与长期主义',
+    accent: '🛡️',
+
+    defaultCheckedPatterns: [
+      'promptSystem',
+      'promptContent',
+      'digest',
+      'imageCover.value',
+      'imagesInlineList.*.value',
+    ],
+
+    fields: {
+      promptSystem:
+        '你是一名拥有多年从业经验的保险顾问和家庭财务规划师。你写公众号时，不销售产品，不制造焦虑，也不刻意治愈。你的目标是帮助普通家庭理解风险、建立保障体系、管理长期资产。文字应当理性、克制、可信，像一个认真负责的专业人士在分享经验。避免鸡汤、成功学、夸张案例、情绪煽动和销售话术。不要频繁使用“万一”“后悔”“一定要买”等制造压力的表达。多使用真实场景、家庭决策逻辑、保障原理、数据事实和长期观察。',
+
+      promptContent:
+        '请围绕【主题】写一篇 1500–2200 字的保险与家庭财务公众号文章。不要写成产品宣传稿，也不要写成保险科普教材。应当像一位经验丰富的保险顾问，在认真分析一个现实问题。文章可以从一个真实家庭场景、客户咨询案例、社会现象、理赔事件、政策变化或资产配置问题切入。重点回答：问题是什么、人们为什么容易忽略它、正确的决策逻辑是什么、保障与资产管理应该如何配合。不要直接推荐具体产品，而是帮助读者建立判断框架。允许表达个人观察和行业经验，但不要刻意制造权威感。小标题自然形成，不要像培训课件。结尾给出一个务实且长期主义的观察，不要强行升华。正文请输出微信公众号兼容 HTML 片段，不要输出 html、body、head 标签，不要使用 Markdown。排版风格简洁专业，留白充足。正文主色深灰；数据、规则、定义可使用 strong 强调；重要观点可使用 blockquote 进行说明；避免大段密集文字。',
+
+      digest:
+        '60–100 字。用顾问视角告诉读者这篇文章讨论什么问题，以及为什么这件事与家庭保障或资产管理有关。不要写成营销文案。',
+
+      coverValue:
+        'professional financial advisor editorial cover, topic:【文章主题】, realistic lifestyle photography, trustworthy atmosphere, family finance planning, wealth protection, premium magazine composition, typography-friendly negative space, no text, no watermark',
+
+      inlineValueList: [
+        'realistic family financial planning scene related to【家庭场景】, natural interaction, trustworthy atmosphere, editorial photography, premium magazine quality, 16:9, no text, no watermark',
+        'professional consultation scene about【保险决策】, advisor and client discussion, realistic office environment, documentary style, 16:9, no text, no watermark',
+        'editorial infographic explaining【保障结构】, clean visual hierarchy, modern publication design, restrained colors, lots of negative space, 16:9, no text, no watermark',
+        'realistic image illustrating【风险事件】, subtle storytelling, documentary photography, calm emotion, premium editorial style, 16:9, no text, no watermark',
+        'financial planning workspace related to【资产配置】, documents, charts, laptop, clean professional atmosphere, magazine quality, 16:9, no text, no watermark',
+        'human-centered portrait representing【目标人群】, authentic expression, natural light, trustworthy feeling, editorial photography, 16:9, no text, no watermark',
+        'timeline illustration explaining【保障规划阶段】, minimalist editorial design, subtle icons, premium publication style, 16:9, no text, no watermark',
+        'editorial visualization about【长期趋势】, demographic, medical cost or retirement related concepts, clean modern design, 16:9, no text, no watermark',
+        'symbolic image about【家庭责任与风险管理】, realistic metaphor, restrained emotion, premium magazine composition, 16:9, no text, no watermark',
       ],
     },
   },
