@@ -147,6 +147,7 @@ export type StoryListResult = {
 // ===== 公众号发布 =====
 
 export type OfficialArticleType = 'news' | 'newspic';
+export type OfficialPublisherMode = 'create' | 'rewrite';
 export type OfficialPublisherProvider = 'AGNES' | 'MINIMAX';
 export type OfficialImageSourceType = 'ai' | 'url' | 'base64';
 
@@ -163,12 +164,16 @@ export interface OfficialCommentConfig {
 export interface PostOfficialPublisherBody {
   appId: string;
   appSecret: string;
+  publishMode?: OfficialPublisherMode;
   articleType: OfficialArticleType;
   provider?: OfficialPublisherProvider;
   promptSystem?: string;
   promptContent?: string | string[];
   promptReferences?: string[];
-  imageCover: OfficialImageConfig;
+  sourceArticleUrl?: string;
+  rewriteRequirement?: string;
+  inlineImageCount?: number;
+  imageCover?: OfficialImageConfig;
   imagesInlineList?: OfficialImageConfig[];
   author?: string;
   digest?: string;
@@ -178,8 +183,23 @@ export interface PostOfficialPublisherBody {
 
 export interface OfficialDraftResult {
   time?: string;
+  publishMode?: OfficialPublisherMode;
   articleType?: OfficialArticleType;
+  sourceArticleUrl?: string;
+  sourceArticleTitle?: string;
+  topic?: string;
   title?: string;
+  coverMediaId?: string;
+  coverImageUrl?: string;
+  inlineImages?: Array<{
+    url?: string;
+    mediaId?: string;
+    alt?: string;
+  }>;
+  skippedInlineImages?: Array<{
+    imageIndex?: number;
+    reason?: string;
+  }>;
   imagePath?: string;
   inlineImagePaths?: string[];
   mediaId?: string;

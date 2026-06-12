@@ -510,6 +510,24 @@ export const messages = {
       AGNES: 'AGNES',
       MINIMAX: 'MINIMAX',
     },
+    modeSwitch: {
+      title: '公開モードを選択',
+      description:
+        'タスク種別に合わせてフォームを切り替え、同じ公開フローで草稿を作成します。',
+      legend: '公開モード *',
+    },
+    modes: {
+      create: {
+        label: 'AI 公众号作成',
+        description:
+          'プロンプト、カバー画像、本文画像から新しい草稿を生成します。',
+      },
+      rewrite: {
+        label: 'AI 公众号リライト',
+        description:
+          '公众号原文リンクと要件から、文章・画像・レイアウトを再構成します。',
+      },
+    },
     autoFill: {
       chip: '自動入力済み',
       clear: 'クリア',
@@ -601,6 +619,21 @@ export const messages = {
         digestPlaceholder: '公众号摘要に表示する短い文',
         comment: 'コメント設定 *',
       },
+      rewrite: {
+        title: 'リライト設定',
+        description:
+          '原文リンクと特別要件だけで進められます。サーバー側でリライト用プロンプト、画像、レイアウト方針を補います。',
+        sourceUrl: 'リライトする公众号リンク *',
+        sourceUrlPlaceholder:
+          'https://mp.weixin.qq.com/s/5b9Z4EOs3wsMgc6GqAGHBQ',
+        sourceUrlHint:
+          'mp.weixin.qq.com/s で始まる WeChat 公众号記事リンクに対応します。',
+        requirement: 'リライト特別要件 *',
+        requirementPlaceholder:
+          'トーン、読者、文字量、レイアウト、避けたい表現を入力...',
+        requirementHint:
+          '初心者でもそのまま使える既定要件を入力済みです。必要に応じて調整してください。',
+      },
     },
     references: { festivals: '祝日', solarTerms: '二十四節気' },
     comments: {
@@ -613,6 +646,8 @@ export const messages = {
       prompt: '記事プロンプト',
       images: 'カバーと本文画像',
       meta: '記事メタ情報',
+      rewriteSource: '原文リンク',
+      rewriteRequirement: 'リライト要件',
     },
     progress: {
       ariaLabel: 'リアルタイム公開状態',
@@ -644,6 +679,8 @@ export const messages = {
       validationFailed: '必須項目を入力してから公開タスクを生成してください。',
       confirmGenerate:
         '公開タスクの生成には時間がかかる場合があります。開始しますか？',
+      confirmRewrite:
+        'リライトタスクは原文を取得し、文章・画像・レイアウトを生成します。時間がかかる場合があります。開始しますか？',
       connecting: '公開サービスへ接続中。進捗はタイムラインに表示されます。',
       connected: '公開サービスに接続しました。WeChat 草稿を生成しています。',
       runningPrefix: '実行中：',
@@ -670,6 +707,12 @@ export const messages = {
       appSecret: '公众号 appSecret を入力してください。',
       articleType: '草稿タイプを選択してください。',
       provider: 'AI プロバイダーを選択してください。',
+      promptSystem: 'システムプロンプトを入力してください。',
+      promptContent: '本文プロンプトを入力してください。',
+      rewriteSourceUrl: 'リライトする公众号リンクを入力してください。',
+      rewriteSourceUrlInvalid:
+        '有効な WeChat 公众号記事リンクを入力してください。例：https://mp.weixin.qq.com/s/5b9Z4EOs3wsMgc6GqAGHBQ。',
+      rewriteRequirement: 'リライト特別要件を入力してください。',
       coverType: 'カバー画像生成タイプを選択してください。',
       coverValue: 'カバー画像生成値を入力またはアップロードしてください。',
       inlineTypePrefix: '本文画像',
@@ -686,6 +729,7 @@ export const messages = {
       reset: 'リセット',
       generating: '生成中...',
       generate: '公開タスクを生成',
+      generateRewrite: 'リライトして草稿作成',
     },
     success: {
       closeAriaLabel: '草稿公開結果を閉じる',
@@ -717,6 +761,10 @@ export const messages = {
       general: [
         '汎用ニュース',
         'ニュース・客観報道、情報密度と人間的観察を重視',
+      ],
+      insurance_advisor: [
+        '保険アドバイザー',
+        '保障、家計、資産管理を理性的かつ長期視点で解説',
       ],
       culture: ['文化叙事', '祝日・節気・人文物語、温度と余韻を重視'],
       tech: ['テックレビュー', '製品レビュー・技術解説、体験と判断を重視'],

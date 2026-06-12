@@ -4,6 +4,7 @@ import {
   type OfficialDraftResult,
   type OfficialImageConfig,
   type OfficialImageSourceType,
+  type OfficialPublisherMode,
   type OfficialPublisherProgressEvent,
   type OfficialPublisherProvider,
   type PostOfficialPublisherBody,
@@ -64,11 +65,14 @@ import { Link } from 'react-router-dom';
 import './index.css';
 
 interface WechatPublisherForm {
+  publishMode: OfficialPublisherMode;
   appId: string;
   appSecret: string;
   provider: OfficialPublisherProvider;
   promptSystem: string;
   promptContent: string;
+  sourceArticleUrl: string;
+  rewriteRequirement: string;
   imageCover: OfficialImageConfig;
   imagesInlineList: OfficialImageConfig[];
   author: string;
@@ -124,12 +128,18 @@ const officialPublisherProviders: OfficialPublisherProvider[] = [
   'AGNES',
   'MINIMAX',
 ];
+const officialPublisherModes: OfficialPublisherMode[] = ['create', 'rewrite'];
+const defaultRewriteRequirement =
+  '请在保留原文核心事实、信息价值和读者收益的基础上，重写成一篇全新的公众号文章。标题、开头、段落顺序、表达方式和案例串联都要明显区别于原文；不要逐句同义替换，不要照搬原文金句；排版要适合微信公众号阅读，整体有层次、有留白、有编辑感。';
 const defaultForm: WechatPublisherForm = {
+  publishMode: 'create',
   appId: '',
   appSecret: '',
   provider: 'AGNES',
   promptSystem: '',
   promptContent: '',
+  sourceArticleUrl: '',
+  rewriteRequirement: defaultRewriteRequirement,
   imageCover: { type: 'ai', value: '' },
   imagesInlineList: [],
   author: '',
@@ -259,7 +269,10 @@ function DraftSuccessModal({
   draftResult: OfficialDraftResult | null;
   onClose: () => void;
 }) {
-  const inlineImageCount = draftResult?.inlineImagePaths?.length ?? 0;
+  const inlineImages = draftResult?.inlineImages ?? [];
+  const inlineImageCount =
+    inlineImages.length || draftResult?.inlineImagePaths?.length || 0;
+  const coverValue = draftResult?.coverImageUrl || draftResult?.imagePath || '';
 
   return (
     <OModal
@@ -316,7 +329,7 @@ function DraftSuccessModal({
             <div>
               <dt>{copy.success.cover}</dt>
               <dd>
-                {draftResult?.imagePath
+                {coverValue
                   ? copy.success.coverDone
                   : copy.success.coverProcessed}
               </dd>
@@ -338,21 +351,35 @@ function DraftSuccessModal({
             </div>
           ) : null}
 
-          {draftResult?.imagePath || draftResult?.inlineImagePaths?.length ? (
+          {coverValue || inlineImageCount ? (
             <details className='draft-success-details'>
               <summary className='interactive'>{copy.success.details}</summary>
               <dl className='summary-list'>
-                {draftResult.imagePath ? (
+                {coverValue ? (
                   <div>
                     <dt>{copy.success.cover}</dt>
-                    <dd className='summary-mono'>{draftResult.imagePath}</dd>
+                    <dd className='summary-mono'>{coverValue}</dd>
                   </div>
                 ) : null}
-                {draftResult.inlineImagePaths?.length ? (
+                {inlineImages.length ? (
                   <div>
                     <dt>{copy.success.inlineDetail}</dt>
                     <dd>
-                      {draftResult.inlineImagePaths.map((path, index) => (
+                      {inlineImages.map((image, index) => (
+                        <span
+                          className='summary-mono'
+                          key={`${image.url || image.mediaId}-${index}`}
+                        >
+                          {image.url || image.mediaId}
+                        </span>
+                      ))}
+                    </dd>
+                  </div>
+                ) : draftResult?.inlineImagePaths?.length ? (
+                  <div>
+                    <dt>{copy.success.inlineDetail}</dt>
+                    <dd>
+                      {draftResult.inlineImagePaths?.map((path, index) => (
                         <span className='summary-mono' key={`${path}-${index}`}>
                           {path}
                         </span>
@@ -438,6 +465,14 @@ function normalizeOfficialPublisherProvider(
     : 'AGNES';
 }
 
+function normalizeOfficialPublisherMode(value: unknown): OfficialPublisherMode {
+  const normalized =
+    typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return officialPublisherModes.includes(normalized as OfficialPublisherMode)
+    ? (normalized as OfficialPublisherMode)
+    : 'create';
+}
+
 function normalizeForm(input: unknown): WechatPublisherForm {
   const source =
     typeof input === 'object' && input
@@ -487,9 +522,23 @@ function normalizeForm(input: unknown): WechatPublisherForm {
   return {
     ...defaultForm,
     ...source,
+    publishMode: normalizeOfficialPublisherMode(
+      source.publishMode ?? source.mode ?? source.scene
+    ),
     provider: normalizeOfficialPublisherProvider(
       source.provider ?? source.aiProvider ?? source.ai?.provider
     ),
+    sourceArticleUrl:
+      typeof source.sourceArticleUrl === 'string'
+        ? source.sourceArticleUrl
+        : typeof source.rewriteHref === 'string'
+          ? source.rewriteHref
+          : '',
+    rewriteRequirement:
+      typeof source.rewriteRequirement === 'string' &&
+      source.rewriteRequirement.trim()
+        ? source.rewriteRequirement
+        : defaultRewriteRequirement,
     imageCover: { type: coverType, value: coverValue },
     imagesInlineList: inlineList.slice(0, 9).map(item => ({
       type: item?.type === 'url' || item?.type === 'base64' ? item.type : 'ai',
@@ -503,10 +552,44 @@ function hasText(value: string) {
   return Boolean(value.trim());
 }
 
+function isWechatArticleUrl(value: string) {
+  try {
+    const url = new URL(value.trim());
+    return (
+      url.protocol === 'https:' &&
+      url.hostname === 'mp.weixin.qq.com' &&
+      (url.pathname === '/s' || url.pathname.startsWith('/s/'))
+    );
+  } catch {
+    return false;
+  }
+}
+
 function getCompletionItems(
   form: WechatPublisherForm,
   copy: PublisherCopy
 ): CompletionItem[] {
+  if (form.publishMode === 'rewrite') {
+    return [
+      {
+        label: copy.completion.account,
+        done:
+          hasText(form.appId) &&
+          hasText(form.appSecret) &&
+          Boolean(form.provider),
+      },
+      {
+        label: copy.completion.rewriteSource,
+        done:
+          hasText(form.sourceArticleUrl) &&
+          isWechatArticleUrl(form.sourceArticleUrl),
+      },
+      {
+        label: copy.completion.rewriteRequirement,
+        done: hasText(form.rewriteRequirement),
+      },
+    ];
+  }
   return [
     {
       label: copy.completion.account,
@@ -517,7 +600,7 @@ function getCompletionItems(
     },
     {
       label: copy.completion.prompt,
-      done: true,
+      done: hasText(form.promptSystem) && hasText(form.promptContent),
     },
     {
       label: copy.completion.images,
@@ -541,6 +624,21 @@ function getValidationErrors(form: WechatPublisherForm, copy: PublisherCopy) {
   if (!hasText(form.appId)) nextErrors.push(copy.validation.appId);
   if (!hasText(form.appSecret)) nextErrors.push(copy.validation.appSecret);
   if (!form.provider) nextErrors.push(copy.validation.provider);
+  if (form.publishMode === 'rewrite') {
+    if (!hasText(form.sourceArticleUrl)) {
+      nextErrors.push(copy.validation.rewriteSourceUrl);
+    } else if (!isWechatArticleUrl(form.sourceArticleUrl)) {
+      nextErrors.push(copy.validation.rewriteSourceUrlInvalid);
+    }
+    if (!hasText(form.rewriteRequirement)) {
+      nextErrors.push(copy.validation.rewriteRequirement);
+    }
+    return nextErrors;
+  }
+  if (!hasText(form.promptSystem))
+    nextErrors.push(copy.validation.promptSystem);
+  if (!hasText(form.promptContent))
+    nextErrors.push(copy.validation.promptContent);
   if (!form.imageCover.type) nextErrors.push(copy.validation.coverType);
   if (!hasText(form.imageCover.value))
     nextErrors.push(copy.validation.coverValue);
@@ -642,6 +740,17 @@ export function OfficialPublisher() {
       })),
     [publisherCopy.providers]
   );
+  const modeOptions = useMemo(() => {
+    const modeCopy = publisherCopy.modes as Record<
+      OfficialPublisherMode,
+      { label: string; description: string }
+    >;
+    return officialPublisherModes.map(mode => ({
+      value: mode,
+      label: modeCopy[mode].label,
+      description: modeCopy[mode].description,
+    }));
+  }, [publisherCopy.modes]);
   const [form, setForm] = useState<WechatPublisherForm>(() => {
     try {
       return normalizeForm(CacheManager.getLocalStorage(storageKey));
@@ -828,6 +937,22 @@ export function OfficialPublisher() {
     setForm(current => ({ ...current, [key]: value }));
   }
 
+  function updatePublishMode(publishMode: OfficialPublisherMode) {
+    setTemplateMenuOpen(false);
+    setPendingTemplate(null);
+    setSelectedKeys(new Set());
+    setLastAutoFill(null);
+    setAutoFilledKeys(new Set());
+    setErrors([]);
+    setForm(current => ({
+      ...current,
+      publishMode,
+      rewriteRequirement: hasText(current.rewriteRequirement)
+        ? current.rewriteRequirement
+        : defaultRewriteRequirement,
+    }));
+  }
+
   function updateCoverImageValue(value: string) {
     setForm(current => ({
       ...current,
@@ -963,7 +1088,11 @@ export function OfficialPublisher() {
       setStatusText(publisherCopy.status.validationFailed);
       return;
     }
-    const confirmed = window.confirm(publisherCopy.status.confirmGenerate);
+    const confirmed = window.confirm(
+      form.publishMode === 'rewrite'
+        ? publisherCopy.status.confirmRewrite
+        : publisherCopy.status.confirmGenerate
+    );
     if (!confirmed) return;
 
     setIsGenerating(true);
@@ -977,31 +1106,40 @@ export function OfficialPublisher() {
     const body: PostOfficialPublisherBody = {
       appId: form.appId.trim(),
       appSecret: form.appSecret.trim(),
+      publishMode: form.publishMode,
       articleType: 'news',
       provider: form.provider,
-      imageCover: {
-        type: form.imageCover.type,
-        value: form.imageCover.value,
-      },
-      imagesInlineList: form.imagesInlineList.map(item => ({
-        type: item.type,
-        value: item.value,
-      })),
       comment: {
         open: form.comment.open === 1 ? 1 : 0,
         fansOnly: form.comment.fansOnly === 1 ? 1 : 0,
       },
     };
+    if (form.publishMode === 'rewrite') {
+      body.sourceArticleUrl = form.sourceArticleUrl.trim();
+      body.rewriteRequirement = form.rewriteRequirement.trim();
+      body.inlineImageCount = 3;
+    } else {
+      body.imageCover = {
+        type: form.imageCover.type,
+        value: form.imageCover.value,
+      };
+      body.imagesInlineList = form.imagesInlineList.map(item => ({
+        type: item.type,
+        value: item.value,
+      }));
+    }
     const promptSystem = form.promptSystem.trim();
     const promptContent = form.promptContent.trim();
     const author = form.author.trim();
     const digest = form.digest.trim();
     const sourceUrl = form.sourceUrl.trim();
-    if (promptSystem) body.promptSystem = promptSystem;
-    if (promptContent) body.promptContent = promptContent;
-    if (author) body.author = author;
-    if (digest) body.digest = digest;
-    if (sourceUrl) body.sourceUrl = sourceUrl;
+    if (form.publishMode === 'create') {
+      if (promptSystem) body.promptSystem = promptSystem;
+      if (promptContent) body.promptContent = promptContent;
+      if (author) body.author = author;
+      if (digest) body.digest = digest;
+      if (sourceUrl) body.sourceUrl = sourceUrl;
+    }
 
     try {
       publisherAbortRef.current?.abort();
@@ -1433,7 +1571,40 @@ export function OfficialPublisher() {
         </OCard>
 
         <form className='publisher-form' onSubmit={handleGenerate}>
-          {lastAutoFill ? (
+          <OCard
+            as='section'
+            accentBar
+            className='form-panel publisher-mode-card'
+            padding='lg'
+          >
+            <div className='form-panel-heading'>
+              <span className='panel-icon'>
+                <Sparkles size={19} aria-hidden='true' />
+              </span>
+              <div>
+                <h2>{publisherCopy.modeSwitch.title}</h2>
+                <p>{publisherCopy.modeSwitch.description}</p>
+              </div>
+            </div>
+            <fieldset className='choice-field mode-choice-field'>
+              <legend>{publisherCopy.modeSwitch.legend}</legend>
+              {modeOptions.map(option => (
+                <label className='interactive' key={option.value}>
+                  <input
+                    type='radio'
+                    checked={form.publishMode === option.value}
+                    onChange={() => updatePublishMode(option.value)}
+                  />
+                  <span>
+                    <strong>{option.label}</strong>
+                    <small>{option.description}</small>
+                  </span>
+                </label>
+              ))}
+            </fieldset>
+          </OCard>
+
+          {form.publishMode === 'create' && lastAutoFill ? (
             <div className='autofill-banner' role='status'>
               <Sparkles size={16} aria-hidden='true' />
               <span>
@@ -1516,250 +1687,323 @@ export function OfficialPublisher() {
                 </fieldset>
               </OCard>
 
-              <OCard as='section' accentBar className='form-panel' padding='lg'>
-                <div className='form-panel-heading'>
-                  <span className='panel-icon'>
-                    <Sparkles size={19} aria-hidden='true' />
-                  </span>
-                  <div className='form-panel-heading-main'>
-                    <h2>{publisherCopy.sections.prompt.title}</h2>
-                    <p>{publisherCopy.sections.prompt.description}</p>
-                  </div>
-                  <div className='autofill-trigger' ref={templateMenuRef}>
-                    <OButton
-                      ref={templateButtonRef}
-                      type='button'
-                      size='sm'
-                      variant='ghost'
-                      aria-haspopup='dialog'
-                      aria-expanded={isTemplateMenuOpen}
-                      onClick={() => setTemplateMenuOpen(current => !current)}
-                    >
-                      <Wand2 size={17} aria-hidden='true' />
-                      {publisherCopy.sections.prompt.aiFill}
-                    </OButton>
-                  </div>
-                </div>
-                <label className='field'>
-                  <span>{publisherCopy.sections.prompt.systemLabel}</span>
-                  <textarea
-                    value={form.promptSystem}
-                    onChange={event =>
-                      updateField('promptSystem', event.target.value)
-                    }
-                    rows={4}
-                    placeholder={
-                      publisherCopy.sections.prompt.systemPlaceholder
-                    }
-                  />
-                  {autoFilledKeys.has('promptSystem') ? (
-                    <AutoFillChip
-                      copy={publisherCopy}
-                      onClear={() => clearAutoFillField('promptSystem')}
-                    />
-                  ) : null}
-                </label>
-                <label className='field'>
-                  <span>{publisherCopy.sections.prompt.contentLabel}</span>
-                  <textarea
-                    value={form.promptContent}
-                    onChange={event =>
-                      updateField('promptContent', event.target.value)
-                    }
-                    rows={5}
-                    placeholder={
-                      publisherCopy.sections.prompt.contentPlaceholder
-                    }
-                  />
-                  {autoFilledKeys.has('promptContent') ? (
-                    <AutoFillChip
-                      copy={publisherCopy}
-                      onClear={() => clearAutoFillField('promptContent')}
-                    />
-                  ) : null}
-                </label>
-              </OCard>
-
-              <OCard as='section' accentBar className='form-panel' padding='lg'>
-                <div className='form-panel-heading'>
-                  <span className='panel-icon'>
-                    <Image size={19} aria-hidden='true' />
-                  </span>
-                  <div>
-                    <h2>{publisherCopy.sections.images.title}</h2>
-                    <p>{publisherCopy.sections.images.description}</p>
-                  </div>
-                </div>
-                <label className='field'>
-                  <span>{publisherCopy.sections.images.coverLabel}</span>
-                  <input
-                    value={form.imageCover.value}
-                    onChange={event =>
-                      updateCoverImageValue(event.target.value)
-                    }
-                    placeholder={
-                      form.imageCover.type === 'ai'
-                        ? publisherCopy.sections.images.coverAiPlaceholder
-                        : publisherCopy.sections.images.coverUrlPlaceholder
-                    }
-                    required
-                  />
-                  {autoFilledKeys.has('imageCover.value') ? (
-                    <AutoFillChip
-                      copy={publisherCopy}
-                      onClear={() => clearAutoFillField('imageCover.value')}
-                    />
-                  ) : null}
-                </label>
-
-                <div className='inline-image-head'>
-                  <div>
-                    <h3>{publisherCopy.sections.images.inlineTitle}</h3>
-                    <p>
-                      {form.imagesInlineList.length
-                        ? `${publisherCopy.sections.images.inlineAddedPrefix} ${form.imagesInlineList.length} ${publisherCopy.sections.images.inlineAddedSuffix}`
-                        : publisherCopy.sections.images.inlineEmpty}
-                    </p>
-                  </div>
-                  <OButton
-                    type='button'
-                    size='sm'
-                    variant='ghost'
-                    onClick={addInlineImage}
-                    disabled={form.imagesInlineList.length >= 9}
+              {form.publishMode === 'create' ? (
+                <>
+                  <OCard
+                    as='section'
+                    accentBar
+                    className='form-panel'
+                    padding='lg'
                   >
-                    <Plus size={17} aria-hidden='true' />
-                    {publisherCopy.sections.images.addImage}
-                  </OButton>
-                </div>
-                <div className='inline-image-list'>
-                  {form.imagesInlineList.map((item, index) => (
-                    <OCard
-                      as='article'
-                      className='inline-image-item'
-                      interactive
-                      key={index}
-                      padding='sm'
-                      tone='soft'
-                    >
-                      <div className='inline-image-title'>
-                        <strong>
-                          {publisherCopy.sections.images.inlineImage}{' '}
-                          {index + 1}
-                        </strong>
-                        <OIconButton
-                          type='button'
-                          aria-label={`${publisherCopy.sections.images.deleteInlineImage} ${index + 1}`}
-                          onClick={() => removeInlineImage(index)}
-                          size='sm'
-                        >
-                          <Trash2 size={17} />
-                        </OIconButton>
+                    <div className='form-panel-heading'>
+                      <span className='panel-icon'>
+                        <Sparkles size={19} aria-hidden='true' />
+                      </span>
+                      <div className='form-panel-heading-main'>
+                        <h2>{publisherCopy.sections.prompt.title}</h2>
+                        <p>{publisherCopy.sections.prompt.description}</p>
                       </div>
+                      <div className='autofill-trigger' ref={templateMenuRef}>
+                        <OButton
+                          ref={templateButtonRef}
+                          type='button'
+                          size='sm'
+                          variant='ghost'
+                          aria-haspopup='dialog'
+                          aria-expanded={isTemplateMenuOpen}
+                          onClick={() =>
+                            setTemplateMenuOpen(current => !current)
+                          }
+                        >
+                          <Wand2 size={17} aria-hidden='true' />
+                          {publisherCopy.sections.prompt.aiFill}
+                        </OButton>
+                      </div>
+                    </div>
+                    <label className='field'>
+                      <span>{publisherCopy.sections.prompt.systemLabel}</span>
+                      <textarea
+                        value={form.promptSystem}
+                        onChange={event =>
+                          updateField('promptSystem', event.target.value)
+                        }
+                        rows={4}
+                        placeholder={
+                          publisherCopy.sections.prompt.systemPlaceholder
+                        }
+                      />
+                      {autoFilledKeys.has('promptSystem') ? (
+                        <AutoFillChip
+                          copy={publisherCopy}
+                          onClear={() => clearAutoFillField('promptSystem')}
+                        />
+                      ) : null}
+                    </label>
+                    <label className='field'>
+                      <span>{publisherCopy.sections.prompt.contentLabel}</span>
+                      <textarea
+                        value={form.promptContent}
+                        onChange={event =>
+                          updateField('promptContent', event.target.value)
+                        }
+                        rows={5}
+                        placeholder={
+                          publisherCopy.sections.prompt.contentPlaceholder
+                        }
+                      />
+                      {autoFilledKeys.has('promptContent') ? (
+                        <AutoFillChip
+                          copy={publisherCopy}
+                          onClear={() => clearAutoFillField('promptContent')}
+                        />
+                      ) : null}
+                    </label>
+                  </OCard>
+
+                  <OCard
+                    as='section'
+                    accentBar
+                    className='form-panel'
+                    padding='lg'
+                  >
+                    <div className='form-panel-heading'>
+                      <span className='panel-icon'>
+                        <Image size={19} aria-hidden='true' />
+                      </span>
+                      <div>
+                        <h2>{publisherCopy.sections.images.title}</h2>
+                        <p>{publisherCopy.sections.images.description}</p>
+                      </div>
+                    </div>
+                    <label className='field'>
+                      <span>{publisherCopy.sections.images.coverLabel}</span>
+                      <input
+                        value={form.imageCover.value}
+                        onChange={event =>
+                          updateCoverImageValue(event.target.value)
+                        }
+                        placeholder={
+                          form.imageCover.type === 'ai'
+                            ? publisherCopy.sections.images.coverAiPlaceholder
+                            : publisherCopy.sections.images.coverUrlPlaceholder
+                        }
+                        required
+                      />
+                      {autoFilledKeys.has('imageCover.value') ? (
+                        <AutoFillChip
+                          copy={publisherCopy}
+                          onClear={() => clearAutoFillField('imageCover.value')}
+                        />
+                      ) : null}
+                    </label>
+
+                    <div className='inline-image-head'>
+                      <div>
+                        <h3>{publisherCopy.sections.images.inlineTitle}</h3>
+                        <p>
+                          {form.imagesInlineList.length
+                            ? `${publisherCopy.sections.images.inlineAddedPrefix} ${form.imagesInlineList.length} ${publisherCopy.sections.images.inlineAddedSuffix}`
+                            : publisherCopy.sections.images.inlineEmpty}
+                        </p>
+                      </div>
+                      <OButton
+                        type='button'
+                        size='sm'
+                        variant='ghost'
+                        onClick={addInlineImage}
+                        disabled={form.imagesInlineList.length >= 9}
+                      >
+                        <Plus size={17} aria-hidden='true' />
+                        {publisherCopy.sections.images.addImage}
+                      </OButton>
+                    </div>
+                    <div className='inline-image-list'>
+                      {form.imagesInlineList.map((item, index) => (
+                        <OCard
+                          as='article'
+                          className='inline-image-item'
+                          interactive
+                          key={index}
+                          padding='sm'
+                          tone='soft'
+                        >
+                          <div className='inline-image-title'>
+                            <strong>
+                              {publisherCopy.sections.images.inlineImage}{' '}
+                              {index + 1}
+                            </strong>
+                            <OIconButton
+                              type='button'
+                              aria-label={`${publisherCopy.sections.images.deleteInlineImage} ${index + 1}`}
+                              onClick={() => removeInlineImage(index)}
+                              size='sm'
+                            >
+                              <Trash2 size={17} />
+                            </OIconButton>
+                          </div>
+                          <label className='field'>
+                            <span>
+                              {publisherCopy.sections.images.imageValueLabel}
+                            </span>
+                            <input
+                              value={item.value}
+                              onChange={event =>
+                                updateInlineImage(index, {
+                                  value: event.target.value,
+                                })
+                              }
+                              placeholder={
+                                item.type === 'ai'
+                                  ? publisherCopy.sections.images
+                                      .imageAiPlaceholder
+                                  : publisherCopy.sections.images
+                                      .imageUrlPlaceholder
+                              }
+                            />
+                            {autoFilledKeys.has(
+                              `imagesInlineList.${index}.value` as AutoFillKey
+                            ) ? (
+                              <AutoFillChip
+                                copy={publisherCopy}
+                                onClear={() =>
+                                  clearAutoFillField(
+                                    `imagesInlineList.${index}.value` as AutoFillKey
+                                  )
+                                }
+                              />
+                            ) : null}
+                          </label>
+                        </OCard>
+                      ))}
+                    </div>
+                  </OCard>
+
+                  <OCard
+                    as='section'
+                    accentBar
+                    className='form-panel'
+                    padding='lg'
+                  >
+                    <div className='form-panel-heading'>
+                      <span className='panel-icon'>
+                        <Newspaper size={19} aria-hidden='true' />
+                      </span>
+                      <div>
+                        <h2>{publisherCopy.sections.meta.title}</h2>
+                        <p>{publisherCopy.sections.meta.description}</p>
+                      </div>
+                    </div>
+                    <div className='form-grid two'>
                       <label className='field'>
-                        <span>
-                          {publisherCopy.sections.images.imageValueLabel}
-                        </span>
+                        <span>{publisherCopy.sections.meta.author}</span>
                         <input
-                          value={item.value}
+                          value={form.author}
                           onChange={event =>
-                            updateInlineImage(index, {
-                              value: event.target.value,
-                            })
+                            updateField('author', event.target.value)
                           }
                           placeholder={
-                            item.type === 'ai'
-                              ? publisherCopy.sections.images.imageAiPlaceholder
-                              : publisherCopy.sections.images
-                                  .imageUrlPlaceholder
+                            publisherCopy.sections.meta.authorPlaceholder
                           }
                         />
-                        {autoFilledKeys.has(
-                          `imagesInlineList.${index}.value` as AutoFillKey
-                        ) ? (
-                          <AutoFillChip
-                            copy={publisherCopy}
-                            onClear={() =>
-                              clearAutoFillField(
-                                `imagesInlineList.${index}.value` as AutoFillKey
-                              )
-                            }
-                          />
-                        ) : null}
                       </label>
-                    </OCard>
-                  ))}
-                </div>
-              </OCard>
-
-              <OCard as='section' accentBar className='form-panel' padding='lg'>
-                <div className='form-panel-heading'>
-                  <span className='panel-icon'>
-                    <Newspaper size={19} aria-hidden='true' />
-                  </span>
-                  <div>
-                    <h2>{publisherCopy.sections.meta.title}</h2>
-                    <p>{publisherCopy.sections.meta.description}</p>
+                      <label className='field'>
+                        <span>{publisherCopy.sections.meta.sourceUrl}</span>
+                        <input
+                          value={form.sourceUrl}
+                          onChange={event =>
+                            updateField('sourceUrl', event.target.value)
+                          }
+                          placeholder='https://example.com/source'
+                        />
+                      </label>
+                    </div>
+                    <label className='field'>
+                      <span>{publisherCopy.sections.meta.digest}</span>
+                      <textarea
+                        value={form.digest}
+                        onChange={event =>
+                          updateField('digest', event.target.value)
+                        }
+                        rows={3}
+                        placeholder={
+                          publisherCopy.sections.meta.digestPlaceholder
+                        }
+                      />
+                      {autoFilledKeys.has('digest') ? (
+                        <AutoFillChip
+                          copy={publisherCopy}
+                          onClear={() => clearAutoFillField('digest')}
+                        />
+                      ) : null}
+                    </label>
+                    <fieldset className='choice-field'>
+                      <legend>{publisherCopy.sections.meta.comment}</legend>
+                      {commentOptions.map(option => (
+                        <label className='interactive' key={option.label}>
+                          <input
+                            type='radio'
+                            checked={
+                              option.value.open === form.comment.open &&
+                              option.value.fansOnly === form.comment.fansOnly
+                            }
+                            onChange={() => updateComment(option.value)}
+                          />
+                          {option.label}
+                        </label>
+                      ))}
+                    </fieldset>
+                  </OCard>
+                </>
+              ) : (
+                <OCard
+                  as='section'
+                  accentBar
+                  className='form-panel rewrite-panel'
+                  padding='lg'
+                >
+                  <div className='form-panel-heading'>
+                    <span className='panel-icon'>
+                      <Newspaper size={19} aria-hidden='true' />
+                    </span>
+                    <div>
+                      <h2>{publisherCopy.sections.rewrite.title}</h2>
+                      <p>{publisherCopy.sections.rewrite.description}</p>
+                    </div>
                   </div>
-                </div>
-                <div className='form-grid two'>
                   <label className='field'>
-                    <span>{publisherCopy.sections.meta.author}</span>
+                    <span>{publisherCopy.sections.rewrite.sourceUrl}</span>
                     <input
-                      value={form.author}
+                      value={form.sourceArticleUrl}
                       onChange={event =>
-                        updateField('author', event.target.value)
+                        updateField('sourceArticleUrl', event.target.value)
                       }
                       placeholder={
-                        publisherCopy.sections.meta.authorPlaceholder
+                        publisherCopy.sections.rewrite.sourceUrlPlaceholder
                       }
+                      required
                     />
+                    <small>
+                      {publisherCopy.sections.rewrite.sourceUrlHint}
+                    </small>
                   </label>
                   <label className='field'>
-                    <span>{publisherCopy.sections.meta.sourceUrl}</span>
-                    <input
-                      value={form.sourceUrl}
+                    <span>{publisherCopy.sections.rewrite.requirement}</span>
+                    <textarea
+                      value={form.rewriteRequirement}
                       onChange={event =>
-                        updateField('sourceUrl', event.target.value)
+                        updateField('rewriteRequirement', event.target.value)
                       }
-                      placeholder='https://example.com/source'
+                      rows={6}
+                      placeholder={
+                        publisherCopy.sections.rewrite.requirementPlaceholder
+                      }
                     />
+                    <small>
+                      {publisherCopy.sections.rewrite.requirementHint}
+                    </small>
                   </label>
-                </div>
-                <label className='field'>
-                  <span>{publisherCopy.sections.meta.digest}</span>
-                  <textarea
-                    value={form.digest}
-                    onChange={event =>
-                      updateField('digest', event.target.value)
-                    }
-                    rows={3}
-                    placeholder={publisherCopy.sections.meta.digestPlaceholder}
-                  />
-                  {autoFilledKeys.has('digest') ? (
-                    <AutoFillChip
-                      copy={publisherCopy}
-                      onClear={() => clearAutoFillField('digest')}
-                    />
-                  ) : null}
-                </label>
-                <fieldset className='choice-field'>
-                  <legend>{publisherCopy.sections.meta.comment}</legend>
-                  {commentOptions.map(option => (
-                    <label className='interactive' key={option.label}>
-                      <input
-                        type='radio'
-                        checked={
-                          option.value.open === form.comment.open &&
-                          option.value.fansOnly === form.comment.fansOnly
-                        }
-                        onChange={() => updateComment(option.value)}
-                      />
-                      {option.label}
-                    </label>
-                  ))}
-                </fieldset>
-              </OCard>
+                </OCard>
+              )}
             </div>
 
             <aside
@@ -1789,11 +2033,15 @@ export function OfficialPublisher() {
                   </div>
                   <strong>
                     {completedCount}
-                    <small>/4</small>
+                    <small>/{completionItems.length}</small>
                   </strong>
                 </div>
                 <div className='publish-readiness-meter' aria-hidden='true'>
-                  <span style={{ width: `${(completedCount / 4) * 100}%` }} />
+                  <span
+                    style={{
+                      width: `${(completedCount / completionItems.length) * 100}%`,
+                    }}
+                  />
                 </div>
                 <div className='summary-checks'>
                   {completionItems.map(item => (
@@ -1858,7 +2106,9 @@ export function OfficialPublisher() {
                     )}
                     {isGenerating
                       ? publisherCopy.aside.generating
-                      : publisherCopy.aside.generate}
+                      : form.publishMode === 'rewrite'
+                        ? publisherCopy.aside.generateRewrite
+                        : publisherCopy.aside.generate}
                   </OButton>
                 </div>
               </OCard>
@@ -1888,7 +2138,7 @@ export function OfficialPublisher() {
         />
       ) : null}
 
-      {isTemplateMenuOpen && popoverPos
+      {form.publishMode === 'create' && isTemplateMenuOpen && popoverPos
         ? createPortal(
             <OCard
               className='autofill-menu'
@@ -1961,7 +2211,7 @@ export function OfficialPublisher() {
           )
         : null}
 
-      {pendingTemplate ? (
+      {form.publishMode === 'create' && pendingTemplate ? (
         <OModal
           className='autofill-confirm'
           isOpen

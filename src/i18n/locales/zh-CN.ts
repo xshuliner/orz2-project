@@ -479,6 +479,21 @@ export const messages = {
       AGNES: 'AGNES',
       MINIMAX: 'MINIMAX',
     },
+    modeSwitch: {
+      title: '选择发布维度',
+      description: '按任务类型切换表单，创作和洗稿共用同一套发布流程。',
+      legend: '发布维度 *',
+    },
+    modes: {
+      create: {
+        label: 'AI 创作公众号',
+        description: '从主题、提示词、封面和正文配图生成一篇新草稿。',
+      },
+      rewrite: {
+        label: 'AI 洗稿公众号',
+        description: '输入公众号原文链接和特殊要求，自动重写文字、图片与排版。',
+      },
+    },
     autoFill: {
       chip: '已智能填充',
       clear: '清除',
@@ -568,6 +583,19 @@ export const messages = {
         digestPlaceholder: '用于公众号摘要展示的短文案',
         comment: '评论配置 *',
       },
+      rewrite: {
+        title: '洗稿公众号配置',
+        description:
+          '只需要原文链接和特殊要求，服务端会补齐洗稿提示词、图片和排版策略。',
+        sourceUrl: '需要洗稿的公众号链接 *',
+        sourceUrlPlaceholder:
+          'https://mp.weixin.qq.com/s/5b9Z4EOs3wsMgc6GqAGHBQ',
+        sourceUrlHint: '支持 mp.weixin.qq.com/s 开头的微信公众号文章链接。',
+        requirement: '洗稿特殊要求 *',
+        requirementPlaceholder: '输入风格、受众、篇幅、排版或避讳要求...',
+        requirementHint:
+          '已内置一份适合新手直接使用的默认要求，可按实际业务微调。',
+      },
     },
     references: {
       festivals: '节日',
@@ -583,6 +611,8 @@ export const messages = {
       prompt: '文章生成提示词',
       images: '封面与内嵌图片',
       meta: '文章元信息',
+      rewriteSource: '原文链接',
+      rewriteRequirement: '洗稿要求',
     },
     progress: {
       ariaLabel: '实时发布状态',
@@ -613,6 +643,8 @@ export const messages = {
       autosave: '表单会自动保存到本机浏览器。',
       validationFailed: '请先补齐必填项，再生成公众号发布任务。',
       confirmGenerate: '生成公众号发布任务可能耗时较长，请确认是否开始？',
+      confirmRewrite:
+        '洗稿公众号任务会抓取原文并生成文字、图片与排版，可能耗时较长，请确认是否开始？',
       connecting: '正在连接发布服务，实时进度会显示在发布轨迹中。',
       connected: '已连接发布服务，正在生成公众号草稿。',
       runningPrefix: '正在执行：',
@@ -637,6 +669,12 @@ export const messages = {
       appSecret: '请填写公众号 appSecret。',
       articleType: '请选择草稿类型。',
       provider: '请选择 AI 提供商。',
+      promptSystem: '请填写系统提示词。',
+      promptContent: '请填写主体内容提示词。',
+      rewriteSourceUrl: '请填写需要洗稿的公众号链接。',
+      rewriteSourceUrlInvalid:
+        '请填写有效的微信公众号文章链接，例如 https://mp.weixin.qq.com/s/5b9Z4EOs3wsMgc6GqAGHBQ。',
+      rewriteRequirement: '请填写洗稿特殊要求。',
       coverType: '请选择封面图生成类型。',
       coverValue: '请填写或上传封面图生成值。',
       inlineTypePrefix: '第',
@@ -653,6 +691,7 @@ export const messages = {
       reset: '重置',
       generating: '生成中...',
       generate: '生成发布任务',
+      generateRewrite: '洗稿并生成草稿',
     },
     success: {
       closeAriaLabel: '关闭草稿发布结果',
@@ -681,6 +720,10 @@ export const messages = {
     },
     promptTemplates: {
       general: ['通用资讯', '新闻动态、客观报道，强调信息密度与人类观察'],
+      insurance_advisor: [
+        '保险顾问',
+        '人身保障、家庭财务与资产管理，强调理性决策与长期主义',
+      ],
       culture: ['文化叙事', '节日节气、人文故事，强调温度与余味'],
       tech: ['科技数码', '产品测评、技术解读，强调体验与判断'],
       lifestyle: ['生活方式', '治愈、生活美学，强调轻盈与真实感'],

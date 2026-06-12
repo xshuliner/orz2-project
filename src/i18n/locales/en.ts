@@ -511,6 +511,24 @@ export const messages = {
       AGNES: 'AGNES',
       MINIMAX: 'MINIMAX',
     },
+    modeSwitch: {
+      title: 'Choose publishing mode',
+      description:
+        'Switch the form by task type while keeping the same publishing flow.',
+      legend: 'Publishing mode *',
+    },
+    modes: {
+      create: {
+        label: 'AI create article',
+        description:
+          'Generate a new draft from prompts, cover art, and inline images.',
+      },
+      rewrite: {
+        label: 'AI rewrite article',
+        description:
+          'Use a WeChat article URL and requirements to rewrite copy, images, and layout.',
+      },
+    },
     autoFill: {
       chip: 'Auto-filled',
       clear: 'Clear',
@@ -605,6 +623,21 @@ export const messages = {
         digestPlaceholder: 'Short copy shown as the WeChat article digest',
         comment: 'Comment setting *',
       },
+      rewrite: {
+        title: 'Rewrite Article Setup',
+        description:
+          'Only the source URL and requirements are needed. The server supplies the rewrite prompt, image, and layout strategy.',
+        sourceUrl: 'WeChat article URL to rewrite *',
+        sourceUrlPlaceholder:
+          'https://mp.weixin.qq.com/s/5b9Z4EOs3wsMgc6GqAGHBQ',
+        sourceUrlHint:
+          'Supports WeChat article links starting with mp.weixin.qq.com/s.',
+        requirement: 'Rewrite requirements *',
+        requirementPlaceholder:
+          'Enter tone, audience, length, layout, or avoidance rules...',
+        requirementHint:
+          'A beginner-friendly default is already filled in. Adjust it for the business case.',
+      },
     },
     references: { festivals: 'Festivals', solarTerms: 'Solar terms' },
     comments: {
@@ -617,6 +650,8 @@ export const messages = {
       prompt: 'Article prompts',
       images: 'Cover and inline images',
       meta: 'Article metadata',
+      rewriteSource: 'Source URL',
+      rewriteRequirement: 'Rewrite requirements',
     },
     progress: {
       ariaLabel: 'Live publishing status',
@@ -649,6 +684,8 @@ export const messages = {
         'Complete required fields before generating the publishing task.',
       confirmGenerate:
         'Generating a publishing task may take a while. Start now?',
+      confirmRewrite:
+        'The rewrite task will fetch the source article and generate copy, images, and layout. It may take a while. Start now?',
       connecting:
         'Connecting to the publishing service. Live progress appears in the timeline.',
       connected:
@@ -676,6 +713,12 @@ export const messages = {
       appSecret: 'Enter the official account appSecret.',
       articleType: 'Choose a draft type.',
       provider: 'Choose an AI provider.',
+      promptSystem: 'Enter the system prompt.',
+      promptContent: 'Enter the main content prompt.',
+      rewriteSourceUrl: 'Enter the WeChat article URL to rewrite.',
+      rewriteSourceUrlInvalid:
+        'Enter a valid WeChat article URL, for example https://mp.weixin.qq.com/s/5b9Z4EOs3wsMgc6GqAGHBQ.',
+      rewriteRequirement: 'Enter rewrite requirements.',
       coverType: 'Choose a cover image source type.',
       coverValue: 'Enter or upload the cover image value.',
       inlineTypePrefix: 'Inline image',
@@ -692,6 +735,7 @@ export const messages = {
       reset: 'Reset',
       generating: 'Generating...',
       generate: 'Generate task',
+      generateRewrite: 'Rewrite and create draft',
     },
     success: {
       closeAriaLabel: 'Close draft publishing result',
@@ -723,6 +767,10 @@ export const messages = {
       general: [
         'General News',
         'News and objective reporting with density and human observation',
+      ],
+      insurance_advisor: [
+        'Insurance Advisor',
+        'Personal protection, family finance, and long-term asset planning',
       ],
       culture: [
         'Culture Story',
