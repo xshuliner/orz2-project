@@ -1,9 +1,9 @@
 .catalog-recent {
   position: relative;
   display: grid;
-  gap: var(--space-5);
-  margin: 2px 0 var(--space-10);
-  padding: var(--space-5) 0 var(--space-7);
+  gap: var(--space-6);
+  margin: var(--space-2) 0 var(--space-12);
+  padding: var(--space-6) 0 var(--space-8);
   border-top: 1px solid color-mix(in srgb, var(--color-line) 72%, transparent);
   border-bottom: 1px solid
     color-mix(in srgb, var(--color-line) 54%, transparent);
@@ -26,35 +26,43 @@
 .catalog-recent-heading {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 12px;
+  max-width: 720px;
 }
 
 .catalog-recent-icon {
   display: grid;
   flex: 0 0 auto;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   place-items: center;
   border: 1px solid color-mix(in srgb, var(--color-line) 88%, transparent);
   border-radius: var(--radius-control);
-  color: var(--color-text-status);
-  background: color-mix(in srgb, var(--color-panel) 80%, transparent);
+  color: var(--color-green-dark);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--color-green) 12%, transparent),
+      transparent 58%
+    ),
+    color-mix(in srgb, var(--color-panel) 84%, transparent);
+  box-shadow: 0 10px 22px color-mix(in srgb, var(--color-green) 8%, transparent);
 }
 
 .catalog-recent-heading h3 {
   margin: 0;
   color: var(--color-ink);
-  font-size: 18px;
+  font-size: 20px;
   line-height: 1.2;
   letter-spacing: 0;
 }
 
 .catalog-recent-heading p {
   max-width: 620px;
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   color: var(--color-muted);
-  font-size: var(--text-caption);
-  font-weight: 650;
+  font-size: var(--text-body-sm);
+  font-weight: 640;
   line-height: var(--line-height-body);
 }
 
@@ -65,15 +73,18 @@
 }
 
 .catalog-recent .catalog-card {
-  min-height: 340px;
-  border-color: color-mix(in srgb, var(--color-green) 16%, var(--color-line));
+  min-height: 350px;
+  border-color: color-mix(in srgb, var(--color-green) 18%, var(--color-line));
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--color-green) 5%, transparent),
-      transparent 52%
+      color-mix(in srgb, var(--color-green) 7%, transparent),
+      transparent 58%
     ),
     var(--surface-panel);
+  box-shadow:
+    var(--shadow-card),
+    0 18px 42px color-mix(in srgb, var(--color-green-deep) 4%, transparent);
 }
 
 .catalog-recent .catalog-card:hover {
