@@ -14,6 +14,7 @@ import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { OIconButton } from '@/components/OIconButton';
 import { OModal } from '@/components/OModal';
+import { ORadio } from '@/components/ORadio';
 import { OTooltip } from '@/components/OTooltip';
 import { Seo } from '@/components/Seo';
 import { getToolSeo } from '@/config/seo';
@@ -749,6 +750,7 @@ export function OfficialPublisher() {
       value: mode,
       label: modeCopy[mode].label,
       description: modeCopy[mode].description,
+      icon: mode === 'create' ? Newspaper : PenLine,
     }));
   }, [publisherCopy.modes]);
   const [form, setForm] = useState<WechatPublisherForm>(() => {
@@ -1586,22 +1588,18 @@ export function OfficialPublisher() {
                 <p>{publisherCopy.modeSwitch.description}</p>
               </div>
             </div>
-            <fieldset className='choice-field mode-choice-field'>
-              <legend>{publisherCopy.modeSwitch.legend}</legend>
-              {modeOptions.map(option => (
-                <label className='interactive' key={option.value}>
-                  <input
-                    type='radio'
-                    checked={form.publishMode === option.value}
-                    onChange={() => updatePublishMode(option.value)}
-                  />
-                  <span>
-                    <strong>{option.label}</strong>
-                    <small>{option.description}</small>
-                  </span>
-                </label>
-              ))}
-            </fieldset>
+            <div className='mode-choice-field'>
+              <span className='mode-choice-label'>
+                {publisherCopy.modeSwitch.legend}
+              </span>
+              <ORadio
+                ariaLabel={publisherCopy.modeSwitch.legend}
+                className='publisher-mode-radio'
+                options={modeOptions}
+                value={form.publishMode}
+                onChange={updatePublishMode}
+              />
+            </div>
           </OCard>
 
           {form.publishMode === 'create' && lastAutoFill ? (
