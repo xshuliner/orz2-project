@@ -1,10 +1,7 @@
 import { prefersReducedMotion } from '@/utils/motion';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-
-gsap.registerPlugin(ScrollTrigger);
 
 export function DeferredEffectsMotion() {
   const location = useLocation();
@@ -72,77 +69,101 @@ export function DeferredEffectsMotion() {
         );
       }
 
-      const revealTargets = gsap.utils.toArray<HTMLElement>(
-        [
-          '.section-heading',
-          '.reveal-on-scroll',
-          '.privacy-article section',
-          '.footer-grid > *',
-        ].join(',')
-      );
-      if (revealTargets.length) {
-        gsap.set(revealTargets, { y: 26, opacity: 0 });
+      const revealSelector = [
+        '.section-heading',
+        '.reveal-on-scroll',
+        '.privacy-article section',
+        '.footer-grid > *',
+      ].join(',');
 
-        ScrollTrigger.batch(revealTargets, {
-          start: 'top 95%',
-          once: true,
-          interval: 0.08,
-          batchMax: 4,
-          onEnter: batch => {
-            batch.forEach(element => {
-              (element as HTMLElement).dataset.motionShown = 'true';
-            });
-            gsap.to(batch, {
-              y: 0,
-              opacity: 1,
-              duration: 0.68,
-              ease: 'power3.out',
-              stagger: 0.09,
-              onComplete: () => {
-                batch.forEach(element => {
-                  (element as HTMLElement).classList.add('is-revealed');
+      const observedRevealTargets = new WeakSet<HTMLElement>();
+      const revealObserver =
+        'IntersectionObserver' in window
+          ? new IntersectionObserver(
+              (entries, observer) => {
+                const enteredTargets = entries
+                  .filter(entry => entry.isIntersecting)
+                  .map(entry => entry.target as HTMLElement)
+                  .filter(element => element.dataset.motionShown !== 'true');
+
+                if (!enteredTargets.length) return;
+
+                enteredTargets.forEach(element => {
+                  element.dataset.motionShown = 'true';
+                  observer.unobserve(element);
+                });
+
+                gsap.to(enteredTargets, {
+                  y: 0,
+                  opacity: 1,
+                  duration: 0.68,
+                  ease: 'power3.out',
+                  stagger: 0.09,
+                  onComplete: () => {
+                    enteredTargets.forEach(element => {
+                      element.classList.add('is-revealed');
+                    });
+                  },
                 });
               },
-            });
-          },
-        });
-      }
+              {
+                rootMargin: '0px 0px -5% 0px',
+                threshold: 0,
+              }
+            )
+          : null;
 
-      const revealVisibleDynamicItems = () => {
-        const visibleHiddenItems = gsap.utils
-          .toArray<HTMLElement>('.reveal-on-scroll')
-          .filter(element => {
-            if (element.dataset.motionShown === 'true') return false;
-            const rect = element.getBoundingClientRect();
-            return rect.top < window.innerHeight * 0.95 && rect.bottom > 0;
-          });
+      const getRevealTargets = (root: ParentNode = document) => {
+        const targets = gsap.utils.toArray<HTMLElement>(revealSelector, root);
 
-        if (!visibleHiddenItems.length) return;
-        visibleHiddenItems.forEach(element => {
-          element.dataset.motionShown = 'true';
-        });
-        gsap.to(visibleHiddenItems, {
-          y: 0,
-          opacity: 1,
-          duration: 0.58,
-          ease: 'power3.out',
-          stagger: 0.06,
-          onComplete: () => {
-            visibleHiddenItems.forEach(element => {
-              element.classList.add('is-revealed');
-            });
-          },
-        });
-        ScrollTrigger.refresh();
+        if (root instanceof HTMLElement && root.matches(revealSelector)) {
+          targets.unshift(root);
+        }
+
+        return targets;
       };
+
+      const registerRevealTargets = (root?: ParentNode) => {
+        const nextTargets = getRevealTargets(root).filter(
+          element =>
+            !observedRevealTargets.has(element) &&
+            element.dataset.motionShown !== 'true'
+        );
+
+        if (!nextTargets.length) return;
+
+        nextTargets.forEach(element => {
+          observedRevealTargets.add(element);
+        });
+
+        gsap.set(nextTargets, { y: 26, opacity: 0 });
+
+        if (!revealObserver) {
+          nextTargets.forEach(element => {
+            element.dataset.motionShown = 'true';
+            element.classList.add('is-revealed');
+          });
+          gsap.set(nextTargets, { y: 0, opacity: 1 });
+          return;
+        }
+
+        nextTargets.forEach(element => revealObserver.observe(element));
+      };
+
+      registerRevealTargets();
+      cleanupFns.push(() => revealObserver?.disconnect());
 
       let dynamicRevealFrame: number | null = null;
       const observerTarget = document.querySelector('main') ?? document.body;
-      const dynamicRevealObserver = new MutationObserver(() => {
+      const dynamicRevealObserver = new MutationObserver(mutations => {
         if (dynamicRevealFrame !== null) return;
         dynamicRevealFrame = window.requestAnimationFrame(() => {
           dynamicRevealFrame = null;
-          revealVisibleDynamicItems();
+          mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+              if (node instanceof HTMLElement) registerRevealTargets(node);
+            });
+          });
         });
       });
       dynamicRevealObserver.observe(observerTarget, {
@@ -169,6 +190,9 @@ export function DeferredEffectsMotion() {
 
       tiltCards.forEach(card => {
         gsap.set(card, { transformPerspective: 900 });
+        let cardBounds: DOMRect | null = null;
+        let latestPointerEvent: PointerEvent | null = null;
+        let pointerFrame: number | null = null;
         const rotateXTo = gsap.quickTo(card, 'rotationX', {
           duration: 0.28,
           ease: 'power3.out',
@@ -181,34 +205,56 @@ export function DeferredEffectsMotion() {
           duration: 0.28,
           ease: 'power3.out',
         });
-        const moveCard = (event: PointerEvent) => {
-          const rect = card.getBoundingClientRect();
-          const x = (event.clientX - rect.left) / rect.width;
-          const y = (event.clientY - rect.top) / rect.height;
+
+        const readCardBounds = () => {
+          cardBounds = card.getBoundingClientRect();
+        };
+        const updateCard = () => {
+          pointerFrame = null;
+          if (!cardBounds || !latestPointerEvent) return;
+
+          const x =
+            (latestPointerEvent.clientX - cardBounds.left) / cardBounds.width;
+          const y =
+            (latestPointerEvent.clientY - cardBounds.top) / cardBounds.height;
           card.style.setProperty('--pointer-x', `${x * 100}%`);
           card.style.setProperty('--pointer-y', `${y * 100}%`);
           rotateXTo((0.5 - y) * 4);
           rotateYTo((x - 0.5) * 4);
           yTo(-4);
         };
+        const enterCard = (event: PointerEvent) => {
+          readCardBounds();
+          latestPointerEvent = event;
+          updateCard();
+        };
+        const moveCard = (event: PointerEvent) => {
+          latestPointerEvent = event;
+          if (!cardBounds) readCardBounds();
+          if (pointerFrame !== null) return;
+          pointerFrame = window.requestAnimationFrame(updateCard);
+        };
         const resetCard = () => {
+          cardBounds = null;
+          latestPointerEvent = null;
+          if (pointerFrame !== null) {
+            window.cancelAnimationFrame(pointerFrame);
+            pointerFrame = null;
+          }
           rotateXTo(0);
           rotateYTo(0);
           yTo(0);
         };
-        card.addEventListener('pointermove', moveCard);
+        card.addEventListener('pointerenter', enterCard, { passive: true });
+        card.addEventListener('pointermove', moveCard, { passive: true });
         card.addEventListener('pointerleave', resetCard);
         cleanupFns.push(() => {
+          card.removeEventListener('pointerenter', enterCard);
           card.removeEventListener('pointermove', moveCard);
           card.removeEventListener('pointerleave', resetCard);
+          if (pointerFrame !== null) window.cancelAnimationFrame(pointerFrame);
         });
       });
-
-      const refreshTimer = window.setTimeout(() => {
-        ScrollTrigger.refresh();
-        revealVisibleDynamicItems();
-      }, 80);
-      cleanupFns.push(() => window.clearTimeout(refreshTimer));
     });
 
     return () => {

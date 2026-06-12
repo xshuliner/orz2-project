@@ -25,7 +25,18 @@
   }
 
   .app-shell {
+    position: relative;
+    isolation: isolate;
     min-height: 100vh;
+    background-color: var(--app-background-base);
+  }
+
+  .app-shell::before {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    content: '';
     background:
       radial-gradient(
         circle at 14% -8%,
@@ -70,18 +81,34 @@
         var(--app-background-soft) 42%,
         var(--app-background-warm) 100%
       );
-    background-attachment: fixed, fixed, fixed, fixed, scroll, scroll, scroll;
     background-color: var(--app-background-base);
+    transform: translateZ(0);
+  }
+
+  .app-shell > main,
+  .app-shell > footer {
+    position: relative;
+    z-index: 1;
+  }
+
+  @supports (contain: paint) {
+    .app-shell::before {
+      contain: paint;
+    }
   }
 
   .product-silicon-active .app-shell {
     background: var(--color-panel);
   }
+
+  .product-silicon-active .app-shell::before {
+    display: none;
+  }
 }
 
 @media (max-width: 640px) {
   @layer base {
-    .app-shell {
+    .app-shell::before {
       background:
         repeating-linear-gradient(
           90deg,
@@ -102,7 +129,6 @@
           var(--app-background-soft) 54%,
           var(--color-panel) 100%
         );
-      background-attachment: scroll;
     }
   }
 }
