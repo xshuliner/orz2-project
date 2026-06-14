@@ -1,0 +1,61 @@
+name: Deploy
+
+run-name: Deploy ${{ inputs.env }} by @${{ github.actor }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: Deployment environment.
+        required: true
+        default: prod
+        type: choice
+        options:
+          - prod
+          - uat
+      bump:
+        description: Version bump before deploy.
+        required: false
+        default: patch
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - none
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    name: Build and deploy site
+    uses: xshuliner/workflows/.github/workflows/release-deploy.yml@master
+    with:
+      target: web
+      env: ${{ inputs.env }}
+      project_name: orz2
+      bump: ${{ inputs.bump }}
+      node_version: "22"
+      build_command: pnpm run build:${{ inputs.env }}
+      build_path: dist
+      server_path_map: |
+        {
+          "prod": "/var/www/orz2.online/html",
+          "uat": "/var/www/orz2.online/html/uat"
+        }
+      server_preview_url_map: |
+        {
+          "prod": "https://www.orz2.online",
+          "uat": "https://www.orz2.online/uat"
+        }
+      server_clean_mode: artifact
+      ssh_strict_host_key: true
+    secrets:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+      NOTIFY_WEBHOOKS: ${{ secrets.NOTIFY_WEBHOOKS }}
+      REPORT_AUTHORIZATION: ${{ secrets.REPORT_AUTHORIZATION }}
