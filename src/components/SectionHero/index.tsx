@@ -85,7 +85,7 @@ function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
     if (reducedMotion) return;
 
     let idleId: number | null = null;
-    let timeoutId: number | null = null;
+    let timeoutId: ReturnType<typeof globalThis.setTimeout> | null = null;
     const loadVideos = () => {
       if ('requestIdleCallback' in window) {
         idleId = window.requestIdleCallback(() => setShouldLoadVideos(true), {
@@ -105,7 +105,7 @@ function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
     return () => {
       window.removeEventListener('load', loadVideos);
       if (idleId !== null) window.cancelIdleCallback(idleId);
-      if (timeoutId !== null) window.clearTimeout(timeoutId);
+      if (timeoutId !== null) globalThis.clearTimeout(timeoutId);
     };
   }, [reducedMotion]);
 
