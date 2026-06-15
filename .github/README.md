@@ -15,13 +15,13 @@
 | `SSH_HOST`        | 服务器地址         |
 | `SSH_USERNAME`    | SSH 用户名         |
 | `SSH_KEY`         | SSH 私钥           |
-| `SSH_KNOWN_HOSTS` | 服务器 known_hosts |
 
 可选：
 
 | 名称                   | 用途                       |
 | ---------------------- | -------------------------- |
 | `SSH_PORT`             | SSH 端口，默认 `22`        |
+| `SSH_KNOWN_HOSTS`      | 服务器 known_hosts，推荐配置 |
 | `NOTIFY_WEBHOOKS`      | 部署通知 webhook JSON 数组 |
 | `REPORT_AUTHORIZATION` | 覆盖部署上报鉴权           |
 
