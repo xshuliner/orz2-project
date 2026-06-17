@@ -21,7 +21,11 @@
           document.documentElement.dataset.theme = theme;
           document.documentElement.style.colorScheme = theme;
           var meta = document.querySelector('meta[name="theme-color"]');
-          if (meta) meta.setAttribute('content', theme === 'dark' ? '#0d120f' : '#ffffff');
+          if (meta)
+            meta.setAttribute(
+              'content',
+              theme === 'dark' ? '#0d120f' : '#ffffff'
+            );
         } catch (error) {
           document.documentElement.dataset.theme = 'light';
         }
@@ -67,7 +71,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600;700&display=swap"
       media="print"
-      onload="this.media='all'"
+      onload="this.media = 'all'"
     />
     <noscript>
       <link
@@ -79,6 +83,7 @@
   </head>
   <body>
     <div id="root"></div>
+    <script vite-ignore src="%BASE_URL%__xshuliner__/build-info.js"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
