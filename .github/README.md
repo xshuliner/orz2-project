@@ -36,15 +36,17 @@
 
 `bump` 默认选 `patch`；只部署不打 tag 时选 `none`。
 
-当前部署 workflow 先调用 `xshuliner/build-info` 仓库迁移后的
-`release-tag.yml`：
+当前部署 workflow 调用 `xshuliner/build-info` 仓库迁移后的
+`release-deploy.yml`：
 
 1. 按已有 tag 计算下一版。
-2. 当 `bump` 不是 `none` 时，同步 `package.json` 的 `version` 字段、提交并创建 tag。
+2. 当 `bump` 不是 `none` 时，公共 workflow 会在 GitHub Actions 工作区临时同步
+   `package.json` 的 `version` 字段，不提交 commit。
+3. 执行 `pnpm run build:{env}`，构建命令内的 `xbi generate` 会读取到临时更新后的
+   `package.json.version`。
+4. 构建和部署成功后，由公共 workflow 创建 tag。
 
-随后 workflow 以 `bump: none` 调用 `release-deploy.yml` 执行构建和部署，避免二次打 tag。
-如果前一步创建了新 tag，部署阶段会先 checkout 到该 tag，再执行 `pnpm run build:{env}`；
-构建命令内的 `xbi generate` 因此会读取到已经更新的 `package.json.version`，并生成：
+`xbi generate` 会生成：
 
 ```text
 public/__xshuliner__/build-info.json

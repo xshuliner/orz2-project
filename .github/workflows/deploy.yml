@@ -28,30 +28,15 @@ permissions:
   contents: write
 
 jobs:
-  release:
-    name: Resolve release version
-    uses: xshuliner/build-info/.github/workflows/release-tag.yml@master
-    with:
-      bump: ${{ inputs.bump }}
-      sync_package_json_version: true
-
   deploy:
     name: Build and deploy site
-    needs: release
     uses: xshuliner/build-info/.github/workflows/release-deploy.yml@master
     with:
       target: web
       env: ${{ inputs.env }}
       project_name: orz2
-      bump: none
+      bump: ${{ inputs.bump }}
       node_version: "22"
-      install_command: |
-        corepack enable
-        if [ "${{ needs.release.outputs.created }}" = "true" ]; then
-          git fetch --tags --force
-          git checkout "${{ needs.release.outputs.version }}"
-        fi
-        pnpm install --frozen-lockfile
       build_command: |
         export XSHULINER_APP_MODE=github-actions
         export XSHULINER_DEPLOY_REGION=server
