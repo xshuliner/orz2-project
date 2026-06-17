@@ -28,20 +28,35 @@ permissions:
   contents: write
 
 jobs:
+  release:
+    name: Resolve release version
+    uses: xshuliner/build-info/.github/workflows/release-tag.yml@master
+    with:
+      bump: ${{ inputs.bump }}
+      sync_package_json_version: true
+
   deploy:
     name: Build and deploy site
+    needs: release
     uses: xshuliner/build-info/.github/workflows/release-deploy.yml@master
     with:
       target: web
       env: ${{ inputs.env }}
       project_name: orz2
-      bump: ${{ inputs.bump }}
+      bump: none
       node_version: "22"
-      build_command: >
-        XSHULINER_APP_MODE=github-actions
-        XSHULINER_DEPLOY_REGION=server
-        XSHULINER_RELEASE_ID=${{ github.run_id }}-${{ github.sha }}
-        XSHULINER_BUILD_ID=${{ github.run_number }}
+      install_command: |
+        corepack enable
+        if [ "${{ needs.release.outputs.created }}" = "true" ]; then
+          git fetch --tags --force
+          git checkout "${{ needs.release.outputs.version }}"
+        fi
+        pnpm install --frozen-lockfile
+      build_command: |
+        export XSHULINER_APP_MODE=github-actions
+        export XSHULINER_DEPLOY_REGION=server
+        export XSHULINER_RELEASE_ID="$GITHUB_RUN_ID-$(git rev-parse HEAD)"
+        export XSHULINER_BUILD_ID="$GITHUB_RUN_NUMBER"
         pnpm run build:${{ inputs.env }}
       build_path: dist
       server_path_map: |
