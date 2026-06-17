@@ -1,0 +1,192 @@
+.build-info-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: var(--space-5);
+}
+
+.build-info-actions .o-button {
+  gap: 8px;
+}
+
+.build-info-layout {
+  display: grid;
+  gap: var(--space-6);
+  width: var(--page-content-width);
+  margin: 0 auto;
+  padding: var(--space-6) 0 var(--space-20);
+}
+
+.build-info-summary {
+  display: grid;
+  gap: 8px;
+}
+
+.build-info-summary p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 14px;
+}
+
+.build-info-summary strong {
+  color: var(--color-ink);
+  font-family:
+    'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    monospace;
+  font-size: clamp(20px, 3vw, 30px);
+  font-weight: 600;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.build-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.build-info-card {
+  display: grid;
+  align-content: start;
+  gap: var(--space-4);
+}
+
+.build-info-card h2,
+.build-info-empty h2 {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: 20px;
+}
+
+.build-info-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.build-info-row {
+  display: grid;
+  grid-template-columns: minmax(112px, 0.38fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: baseline;
+  padding-bottom: 10px;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-line) 78%, transparent);
+}
+
+.build-info-row:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.build-info-row dt {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.build-info-row dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--color-ink);
+  font-family:
+    'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    monospace;
+  font-size: 13px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.build-info-link {
+  color: var(--color-green-dark);
+  text-decoration: none;
+}
+
+.build-info-link:hover {
+  color: var(--color-green-deep);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.build-info-commits ol {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.build-info-commits li {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr) max-content;
+  gap: 12px;
+  align-items: baseline;
+  padding-bottom: 10px;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-line) 78%, transparent);
+}
+
+.build-info-commits li:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.build-info-commits code {
+  color: var(--color-green-dark);
+  font-family:
+    'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    monospace;
+  font-size: 13px;
+}
+
+.build-info-commits span {
+  min-width: 0;
+  color: var(--color-ink);
+  overflow-wrap: anywhere;
+}
+
+.build-info-commits time {
+  color: var(--color-muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.build-info-empty {
+  max-width: 760px;
+}
+
+.build-info-empty p {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 960px) {
+  .build-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .build-info-commits li {
+    grid-template-columns: 76px minmax(0, 1fr);
+  }
+
+  .build-info-commits time {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 640px) {
+  .build-info-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .build-info-commits li {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .build-info-commits time {
+    grid-column: auto;
+  }
+}
