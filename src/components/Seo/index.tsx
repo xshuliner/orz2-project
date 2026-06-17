@@ -43,7 +43,8 @@ export function Seo({ config }: SeoProps) {
     setMeta('meta[name="twitter:title"]', 'content', config.title);
     setMeta('meta[name="twitter:description"]', 'content', config.description);
     setMeta('meta[name="twitter:image"]', 'content', image);
-  }, [config.description, config.title, image, locale]);
+    setMeta('meta[name="robots"]', 'content', config.robots ?? 'index, follow');
+  }, [config.description, config.robots, config.title, image, locale]);
 
   const alternateLocales: Array<Locale | 'x-default'> = [
     ...locales,
@@ -57,6 +58,7 @@ export function Seo({ config }: SeoProps) {
       {config.keywords?.length ? (
         <meta name='keywords' content={config.keywords.join(', ')} />
       ) : null}
+      <meta name='robots' content={config.robots ?? 'index, follow'} />
       <link rel='canonical' href={canonical} />
       {alternateLocales.map(item => {
         const hrefLang = item === 'x-default' ? 'x-default' : item;

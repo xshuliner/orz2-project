@@ -1,12 +1,20 @@
 import { siteConfig } from '@/config';
+import { useBuildInfo } from '@/hooks/useBuildInfo';
 import { useI18n } from '@/i18n';
+import { getBuildInfoCommit, getBuildInfoVersion } from '@/utils/buildInfo';
 import { Link } from 'react-router-dom';
 import './index.css';
 
 export function OFooter() {
   const { localizePath, messages } = useI18n();
+  const { info } = useBuildInfo();
   const footerCopy = messages.footer;
   const pageTitles = messages.pageTitles;
+  const buildInfoVersion = info ? getBuildInfoVersion(info) : '';
+  const buildInfoCommit = info ? getBuildInfoCommit(info) : '';
+  const buildInfoSummary = [buildInfoVersion, buildInfoCommit]
+    .filter(Boolean)
+    .join(' · ');
   return (
     <footer className='bg-footer text-footer-text'>
       <div className='footer-grid'>
@@ -63,6 +71,12 @@ export function OFooter() {
           >
             {pageTitles.designSystem}
           </Link>
+          <Link
+            className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
+            to={localizePath('/build-info')}
+          >
+            {pageTitles.buildInfo}
+          </Link>
         </nav>
         <div className='grid content-start gap-2'>
           <h2 className='!mb-[14px] text-[15px] !text-white'>
@@ -95,7 +109,19 @@ export function OFooter() {
       </div>
       <div className='footer-bottom mx-auto flex justify-between gap-4 border-t border-white/10 px-0 pt-[18px] pb-[26px] text-[13px] text-footer-muted max-sm:flex-col'>
         <span>{footerCopy.copyright}</span>
-        <span>{footerCopy.tagline}</span>
+        <div className='footer-bottom-meta'>
+          {buildInfoSummary ? (
+            <Link
+              aria-label={footerCopy.buildInfoAriaLabel}
+              className='interactive footer-build-info-link'
+              to={localizePath('/build-info')}
+            >
+              <span>{footerCopy.buildInfoLabel}</span>
+              <code>{buildInfoSummary}</code>
+            </Link>
+          ) : null}
+          <span>{footerCopy.tagline}</span>
+        </div>
       </div>
     </footer>
   );

@@ -106,4 +106,5 @@ export interface SeoConfig {
   keywords?: string[];
   locale?: import('@/i18n').Locale;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  robots?: string;
 }

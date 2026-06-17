@@ -143,6 +143,14 @@ export function getPageSeo(locale: Locale): Record<string, SeoConfig> {
       ogImage: defaultImageOg,
       locale,
     },
+    buildInfo: {
+      title: m.seo.buildInfo.title,
+      description: m.seo.buildInfo.description,
+      canonicalPath: '/build-info',
+      ogImage: defaultImageOg,
+      locale,
+      robots: 'noindex, follow',
+    },
   };
 }
 

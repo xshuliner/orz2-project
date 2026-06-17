@@ -34,3 +34,43 @@ footer {
 .footer-bottom {
   width: var(--page-content-width);
 }
+
+.footer-bottom-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.footer-build-info-link {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  color: var(--color-footer-muted);
+  text-decoration: none;
+}
+
+.footer-build-info-link:hover {
+  color: white;
+}
+
+.footer-build-info-link code {
+  max-width: min(260px, 52vw);
+  overflow: hidden;
+  color: inherit;
+  font-family:
+    'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    monospace;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .footer-bottom-meta {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+}

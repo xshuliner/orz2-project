@@ -17,6 +17,11 @@ const PageDesignSystem = lazy(() =>
     default: module.PageDesignSystem,
   }))
 );
+const PageBuildInfo = lazy(() =>
+  import('@/pages/PageBuildInfo').then(module => ({
+    default: module.PageBuildInfo,
+  }))
+);
 const PageProducts = lazy(() =>
   import('@/pages/PageProducts').then(module => ({
     default: module.PageProducts,
@@ -73,6 +78,10 @@ function createAppChildren(): RouteObject[] {
     {
       path: 'design-system',
       element: <PageDesignSystem />,
+    },
+    {
+      path: 'build-info',
+      element: <PageBuildInfo />,
     },
   ];
 }
