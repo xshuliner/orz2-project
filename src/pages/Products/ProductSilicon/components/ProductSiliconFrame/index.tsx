@@ -1,3 +1,4 @@
+import { stripLocalePrefix, useI18n } from '@/i18n';
 import { ProductSiliconWatermark } from '@/pages/Products/ProductSilicon/components/ProductSiliconWatermark';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import { useEffect, type ReactNode } from 'react';
@@ -6,7 +7,9 @@ import './index.css';
 
 export function ProductSiliconFrame({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
-  const isSiliconHome = pathname === '/products/silicon';
+  const { localizePath } = useI18n();
+  const routePath = stripLocalePrefix(pathname);
+  const isSiliconHome = routePath === '/products/silicon';
 
   useEffect(() => {
     document.body.classList.add('product-silicon-active');
@@ -17,14 +20,14 @@ export function ProductSiliconFrame({ children }: { children: ReactNode }) {
     {
       label: '江湖门庭',
       to: '/products/silicon',
-      active: pathname === '/products/silicon',
+      active: routePath === '/products/silicon',
     },
     {
       label: '江湖名册',
       to: '/products/silicon/member-list',
       active:
-        pathname === '/products/silicon/member-list' ||
-        pathname === '/products/silicon/member-detail',
+        routePath === '/products/silicon/member-list' ||
+        routePath === '/products/silicon/member-detail',
     },
   ];
 
@@ -32,7 +35,10 @@ export function ProductSiliconFrame({ children }: { children: ReactNode }) {
     <div className='product-silicon-theme'>
       <header className='silicon-nav'>
         <nav className='silicon-nav-inner' aria-label='硅基江湖导航'>
-          <Link className='silicon-nav-brand' to='/products/silicon'>
+          <Link
+            className='silicon-nav-brand'
+            to={localizePath('/products/silicon')}
+          >
             <span className='silicon-nav-brand-mark' aria-hidden>
               硅
             </span>
@@ -46,7 +52,7 @@ export function ProductSiliconFrame({ children }: { children: ReactNode }) {
             {!isSiliconHome && (
               <Link
                 className='silicon-nav-home'
-                to='/products/silicon'
+                to={localizePath('/products/silicon')}
                 aria-label='返回硅基江湖首页'
               >
                 <ArrowLeft aria-hidden className='size-3.5' />
@@ -61,7 +67,7 @@ export function ProductSiliconFrame({ children }: { children: ReactNode }) {
                     ? 'silicon-nav-link is-active'
                     : 'silicon-nav-link'
                 }
-                to={link.to}
+                to={localizePath(link.to)}
                 aria-current={link.active ? 'page' : undefined}
               >
                 {link.label}
@@ -69,7 +75,7 @@ export function ProductSiliconFrame({ children }: { children: ReactNode }) {
             ))}
           </div>
 
-          <Link className='silicon-nav-return' to='/'>
+          <Link className='silicon-nav-return' to={localizePath('/')}>
             <span>返回 ORZ2</span>
             <ArrowUpRight aria-hidden className='size-3.5' />
           </Link>

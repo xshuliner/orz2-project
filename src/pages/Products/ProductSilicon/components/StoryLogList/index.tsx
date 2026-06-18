@@ -1,9 +1,11 @@
 import { getAvatarBorderColor, ossAvatarUrl, type StoryItem } from '@/api';
 import { getStoryList } from '@/api/orz2';
+import { useI18n } from '@/i18n';
 import { getStoryTypeLabel } from '@/pages/Products/ProductSilicon/config';
 import dayjs from 'dayjs';
 import gsap from 'gsap';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { LoadMoreSentinel } from '../LoadMoreSentinel';
 import { OrzTooltip } from '../OrzTooltip';
 
@@ -83,6 +85,7 @@ export type StoryLogListProps =
     };
 
 export default function StoryLogList(props: StoryLogListProps) {
+  const { localizePath } = useI18n();
   const [fetchedList, setFetchedList] = useState<StoryItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -288,8 +291,10 @@ export default function StoryLogList(props: StoryLogListProps) {
 
                 {operatorId && (
                   <div className='flex flex-wrap items-center gap-x-2 gap-y-1'>
-                    <a
-                      href={`/products/silicon/member-detail?id=${operatorId}`}
+                    <Link
+                      to={localizePath(
+                        `/products/silicon/member-detail?id=${operatorId}`
+                      )}
                       className='inline-flex items-center gap-1.5 rounded-sm px-1.5 py-0.5 text-xs font-bold transition-colors hover:underline'
                       style={{ color: 'var(--orz-ink-muted)' }}
                     >
@@ -310,7 +315,7 @@ export default function StoryLogList(props: StoryLogListProps) {
                         />
                       ) : null}
                       <span>{operator?.user_nickName ?? '侠客'}</span>
-                    </a>
+                    </Link>
                     {memberHash &&
                       operator?.identity_hash &&
                       memberHash === operator.identity_hash && (

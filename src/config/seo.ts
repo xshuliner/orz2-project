@@ -2,8 +2,8 @@ import { siteConfig } from '@/config';
 import { defaultLocale, getMessages, localizePath, type Locale } from '@/i18n';
 import { getProducts, getTools } from '@/i18n/catalog';
 import type { CatalogEntry, CatalogItem, SeoConfig } from '@/types';
+import { toSiteUrl } from '@/utils/siteUrl';
 
-export const siteUrl = 'https://orz2.com';
 export const siteName = 'ORZ2';
 export const defaultImageOg =
   'https://cos.orz2.online/Logo/orz2/logo_light_320x320.webp';
@@ -11,8 +11,7 @@ export const defaultImageLogo =
   'https://cos.orz2.online/Logo/orz2/logo_light_320x320.webp';
 
 export function routeUrl(path: string, locale: Locale = defaultLocale) {
-  const localized = localizePath(path, locale);
-  return localized === '/' ? `${siteUrl}/` : `${siteUrl}${localized}`;
+  return toSiteUrl(localizePath(path, locale));
 }
 
 function getPrimaryLink(item: CatalogItem) {

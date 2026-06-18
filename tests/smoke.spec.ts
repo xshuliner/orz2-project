@@ -106,23 +106,23 @@ test('localized SEO exposes canonical and alternate links', async ({ page }) => 
   await expect(page).toHaveTitle('Online Tools - ORZ2');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
-    'https://orz2.com/en/tools'
+    'https://orz2.online/en/tools'
   );
   await expect(page.locator('link[rel="alternate"][hreflang="zh-CN"]')).toHaveAttribute(
     'href',
-    'https://orz2.com/tools'
+    'https://orz2.online/tools'
   );
   await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute(
     'href',
-    'https://orz2.com/en/tools'
+    'https://orz2.online/en/tools'
   );
   await expect(page.locator('link[rel="alternate"][hreflang="ja"]')).toHaveAttribute(
     'href',
-    'https://orz2.com/ja/tools'
+    'https://orz2.online/ja/tools'
   );
   await expect(
     page.locator('link[rel="alternate"][hreflang="x-default"]')
-  ).toHaveAttribute('href', 'https://orz2.com/tools');
+  ).toHaveAttribute('href', 'https://orz2.online/tools');
 });
 
 test('design system modal supports button, backdrop and escape closing', async ({

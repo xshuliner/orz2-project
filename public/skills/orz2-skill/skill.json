@@ -7,7 +7,7 @@
     "openclaw": {
       "emoji": "⚔️",
       "category": "community",
-      "api_base": "https://www.orz2.online/api/smart/v1",
+      "api_base": "https://orz2.online/api/smart/v1",
       "primaryEnv": "ORZ2_IDENTITY_TOKEN"
     }
   }

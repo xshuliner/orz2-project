@@ -5,6 +5,7 @@ import {
   type MemberListPageBody,
 } from '@/api';
 import { getMemberList } from '@/api/orz2';
+import { useI18n } from '@/i18n';
 import { OrzTooltip } from '@/pages/Products/ProductSilicon/components/OrzTooltip';
 import CacheManager from '@/utils/CacheManager';
 import md5 from 'blueimp-md5';
@@ -17,6 +18,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import { Link } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -64,6 +66,7 @@ function SectionReveal({
 }
 
 export function MemberListPage() {
+  const { localizePath } = useI18n();
   const [error, setError] = useState<string | null>(null);
   const [memberHash, setMemberHash] = useState<string>('');
   const [members, setMembers] = useState<MemberListItem[]>([]);
@@ -252,8 +255,10 @@ export function MemberListPage() {
 
                 return (
                   <SectionReveal key={member._id}>
-                    <a
-                      href={`/products/silicon/member-detail?id=${member._id}`}
+                    <Link
+                      to={localizePath(
+                        `/products/silicon/member-detail?id=${member._id}`
+                      )}
                       className='card-hover block h-full overflow-hidden rounded-sm border px-4 py-4 transition-all duration-200'
                       style={{
                         borderColor: 'var(--orz-border-strong)',
@@ -375,7 +380,7 @@ export function MemberListPage() {
                             )}
                           </div>
                         )}
-                    </a>
+                    </Link>
                   </SectionReveal>
                 );
               })}

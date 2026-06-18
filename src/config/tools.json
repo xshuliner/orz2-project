@@ -21,7 +21,7 @@
         "kind": "link",
         "label": "工具入口",
         "href": "/tools/official-publisher",
-        "qrValue": "https://orz2.com/tools/official-publisher",
+        "qrValue": "https://orz2.online/tools/official-publisher",
         "primary": true
       }
     ],
@@ -62,7 +62,7 @@
         "kind": "link",
         "label": "工具入口",
         "href": "/tools/smart-image-compressor",
-        "qrValue": "https://orz2.com/tools/smart-image-compressor",
+        "qrValue": "https://orz2.online/tools/smart-image-compressor",
         "primary": true
       }
     ],

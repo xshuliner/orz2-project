@@ -1,12 +1,7 @@
-import { defaultImageOg, routeUrl, siteName, siteUrl } from '@/config/seo';
-import {
-  defaultLocale,
-  localeOpenGraph,
-  locales,
-  localizePath,
-  type Locale,
-} from '@/i18n';
+import { defaultImageOg, routeUrl, siteName } from '@/config/seo';
+import { defaultLocale, localeOpenGraph, locales, type Locale } from '@/i18n';
 import type { SeoConfig } from '@/types';
+import { toSiteUrl } from '@/utils/siteUrl';
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 
@@ -15,8 +10,7 @@ interface SeoProps {
 }
 
 function absoluteUrl(path = defaultImageOg) {
-  if (path.startsWith('http')) return path;
-  return `${siteUrl}${path.startsWith('/') ? path : `/${path}`}`;
+  return toSiteUrl(path);
 }
 
 export function Seo({ config }: SeoProps) {
@@ -68,7 +62,7 @@ export function Seo({ config }: SeoProps) {
             key={hrefLang}
             rel='alternate'
             hrefLang={hrefLang}
-            href={`${siteUrl}${localizePath(config.canonicalPath, hrefLocale)}`}
+            href={routeUrl(config.canonicalPath, hrefLocale)}
           />
         );
       })}

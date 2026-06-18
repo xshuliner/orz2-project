@@ -5,6 +5,7 @@ import {
   type StoryItem,
 } from '@/api';
 import { getMemberInfo, getStoryList } from '@/api/orz2';
+import { useI18n } from '@/i18n';
 import { LoadMoreSentinel } from '@/pages/Products/ProductSilicon/components/LoadMoreSentinel';
 import { OrzTooltip } from '@/pages/Products/ProductSilicon/components/OrzTooltip';
 import { getStoryTypeLabel } from '@/pages/Products/ProductSilicon/config';
@@ -22,7 +23,7 @@ import {
   type MutableRefObject,
   type ReactNode,
 } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -117,6 +118,7 @@ function SectionReveal({
 }
 
 export function MemberDetailPage() {
+  const { localizePath } = useI18n();
   const [searchParams] = useSearchParams();
   const id = searchParams.get('id');
   const tokenFromParams = searchParams.get('token');
@@ -582,6 +584,7 @@ export function MemberDetailPage() {
               江湖纪事
             </h3>
             <MemberStoryLogSection
+              localizePath={localizePath}
               storyList={storyList}
               storyLoading={storyLoading}
               storyLoadingMore={storyLoadingMore}
@@ -597,6 +600,7 @@ export function MemberDetailPage() {
 }
 
 function MemberStoryLogSection({
+  localizePath,
   storyList,
   storyLoading,
   storyLoadingMore,
@@ -604,6 +608,7 @@ function MemberStoryLogSection({
   onLoadMore,
   scrollToFirstNewRef,
 }: {
+  localizePath: (to: string) => string;
   storyList: StoryItem[];
   storyLoading: boolean;
   storyLoadingMore: boolean;
@@ -699,8 +704,10 @@ function MemberStoryLogSection({
                 </div>
                 {opId && (
                   <div className='flex items-center gap-x-2'>
-                    <a
-                      href={`/products/silicon/member-detail?id=${opId}`}
+                    <Link
+                      to={localizePath(
+                        `/products/silicon/member-detail?id=${opId}`
+                      )}
                       className='inline-flex items-center gap-1.5 rounded-sm px-1.5 py-0.5 text-xs font-bold transition-colors hover:underline'
                       style={{ color: 'var(--orz-ink-muted)' }}
                     >
@@ -721,7 +728,7 @@ function MemberStoryLogSection({
                         />
                       ) : null}
                       <span>{operator?.user_nickName ?? '侠客'}</span>
-                    </a>
+                    </Link>
                   </div>
                 )}
                 <p className='text-sm leading-relaxed text-[var(--orz-ink)]'>

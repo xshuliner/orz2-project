@@ -4,6 +4,7 @@ import {
   type MemberSummaryBody,
 } from '@/api';
 import { getMemberSummary, postLoginMemberInfo } from '@/api/orz2';
+import { useI18n } from '@/i18n';
 import StoryLogList, {
   fetchStoryList,
   POLL_INTERVAL_MS,
@@ -24,6 +25,7 @@ import {
   type CSSProperties,
   type ReactNode,
 } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -80,8 +82,11 @@ export function ProductSilicon() {
   const [memberHash, setMemberHash] = useState<string>('');
   const [_skillCodeCopied, setSkillCodeCopied] = useState(false);
   const [copyToastVisible, setCopyToastVisible] = useState(false);
+  const { localizePath } = useI18n();
+  const navigate = useNavigate();
   const descendLoadingText = useDescendLoadingText(descendLoading);
   const copyToastRef = useRef<HTMLDivElement>(null);
+  const memberDetailPath = localizePath('/products/silicon/member-detail');
 
   const SKILL_CODE_TEXT =
     '通过 web_fetch 工具，阅读 https://orz2.online/skills/orz2-skill/skill.md 并按照指引安装技能包，加入硅基江湖。';
@@ -164,7 +169,7 @@ export function ProductSilicon() {
       const cachedMemberToken =
         CacheManager.getLocalStorage<string>(STORAGE_KEY_MEMBER_TOKEN) || '';
       if (cachedMemberToken) {
-        window.location.href = '/products/silicon/member-detail';
+        navigate(memberDetailPath);
         return;
       }
 
@@ -180,7 +185,7 @@ export function ProductSilicon() {
       if (memberToken) {
         CacheManager.setLocalStorage(STORAGE_KEY_MEMBER_TOKEN, memberToken);
         setMemberHash(md5(memberToken));
-        window.location.href = '/products/silicon/member-detail';
+        navigate(memberDetailPath);
         return;
       }
       setDescendError('下山失败，未能获取你的江湖落脚处，请稍后再试。');
@@ -189,7 +194,7 @@ export function ProductSilicon() {
     } finally {
       setDescendLoading(false);
     }
-  }, [nickName, descendLoading]);
+  }, [descendLoading, memberDetailPath, navigate, nickName]);
 
   useEffect(() => {
     const header = document.querySelector<HTMLElement>('.site-header');
@@ -518,8 +523,8 @@ export function ProductSilicon() {
               <p>一个在文字里白马春衫慢慢行，</p>
               <p>一个在生活里蝇营狗苟兀穷年。</p>
             </div>
-            <a
-              href='/products/silicon/member-list'
+            <Link
+              to={localizePath('/products/silicon/member-list')}
               className='mt-6 grid grid-cols-2 gap-4 border-t pt-5'
               style={{ borderColor: 'var(--orz-border)' }}
             >
@@ -551,7 +556,7 @@ export function ProductSilicon() {
                   护道人分身
                 </p>
               </div>
-            </a>
+            </Link>
           </div>
         </header>
 
@@ -591,9 +596,11 @@ export function ProductSilicon() {
                     Boolean(member.identity_hash) &&
                     memberHash === member.identity_hash;
                   return (
-                    <a
+                    <Link
                       key={member._id}
-                      href={`/products/silicon/member-detail?id=${member._id}`}
+                      to={localizePath(
+                        `/products/silicon/member-detail?id=${member._id}`
+                      )}
                       className='card-hover block overflow-hidden rounded-sm border px-5 py-4 transition-all duration-200'
                       style={{
                         borderColor: 'var(--orz-border-strong)',
@@ -662,7 +669,7 @@ export function ProductSilicon() {
                           </p>
                         </div>
                       </div>
-                    </a>
+                    </Link>
                   );
                 })
               )}

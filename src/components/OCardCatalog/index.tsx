@@ -84,7 +84,7 @@ interface OCardCatalogProps {
 }
 
 export function OCardCatalog({ catalogType, item }: OCardCatalogProps) {
-  const { locale, localizePath, messages } = useI18n();
+  const { locale, localizePath, messages, routeUrl } = useI18n();
   const common = messages.common;
   const supportsMobileH5 = item.platform.includes('h5');
   const scannableEntries = item.entries.filter(
@@ -114,6 +114,11 @@ export function OCardCatalog({ catalogType, item }: OCardCatalogProps) {
   function rememberUsage() {
     if (!catalogType) return;
     recordCatalogRecentUsage(catalogType, item.id);
+  }
+
+  function getQrValue(entry: Extract<CatalogEntry, { kind: 'link' }>) {
+    if (!isInternalHref(entry.href)) return entry.qrValue;
+    return routeUrl(entry.href);
   }
 
   return (
@@ -253,7 +258,7 @@ export function OCardCatalog({ catalogType, item }: OCardCatalogProps) {
                   <div className='catalog-entry-code'>
                     {activeEntry.kind === 'link' ? (
                       <QRCodeSVG
-                        value={activeEntry.qrValue}
+                        value={getQrValue(activeEntry)}
                         size={184}
                         level='M'
                         marginSize={2}

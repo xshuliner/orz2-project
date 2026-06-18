@@ -17,15 +17,33 @@ const secretKey = 'I@, ha*ve #187076081$ dream(s)!~';
 
 const web = {
   prod: {
-    baseUrl: 'https://www.orz2.online/api',
+    baseUrl: 'https://orz2.online/api',
   },
   uat: {
-    baseUrl: 'https://www.orz2.online/apiuat',
+    baseUrl: 'https://orz2.online/apiuat',
   },
   local: {
     baseUrl: 'http://localhost:9002/apilocal',
   },
 };
+
+function getFallbackBaseUrl() {
+  const objWeb = web[webenv] ? web[webenv] : web.prod;
+  return objWeb.baseUrl;
+}
+
+function resolveBaseUrl() {
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '');
+  if (!apiBaseUrl) return getFallbackBaseUrl();
+
+  try {
+    const parsed = new URL(apiBaseUrl);
+    parsed.pathname = parsed.pathname.replace(/\/smart\/v1\/?$/, '');
+    return parsed.toString().replace(/\/$/, '');
+  } catch {
+    return getFallbackBaseUrl();
+  }
+}
 
 interface RequestConfig {
   method?: string;
@@ -113,10 +131,7 @@ class FetchManager {
   private axiosInstance: AxiosInstance;
 
   constructor() {
-    const objWeb = web[webenv] ? web[webenv] : web['prod'];
-    const { baseUrl } = objWeb || {};
-
-    this.baseUrl = baseUrl || '';
+    this.baseUrl = resolveBaseUrl();
 
     this.axiosInstance = axios.create({
       baseURL: this.baseUrl,
@@ -126,7 +141,7 @@ class FetchManager {
       },
     });
 
-    console.log('FetchManager getInstance', webenv, objWeb);
+    console.log('FetchManager getInstance', webenv, this.baseUrl);
   }
 
   static getInstance(): FetchManager {

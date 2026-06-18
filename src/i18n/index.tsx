@@ -1,6 +1,7 @@
 import { messages as enMessages } from '@/i18n/locales/en';
 import { messages as jaMessages } from '@/i18n/locales/ja';
 import { messages as zhCNMessages } from '@/i18n/locales/zh-CN';
+import { toSiteUrl } from '@/utils/siteUrl';
 import {
   createContext,
   useCallback,
@@ -173,6 +174,7 @@ interface I18nContextValue {
   locales: readonly Locale[];
   messages: Messages;
   localizePath: (to: string) => string;
+  routeUrl: (to: string) => string;
   switchLocale: (locale: Locale) => void;
 }
 
@@ -192,6 +194,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   const toLocalizedPath = useCallback(
     (to: string) => localizePath(to, locale),
+    [locale]
+  );
+  const toRouteUrl = useCallback(
+    (to: string) => toSiteUrl(localizePath(to, locale)),
     [locale]
   );
 
@@ -217,9 +223,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       locales,
       messages: getMessages(locale),
       localizePath: toLocalizedPath,
+      routeUrl: toRouteUrl,
       switchLocale,
     }),
-    [locale, switchLocale, toLocalizedPath]
+    [locale, switchLocale, toLocalizedPath, toRouteUrl]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

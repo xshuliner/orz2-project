@@ -21,7 +21,7 @@
         "kind": "link",
         "label": "Web 体验",
         "href": "/products/silicon",
-        "qrValue": "https://orz2.com/products/silicon",
+        "qrValue": "https://orz2.online/products/silicon",
         "primary": true
       }
     ],
@@ -48,8 +48,8 @@
         "id": "h5",
         "kind": "link",
         "label": "H5 页面",
-        "href": "https://www.orz2.online/portal/smart-app/weather/",
-        "qrValue": "https://www.orz2.online/portal/smart-app/weather/",
+        "href": "https://orz2.online/portal/smart-app/weather/",
+        "qrValue": "https://orz2.online/portal/smart-app/weather/",
         "primary": true
       },
       {
@@ -82,8 +82,8 @@
         "id": "h5",
         "kind": "link",
         "label": "H5 页面",
-        "href": "https://www.orz2.online/portal/smart-app/zero/",
-        "qrValue": "https://www.orz2.online/portal/smart-app/zero/",
+        "href": "https://orz2.online/portal/smart-app/zero/",
+        "qrValue": "https://orz2.online/portal/smart-app/zero/",
         "primary": true
       },
       {
@@ -116,8 +116,8 @@
         "id": "h5",
         "kind": "link",
         "label": "H5 页面",
-        "href": "https://www.orz2.online/portal/smart-app/carbon/",
-        "qrValue": "https://www.orz2.online/portal/smart-app/carbon/",
+        "href": "https://orz2.online/portal/smart-app/carbon/",
+        "qrValue": "https://orz2.online/portal/smart-app/carbon/",
         "primary": true
       },
       {
@@ -195,8 +195,8 @@
         "id": "h5-game",
         "kind": "link",
         "label": "H5 游戏",
-        "href": "https://www.orz2.online/portal/fiveball",
-        "qrValue": "https://www.orz2.online/portal/fiveball",
+        "href": "https://orz2.online/portal/fiveball",
+        "qrValue": "https://orz2.online/portal/fiveball",
         "primary": true
       }
     ]
@@ -222,8 +222,8 @@
         "id": "h5-game",
         "kind": "link",
         "label": "H5 游戏",
-        "href": "https://www.orz2.online/portal/mathcookies",
-        "qrValue": "https://www.orz2.online/portal/mathcookies",
+        "href": "https://orz2.online/portal/mathcookies",
+        "qrValue": "https://orz2.online/portal/mathcookies",
         "primary": true
       }
     ]
@@ -249,8 +249,8 @@
         "id": "web",
         "kind": "link",
         "label": "Web 站点",
-        "href": "https://www.orz2.online/gengjian1203",
-        "qrValue": "https://www.orz2.online/gengjian1203",
+        "href": "https://orz2.online/gengjian1203",
+        "qrValue": "https://orz2.online/gengjian1203",
         "primary": true
       }
     ]

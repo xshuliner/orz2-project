@@ -7,8 +7,16 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = resolve(__dirname, '..');
 
 const mode = process.argv[2] || 'prod';
-const env = loadEnv(mode, rootDir, 'SITE_');
-const siteUrl = env.SITE_URL || 'https://orz2.com';
+const env = {
+  ...loadEnv(mode, rootDir, 'SITE_'),
+  ...loadEnv(mode, rootDir, 'VITE_'),
+};
+
+function defaultSiteUrl(mode) {
+  return mode === 'uat' ? 'https://orz2.online/uat' : 'https://orz2.online';
+}
+
+const siteUrl = env.SITE_URL || env.VITE_SITE_URL || defaultSiteUrl(mode);
 
 const locales = ['zh-CN', 'en', 'ja'];
 const defaultLocale = 'zh-CN';

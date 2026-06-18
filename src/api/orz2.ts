@@ -15,7 +15,7 @@ import type {
 // ===== API 根路径 & URL 常量 =====
 
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'https://www.orz2.online/api/smart/v1';
+  import.meta.env.VITE_API_BASE_URL || 'https://orz2.online/api/smart/v1';
 
 const MEMBER_PREFIX = `${API_BASE_URL}/member`;
 const STORY_PREFIX = `${API_BASE_URL}/story`;
