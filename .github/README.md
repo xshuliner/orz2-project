@@ -40,11 +40,14 @@
 `release-deploy.yml`：
 
 1. 按已有 tag 计算下一版。
-2. 当 `bump` 不是 `none` 时，公共 workflow 会在 GitHub Actions 工作区临时同步
+2. 公共 workflow 会在 build job 创建不推送的本地 release tag，并注入
+   `RELEASE_VERSION`、`RELEASE_VERSION_NUMBER`、`XSHULINER_TAG_VERSION`、
+   `XSHULINER_RELEASE_VERSION` 和 `XSHULINER_APP_VERSION`。
+3. 当 `bump` 不是 `none` 时，公共 workflow 会在 GitHub Actions 工作区临时同步
    `package.json` 的 `version` 字段，不提交 commit。
-3. 执行 `pnpm run build:{env}`，构建命令内的 `xbi generate` 会读取到临时更新后的
-   `package.json.version`。
-4. 构建和部署成功后，由公共 workflow 创建 tag。
+4. 执行 `pnpm run build:{env}`，构建命令内的 `xbi generate` 会读取到同一个 resolved
+   version：`tagVersion`/`git.nearestTag` 使用 `vX.Y.Z`，`app.version` 使用 `X.Y.Z`。
+5. 构建和部署成功后，由公共 workflow 创建并推送正式 tag。
 
 `xbi generate` 会生成：
 
@@ -55,6 +58,16 @@ public/__xshuliner__/build-info.js
 
 页面会加载 `build-info.js` 到 `window.__xshuliner__`。页脚展示当前版本和Git
 commit hash，`/build-info` 页面展示详细构建、部署、Git 和 CI 信息。
+
+## Workflow 接入约定
+
+- `bump` selector 顺序保持 `patch`、`minor`、`major`、`none`，默认值 `patch` 放第一。
+- `env` selector 顺序跟部署表格一致：`prod`、`uat`。
+- 版本只来自公共 workflow 输出：`RELEASE_VERSION` 是带 `v` 的 tag，
+  `RELEASE_VERSION_NUMBER` 是无前缀版本号。
+- `XSHULINER_RELEASE_ID` 只做追踪 id，当前为 `${GITHUB_RUN_ID}-${commit}`，不要用它替代
+  tag 版本。
+- 前端构建脚本继续在 Vite build 之前执行 `xbi generate`，避免页面拿到旧部署信息。
 
 建议服务器对 `/__xshuliner__/*` 配置
 `Cache-Control: no-store`，避免部署后页面读取到旧版本构建信息。

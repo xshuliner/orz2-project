@@ -85,8 +85,8 @@ importers:
         specifier: ^5.0.0
         version: 5.2.0(vite@6.4.3(@types/node@25.9.3)(jiti@2.7.0)(lightningcss@1.32.0))
       '@xshuliner/build-info':
-        specifier: ^0.1.1
-        version: 0.1.1(react@18.3.1)
+        specifier: ^0.1.2
+        version: 0.1.2(react@18.3.1)
       eslint:
         specifier: ^10.4.1
         version: 10.5.0(jiti@2.7.0)
@@ -847,8 +847,8 @@ packages:
     peerDependencies:
       vite: ^4.2.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
 
-  '@xshuliner/build-info@0.1.1':
-    resolution: {integrity: sha512-zidPtCGMeujX1HME3jclQFW674E0Z+i4l6m3RvVrOKlA74D0erGh/Alxom3OQP8+H1QNghagvr7S4/BzFk/EZg==}
+  '@xshuliner/build-info@0.1.2':
+    resolution: {integrity: sha512-0w880ADdVmbUTw+S+vtAZpuc5HjhZpMuClV9fZnw+XrFRf/h11CwLsZEbZ1MllDqvK2Kbv+GERM/HKdrBzf18Q==}
     engines: {node: '>=20'}
     hasBin: true
     peerDependencies:
@@ -2542,7 +2542,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@xshuliner/build-info@0.1.1(react@18.3.1)':
+  '@xshuliner/build-info@0.1.2(react@18.3.1)':
     dependencies:
       react: 18.3.1
 
