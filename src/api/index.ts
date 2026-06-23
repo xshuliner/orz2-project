@@ -6,6 +6,7 @@ export default {
 
 export {
   postOfficialPublisher,
+  postPolishContent,
   postTinifyImage,
   streamPostOfficialPublisher,
 } from './orz2';
@@ -29,6 +30,9 @@ export type {
   OfficialPublisherProvider,
   OperatorMemberInfo,
   PostOfficialPublisherBody,
+  PostPolishContentBody,
+  PostPolishContentMode,
+  PostPolishContentResult,
   StoryItem,
   StoryListResult,
   TinifyImageResult,

@@ -21,6 +21,14 @@ export const messages = {
     loadMore: 'Load more...',
     empty: 'No content yet',
     backHome: 'Back home',
+    aiInput: {
+      polish: 'Polish',
+      polishing: 'Polishing',
+      restore: 'Restore',
+      polishAriaLabel: 'Polish content with AI',
+      restoreAriaLabel: 'Restore content before polishing',
+      failed: 'Could not polish the content. Try again later.',
+    },
   },
   locale: {
     ariaLabel: 'Language switcher',

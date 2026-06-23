@@ -21,6 +21,14 @@ export const messages = {
     loadMore: 'さらに読み込む…',
     empty: 'まだありません',
     backHome: 'ホームへ戻る',
+    aiInput: {
+      polish: '推敲',
+      polishing: '推敲中',
+      restore: '復元',
+      polishAriaLabel: 'AI で内容を推敲',
+      restoreAriaLabel: '推敲前の内容に戻す',
+      failed: '内容を推敲できませんでした。後でもう一度お試しください。',
+    },
   },
   locale: {
     ariaLabel: '言語切替',

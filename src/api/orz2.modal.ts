@@ -150,6 +150,28 @@ export type OfficialArticleType = 'news' | 'newspic';
 export type OfficialPublisherMode = 'create' | 'rewrite';
 export type OfficialPublisherProvider = 'AGNES' | 'MINIMAX';
 export type OfficialImageSourceType = 'ai' | 'url' | 'base64';
+export type PostPolishContentMode =
+  | 'official_system_prompt'
+  | 'official_content_prompt'
+  | 'official_image_prompt'
+  | 'text_prompt'
+  | 'image_prompt';
+
+export interface PostPolishContentBody {
+  content: string;
+  mode: PostPolishContentMode;
+}
+
+export interface PostPolishContentResult {
+  content: string;
+  mode: PostPolishContentMode;
+  model?: {
+    provider?: string;
+    name?: string;
+  } | null;
+  usage?: Record<string, unknown> | null;
+  meta?: Record<string, unknown> | null;
+}
 
 export interface OfficialImageConfig {
   type: OfficialImageSourceType;

@@ -8,6 +8,8 @@ import type {
   OfficialDraftResult,
   OfficialPublisherProgressEvent,
   PostOfficialPublisherBody,
+  PostPolishContentBody,
+  PostPolishContentResult,
   StoryListResult,
   TinifyImageResult,
 } from './orz2.modal';
@@ -20,6 +22,7 @@ const API_BASE_URL =
 const MEMBER_PREFIX = `${API_BASE_URL}/member`;
 const STORY_PREFIX = `${API_BASE_URL}/story`;
 const OFFICIAL_PREFIX = `${API_BASE_URL}/official`;
+const LLM_PREFIX = `${API_BASE_URL}/llm`;
 const TINIFY_IMAGE_API_PATH = '/smart/v1/tool/postTinifyImage';
 const TINIFY_IMAGE_SIGN_PATH = `${new URL(API_BASE_URL).pathname}/tool/postTinifyImage`;
 
@@ -29,6 +32,7 @@ export const MEMBER_INFO_API_URL = `${MEMBER_PREFIX}/getQueryMemberInfoForSilico
 export const MEMBER_LOGIN_API_URL = `${MEMBER_PREFIX}/postLoginMemberInfoForSilicon`;
 export const STORY_LIST_API_URL = `${STORY_PREFIX}/getQueryStoryListForSilicon`;
 export const OFFICIAL_PUBLISHER_API_URL = `${OFFICIAL_PREFIX}/postOfficialPublisher`;
+export const POLISH_CONTENT_API_URL = `${LLM_PREFIX}/postPolishContent`;
 
 /**
  * 查询二维码登录状态
@@ -217,6 +221,7 @@ export default {
   postCreateMiniCodeLogin,
   getQueryMemberInfo,
   postLoginMemberInfoForPassword,
+  postPolishContent,
   postTinifyImage,
 };
 
@@ -273,6 +278,36 @@ export async function postTinifyImage(params: {
 
   const message =
     data?.message || data?.content || response.error || 'TinyPNG 压缩失败';
+  throw new Error(message);
+}
+
+// ===== LLM API =====
+
+/**
+ * 调用后端 AI 内容润色接口。
+ * 后端路由：POST /smart/v1/llm/postPolishContent
+ */
+export async function postPolishContent(
+  body: PostPolishContentBody
+): Promise<PostPolishContentResult> {
+  const { data } = await axios.post<{
+    code?: number;
+    body?: PostPolishContentResult | null;
+    message?: string;
+    content?: string;
+  }>(POLISH_CONTENT_API_URL, body, {
+    headers: {
+      brand: 'orz2',
+      platform: 'WEB',
+    },
+    timeout: 120000,
+  });
+
+  if (data?.code === 200 && data?.body?.content) {
+    return data.body;
+  }
+
+  const message = data?.message || data?.content || '内容润色失败';
   throw new Error(message);
 }
 

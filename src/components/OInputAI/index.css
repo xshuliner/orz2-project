@@ -1,0 +1,75 @@
+.o-input-ai {
+  width: 100%;
+}
+
+.o-input-ai--input {
+  position: relative;
+}
+
+.field .o-input-ai--input input.o-input-ai__control {
+  padding-inline-end: 92px;
+}
+
+.o-input-ai--input .o-input-ai__button {
+  --o-button-transform: translateY(-50%);
+
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 6px;
+  min-height: calc(var(--control-height-lg) - 12px);
+  transform: var(--o-button-transform);
+  z-index: 1;
+}
+
+.o-input-ai--input .o-input-ai__button:hover,
+.o-input-ai--input .o-input-ai__button:focus-visible,
+.o-input-ai--input .o-input-ai__button:disabled {
+  transform: var(--o-button-transform);
+}
+
+.o-input-ai--textarea {
+  display: grid;
+  gap: 8px;
+}
+
+.o-input-ai__textarea-wrap {
+  position: relative;
+}
+
+.field .o-input-ai__textarea-wrap textarea.o-input-ai__control {
+  padding-block-end: 48px;
+}
+
+.o-input-ai__textarea-action {
+  position: absolute;
+  inset-block-end: 12px;
+  inset-inline-end: 12px;
+  display: flex;
+  justify-content: flex-end;
+  z-index: 1;
+}
+
+.o-input-ai__button {
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.o-input-ai__loading-icon {
+  animation: o-input-ai-spin 900ms linear infinite;
+}
+
+.o-input-ai__feedback {
+  color: var(--color-danger);
+}
+
+@keyframes o-input-ai-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .field .o-input-ai--input input.o-input-ai__control {
+    padding-inline-end: 82px;
+  }
+}

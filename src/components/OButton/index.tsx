@@ -68,7 +68,7 @@ export const OButton = forwardRef<
 >(function OButton(props, ref) {
   const {
     className,
-    hoverTranslate = true,
+    hoverTranslate = false,
     size = 'md',
     variant = 'primary',
   } = props;

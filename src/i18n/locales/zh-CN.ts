@@ -21,6 +21,14 @@ export const messages = {
     loadMore: '加载更多…',
     empty: '暂无内容',
     backHome: '返回首页',
+    aiInput: {
+      polish: '润色',
+      polishing: '润色中',
+      restore: '恢复',
+      polishAriaLabel: 'AI 润色内容',
+      restoreAriaLabel: '恢复润色前内容',
+      failed: '内容润色失败，请稍后重试',
+    },
   },
   locale: {
     ariaLabel: '语言切换',

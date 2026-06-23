@@ -13,6 +13,7 @@ import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { OIconButton } from '@/components/OIconButton';
+import { OInputAI } from '@/components/OInputAI';
 import { OModal } from '@/components/OModal';
 import { ORadio } from '@/components/ORadio';
 import { OTooltip } from '@/components/OTooltip';
@@ -1720,11 +1721,13 @@ export function OfficialPublisher() {
                     </div>
                     <label className='field'>
                       <span>{publisherCopy.sections.prompt.systemLabel}</span>
-                      <textarea
+                      <OInputAI
+                        as='textarea'
                         value={form.promptSystem}
-                        onChange={event =>
-                          updateField('promptSystem', event.target.value)
+                        onValueChange={value =>
+                          updateField('promptSystem', value)
                         }
+                        polishMode='official_system_prompt'
                         rows={4}
                         placeholder={
                           publisherCopy.sections.prompt.systemPlaceholder
@@ -1739,11 +1742,13 @@ export function OfficialPublisher() {
                     </label>
                     <label className='field'>
                       <span>{publisherCopy.sections.prompt.contentLabel}</span>
-                      <textarea
+                      <OInputAI
+                        as='textarea'
                         value={form.promptContent}
-                        onChange={event =>
-                          updateField('promptContent', event.target.value)
+                        onValueChange={value =>
+                          updateField('promptContent', value)
                         }
+                        polishMode='official_content_prompt'
                         rows={5}
                         placeholder={
                           publisherCopy.sections.prompt.contentPlaceholder
@@ -1775,11 +1780,11 @@ export function OfficialPublisher() {
                     </div>
                     <label className='field'>
                       <span>{publisherCopy.sections.images.coverLabel}</span>
-                      <input
+                      <OInputAI
                         value={form.imageCover.value}
-                        onChange={event =>
-                          updateCoverImageValue(event.target.value)
-                        }
+                        onValueChange={updateCoverImageValue}
+                        polishMode='official_image_prompt'
+                        disabledPolish={form.imageCover.type !== 'ai'}
                         placeholder={
                           form.imageCover.type === 'ai'
                             ? publisherCopy.sections.images.coverAiPlaceholder
@@ -1843,13 +1848,15 @@ export function OfficialPublisher() {
                             <span>
                               {publisherCopy.sections.images.imageValueLabel}
                             </span>
-                            <input
+                            <OInputAI
                               value={item.value}
-                              onChange={event =>
+                              onValueChange={value =>
                                 updateInlineImage(index, {
-                                  value: event.target.value,
+                                  value,
                                 })
                               }
+                              polishMode='official_image_prompt'
+                              disabledPolish={item.type !== 'ai'}
                               placeholder={
                                 item.type === 'ai'
                                   ? publisherCopy.sections.images

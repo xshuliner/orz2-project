@@ -18,5 +18,9 @@
 }
 
 .button.o-button--no-hover-translate:hover {
+  transform: var(--o-button-transform, none);
+}
+
+.button.o-button--no-hover-translate:hover svg {
   transform: none;
 }
