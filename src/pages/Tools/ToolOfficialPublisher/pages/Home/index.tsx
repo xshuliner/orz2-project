@@ -113,7 +113,7 @@ interface PublishStep {
 
 type PublisherCopy = ReturnType<typeof useI18n>['messages']['publisher'];
 
-const storageKey = 'orz2:wechat-auto-publisher-form';
+const storageKey = 'orz2:official-publisher-form';
 const wechatConsoleUrl = 'https://developers.weixin.qq.com/console/index';
 const wechatDraftBoxUrl =
   'https://mp.weixin.qq.com/cgi-bin/appmsg?t=media/appmsg_list&action=list&begin=0&count=10&type=10&lang=zh_CN';
@@ -1494,15 +1494,11 @@ export function OfficialPublisher() {
     <>
       <Seo config={localizedToolSeo['official-publisher']} />
       <section className='tool-form-page'>
-        <Link className='back-link interactive' to={localizePath('/tools')}>
-          <ArrowLeft size={16} aria-hidden='true' />
-          {publisherCopy.backLabel}
-        </Link>
-        <div className='tool-form-hero'>
-          <div>
-            <h1>{publisherTool?.name ?? publisherCopy.fallbackName}</h1>
-            <p>{publisherTool?.summary ?? publisherCopy.fallbackSummary}</p>
-          </div>
+        <div className='tool-form-topbar'>
+          <Link className='back-link interactive' to={localizePath('/tools')}>
+            <ArrowLeft size={16} aria-hidden='true' />
+            {publisherCopy.backLabel}
+          </Link>
           <div
             className='json-actions'
             aria-label={publisherCopy.jsonActionsAriaLabel}
@@ -1528,6 +1524,12 @@ export function OfficialPublisher() {
             />
           </div>
         </div>
+        <header className='tool-form-hero'>
+          <div className='tool-form-hero-copy'>
+            <h1>{publisherTool?.name ?? publisherCopy.fallbackName}</h1>
+            <p>{publisherTool?.summary ?? publisherCopy.fallbackSummary}</p>
+          </div>
+        </header>
 
         <OCard
           as='section'
@@ -1576,9 +1578,8 @@ export function OfficialPublisher() {
         <form className='publisher-form' onSubmit={handleGenerate}>
           <OCard
             as='section'
-            accentBar
             className='form-panel publisher-mode-card'
-            padding='lg'
+            padding='md'
           >
             <div className='form-panel-heading'>
               <span className='panel-icon'>
@@ -1632,7 +1633,7 @@ export function OfficialPublisher() {
           ) : null}
           <div className='publisher-workspace'>
             <div className='publisher-main'>
-              <OCard as='section' accentBar className='form-panel' padding='lg'>
+              <OCard as='section' className='form-panel' padding='md'>
                 <div className='form-panel-heading'>
                   <span className='panel-icon'>
                     <KeyRound size={19} aria-hidden='true' />
@@ -1688,12 +1689,7 @@ export function OfficialPublisher() {
 
               {form.publishMode === 'create' ? (
                 <>
-                  <OCard
-                    as='section'
-                    accentBar
-                    className='form-panel'
-                    padding='lg'
-                  >
+                  <OCard as='section' className='form-panel' padding='md'>
                     <div className='form-panel-heading'>
                       <span className='panel-icon'>
                         <Sparkles size={19} aria-hidden='true' />
@@ -1763,12 +1759,7 @@ export function OfficialPublisher() {
                     </label>
                   </OCard>
 
-                  <OCard
-                    as='section'
-                    accentBar
-                    className='form-panel'
-                    padding='lg'
-                  >
+                  <OCard as='section' className='form-panel' padding='md'>
                     <div className='form-panel-heading'>
                       <span className='panel-icon'>
                         <Image size={19} aria-hidden='true' />
@@ -1883,12 +1874,7 @@ export function OfficialPublisher() {
                     </div>
                   </OCard>
 
-                  <OCard
-                    as='section'
-                    accentBar
-                    className='form-panel'
-                    padding='lg'
-                  >
+                  <OCard as='section' className='form-panel' padding='md'>
                     <div className='form-panel-heading'>
                       <span className='panel-icon'>
                         <Newspaper size={19} aria-hidden='true' />
@@ -1962,9 +1948,8 @@ export function OfficialPublisher() {
               ) : (
                 <OCard
                   as='section'
-                  accentBar
                   className='form-panel rewrite-panel'
-                  padding='lg'
+                  padding='md'
                 >
                   <div className='form-panel-heading'>
                     <span className='panel-icon'>
@@ -2016,60 +2001,49 @@ export function OfficialPublisher() {
               aria-label={publisherCopy.aside.summaryAriaLabel}
               ref={publisherAsideRef}
             >
-              {publishPhase !== 'idle' ? (
-                <PublisherProgressPanel
-                  copy={publisherCopy}
-                  elapsedMs={publishElapsedMs}
-                  phase={publishPhase}
-                  steps={publishSteps}
-                />
-              ) : null}
-
-              <OCard
-                as='section'
-                className='publish-summary-card publish-readiness-card'
-                aria-label={publisherCopy.aside.progressAriaLabel}
-                padding='md'
-              >
-                <div className='publish-readiness-head'>
-                  <div className='summary-heading'>
-                    <CheckCircle2 size={18} aria-hidden='true' />
-                    <h2>{publisherCopy.aside.progressTitle}</h2>
-                  </div>
-                  <strong>
-                    {completedCount}
-                    <small>/{completionItems.length}</small>
-                  </strong>
-                </div>
-                <div className='publish-readiness-meter' aria-hidden='true'>
-                  <span
-                    style={{
-                      width: `${(completedCount / completionItems.length) * 100}%`,
-                    }}
-                  />
-                </div>
-                <div className='summary-checks'>
-                  {completionItems.map(item => (
-                    <div
-                      className={
-                        item.done ? 'summary-check done' : 'summary-check'
-                      }
-                      key={item.label}
-                    >
-                      <CheckCircle2 size={17} aria-hidden='true' />
-                      <span>{item.label}</span>
-                    </div>
-                  ))}
-                </div>
-              </OCard>
-
               <OCard
                 as='section'
                 className='publisher-action-dock'
                 aria-label={publisherCopy.aside.actionAriaLabel}
-                padding='sm'
+                padding='md'
                 tone='soft'
               >
+                <div
+                  className='publish-readiness-card'
+                  aria-label={publisherCopy.aside.progressAriaLabel}
+                >
+                  <div className='publish-readiness-head'>
+                    <div className='summary-heading'>
+                      <CheckCircle2 size={18} aria-hidden='true' />
+                      <h2>{publisherCopy.aside.progressTitle}</h2>
+                    </div>
+                    <strong>
+                      {completedCount}
+                      <small>/{completionItems.length}</small>
+                    </strong>
+                  </div>
+                  <div className='publish-readiness-meter' aria-hidden='true'>
+                    <span
+                      style={{
+                        width: `${(completedCount / completionItems.length) * 100}%`,
+                      }}
+                    />
+                  </div>
+                  <div className='summary-checks'>
+                    {completionItems.map(item => (
+                      <div
+                        className={
+                          item.done ? 'summary-check done' : 'summary-check'
+                        }
+                        key={item.label}
+                      >
+                        <CheckCircle2 size={17} aria-hidden='true' />
+                        <span>{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 <div className='publisher-status-line' aria-live='polite'>
                   {isGenerating ? (
                     <Loader2 className='spin' size={18} aria-hidden='true' />
@@ -2117,6 +2091,15 @@ export function OfficialPublisher() {
                   </OButton>
                 </div>
               </OCard>
+
+              {publishPhase !== 'idle' ? (
+                <PublisherProgressPanel
+                  copy={publisherCopy}
+                  elapsedMs={publishElapsedMs}
+                  phase={publishPhase}
+                  steps={publishSteps}
+                />
+              ) : null}
             </aside>
           </div>
 
