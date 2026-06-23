@@ -1,170 +1,433 @@
 # AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance for coding agents working in this repository.
 
 ## Commands
 
+This project is pinned to `pnpm@10.34.3` in `package.json`. Prefer `pnpm`
+commands when installing or running scripts.
+
 ```bash
-npm run dev              # Vite dev server on 0.0.0.0 (default port 5173)
-npm run start:local      # Dev mode using .env.dev
-npm run start:uat        # Dev mode using .env.uat
-npm run start:prod       # Dev mode using .env.prod
-npm run build            # Clean → generate sitemap → tsc -b → vite build (default mode)
-npm run build:local      # Build with .env.dev (sitemap generated for dev)
-npm run build:uat        # Build with .env.uat
-npm run build:prod       # Build with .env.prod
-npm run preview          # Preview the production build
-npm run test:e2e         # Playwright E2E tests (dev server auto-starts)
-npm run generate:sitemap # Regenerate public/sitemap.xml from products/tools
-npm run lint             # ESLint --fix on src
-npm run format           # ESLint --fix + Prettier write on src
+pnpm run dev              # Vite dev server on 0.0.0.0, default port 5173
+pnpm run start:local      # Dev server using .env.dev
+pnpm run start:uat        # Dev server using .env.uat
+pnpm run start:prod       # Dev server using .env.prod
+pnpm run clean            # Remove dist/
+pnpm run generate:sitemap # Regenerate public/sitemap.xml from static pages + internal tool entries
+pnpm run build            # clean -> sitemap(prod) -> xbi generate -> tsc -b -> vite build
+pnpm run build:local      # Build with .env.dev and local build-info metadata
+pnpm run build:uat        # Build with .env.uat, base /uat/, deploy URL https://orz2.online/uat
+pnpm run build:prod       # Build with .env.prod, deploy URL https://orz2.online
+pnpm run preview          # Preview the production build
+pnpm run test:e2e         # Playwright smoke tests; webServer starts the dev server
+pnpm run lint             # ESLint --fix on src
+pnpm run format           # ESLint --fix + Prettier write on src
 ```
 
-## Debugging with the Production Environment
+`playwright.config.ts` currently uses `http://localhost:5173` and starts
+`npm run dev -- --port 5173` as its web server command, so keep that config in
+sync if the dev command changes.
 
-当需要排查线上问题、复现仅在 `prod` 环境出现的行为（API 域名、鉴权、CDN、第三方脚本等）时，不要直接改代码或重新 `build`，而是用 dev server 加载 `.env.prod`：
+## Debugging With The Production Environment
+
+当需要排查线上问题、复现仅在 `prod`
+环境出现的行为（API 域名、鉴权、CDN、第三方脚本等）时，优先用 dev server 加载
+`.env.prod`，不要先改代码或重新打完整包：
 
 ```bash
-npm run start:prod       # 走 .env.prod 的环境变量，但由 Vite dev server 提供热更新
+pnpm run start:prod
 ```
 
 要点：
 
-- `start:prod` 复用 `npm run dev` 的 Vite dev server，**不**会生成 `dist/`，也不需要 `build:prod`，省去一次完整打包。
-- 调试完切回常规开发请改用 `npm run dev`（默认 mode），避免误把 prod 配置带进日常迭代。
-- 真正需要验证构建产物（资源路径、压缩、SRI、CDN 缓存策略）时再跑 `npm run build:prod && npm run preview`，而不是 `start:prod`。
-- 切换环境时如遇 `.env.*` 变更未生效，先停掉 dev server 再重启；Vite 不会在运行期重新加载 `.env.*`。
+- `start:prod` 复用 Vite dev server，加载 `.env.prod`，不会生成 `dist/`。
+- 调试完切回常规开发请改用 `pnpm run dev`，避免把 prod 配置带入日常迭代。
+- 只有需要验证构建产物、资源路径、压缩、base
+  path、build-info 或 CDN 行为时，才运行
+  `pnpm run build:prod && pnpm run preview`。
+- `.env.*` 变更后需要重启 dev server；Vite 不会在运行中重新加载 env 文件。
 
 ## Architecture
 
-This is **ORZ2** — a commercial online-tools platform built with **React 18 + Vite 6 + TypeScript**. It serves as both a tools directory and a customizable product showcase. The site is purely static (no backend), with all content driven by JSON data files plus per-locale dictionaries.
+**ORZ2** is a commercial online-tools and product-showcase frontend built with
+**React 18 + Vite 6 + TypeScript**. The repository ships a static frontend;
+there is no in-repo backend. Runtime features such as login, Silicon member
+data, content polishing, WeChat publishing, and TinyPNG compression call remote
+ORZ2 APIs from `src/api/orz2.ts`.
 
 ### Stack
 
 - **React 18** + **Vite 6** + **TypeScript 5.7**
-- **react-router-dom v6** with the v7 future flags (`v7_relativeSplatPath`, `v7_startTransition`)
-- **GSAP 3** + **ScrollTrigger** + **@gsap/react** for scroll, intro, and hover animations
-- **react-helmet-async** for per-page SEO (Open Graph, Twitter, JSON-LD)
-- **Tailwind CSS v4** via `@tailwindcss/vite` (no `tailwind.config.js`; tokens live in `@theme` inside `src/styles/theme.css`)
+- **react-router-dom v6** with future flags `v7_relativeSplatPath` and
+  `v7_startTransition`
+- **Tailwind CSS v4** via `@tailwindcss/vite`; tokens live in
+  `src/styles/theme.css`, not in `tailwind.config.js`
+- **GSAP 3** + `ScrollTrigger` for reveal, header, tilt, and Silicon page motion
+- **react-helmet-async** for SEO, canonical/alternate links, and JSON-LD
 - **lucide-react** for icons
-- **axios** + **dayjs** + **blueimp-md5** + **qrcode.react** + **uuid** for the WeChat publisher / auth flow
-- **Playwright** for E2E tests
-- Path alias `@/*` → `src/*`
+- **axios**, `FetchManager`, **blueimp-md5**, **uuid**, **dayjs**,
+  **qrcode.react**, and **jszip** for APIs, signed requests, QR codes, date
+  display, and image ZIP export
+- **@xshuliner/build-info** (`xbi generate`) for static deployment metadata
+- **Playwright** for E2E smoke tests
+- Path alias `@/*` -> `src/*`
 
-### Entry & Providers (`src/main.tsx`)
+### Entry & Providers
 
-`main.tsx` wraps the app in `ThemeProvider` → `HelmetProvider` → `BrowserRouter` → `I18nProvider` → `AuthProvider` → `App`. The first paint is optimized by an inline script in `index.html` that reads `orz2:theme-preference` from `localStorage` and applies `data-theme` before React boots, preventing a flash of incorrect theme.
+`src/main.tsx` wraps the app in:
 
-### Routing (`src/routes/index.tsx`)
+`ThemeProvider` -> `HelmetProvider` -> `BrowserRouter` -> `I18nProvider` ->
+`AuthProvider` -> `App`
 
-Routes are constructed in three locale branches (`/`, `/en`, `/ja`) plus a catch-all `:locale/*` redirect that strips unknown locale prefixes. Inside each branch, `LayoutApp` hosts the children:
+`BrowserRouter` derives its basename from `import.meta.env.BASE_URL`, which is
+`/uat/` for UAT builds and `/` otherwise. `index.html` contains a first-paint
+theme script that reads `orz2:theme-preference`, applies `data-theme`, updates
+`color-scheme`, and loads `%BASE_URL%__xshuliner__/build-info.js` before React
+boots.
 
-- `/` — `PageHome` (hero rotator, tools, products, testimonials, contact)
-- `/products` — `PageProducts` index, plus `ProductSilicon` sub-routes (`/products/silicon`)
-- `/tools` — `PageTools` index, plus `ToolOfficialPublisher` sub-routes (`/tools/official-publisher`)
-- `/team` — `PageTeam`
-- `/privacy` — `PagePrivacy`
-- `/design-system` — `PageDesignSystem` (internal component gallery)
+`src/App.tsx` mounts `EffectsMotion` once, then renders `useRoutes(routes)` in a
+`Suspense` boundary.
 
-All non-home pages are lazy-loaded with `React.lazy` and rendered through `useRoutes` in `App.tsx`, which also mounts the `EffectsMotion` listener once. `I18nProvider` syncs `<html lang>` and writes the active locale to `localStorage` whenever the URL prefix changes.
+### Routing
 
-### Data Layer (`src/config/` + `src/i18n/catalog.ts`)
+Routes are built in `src/routes/index.tsx` for three locale branches:
 
-Static content lives under `src/config/`:
+| Locale  | Prefix | Notes          |
+| ------- | ------ | -------------- |
+| `zh-CN` | none   | default locale |
+| `en`    | `/en`  | English        |
+| `ja`    | `/ja`  | Japanese       |
 
-- `index.ts` — exports `siteConfig` (contact email, etc.)
-- `products.json` / `tools.json` — arrays of `CatalogItem` (the unified model for both products and tools; originally split from `tools.json` to introduce `products.json`)
-- `site.ts` — `heroMedia`, `testimonials`, `teamMembers`, `toolCategories`, `productGroups`, `toolGroups`, and Chinese-only site copy (`homeSections`, `footerCopy`, `loginCopy`, `headerCopy`, `pageTitles`)
-- `seo.ts` — per-locale page SEO configs and per-tool SEO configs with JSON-LD
-- `catalog-stages.ts` — the `LIVE` / `BETA` / `PLANNING` enum is stored upper-case in JSON; this file owns the rendered label/tone and the `catalog-card-stage--{tone}` class names
+Unknown locale-like prefixes are handled by the `:locale/*` catch-all redirect,
+which strips the first path segment.
 
-Catalog content is **localized** in `src/i18n/catalog.ts`: it exports `getTools(locale)` and `getProducts(locale)`, applying `groupTranslations` (en/ja) plus per-item translations (name, summary, badges, entries, SEO). Use these accessors in components — do not read `tools.json` / `products.json` directly through `@/config` in render code.
+Inside each locale branch, `LayoutApp` renders `OHeader`, `<Outlet />`, and
+`OFooter`, and forces scroll-to-top on route/search changes.
 
-All shared types live in `src/types.ts` (`CatalogItem`, `CatalogGroup`, `CatalogStage`, `CatalogPlatform`, `CatalogMedia`, `CatalogEntry`, `HeroMedia`, `TeamMember`, `Testimonial`, `SeoConfig`).
+Current app routes:
 
-### i18n (`src/i18n/`)
+- `/` -> `PageHome`
+- `/products` -> `PageProducts`
+- `/products/silicon` -> Silicon product home inside `ProductSiliconFrame`
+- `/products/silicon/member-list` -> Silicon member list
+- `/products/silicon/member-detail` -> Silicon member detail
+- `/tools` -> `PageTools`
+- `/tools/official-publisher` -> WeChat official-account publisher
+- `/tools/smart-image-compressor` -> batch image studio / compressor
+- `/team` -> `PageTeam`
+- `/privacy` -> `PagePrivacy`
+- `/design-system` -> internal component gallery
+- `/build-info` -> deployment build metadata viewer, `robots: noindex, follow`
 
-A custom lightweight i18n setup (no `react-intl`/`i18next`) with three locales:
+All non-home page modules and product/tool sub-routes are lazy-loaded.
+
+### Data Layer
+
+Static catalog and site data live in `src/config/`:
+
+- `index.ts` exports `siteConfig` such as `contactEmail`.
+- `products.json` and `tools.json` store the source `CatalogItem[]`.
+- `site.ts` exports Chinese base copy and static collections such as hero media,
+  testimonials, team members, section copy, footer copy, login copy, and header
+  copy.
+- `seo.ts` builds per-locale page SEO and per-tool SEO from `getMessages()`,
+  `getProducts()`, and `getTools()`.
+- `catalog-stages.ts` owns the `LIVE` / `BETA` / `PLANNING` display metadata and
+  `catalog-card-stage--{tone}` class names.
+
+Render code should consume localized catalog accessors from
+`src/i18n/catalog.ts`:
+
+- `getTools(locale)`
+- `getProducts(locale)`
+- `getToolGroups(locale)`
+- `getProductGroups(locale)`
+- `getToolCategories(locale, allLabel)`
+- `getHeroMedia(locale)`
+- `getTestimonials(locale)`
+- `getTeamMembers(locale)`
+
+Do not read `tools.json` or `products.json` directly from UI components unless
+you are intentionally bypassing localization.
+
+Shared catalog and SEO types live in `src/types.ts`, including
+`CatalogLifecycle`, `CatalogIconName`, `CatalogPlatform`, `CatalogMedia`,
+`CatalogEntry`, `CatalogItem`, `CatalogGroup`, `HeroMedia`, `TeamMember`,
+`Testimonial`, and `SeoConfig`. Build-info types live in
+`src/types/buildInfo.ts`.
+
+### Catalog Behavior
+
+`OCardCatalog` renders tool/product cards, lifecycle stage, platform chips,
+badges, primary links, QR codes for H5/internal links, and WeChat sun-code
+images. When `catalogType` is provided, opening a primary link or QR tooltip
+records recent usage through `recordCatalogRecentUsage()`.
+
+Recent usage is stored through `CacheManager` under `orz2:catalog-recent-usage`
+and surfaced by:
+
+- `src/hooks/useCatalogRecentUsage.ts`
+- `src/utils/catalogRecentUsage.ts`
+- `SectionCatalogRecent`
+
+`SectionTools` and `SectionProducts` use URL search params `q` and `category` on
+full listing pages. Their compact homepage mode merges recent items ahead of
+items marked `compact: true`.
+
+### i18n
+
+The project uses a lightweight custom i18n layer, not `react-intl` or `i18next`.
 
 | Locale  | URL prefix | `<html lang>` | OpenGraph |
 | ------- | ---------- | ------------- | --------- |
-| zh-CN   | (none)     | `zh-CN`       | `zh_CN`   |
-| en      | `/en`      | `en`          | `en_US`   |
-| ja      | `/ja`      | `ja`          | `ja_JP`   |
+| `zh-CN` | none       | `zh-CN`       | `zh_CN`   |
+| `en`    | `/en`      | `en`          | `en_US`   |
+| `ja`    | `/ja`      | `ja`          | `ja_JP`   |
 
-- `locales/{zh-CN,en,ja}.ts` export `messages` objects shaped as `messages.{pageTitles,header,footer,home,login,seo,catalogStages,...}`. Each locale is roughly 25–32 KB; add a new key to all three files when extending.
-- `index.tsx` exposes the `I18nProvider`, the `useI18n()` hook (`locale`, `localeName`, `locales`, `messages`, `localizePath`, `switchLocale`), and helpers: `parseLocalizedPath`, `stripLocalePrefix`, `localizePath`, `switchLocaleInPath`, `isPrefixedLocalePath`, `isInvalidLocaleLikePrefix`.
-- The persisted key is `orz2:locale` (set on every locale change).
-- Components render text via `const { messages } = useI18n(); messages.foo.bar` — do not hard-code English or Chinese strings inside components.
+`src/i18n/locales/{zh-CN,en,ja}.ts` export `messages`. Add new user-visible
+message keys to all three locale files. Components should render copy through
+`const { messages } = useI18n()` and should not hard-code Chinese, English, or
+Japanese strings in shared UI.
 
-### Theme (`src/theme/index.tsx`)
+`src/i18n/index.tsx` exposes `I18nProvider`, `useI18n()`, route localization
+helpers, locale metadata, and `routeUrl()`. `I18nProvider` syncs
+`document.documentElement.lang` and persists the active locale to `orz2:locale`.
 
-A `ThemeProvider` with three user preferences: `system` (default), `light`, `dark`. It writes `document.documentElement.dataset.theme`, sets `color-scheme`, updates `<meta name="theme-color">`, persists to `orz2:theme-preference` in `localStorage`, and listens to `prefers-color-scheme` changes when preference is `system`. The hook `useTheme()` returns `{ preference, resolvedTheme, setPreference, cycleTheme }`. Tokens are defined in `src/styles/theme.css` under `@theme` for light defaults, with overrides under `[data-theme="dark"]` in the same file.
+Use `localizePath()` or components that call it internally (`OButton` with `to`)
+for internal links. Use `routeUrl()` / `toSiteUrl()` for absolute canonical,
+alternate, and QR URLs.
 
-### Auth System (`src/components/ContextAuth/`)
+### Theme & Styling
 
-Mock authentication using React Context + `localStorage`. `useAuth()` exposes `isAuthenticated`, `user`, `login()`, `logout()`, `withLoginRequired` (higher-order gate that opens the login modal before running a gated action), and `openLogin()` (manual trigger used by Header). The WeChat publisher page uses `useLoginGate()` to wrap the "generate" button. Login copy lives in `site.ts` (`loginCopy`); the modal renders a `qrcode.react` "太阳码" with auto-refresh on expiry, and now uses a `third` channel identifier for the mini-program scan flow.
+`ThemeProvider` supports `system`, `light`, and `dark`. It persists
+`orz2:theme-preference`, writes `document.documentElement.dataset.theme`, sets
+`color-scheme`, updates `<meta name="theme-color">`, and listens to
+`prefers-color-scheme` changes while in `system` mode.
 
-### Design System (`src/components/O*/`)
+CSS entry order is `src/styles/tailwind.css` -> `theme.css` -> `common.css`.
 
-The `O*` family is the project's own design system. New UI should reach for these first; only drop down to raw elements when nothing fits.
+Important styling conventions:
 
-- `OButton` — primary/secondary/ghost variants
-- `OIconButton` — square icon-only button used in Header (locale/theme menus, mobile nav)
-- `OBadge` — small label / status pill
-- `OCard` — base card surface
-- `OCardCatalog` — the catalog card used by tools & products, renders lifecycle stage + entries
-- `OEmptyState` — empty list placeholder
-- `OModal` — generic modal/dialog primitive
-- `OPageHero` — page-level hero with title/description/actions
-- `ORadio` — radio group (used by Header for theme preference)
-- `OSectionHeading` — section title + subtitle
-- `OSelector` — segmented selector (used for category filters)
-- `OTab` — tab control
-- `OTooltip` — accessible tooltip (used in publisher config hints)
+- Tailwind v4 tokens live in `@theme` inside `src/styles/theme.css`.
+- CSS custom properties for layout, spacing, text, controls, surfaces, shadows,
+  z-index, and product-specific theme overrides also live in `theme.css`.
+- Shared base styles and `.interactive` focus/hover behavior live in
+  `src/styles/common.css`.
+- Component-local CSS lives beside the component as `index.css`.
+- Use the UI/UX reference at `docs/UI_UX_GUIDELINES.md` when adding new screens.
+- `ProductSilicon` has an independent product theme via `.product-silicon-theme`
+  and `.product-silicon-active`; do not flatten it into global ORZ2 styling.
 
-### Other Key Components
+### Design System
 
-- **`EffectsMotion`** (`src/components/EffectsMotion/`) — renderless, mounted once in `App`. Registers header shrink-on-scroll, intro reveals, scroll-triggered batch reveals, card tilt on pointer move, and a `MutationObserver` that re-applies reveals when the DOM changes. Respects `prefers-reduced-motion`.
-- **`Seo`** (`src/components/Seo/`) — sets `<title>`, meta tags, canonical link, and JSON-LD via `react-helmet-async` plus direct DOM mutations for dynamic updates.
-- **`SectionProducts` / `SectionTools`** — replaced the old single `SectionProduct`. Both consume `getProducts` / `getTools` and drive search + group filter via URL search params; the homepage renders them in "compact" mode showing 3 items.
-- **`SectionHero`** — crossfading video/poster layers with random rotation, reduced-motion fallback, and a no-op stub when video fails. Replaces the older `SectionHeroVideo`.
-- **`SectionTestimonial`** — danmaku-style floating testimonials using GSAP timelines with balanced top/bottom distribution.
-- **`LayoutApp`** — Header + `<Outlet />` + Footer. Also handles scroll-to-top on route change.
+The `O*` component family is the house design system. New UI should use these
+first:
+
+- `OButton` -> button, router link, or anchor; internal `to` values are
+  localized
+- `OIconButton` -> square icon-only actions
+- `OBadge` -> small labels and status pills
+- `OCard` -> semantic surfaces with `tone`, `padding`, and optional
+  `interactive`
+- `OCardCatalog` -> catalog card for products and tools
+- `OEmptyState` -> empty lists
+- `OInputAI` -> input/textarea with AI polish/restore action via
+  `postPolishContent`
+- `OModal` -> portal dialog with Escape/backdrop close and focus restoration
+- `OPageHero` -> page-level title/description/action layout
+- `ORadio` -> segmented radio controls
+- `OSectionHeading` -> section title + subtitle
+- `OSelector` -> segmented selector
+- `OTab` -> tab controls
+- `OTooltip` -> accessible hover/click tooltip
+
+`OHeader` and `OFooter` are also `O*` components. The older `Header`/`Footer`
+names are not current.
+
+### Key Components
+
+- `EffectsMotion` lazy-loads `DeferredEffectsMotion` after idle/timeout. The
+  deferred module handles header shrink-on-scroll, intro animation, scroll
+  reveals, dynamic `MutationObserver` reveal registration, and pointer tilt for
+  interactive cards. It respects `prefers-reduced-motion`.
+- `Seo` sets title, description, robots, canonical, alternate locale links,
+  OpenGraph/Twitter tags, and JSON-LD through `react-helmet-async`, with direct
+  DOM meta updates for dynamic changes.
+- `SectionHero` renders localized hero copy and a crossfading remote
+  video/poster rotator with reduced-motion fallback and delayed video loading.
+- `SectionTools` / `SectionProducts` render catalog directories, filters, recent
+  usage, grouped cards, and homepage compact variants.
+- `SectionTestimonial` is lazy-loaded from the homepage when near viewport.
+- `SectionContact` still exists, but the current homepage does not mount it
+  directly; contact actions are in `SectionHero`, `OFooter`, and privacy copy.
+
+### Auth System
+
+`src/components/ContextAuth/` provides React auth context and the shared login
+modal. It is localStorage-backed, but not purely mock:
+
+- Auth user cache: `orz2:auth-user`
+- Token keys: `token`, `refreshToken`
+- Login opens a QR-code modal, calls `postCreateMiniCodeLogin()`, polls
+  `getQueryMiniCodeLogin({ uuid })`, then fetches `getQueryMemberInfo()`.
+- `useAuth()` exposes `user`, `isAuthenticated`, `openLogin`, `closeLogin`,
+  `logout`, and `withLoginRequired`.
+- `useLoginGate()` returns `withLoginRequired` and is used by protected actions
+  such as official-publisher generation.
+
+`CacheManager` prefixes stored business keys with `CACHE_`; remember that
+browser storage keys may not match the raw key string exactly.
+
+### API Surface
+
+`src/api/index.ts` re-exports the default `Orz2` namespace, named API functions,
+and shared types from `orz2.modal.ts`.
+
+`src/api/orz2.ts` contains:
+
+- Mini-code login and member info APIs through `FetchManager`
+- Silicon APIs: summary, member list/detail, story list, member login
+- Tool APIs: `postTinifyImage`
+- LLM polish API: `postPolishContent`
+- Official publisher APIs: `postOfficialPublisher` and
+  `streamPostOfficialPublisher`
+
+`FetchManager` signs requests with `requestid`, `t`, and `k`, reads `token` from
+`CacheManager`, and resolves its base URL from `VITE_API_BASE_URL` or fallback
+env mappings.
+
+Current env files:
+
+- `.env.dev` -> local API at `http://localhost:9002/apilocal/smart/v1`
+- `.env.uat` -> `https://orz2.online/apiuat/smart/v1`, site `/uat`
+- `.env.prod` -> `https://orz2.online/api/smart/v1`
+
+### Product: Silicon
+
+`src/pages/Products/ProductSilicon/` is a product microsite under
+`/products/silicon`. It uses `ProductSiliconFrame`, independent visual theme
+tokens, custom GSAP motion, and hides the global `.site-header` on the Silicon
+home page.
+
+Key pieces:
+
+- Home: member summary, nickname generation, "descend" flow, story feed polling,
+  and skill-copy CTA
+- Member list: paginated/infinite list with `IntersectionObserver`
+- Member detail: token/id lookup, story and profile display
+- Local member token key: `orz2_silicon_member_token`
+- Public skill package: `public/skills/orz2-skill/`
+
+### Tool: Official Publisher
+
+`src/pages/Tools/ToolOfficialPublisher/` powers `/tools/official-publisher`.
+
+Key behaviors:
+
+- Form state persists to `orz2:official-publisher-form`
+- Supports create and rewrite modes
+- Prompt template autofill lives in `config/index.ts`
+- `OInputAI` can polish prompts and image descriptions through
+  `postPolishContent`
+- JSON import/export round-trips the full config
+- `normalizeForm()` sanitizes load/import data and handles old localStorage
+  shapes
+- Completion progress is computed from required sections
+- Generation is login-gated and streams progress through
+  `streamPostOfficialPublisher()`
+
+### Tool: Image Studio
+
+`src/pages/Tools/ToolImageStudio/` powers `/tools/smart-image-compressor`.
+
+Key behaviors:
+
+- Multi-image upload with drag/drop and previews
+- Browser-side canvas resize and format conversion for PNG/JPEG/WebP
+- Optional TinyPNG compression via `postTinifyImage`
+- AVIF input support with browser fallback output handling
+- Base64 image import/copy helpers in `ImageToolParts`
+- Batch processing with per-item status and ZIP download through `jszip`
+
+### Build Info
+
+Build scripts run `xbi generate` before TypeScript/Vite builds. Generated files
+are served from:
+
+- `public/__xshuliner__/build-info.js`
+- `public/__xshuliner__/build-info.json`
+
+`index.html` loads the JS file, `useBuildInfo()` falls back to fetching the
+JSON, `OFooter` shows the current version/commit when available, and
+`/build-info` renders the full metadata plus latest commits.
+
+When build info is missing in dev, the page should degrade gracefully. Do not
+hand-edit generated build-info files unless you are intentionally updating test
+fixtures or static generated output.
+
+### SEO & Sitemap
+
+`src/config/seo.ts` is the source for page SEO and tool SEO. Use localized
+messages and catalog accessors when adding routes.
+
+`scripts/generate-sitemap.mjs` writes `public/sitemap.xml`. It includes:
+
+- Static pages: `/`, `/products`, `/tools`, `/team`, `/privacy`,
+  `/design-system`
+- Internal primary tool entries from `tools.json`
+- All three locales plus `x-default` alternates
+
+It does not currently include product detail routes or `/build-info`.
+
+### Tests
+
+Playwright tests live in `tests/smoke.spec.ts`. Current coverage checks:
+
+- Public route rendering
+- Login modal open/Escape close
+- Locale switching and localized navigation
+- Theme system/manual dark behavior and persistence
+- Canonical and alternate SEO links
+- Design-system modal close behavior
+- Silicon page independent theme/header behavior
+
+Run `pnpm run test:e2e` after changes that affect routes, layout, SEO, theme,
+auth modal behavior, or public page rendering.
 
 ### Naming Convention
 
-Components and pages use **noun-first PascalCase** and live in folders with `index.tsx` (and `index.css` for local styles):
+Components and pages use noun-first PascalCase and folder-based modules:
 
-- Pages: `PageHome`, `PageProducts`, `PageTeam`, `PagePrivacy`, `PageTools`, `PageDesignSystem`, plus `Products/ProductSilicon` and `Tools/ToolOfficialPublisher` for sub-products
-- Components: `LayoutApp`, `ContextAuth`, `Seo`, `SectionContact`, `Footer`, `Header`, `SectionHero`, `SectionProducts`, `SectionTools`, `SectionTestimonial`, `EffectsMotion`
-- Design system: every component in `O*` folders
+- Pages: `PageHome`, `PageProducts`, `PageTools`, `PageTeam`, `PagePrivacy`,
+  `PageDesignSystem`, `PageBuildInfo`
+- Product/tool modules: `Products/ProductSilicon`,
+  `Tools/ToolOfficialPublisher`, `Tools/ToolImageStudio`
+- Shared components: `LayoutApp`, `ContextAuth`, `Seo`, `EffectsMotion`,
+  `SectionHero`, `SectionTools`, `SectionProducts`, `SectionCatalogRecent`,
+  `SectionTestimonial`, `SectionContact`
+- Design system and shell components: `O*`, including `OHeader` and `OFooter`
 
-### WeChat Publisher (`src/pages/Tools/ToolOfficialPublisher/`)
+### Static Assets & Output
 
-The most complex page — a multi-section form for configuring WeChat article publishing. The previous standalone `PageWechatPublisher` is now mounted at `/tools/official-publisher` as part of the tools section. Key behaviors:
+- `dist/` is production output and should usually be treated as generated.
+- `public/` contains root-served static files such as `robots.txt`, `ads.txt`,
+  `sitemap.xml`, build-info files, and public skill assets.
+- Remote images/videos are mostly served from `https://cos.orz2.online`.
+- `vite.config.ts` sets `base: '/uat/'` only for mode `uat`; all other modes use
+  `/`.
 
-- Form state persisted to `localStorage` under key `orz2:official-publisher-form`
-- JSON import/export of the full form config
-- Completion progress indicator (x/4 sections)
-- Login-gated "generate" action via `withLoginRequired`
-- Form validation with inline error display
-- `normalizeForm()` sanitizes data on load/import
-- Streaming `postOfficialPublisher` / `streamPostOfficialPublisher` from `src/api/orz2.ts` drive progress events
+### Practical Guidelines
 
-### Styling Conventions
-
-- Tailwind v4 with the `@theme` directive in `src/styles/theme.css` — semantic color tokens (`--color-green`, `--color-ink`, `--color-muted`, `--color-soft`, `--color-line`, `--color-panel`, danger/gold, etc.) are defined once and consumed via `bg-green`, `text-ink`, etc.
-- Dark mode overrides are declared in the same file under `[data-theme="dark"]`
-- Component-local tweaks live next to each component in `index.css`
-- `.interactive` class is applied to all clickable elements for consistent transitions and `:focus-visible` styles
-- Responsive breakpoints at 960px, 640px, 480px (defined in `src/styles/common.css`)
-- `prefers-reduced-motion` media query disables all GSAP animations
-
-### API Surface (`src/api/`)
-
-`src/api/index.ts` re-exports everything from `./orz2` and `./orz2.modal`. The `Orz2` namespace is the canonical entry; named functions (`postOfficialPublisher`, `streamPostOfficialPublisher`, etc.) are also exported. Types live alongside in `orz2.modal.ts`. Shared utilities: `CacheManager` (TTL-aware localStorage cache), `FetchManager` (axios wrapper), `motion.ts`, `utils.ts`.
-
-### Build Output & Static Assets
-
-The `dist/` directory is the production output. `public/` holds static assets served at root: `sitemap.xml` (regenerated every build via `scripts/generate-sitemap.mjs` against the current `products.json` / `tools.json`), `robots.txt`, and SVG/PNG guides. Mode-specific builds (`build:dev` / `build:uat` / `build:prod`) pick the matching `.env.*` file and forward the mode flag to the sitemap generator so the generated sitemap matches the deployed host.
+- Prefer `O*` components and existing helpers before adding raw UI.
+- Use `messages` for all shared user-facing text; add keys to all locales.
+- Use `getTools()` / `getProducts()` for rendered catalog data.
+- Use `localizePath()` for internal routes and `toSiteUrl()` / `routeUrl()` for
+  absolute URLs.
+- Keep lifecycle values in JSON as uppercase `LIVE`, `BETA`, or `PLANNING`; do
+  not render those enum values directly.
+- Keep component-local CSS next to the component and reuse global tokens instead
+  of inventing one-off colors or spacing.
+- Be careful with `CacheManager`: it stores namespaced keys and optional expiry
+  metadata.
+- Avoid changing generated `dist/`, `*.tsbuildinfo`, `test-results/`, or
+  build-info artifacts unless the task explicitly calls for generated output.
