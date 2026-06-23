@@ -61,7 +61,7 @@ Routes are constructed in three locale branches (`/`, `/en`, `/ja`) plus a catch
 
 - `/` — `PageHome` (hero rotator, tools, products, testimonials, contact)
 - `/products` — `PageProducts` index, plus `ProductSilicon` sub-routes (`/products/silicon`)
-- `/tools` — `PageTools` index, plus `ToolOfficialPublisher` sub-routes (`/tools/wechat-auto-publisher`)
+- `/tools` — `PageTools` index, plus `ToolOfficialPublisher` sub-routes (`/tools/official-publisher`)
 - `/team` — `PageTeam`
 - `/privacy` — `PagePrivacy`
 - `/design-system` — `PageDesignSystem` (internal component gallery)
@@ -142,9 +142,9 @@ Components and pages use **noun-first PascalCase** and live in folders with `ind
 
 ### WeChat Publisher (`src/pages/Tools/ToolOfficialPublisher/`)
 
-The most complex page — a multi-section form for configuring WeChat article publishing. The previous standalone `PageWechatPublisher` is now mounted at `/tools/wechat-auto-publisher` as part of the tools section. Key behaviors:
+The most complex page — a multi-section form for configuring WeChat article publishing. The previous standalone `PageWechatPublisher` is now mounted at `/tools/official-publisher` as part of the tools section. Key behaviors:
 
-- Form state persisted to `localStorage` under key `orz2:wechat-auto-publisher-form`
+- Form state persisted to `localStorage` under key `orz2:official-publisher-form`
 - JSON import/export of the full form config
 - Completion progress indicator (x/4 sections)
 - Login-gated "generate" action via `withLoginRequired`
