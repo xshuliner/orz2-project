@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       env:
-        description: Deployment environment.
+        description: Deployment environment (prod, uat).
         required: true
         default: prod
         type: choice
@@ -14,14 +14,14 @@ on:
           - prod
           - uat
       bump:
-        description: Version bump before deploy.
+        description: Version bump before deploy (major, feat, fix, none).
         required: false
-        default: patch
+        default: feat
         type: choice
         options:
-          - patch
-          - minor
           - major
+          - feat
+          - fix
           - none
 
 permissions:
