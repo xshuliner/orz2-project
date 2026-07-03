@@ -195,7 +195,7 @@ export const messages = {
     tools: {
       title: 'Online Tools - ORZ2',
       description:
-        'Browse the ORZ2 online tool directory for WeChat publishing, JSON formatting, palette, and image compression tools.',
+        'Browse the ORZ2 online tool directory for WeChat publishing, time zone conversion, JSON formatting, palette, and image compression tools.',
       itemListName: 'ORZ2 online tools',
     },
     team: {
@@ -416,6 +416,152 @@ export const messages = {
       unsupported: 'This image cannot be read. Try PNG, JPEG, WebP, or AVIF.',
       failed: 'Processing failed',
       failedPrefix: 'Processing failed: ',
+    },
+  },
+  timezoneTool: {
+    backToTools: 'Online tools',
+    title: 'Time Zone Converter',
+    description:
+      'Pick common countries, edit either local time, and convert the other side with daylight saving rules applied.',
+    heroAriaLabel: 'Time zone converter capabilities',
+    heroHighlights: [
+      'Common country presets',
+      'Two-way time conversion',
+      'Daylight saving aware',
+    ],
+    leftSide: 'Left side',
+    rightSide: 'Right side',
+    sourceBadge: 'Source',
+    convertedBadge: 'Converted',
+    countryLabel: 'Country / time zone',
+    timeLabel: 'Local time',
+    zoneNameLabel: 'Zone',
+    utcOffsetLabel: 'UTC offset',
+    dstLabel: 'DST',
+    dstActive: 'Daylight saving time',
+    dstInactive: 'Standard time',
+    noDst: 'No daylight saving',
+    swapSides: 'Swap sides',
+    noteTitle: 'About daylight saving time',
+    noteDescription:
+      'Conversion uses the browser built-in IANA time zone database, so no extra dependency is needed. The United States, United Kingdom, Australia, and similar regions switch automatically by date.',
+    zones: {
+      china: {
+        country: 'China',
+        city: 'Shanghai / Beijing Time',
+      },
+      unitedStates: {
+        country: 'United States',
+        city: 'New York / Eastern Time',
+      },
+      unitedKingdom: {
+        country: 'United Kingdom',
+        city: 'London',
+      },
+      japan: {
+        country: 'Japan',
+        city: 'Tokyo',
+      },
+      southKorea: {
+        country: 'South Korea',
+        city: 'Seoul',
+      },
+      singapore: {
+        country: 'Singapore',
+        city: 'Singapore',
+      },
+      india: {
+        country: 'India',
+        city: 'New Delhi',
+      },
+      australia: {
+        country: 'Australia',
+        city: 'Sydney',
+      },
+      germany: {
+        country: 'Germany',
+        city: 'Berlin',
+      },
+      france: {
+        country: 'France',
+        city: 'Paris',
+      },
+      canada: {
+        country: 'Canada',
+        city: 'Toronto / Eastern Time',
+      },
+      mexico: {
+        country: 'Mexico',
+        city: 'Mexico City',
+      },
+      brazil: {
+        country: 'Brazil',
+        city: 'Sao Paulo',
+      },
+      argentina: {
+        country: 'Argentina',
+        city: 'Buenos Aires',
+      },
+      italy: {
+        country: 'Italy',
+        city: 'Rome',
+      },
+      spain: {
+        country: 'Spain',
+        city: 'Madrid',
+      },
+      netherlands: {
+        country: 'Netherlands',
+        city: 'Amsterdam',
+      },
+      russia: {
+        country: 'Russia',
+        city: 'Moscow',
+      },
+      newZealand: {
+        country: 'New Zealand',
+        city: 'Auckland',
+      },
+      indonesia: {
+        country: 'Indonesia',
+        city: 'Jakarta',
+      },
+      vietnam: {
+        country: 'Vietnam',
+        city: 'Ho Chi Minh City',
+      },
+      malaysia: {
+        country: 'Malaysia',
+        city: 'Kuala Lumpur',
+      },
+      philippines: {
+        country: 'Philippines',
+        city: 'Manila',
+      },
+      turkey: {
+        country: 'Turkey',
+        city: 'Istanbul',
+      },
+      uae: {
+        country: 'United Arab Emirates',
+        city: 'Dubai',
+      },
+      saudiArabia: {
+        country: 'Saudi Arabia',
+        city: 'Riyadh',
+      },
+      southAfrica: {
+        country: 'South Africa',
+        city: 'Johannesburg',
+      },
+      egypt: {
+        country: 'Egypt',
+        city: 'Cairo',
+      },
+      thailand: {
+        country: 'Thailand',
+        city: 'Bangkok',
+      },
     },
   },
   teamPage: {

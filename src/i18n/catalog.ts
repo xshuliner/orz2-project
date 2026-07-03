@@ -105,6 +105,26 @@ const toolTranslations: Record<NonDefaultLocale, CatalogTranslations> = {
         ],
       },
     },
+    'tool-timezone': {
+      name: 'Time Zone Converter',
+      group: 'Ops and Productivity',
+      summary:
+        'Pick common countries, edit either local time, and convert the other side with daylight saving rules applied.',
+      badges: ['Time zone', 'Countries', 'DST', 'Productivity'],
+      entries: { web: 'Tool entry' },
+      seo: {
+        title: 'Time Zone Converter - ORZ2 Online Productivity Tool',
+        description:
+          'ORZ2 Time Zone Converter supports China, United States, Japan, United Kingdom, and other common country time conversions with IANA daylight saving rules.',
+        keywords: [
+          'time zone converter',
+          'time conversion',
+          'daylight saving time',
+          'United States time',
+          'China time',
+        ],
+      },
+    },
     'tool-json': {
       name: 'JSON Formatter',
       summary:
@@ -199,6 +219,26 @@ const toolTranslations: Record<NonDefaultLocale, CatalogTranslations> = {
           '形式変換',
           '画像リサイズ',
           'ZIP ダウンロード',
+        ],
+      },
+    },
+    'tool-timezone': {
+      name: 'タイムゾーン変換',
+      group: '運用・効率化',
+      summary:
+        '一般的な国を選び、片側の現地時刻を入力すると、夏時間ルール込みでもう片側を自動換算します。',
+      badges: ['タイムゾーン', '国', '夏時間', '効率化'],
+      entries: { web: 'ツール入口' },
+      seo: {
+        title: 'タイムゾーン変換 - ORZ2 オンライン効率化ツール',
+        description:
+          'ORZ2 タイムゾーン変換は、中国、米国、日本、英国など一般的な国の時刻を IANA の夏時間ルールに基づいて換算します。',
+        keywords: [
+          'タイムゾーン変換',
+          '時刻変換',
+          '夏時間',
+          '米国時間',
+          '中国時間',
         ],
       },
     },

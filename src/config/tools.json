@@ -83,9 +83,51 @@
     "compact": true
   },
   {
+    "id": "tool-timezone",
+    "name": "时区转换器",
+    "group": "运营与效率",
+    "summary": "选择常见国家，输入任一侧本地时间，自动换算另一侧时间，并按当地夏令时规则处理。",
+    "media": {
+      "kind": "icon",
+      "name": "Globe2"
+    },
+    "badges": ["时区", "国家", "夏令时", "效率"],
+    "lifecycle": {
+      "stage": "BETA",
+      "version": "0.1.0",
+      "updatedAt": "2026-07-03"
+    },
+    "platform": ["web"],
+    "entries": [
+      {
+        "id": "web",
+        "kind": "link",
+        "label": "工具入口",
+        "href": "/tools/timezone-converter",
+        "qrValue": "https://orz2.online/tools/timezone-converter",
+        "primary": true
+      }
+    ],
+    "seo": {
+      "slug": "timezone-converter",
+      "title": "时区转换器 - ORZ2 在线效率工具",
+      "description": "ORZ2 时区转换器支持中国、美国、日本、英国等常见国家时间互转，并依据 IANA 时区规则处理夏令时与冬令时。",
+      "keywords": [
+        "时区转换器",
+        "时间换算",
+        "夏令时",
+        "美国时间",
+        "中国时间"
+      ],
+      "ogImage": "https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp",
+      "schemaType": "SoftwareApplication"
+    },
+    "compact": true
+  },
+  {
     "id": "tool-json",
     "name": "JSON 格式化",
-    "group": "开发工具",
+    "group": "开发调试",
     "summary": "支持语法高亮和错误检测的 JSON 数据格式化、验证和美化工具",
     "media": {
       "kind": "icon",

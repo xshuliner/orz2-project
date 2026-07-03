@@ -185,7 +185,7 @@ export const messages = {
     tools: {
       title: '在线工具 - ORZ2',
       description:
-        '浏览 ORZ2 在线工具目录，查找公众号自动发布、JSON 格式化、配色和图片压缩工具。',
+        '浏览 ORZ2 在线工具目录，查找公众号自动发布、时区转换、JSON 格式化、配色和图片压缩工具。',
       itemListName: 'ORZ2 在线工具目录',
     },
     team: {
@@ -393,6 +393,148 @@ export const messages = {
       unsupported: '无法读取这张图片，请换用 PNG、JPEG、WebP 或 AVIF。',
       failed: '处理失败',
       failedPrefix: '处理失败：',
+    },
+  },
+  timezoneTool: {
+    backToTools: '在线工具',
+    title: '时区转换器',
+    description:
+      '选择常见国家，输入任一侧本地时间，自动换算另一侧时间，并按当地夏令时规则处理。',
+    heroAriaLabel: '时区转换器能力',
+    heroHighlights: ['常见国家快速选择', '双向时间换算', '自动处理夏令时'],
+    leftSide: '左侧',
+    rightSide: '右侧',
+    sourceBadge: '基准',
+    convertedBadge: '换算',
+    countryLabel: '国家 / 时区',
+    timeLabel: '本地时间',
+    zoneNameLabel: '时区',
+    utcOffsetLabel: 'UTC 偏移',
+    dstLabel: '夏令时',
+    dstActive: '夏令时生效',
+    dstInactive: '标准时间 / 冬令时',
+    noDst: '不使用夏令时',
+    swapSides: '交换左右',
+    noteTitle: '关于夏令时 / 冬令时',
+    noteDescription:
+      '换算使用浏览器内置 IANA 时区数据库，不需要额外依赖；美国、英国、澳大利亚等地区会按所选日期自动切换夏令时或标准时间。',
+    zones: {
+      china: {
+        country: '中国',
+        city: '上海 / 北京时间',
+      },
+      unitedStates: {
+        country: '美国',
+        city: '纽约 / 美东时间',
+      },
+      unitedKingdom: {
+        country: '英国',
+        city: '伦敦',
+      },
+      japan: {
+        country: '日本',
+        city: '东京',
+      },
+      southKorea: {
+        country: '韩国',
+        city: '首尔',
+      },
+      singapore: {
+        country: '新加坡',
+        city: '新加坡',
+      },
+      india: {
+        country: '印度',
+        city: '新德里',
+      },
+      australia: {
+        country: '澳大利亚',
+        city: '悉尼',
+      },
+      germany: {
+        country: '德国',
+        city: '柏林',
+      },
+      france: {
+        country: '法国',
+        city: '巴黎',
+      },
+      canada: {
+        country: '加拿大',
+        city: '多伦多 / 东部时间',
+      },
+      mexico: {
+        country: '墨西哥',
+        city: '墨西哥城',
+      },
+      brazil: {
+        country: '巴西',
+        city: '圣保罗',
+      },
+      argentina: {
+        country: '阿根廷',
+        city: '布宜诺斯艾利斯',
+      },
+      italy: {
+        country: '意大利',
+        city: '罗马',
+      },
+      spain: {
+        country: '西班牙',
+        city: '马德里',
+      },
+      netherlands: {
+        country: '荷兰',
+        city: '阿姆斯特丹',
+      },
+      russia: {
+        country: '俄罗斯',
+        city: '莫斯科',
+      },
+      newZealand: {
+        country: '新西兰',
+        city: '奥克兰',
+      },
+      indonesia: {
+        country: '印度尼西亚',
+        city: '雅加达',
+      },
+      vietnam: {
+        country: '越南',
+        city: '胡志明市',
+      },
+      malaysia: {
+        country: '马来西亚',
+        city: '吉隆坡',
+      },
+      philippines: {
+        country: '菲律宾',
+        city: '马尼拉',
+      },
+      turkey: {
+        country: '土耳其',
+        city: '伊斯坦布尔',
+      },
+      uae: {
+        country: '阿联酋',
+        city: '迪拜',
+      },
+      saudiArabia: {
+        country: '沙特阿拉伯',
+        city: '利雅得',
+      },
+      southAfrica: {
+        country: '南非',
+        city: '约翰内斯堡',
+      },
+      egypt: {
+        country: '埃及',
+        city: '开罗',
+      },
+      thailand: {
+        country: '泰国',
+        city: '曼谷',
+      },
     },
   },
   teamPage: {

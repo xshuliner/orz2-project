@@ -1,0 +1,413 @@
+.timezone-tool-page {
+  width: var(--page-content-width);
+  margin: 0 auto;
+  padding: var(--space-6) 0 var(--space-16);
+}
+
+.timezone-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  color: var(--color-text-link);
+  font-size: var(--text-body-sm);
+  font-weight: 760;
+}
+
+.timezone-tool-hero {
+  width: 100%;
+  margin-bottom: var(--space-5);
+  padding: var(--space-5) 0 var(--space-6);
+}
+
+.timezone-tool-hero.compact-hero {
+  grid-template-columns: minmax(0, 0.95fr) minmax(280px, 0.64fr);
+  align-items: center;
+}
+
+.timezone-tool-hero h1 {
+  font-size: clamp(38px, 4.6vw, 54px);
+  line-height: 1.02;
+  white-space: normal;
+}
+
+.timezone-tool-hero p {
+  margin-top: 0;
+  font-size: var(--text-lead);
+}
+
+.timezone-hero-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.timezone-hero-strip span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border: 1px solid
+    color-mix(in srgb, var(--color-green) 16%, var(--color-line));
+  border-radius: var(--radius-control);
+  background: color-mix(
+    in srgb,
+    var(--color-panel) 82%,
+    var(--color-green-soft)
+  );
+  color: var(--color-text-accent);
+  font-size: var(--text-meta);
+  font-weight: 760;
+}
+
+.timezone-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: stretch;
+}
+
+.timezone-side-card,
+.timezone-relation-card,
+.timezone-note-card {
+  border-color: color-mix(
+    in srgb,
+    var(--color-green) 12%,
+    var(--color-line-card)
+  );
+  box-shadow: var(--shadow-card-sm);
+  animation: timezone-card-in var(--motion-base) ease both;
+}
+
+.timezone-side-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-height: 100%;
+}
+
+.timezone-side-card.is-source {
+  border-color: color-mix(in srgb, var(--color-green) 42%, var(--color-line));
+  box-shadow: 0 18px 48px color-mix(in srgb, var(--color-green) 12%, transparent);
+}
+
+.timezone-card-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.timezone-card-title-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.timezone-card-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-green) 22%, var(--color-line));
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--color-green-soft) 72%, var(--color-panel));
+  color: var(--color-green-action);
+}
+
+.timezone-card-kicker {
+  display: block;
+  color: var(--color-muted);
+  font-size: var(--text-caption);
+  font-weight: 780;
+  letter-spacing: 0;
+}
+
+.timezone-card-heading h2 {
+  margin: 3px 0 0;
+  color: var(--color-ink);
+  font-size: var(--text-heading-sm);
+  line-height: 1.2;
+}
+
+.timezone-source-badge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 var(--space-3);
+  border: 1px solid
+    color-mix(in srgb, var(--color-green) 20%, var(--color-line));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-green-soft) 72%, transparent);
+  color: var(--color-text-accent);
+  font-size: var(--text-caption);
+  font-weight: 820;
+}
+
+.timezone-side-card.is-source .timezone-source-badge {
+  border-color: color-mix(in srgb, var(--color-green) 44%, transparent);
+  background: var(--gradient-brand);
+  color: white;
+}
+
+.timezone-field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.timezone-field > span:first-child {
+  color: var(--color-text-status);
+  font-size: var(--text-meta);
+  font-weight: 780;
+}
+
+.timezone-select-shell {
+  position: relative;
+  display: block;
+}
+
+.timezone-field select,
+.timezone-field input {
+  width: 100%;
+  height: var(--control-height-lg);
+  box-sizing: border-box;
+  border: 1px solid var(--color-line-input);
+  border-radius: var(--radius-control);
+  background: var(--color-panel-input);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-body-sm);
+  font-weight: 720;
+  outline: none;
+  transition:
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    background var(--motion-fast) ease;
+}
+
+.timezone-field select {
+  padding: 0 54px 0 var(--space-4);
+  appearance: none;
+}
+
+.timezone-field input {
+  padding: 0 var(--space-4);
+}
+
+.timezone-field select:focus,
+.timezone-field input:focus {
+  border-color: color-mix(in srgb, var(--color-green) 72%, var(--color-line));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-green) 13%, transparent);
+}
+
+.timezone-select-chevron {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  box-sizing: border-box;
+  padding: 4px;
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--color-green) 12%, transparent);
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--color-green-soft) 54%, transparent);
+  color: var(--color-muted);
+  transform: translateY(-50%);
+  transition:
+    border-color var(--motion-fast) ease,
+    background var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    transform var(--motion-fast) ease;
+}
+
+.timezone-select-shell:hover .timezone-select-chevron,
+.timezone-select-shell:focus-within .timezone-select-chevron {
+  border-color: color-mix(in srgb, var(--color-green) 34%, transparent);
+  background: color-mix(in srgb, var(--color-green-soft) 82%, transparent);
+  color: var(--color-green-action);
+  transform: translateY(-50%) scale(1.04);
+}
+
+.timezone-local-time {
+  display: grid;
+  gap: var(--space-1);
+  margin-top: auto;
+  padding: var(--space-4);
+  border: 1px solid
+    color-mix(in srgb, var(--color-green) 14%, var(--color-line-soft));
+  border-radius: var(--radius-card);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-green-soft-surface) 84%, transparent),
+      transparent 72%
+    ),
+    color-mix(in srgb, var(--color-panel) 88%, transparent);
+}
+
+.timezone-local-time span {
+  color: var(--color-ink);
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 860;
+  line-height: 1.14;
+}
+
+.timezone-local-time strong {
+  color: var(--color-muted);
+  font-size: var(--text-body-sm);
+  font-weight: 720;
+}
+
+.timezone-detail-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.timezone-detail-list div {
+  min-width: 0;
+  padding: var(--space-3);
+  border: 1px solid
+    color-mix(in srgb, var(--color-green) 10%, var(--color-line-soft));
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--color-green-soft-ghost) 72%, transparent);
+}
+
+.timezone-detail-list dt {
+  margin: 0 0 var(--space-1);
+  color: var(--color-muted);
+  font-size: var(--text-caption);
+  font-weight: 760;
+}
+
+.timezone-detail-list dd {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--text-meta);
+  font-weight: 820;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.timezone-relation-card {
+  align-self: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  justify-self: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 999px;
+}
+
+.timezone-swap-button {
+  width: 52px;
+  height: 52px;
+  border-color: color-mix(in srgb, var(--color-green) 30%, var(--color-line));
+  border-radius: 999px;
+  background: var(--gradient-brand);
+  color: white;
+  box-shadow:
+    var(--shadow-button),
+    inset 0 1px color-mix(in srgb, white 28%, transparent);
+}
+
+.timezone-swap-button:hover {
+  border-color: color-mix(in srgb, var(--color-green) 54%, transparent);
+  box-shadow: var(--shadow-button-hover);
+  transform: rotate(6deg);
+}
+
+.timezone-note-card {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: center;
+  width: 100%;
+  margin-top: var(--space-5);
+}
+
+.timezone-note-card svg {
+  align-self: center;
+  color: var(--color-green-action);
+}
+
+.timezone-note-card strong {
+  color: var(--color-ink);
+  font-size: var(--text-body-sm);
+}
+
+.timezone-note-card p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-muted);
+  font-size: var(--text-body-sm);
+  line-height: var(--line-height-compact);
+}
+
+@keyframes timezone-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1080px) {
+  .timezone-tool-hero.compact-hero {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .timezone-workbench {
+    grid-template-columns: 1fr;
+  }
+
+  .timezone-relation-card {
+    width: 100%;
+    height: 64px;
+    border-radius: var(--radius-card);
+  }
+}
+
+@media (max-width: 720px) {
+  .timezone-tool-page {
+    padding-top: var(--space-4);
+  }
+
+  .timezone-tool-hero h1 {
+    font-size: clamp(34px, 12vw, 46px);
+  }
+
+  .timezone-card-heading {
+    flex-direction: column;
+  }
+
+  .timezone-detail-list {
+    grid-template-columns: 1fr;
+  }
+
+  .timezone-note-card {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timezone-side-card,
+  .timezone-relation-card,
+  .timezone-note-card {
+    animation: none;
+  }
+}

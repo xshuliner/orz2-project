@@ -11,6 +11,7 @@ const publicRoutes = [
   '/team',
   '/privacy',
   '/tools/official-publisher',
+  '/tools/timezone-converter',
   '/en/tools/official-publisher',
   '/design-system',
 ];
@@ -123,6 +124,38 @@ test('localized SEO exposes canonical and alternate links', async ({ page }) => 
   await expect(
     page.locator('link[rel="alternate"][hreflang="x-default"]')
   ).toHaveAttribute('href', 'https://orz2.online/tools');
+});
+
+test('timezone converter respects US daylight saving changes', async ({
+  page,
+}) => {
+  await page.goto('/tools/timezone-converter', {
+    waitUntil: 'domcontentloaded',
+  });
+
+  const inputs = page.locator('input[type="datetime-local"]');
+  const selects = page.locator('select');
+
+  await inputs.first().fill('2026-07-03T20:00');
+  await expect(inputs.nth(1)).toHaveValue('2026-07-03T08:00');
+  await expect(page.getByText('夏令时生效')).toBeVisible();
+
+  await selects.first().selectOption('japan');
+  await expect(inputs.first()).toHaveValue('2026-07-03T21:00');
+  await expect(inputs.nth(1)).toHaveValue('2026-07-03T08:00');
+
+  await selects.nth(1).selectOption('unitedKingdom');
+  await expect(inputs.first()).toHaveValue('2026-07-03T21:00');
+  await expect(inputs.nth(1)).toHaveValue('2026-07-03T13:00');
+
+  await inputs.nth(1).fill('2026-07-03T10:00');
+  await expect(inputs.first()).toHaveValue('2026-07-03T18:00');
+
+  await selects.first().selectOption('china');
+  await selects.nth(1).selectOption('unitedStates');
+  await inputs.first().fill('2026-01-03T20:00');
+  await expect(inputs.nth(1)).toHaveValue('2026-01-03T07:00');
+  await expect(page.getByText('标准时间 / 冬令时')).toBeVisible();
 });
 
 test('design system modal supports button, backdrop and escape closing', async ({

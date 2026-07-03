@@ -197,7 +197,7 @@ export const messages = {
     tools: {
       title: 'オンラインツール - ORZ2',
       description:
-        'ORZ2 のオンラインツール目录から、公众号自動投稿、JSON 整形、配色、画像圧縮ツールを探せます。',
+        'ORZ2 のオンラインツール目录から、公众号自動投稿、タイムゾーン変換、JSON 整形、配色、画像圧縮ツールを探せます。',
       itemListName: 'ORZ2 オンラインツール',
     },
     team: {
@@ -421,6 +421,152 @@ export const messages = {
         'この画像は読み取れません。PNG、JPEG、WebP、AVIF をお試しください。',
       failed: '処理に失敗しました',
       failedPrefix: '処理に失敗しました：',
+    },
+  },
+  timezoneTool: {
+    backToTools: 'オンラインツール',
+    title: 'タイムゾーン変換',
+    description:
+      '一般的な国を選び、片側の現地時刻を入力すると、夏時間ルール込みでもう片側を自動換算します。',
+    heroAriaLabel: 'タイムゾーン変換の機能',
+    heroHighlights: [
+      '一般的な国をすぐ選択',
+      '双方向の時刻変換',
+      '夏時間に対応',
+    ],
+    leftSide: '左側',
+    rightSide: '右側',
+    sourceBadge: '基準',
+    convertedBadge: '換算',
+    countryLabel: '国 / タイムゾーン',
+    timeLabel: '現地時刻',
+    zoneNameLabel: 'ゾーン',
+    utcOffsetLabel: 'UTC オフセット',
+    dstLabel: '夏時間',
+    dstActive: '夏時間',
+    dstInactive: '標準時',
+    noDst: '夏時間なし',
+    swapSides: '左右を交換',
+    noteTitle: '夏時間について',
+    noteDescription:
+      '換算はブラウザ内蔵の IANA タイムゾーンデータベースを使用するため、追加依存は不要です。米国、英国、オーストラリアなどは選択した日付に応じて自動的に夏時間または標準時へ切り替わります。',
+    zones: {
+      china: {
+        country: '中国',
+        city: '上海 / 北京時間',
+      },
+      unitedStates: {
+        country: '米国',
+        city: 'ニューヨーク / 東部時間',
+      },
+      unitedKingdom: {
+        country: '英国',
+        city: 'ロンドン',
+      },
+      japan: {
+        country: '日本',
+        city: '東京',
+      },
+      southKorea: {
+        country: '韓国',
+        city: 'ソウル',
+      },
+      singapore: {
+        country: 'シンガポール',
+        city: 'シンガポール',
+      },
+      india: {
+        country: 'インド',
+        city: 'ニューデリー',
+      },
+      australia: {
+        country: 'オーストラリア',
+        city: 'シドニー',
+      },
+      germany: {
+        country: 'ドイツ',
+        city: 'ベルリン',
+      },
+      france: {
+        country: 'フランス',
+        city: 'パリ',
+      },
+      canada: {
+        country: 'カナダ',
+        city: 'トロント / 東部時間',
+      },
+      mexico: {
+        country: 'メキシコ',
+        city: 'メキシコシティ',
+      },
+      brazil: {
+        country: 'ブラジル',
+        city: 'サンパウロ',
+      },
+      argentina: {
+        country: 'アルゼンチン',
+        city: 'ブエノスアイレス',
+      },
+      italy: {
+        country: 'イタリア',
+        city: 'ローマ',
+      },
+      spain: {
+        country: 'スペイン',
+        city: 'マドリード',
+      },
+      netherlands: {
+        country: 'オランダ',
+        city: 'アムステルダム',
+      },
+      russia: {
+        country: 'ロシア',
+        city: 'モスクワ',
+      },
+      newZealand: {
+        country: 'ニュージーランド',
+        city: 'オークランド',
+      },
+      indonesia: {
+        country: 'インドネシア',
+        city: 'ジャカルタ',
+      },
+      vietnam: {
+        country: 'ベトナム',
+        city: 'ホーチミン',
+      },
+      malaysia: {
+        country: 'マレーシア',
+        city: 'クアラルンプール',
+      },
+      philippines: {
+        country: 'フィリピン',
+        city: 'マニラ',
+      },
+      turkey: {
+        country: 'トルコ',
+        city: 'イスタンブール',
+      },
+      uae: {
+        country: 'アラブ首長国連邦',
+        city: 'ドバイ',
+      },
+      saudiArabia: {
+        country: 'サウジアラビア',
+        city: 'リヤド',
+      },
+      southAfrica: {
+        country: '南アフリカ',
+        city: 'ヨハネスブルグ',
+      },
+      egypt: {
+        country: 'エジプト',
+        city: 'カイロ',
+      },
+      thailand: {
+        country: 'タイ',
+        city: 'バンコク',
+      },
     },
   },
   teamPage: {
