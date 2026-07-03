@@ -17,8 +17,12 @@ type NonDefaultLocale = Exclude<Locale, 'zh-CN'>;
 
 const groupTranslations = {
   en: {
+    运营与效率: 'Ops and Productivity',
+    图片与设计: 'Image and Design',
+    开发调试: 'Developer Debugging',
     公众号工具: 'WeChat Tools',
     图片处理: 'Image Processing',
+    效率工具: 'Productivity Tools',
     开发工具: 'Developer Tools',
     设计工具: 'Design Tools',
     'AI 社区': 'AI Community',
@@ -28,8 +32,12 @@ const groupTranslations = {
     个人博客: 'Personal Blog',
   },
   ja: {
+    运营与效率: '運用・効率化',
+    图片与设计: '画像・デザイン',
+    开发调试: '開発・デバッグ',
     公众号工具: 'WeChat ツール',
     图片处理: '画像処理',
+    效率工具: '効率化ツール',
     开发工具: '開発ツール',
     设计工具: 'デザインツール',
     'AI 社区': 'AI コミュニティ',
@@ -416,27 +424,25 @@ const productGroupDescriptions = {
 const toolGroupDescriptions = {
   en: [
     [
-      'WeChat Tools',
-      'Efficiency tools for content operations and automated publishing flows.',
-    ],
-    ['Image Processing', 'Balance asset size, quality, and web performance.'],
-    [
-      'Developer Tools',
-      'Reduce debugging and formatting overhead for direct development tasks.',
+      'Ops and Productivity',
+      'Tools for publishing, scheduling, coordination, and everyday decisions.',
     ],
     [
-      'Design Tools',
-      'Support palette, contrast, and frontend-ready asset generation.',
+      'Image and Design',
+      'Handle images, palettes, visual checks, and frontend-ready assets.',
+    ],
+    [
+      'Developer Debugging',
+      'Reduce formatting, conversion, validation, and debugging overhead.',
     ],
   ],
   ja: [
-    ['WeChat ツール', 'コンテンツ運用と自動投稿フロー向けの効率化ツール。'],
-    ['画像処理', '素材サイズ、品質、Web 性能のバランスを扱います。'],
-    ['開発ツール', 'デバッグと整理コストを減らし、開発タスクを直接進めます。'],
+    ['運用・効率化', '投稿、予定調整、連携、日常判断をすばやく支えるツール。'],
     [
-      'デザインツール',
-      '配色、コントラスト、フロントエンド納品物の生成を支援します。',
+      '画像・デザイン',
+      '画像、配色、視覚チェック、フロントエンド素材を扱います。',
     ],
+    ['開発・デバッグ', '整形、変換、検証、デバッグの手間を減らします。'],
   ],
 } as const;
 
@@ -497,20 +503,16 @@ export function getToolGroups(locale: Locale): CatalogGroup[] {
   if (locale === defaultLocale) {
     return [
       {
-        name: '公众号工具',
-        description: '面向内容运营与自动化发布流程的效率工具。',
+        name: '运营与效率',
+        description: '覆盖发布、排期、协作和日常判断的高频小工具。',
       },
       {
-        name: '图片处理',
-        description: '处理素材体积、质量与网页性能之间的平衡。',
+        name: '图片与设计',
+        description: '处理图片、配色、视觉检查与前端可交付素材。',
       },
       {
-        name: '开发工具',
-        description: '减少调试与整理成本，让开发任务更直接。',
-      },
-      {
-        name: '设计工具',
-        description: '辅助配色、对比度与前端可交付资产的生成。',
+        name: '开发调试',
+        description: '减少格式化、转换、校验和调试成本。',
       },
     ];
   }

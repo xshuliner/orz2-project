@@ -2,7 +2,7 @@
   {
     "id": "tool-wechat-publisher",
     "name": "公众号自动发布",
-    "group": "公众号工具",
+    "group": "运营与效率",
     "summary": "配置公众号凭据、文章提示词、封面图和内嵌图片，一站式准备自动发布任务。",
     "media": {
       "kind": "icon",
@@ -43,7 +43,7 @@
   {
     "id": "tool-image",
     "name": "批量图片处理",
-    "group": "图片处理",
+    "group": "图片与设计",
     "summary": "一次上传多张图片，统一完成格式转换、尺寸缩放、TinyPNG 压缩，并打包下载结果。",
     "media": {
       "kind": "icon",
@@ -111,7 +111,7 @@
   {
     "id": "tool-color",
     "name": "配色实验室",
-    "group": "设计工具",
+    "group": "图片与设计",
     "summary": "专业的颜色选择工具，支持多种颜色格式和调色板",
     "media": {
       "kind": "icon",
@@ -137,7 +137,7 @@
   {
     "id": "tool-base64",
     "name": "Base64 转换器",
-    "group": "开发工具",
+    "group": "开发调试",
     "summary": "文本和文件的 Base64 编码解码转换工具",
     "media": {
       "kind": "icon",
@@ -163,7 +163,7 @@
   {
     "id": "tool-markdown",
     "name": "Markdown 编辑器",
-    "group": "开发工具",
+    "group": "开发调试",
     "summary": "功能丰富的 Markdown 编辑器，支持实时预览和导出功能",
     "media": {
       "kind": "icon",
@@ -189,7 +189,7 @@
   {
     "id": "tool-qrcode",
     "name": "二维码生成器",
-    "group": "开发工具",
+    "group": "开发调试",
     "summary": "创建和自定义 URL、文本和联系信息的二维码",
     "media": {
       "kind": "icon",
