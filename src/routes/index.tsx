@@ -5,6 +5,7 @@ import { routesProductSilicon } from '@/pages/Products/ProductSilicon/routes';
 import { routesToolImageStudio } from '@/pages/Tools/ToolImageStudio/routes';
 import { routesToolOfficialPublisher } from '@/pages/Tools/ToolOfficialPublisher/routes';
 import { routesToolTimezoneConverter } from '@/pages/Tools/ToolTimezoneConverter/routes';
+import { routesToolWorkReportPolisher } from '@/pages/Tools/ToolWorkReportPolisher/routes';
 import { lazy } from 'react';
 import { Navigate, RouteObject, useParams } from 'react-router-dom';
 
@@ -67,6 +68,7 @@ function createAppChildren(): RouteObject[] {
         ...routesToolImageStudio,
         ...routesToolOfficialPublisher,
         ...routesToolTimezoneConverter,
+        ...routesToolWorkReportPolisher,
       ],
     },
     {

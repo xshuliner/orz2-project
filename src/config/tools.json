@@ -125,6 +125,48 @@
     "compact": true
   },
   {
+    "id": "tool-work-report-polisher",
+    "name": "日/周报润色",
+    "group": "运营与效率",
+    "summary": "把零散工作记录整理成自然、克制、像人写的日/周报，保留事实，不夸大表达。",
+    "media": {
+      "kind": "icon",
+      "name": "ClipboardPenLine"
+    },
+    "badges": ["AI", "日报", "周报", "职场写作"],
+    "lifecycle": {
+      "stage": "BETA",
+      "version": "0.1.0",
+      "updatedAt": "2026-07-04"
+    },
+    "platform": ["web"],
+    "entries": [
+      {
+        "id": "web",
+        "kind": "link",
+        "label": "工具入口",
+        "href": "/tools/work-report-polisher",
+        "qrValue": "https://orz2.online/tools/work-report-polisher",
+        "primary": true
+      }
+    ],
+    "seo": {
+      "slug": "work-report-polisher",
+      "title": "日/周报润色工具 - ORZ2 在线效率工具",
+      "description": "ORZ2 日/周报润色工具可将工作记录整理为自然克制的日报或周报，保留事实、减少 AI 味，适合日常工作汇报。",
+      "keywords": [
+        "日报润色",
+        "周报润色",
+        "工作总结",
+        "职场写作",
+        "AI润色"
+      ],
+      "ogImage": "https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp",
+      "schemaType": "SoftwareApplication"
+    },
+    "compact": true
+  },
+  {
     "id": "tool-json",
     "name": "JSON 格式化",
     "group": "开发调试",

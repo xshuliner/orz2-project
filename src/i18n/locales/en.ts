@@ -418,6 +418,67 @@ export const messages = {
       failedPrefix: 'Processing failed: ',
     },
   },
+  reportPolishTool: {
+    backToTools: 'Online tools',
+    title: 'Daily / Weekly Report Polisher',
+    description:
+      'Turn rough work notes into a natural, restrained report that keeps the facts and avoids an over-polished AI tone.',
+    heroAriaLabel: 'Report polishing capabilities',
+    heroHighlights: [
+      'Natural wording',
+      'Facts stay intact',
+      'Daily and weekly reports',
+    ],
+    typeLabel: 'Report type',
+    daily: 'Daily',
+    weekly: 'Weekly',
+    switchConfirm:
+      'Switching the report type will clear the current notes, reference example, and polished result. Continue?',
+    inputTitle: 'Original notes',
+    inputDescription:
+      'Paste today or this week of work notes. Rough bullets are fine.',
+    inputPlaceholder:
+      'Example:\n- Followed up on the new tool page requirements and copy\n- Confirmed the polish API mode with backend\n- Fixed mobile layout details in the time zone tool\n- Continue tests and release checks tomorrow',
+    referenceTitle: 'Reference example',
+    referenceDescription:
+      'Optional. Paste a daily or weekly report style you want the result to follow for structure, tone, and level of detail.',
+    referencePlaceholder:
+      'Example:\nThis week I mainly completed requirement clarification and API coordination for the tool page. Progress is generally on track. Some copy still needs a consistent wording pass, and I have synced the next checks. Next week I plan to add tests and make small adjustments based on review feedback.',
+    outputTitle: 'Polished result',
+    outputDescription:
+      'The result stays practical and plain, ready for a quick final edit.',
+    outputEmpty:
+      'Click "Polish report" to generate a cleaned-up report. If the notes lack facts, the tool will not invent progress.',
+    polish: 'Polish report',
+    polishing: 'Polishing',
+    useSample: 'Use sample',
+    useReferenceSample: 'Use sample',
+    reset: 'Clear',
+    copy: 'Copy result',
+    copied: 'Copied',
+    charCountSuffix: ' chars',
+    success:
+      'Generated a restrained report draft. Adjust one or two lines to match your voice.',
+    errors: {
+      empty: 'Enter work notes before polishing.',
+      failed: 'Could not polish the report. Try again later.',
+      copyFailed: 'Copy failed. Select the result manually.',
+    },
+    tipsTitle: 'Polishing rules',
+    tips: [
+      'Improve wording and structure only; do not add facts, numbers, dates, or achievements.',
+      'Keep this week of work and next week of work in a standard work-report style.',
+      'Avoid grand claims and buzzwords that make normal progress sound exaggerated.',
+    ],
+    sampleDaily:
+      'Order filters done: payment status and after-sales status\nMobile filter bar height bug fixed, inline style left after transition\nBackend still has two old after-sales values, not matching prototype. Temporary mapping for now, wait for product confirmation\nTomorrow: export button permission and sync filters to URL',
+    sampleWeekly:
+      'Member center points detail this week\nList, filters, pagination, empty state mostly done\nTwo versions of points type enum, frontend compatibility mapping for now\nRedemption record API missing operator field, source cannot show fully, column hidden temporarily\nAdded a few smoke tests\nNext week: redemption records, mobile table layout, final points type copy needs product confirmation',
+    sampleReferenceDaily:
+      'Today:\n1. Completed item one, with current progress and status.\n2. Completed item two, including integration, validation, or fixes.\n3. Synced item three, noting confirmed issues or follow-up points.\n\nTomorrow:\n1. Continue the next development or integration task.\n2. Add required tests and edge-case validation.\n3. Make small adjustments based on feedback.\n\nSupport needed:\n1. Product or backend confirmation on rules or wording.\n2. QA focus on specific boundary scenarios.',
+    sampleReferenceWeekly:
+      'This week:\n1. Completed the main development for module one, including status and impact scope.\n2. Completed integration or issue fixes for module two, including key results.\n3. Added tests, documentation, or release preparation, including covered scope.\n\nNext week:\n1. Continue the next stage of feature development.\n2. Improve test coverage and edge-case validation.\n3. Make small adjustments based on review or acceptance feedback.\n\nDifficulties and support needed:\n1. Product rules or API fields that need confirmation.\n2. Items requiring support from backend, QA, or design.\n3. Current risks that may affect progress.',
+  },
   timezoneTool: {
     backToTools: 'Online tools',
     title: 'Time Zone Converter',

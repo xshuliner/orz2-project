@@ -7,6 +7,7 @@ export interface HeroMedia {
 
 export type CatalogIconName =
   | 'Braces'
+  | 'ClipboardPenLine'
   | 'Gamepad2'
   | 'Globe2'
   | 'ImageDown'

@@ -12,6 +12,7 @@ const publicRoutes = [
   '/privacy',
   '/tools/official-publisher',
   '/tools/timezone-converter',
+  '/tools/work-report-polisher',
   '/en/tools/official-publisher',
   '/design-system',
 ];
@@ -156,6 +157,38 @@ test('timezone converter respects US daylight saving changes', async ({
   await inputs.first().fill('2026-01-03T20:00');
   await expect(inputs.nth(1)).toHaveValue('2026-01-03T07:00');
   await expect(page.getByText('标准时间 / 冬令时')).toBeVisible();
+});
+
+test('work report polisher persists report and reference content', async ({
+  page,
+}) => {
+  const reportContent = '本周完成日/周报润色工具页面调整，补充示例输入区域。';
+  const referenceContent =
+    '本周主要完成页面调整和基础验证，下周继续根据反馈优化。';
+
+  await page.goto('/tools/work-report-polisher', {
+    waitUntil: 'domcontentloaded',
+  });
+
+  page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { exact: true, name: '周报' }).click();
+  await page.getByLabel('原始记录').fill(reportContent);
+  await page.getByLabel('示例内容').fill(referenceContent);
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+
+  await expect(
+    page.getByRole('button', { exact: true, name: '周报' })
+  ).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByLabel('原始记录')).toHaveValue(reportContent);
+  await expect(page.getByLabel('示例内容')).toHaveValue(referenceContent);
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        window.localStorage.getItem('CACHE_orz2:work-report-polisher-form')
+      )
+    )
+    .toContain('referenceContent');
 });
 
 test('design system modal supports button, backdrop and escape closing', async ({

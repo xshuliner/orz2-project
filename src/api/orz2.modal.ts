@@ -154,6 +154,8 @@ export type PostPolishContentMode =
   | 'official_system_prompt'
   | 'official_content_prompt'
   | 'official_image_prompt'
+  | 'daily_weekly_report'
+  | 'leafy_note_markdown'
   | 'text_prompt'
   | 'image_prompt';
 

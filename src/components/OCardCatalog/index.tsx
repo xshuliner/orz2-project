@@ -22,6 +22,7 @@ import {
   AppWindow,
   Boxes,
   Braces,
+  ClipboardPenLine,
   ExternalLink,
   Gamepad2,
   GitBranch,
@@ -46,6 +47,7 @@ import './index.css';
 
 const mediaIcons: Record<CatalogIconName, LucideIcon> = {
   Braces,
+  ClipboardPenLine,
   Gamepad2,
   Globe2,
   ImageDown,

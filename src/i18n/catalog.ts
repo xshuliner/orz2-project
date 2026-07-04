@@ -125,6 +125,26 @@ const toolTranslations: Record<NonDefaultLocale, CatalogTranslations> = {
         ],
       },
     },
+    'tool-work-report-polisher': {
+      name: 'Daily / Weekly Report Polisher',
+      group: 'Ops and Productivity',
+      summary:
+        'Turn rough work notes into a natural, restrained daily or weekly report while keeping the facts intact.',
+      badges: ['AI', 'Daily report', 'Weekly report', 'Work writing'],
+      entries: { web: 'Tool entry' },
+      seo: {
+        title: 'Daily / Weekly Report Polisher - ORZ2 Productivity Tool',
+        description:
+          'ORZ2 Daily / Weekly Report Polisher turns work notes into natural, restrained reports that keep facts intact and avoid an AI-written tone.',
+        keywords: [
+          'daily report polishing',
+          'weekly report polishing',
+          'work summary',
+          'workplace writing',
+          'AI polishing',
+        ],
+      },
+    },
     'tool-json': {
       name: 'JSON Formatter',
       summary:
@@ -239,6 +259,26 @@ const toolTranslations: Record<NonDefaultLocale, CatalogTranslations> = {
           '夏時間',
           '米国時間',
           '中国時間',
+        ],
+      },
+    },
+    'tool-work-report-polisher': {
+      name: '日報 / 週報リライト',
+      group: '運用・効率化',
+      summary:
+        '作業メモを、事実を保ったまま自然で控えめな日報・週報に整えます。',
+      badges: ['AI', '日報', '週報', 'ビジネス文書'],
+      entries: { web: 'ツール入口' },
+      seo: {
+        title: '日報 / 週報リライト - ORZ2 オンライン効率化ツール',
+        description:
+          'ORZ2 日報 / 週報リライトは、作業メモを自然で控えめな報告文に整え、AI らしさを抑えて日常の業務報告に使いやすくします。',
+        keywords: [
+          '日報リライト',
+          '週報リライト',
+          '業務報告',
+          'ビジネス文書',
+          'AI 推敲',
         ],
       },
     },
