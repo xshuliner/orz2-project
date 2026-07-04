@@ -29,6 +29,10 @@ export function PageTeam() {
             <img
               className='team-avatar'
               src={member.avatarUrl}
+              width={96}
+              height={96}
+              loading='lazy'
+              decoding='async'
               alt={`${member.name} ${member.role} ${copy.avatarAlt}`}
             />
             <div>

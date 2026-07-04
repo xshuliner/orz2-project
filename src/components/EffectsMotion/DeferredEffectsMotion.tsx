@@ -10,38 +10,6 @@ export function DeferredEffectsMotion() {
     const reduceMotion = prefersReducedMotion();
     const cleanupFns: Array<() => void> = [];
     const ctx = gsap.context(() => {
-      const header = document.querySelector<HTMLElement>('.site-header');
-      if (header) {
-        let headerIsScrolled = header.classList.contains('is-scrolled');
-        let syncHeaderFrame: number | null = null;
-
-        const syncHeader = (force = false) => {
-          const shouldBeScrolled = headerIsScrolled
-            ? window.scrollY > 8
-            : window.scrollY > 28;
-          if (!force && shouldBeScrolled === headerIsScrolled) return;
-
-          headerIsScrolled = shouldBeScrolled;
-          header.classList.toggle('is-scrolled', shouldBeScrolled);
-        };
-
-        const queueHeaderSync = () => {
-          if (syncHeaderFrame !== null) return;
-          syncHeaderFrame = window.requestAnimationFrame(() => {
-            syncHeaderFrame = null;
-            syncHeader();
-          });
-        };
-
-        syncHeader(true);
-        window.addEventListener('scroll', queueHeaderSync, { passive: true });
-        cleanupFns.push(() => {
-          window.removeEventListener('scroll', queueHeaderSync);
-          if (syncHeaderFrame !== null)
-            window.cancelAnimationFrame(syncHeaderFrame);
-        });
-      }
-
       if (reduceMotion) {
         return;
       }

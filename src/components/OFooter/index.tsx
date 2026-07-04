@@ -112,7 +112,6 @@ export function OFooter() {
         <div className='footer-bottom-meta'>
           {buildInfoSummary ? (
             <Link
-              aria-label={footerCopy.buildInfoAriaLabel}
               className='interactive footer-build-info-link'
               to={localizePath('/build-info')}
             >

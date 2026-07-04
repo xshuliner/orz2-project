@@ -83,17 +83,21 @@ function SectionHeroVideo({ media }: HeroVideoRotatorProps) {
 
   useEffect(() => {
     if (reducedMotion) return;
+    const connection = (
+      navigator as Navigator & { connection?: { saveData?: boolean } }
+    ).connection;
+    if (connection?.saveData) return;
 
     let idleId: number | null = null;
     let timeoutId: ReturnType<typeof globalThis.setTimeout> | null = null;
     const loadVideos = () => {
       if ('requestIdleCallback' in window) {
         idleId = window.requestIdleCallback(() => setShouldLoadVideos(true), {
-          timeout: 1500,
+          timeout: 3200,
         });
         return;
       }
-      timeoutId = globalThis.setTimeout(() => setShouldLoadVideos(true), 500);
+      timeoutId = globalThis.setTimeout(() => setShouldLoadVideos(true), 2200);
     };
 
     if (document.readyState === 'complete') {
