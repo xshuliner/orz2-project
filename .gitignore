@@ -5,3 +5,9 @@ public/__xshuliner__/
 .DS_Store
 test-results/
 .env.*.local
+
+# Agents
+.agent/
+.claude/
+.codex/
+.cursor/
