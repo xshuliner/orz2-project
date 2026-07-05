@@ -1,5 +1,5 @@
-import type { CatalogStageCopy } from '@/i18n';
-import type { CatalogStage } from '@/types';
+import type { CatalogLocaleCatalog, CatalogStageCopy } from '@/i18n';
+import type { CatalogStage } from '@/types/catalog';
 
 export const messages = {
   common: {
@@ -1116,4 +1116,137 @@ export const messages = {
       ],
     },
   },
+  catalog: {
+    groupTranslations: {},
+    tools: {},
+    products: {},
+    toolGroups: [
+      {
+        name: '运营与效率',
+        description: '覆盖发布、排期、协作和日常判断的高频小工具。',
+      },
+      {
+        name: '图片与设计',
+        description: '处理图片、配色、视觉检查与前端可交付素材。',
+      },
+      {
+        name: '开发调试',
+        description: '减少格式化、转换、校验和调试成本。',
+      },
+    ],
+    productGroups: [
+      {
+        name: 'AI 社区',
+        description: '围绕 Agent、身份与长期互动体验沉淀的产品实验。',
+      },
+      {
+        name: 'Saas多端应用',
+        description: '覆盖 H5 与小程序等移动入口，适合轻量业务快速触达。',
+      },
+      {
+        name: '浏览器与编辑器扩展',
+        description: '贴近开发与工作流场景，把常用能力放到触手可及的位置。',
+      },
+      {
+        name: '互动游戏',
+        description: '以网页为入口的小型互动体验，保留完整可玩的产品形态。',
+      },
+      {
+        name: '个人博客',
+        description: '承载工程实践、产品思考和长期内容沉淀的 Web 站点。',
+      },
+    ],
+    heroMediaLabels: [
+      '鼠小蓝',
+      '鼠小绿',
+      '鼠小紫',
+      '鼠小红',
+      '鼠小黄',
+      '鼠小橙',
+    ],
+    testimonials: [
+      {
+        id: 'ops',
+        quote:
+          'ORZ2 的工具入口足够直接，不需要培训，新同事也能很快找到该用的功能。',
+        name: '林青',
+        title: '增长运营负责人',
+      },
+      {
+        id: 'studio',
+        quote:
+          '我们喜欢这种轻量但完整的产品感，既能做日常任务，也适合接入自有流程。',
+        name: 'Mia Chen',
+        title: '独立工作室主理人',
+      },
+      {
+        id: 'dev',
+        quote: '页面信息和合规内容摆得很清楚，对准备商业化的工具站来说很省心。',
+        name: '周远',
+        title: '全栈开发者',
+      },
+      {
+        id: 'pm',
+        quote: '工具站结构清晰，信息架构做得很扎实，用户上手零成本。',
+        name: '张明',
+        title: '产品经理',
+      },
+      {
+        id: 'design',
+        quote: '配色和动效都很克制，整体感很强，是难得的设计驱动的工具产品。',
+        name: '李薇',
+        title: 'UI设计师',
+      },
+      {
+        id: 'startup',
+        quote: '上线周期快，合规文档完备，团队接入后几乎没有踩坑。',
+        name: '王浩',
+        title: '创业公司CTO',
+      },
+      {
+        id: 'freelance',
+        quote: '个人工作室没有技术团队也能拥有自己的工具站，省了大几万。',
+        name: '陈静',
+        title: '独立开发者',
+      },
+      {
+        id: 'marketing',
+        quote: '内置的合规模块对营销场景很友好，审核流程顺畅多了。',
+        name: '刘洋',
+        title: '市场营销总监',
+      },
+    ],
+    teamMemberProfiles: [
+      [
+        '鼠小蓝',
+        '项目经理',
+        '负责项目节奏、需求拆解和交付质量，让想法稳定变成可上线产品。',
+      ],
+      [
+        '鼠小绿',
+        '全栈开发',
+        '打通前端、服务端与部署链路，关注性能、可维护性和工程扩展。',
+      ],
+      [
+        '鼠小紫',
+        '产品经理',
+        '把用户场景翻译成清晰功能，平衡商业目标、体验和上线成本。',
+      ],
+      [
+        '鼠小红',
+        'UI设计师',
+        '建立一致的界面语言，让工具网站既专业、易用，也有品牌记忆点。',
+      ],
+      [
+        '鼠小黄',
+        '财务',
+        '关注成本、收入与商业化指标，帮助产品走向长期健康运营。',
+      ],
+      [
+        '鼠小橙',
+        'HR',
+        '维护团队协作、人才成长和文化建设，让每个人在合适的位置发光。',
+      ],
+    ],
+  } satisfies CatalogLocaleCatalog,
 } as const;

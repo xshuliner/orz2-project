@@ -1,6 +1,6 @@
 import { defaultImageOg, routeUrl, siteName } from '@/config/seo';
 import { defaultLocale, localeOpenGraph, locales, type Locale } from '@/i18n';
-import type { SeoConfig } from '@/types';
+import type { SeoConfig } from '@/types/seo';
 import { toSiteUrl } from '@/utils/siteUrl';
 import { useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';

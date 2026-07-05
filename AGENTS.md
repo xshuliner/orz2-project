@@ -125,15 +125,15 @@ All non-home page modules and product/tool sub-routes are lazy-loaded.
 
 Static catalog and site data live in `src/config/`:
 
-- `index.ts` exports `siteConfig` such as `contactEmail`.
-- `products.json` and `tools.json` store the source `CatalogItem[]`.
-- `site.ts` exports Chinese base copy and static collections such as hero media,
-  testimonials, team members, section copy, footer copy, login copy, and header
-  copy.
+- `products.ts` and `tools.ts` store the source `CatalogItem[]`.
+- `site.ts` exports `siteConfig`, Chinese base copy, and static collections such
+  as hero media, testimonials, team members, section copy, footer copy, login
+  copy, and header copy.
 - `seo.ts` builds per-locale page SEO and per-tool SEO from `getMessages()`,
   `getProducts()`, and `getTools()`.
-- `catalog-stages.ts` owns the `LIVE` / `BETA` / `PLANNING` display metadata and
-  `catalog-card-stage--{tone}` class names.
+- `catalog.ts` owns static catalog metadata such as the `LIVE` / `BETA` /
+  `PLANNING` display data; helper logic such as stage labels and tone classes
+  lives outside `src/config/`.
 
 Render code should consume localized catalog accessors from
 `src/i18n/catalog.ts`:
@@ -147,14 +147,14 @@ Render code should consume localized catalog accessors from
 - `getTestimonials(locale)`
 - `getTeamMembers(locale)`
 
-Do not read `tools.json` or `products.json` directly from UI components unless
-you are intentionally bypassing localization.
+Do not read `tools.ts` or `products.ts` directly from UI components unless you
+are intentionally bypassing localization.
 
-Shared catalog and SEO types live in `src/types.ts`, including
-`CatalogLifecycle`, `CatalogIconName`, `CatalogPlatform`, `CatalogMedia`,
-`CatalogEntry`, `CatalogItem`, `CatalogGroup`, `HeroMedia`, `TeamMember`,
-`Testimonial`, and `SeoConfig`. Build-info types live in
-`src/types/buildInfo.ts`.
+Shared catalog and SEO types live in `src/types/` and are re-exported from
+`src/types.ts`, including `CatalogLifecycle`, `CatalogIconName`,
+`CatalogPlatform`, `CatalogMedia`, `CatalogEntry`, `CatalogItem`,
+`CatalogGroup`, `HeroMedia`, `TeamMember`, `Testimonial`, and `SeoConfig`.
+Build-info types live in `src/types/buildInfo.ts`.
 
 ### Catalog Behavior
 
@@ -374,7 +374,7 @@ messages and catalog accessors when adding routes.
 
 - Static pages: `/`, `/products`, `/tools`, `/team`, `/privacy`,
   `/design-system`
-- Internal primary tool entries from `tools.json`
+- Internal primary tool entries from `tools.ts`
 - All three locales plus `x-default` alternates
 
 It does not currently include product detail routes or `/build-info`.
@@ -423,8 +423,8 @@ Components and pages use noun-first PascalCase and folder-based modules:
 - Use `getTools()` / `getProducts()` for rendered catalog data.
 - Use `localizePath()` for internal routes and `toSiteUrl()` / `routeUrl()` for
   absolute URLs.
-- Keep lifecycle values in JSON as uppercase `LIVE`, `BETA`, or `PLANNING`; do
-  not render those enum values directly.
+- Keep lifecycle values in catalog config as uppercase `LIVE`, `BETA`, or
+  `PLANNING`; do not render those enum values directly.
 - Keep component-local CSS next to the component and reuse global tokens instead
   of inventing one-off colors or spacing.
 - Be careful with `CacheManager`: it stores namespaced keys and optional expiry

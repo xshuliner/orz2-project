@@ -6,8 +6,7 @@ import { OPageHero } from '@/components/OPageHero';
 import { OSelector, type OSelectorOption } from '@/components/OSelector';
 import { Seo } from '@/components/Seo';
 import { getToolSeo } from '@/config/seo';
-import { useI18n } from '@/i18n';
-import { getTools } from '@/i18n/catalog';
+import { getTools, useI18n } from '@/i18n';
 import {
   Base64Transfer,
   MetricItem,

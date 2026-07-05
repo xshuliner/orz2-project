@@ -30,7 +30,8 @@
 .privacy-article section {
   scroll-margin-top: 104px;
   padding-bottom: 22px;
-  border-bottom: 1px solid color-mix(in srgb, var(--color-line) 90%, transparent);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-line) 90%, transparent);
 }
 
 @media (max-width: 960px) {

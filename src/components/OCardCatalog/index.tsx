@@ -2,22 +2,19 @@ import { OBadge } from '@/components/OBadge';
 import { OCard } from '@/components/OCard';
 import { OTab } from '@/components/OTab';
 import { OTooltip } from '@/components/OTooltip';
-import {
-  catalogStages,
-  getStageLabel,
-  getStageToneClass,
-} from '@/config/catalog-stages';
+import { catalogStages } from '@/config/catalog';
 import { useI18n } from '@/i18n';
 import type {
   CatalogEntry,
   CatalogIconName,
   CatalogItem,
   CatalogPlatform,
-} from '@/types';
+} from '@/types/catalog';
 import {
   recordCatalogRecentUsage,
   type CatalogRecentKind,
 } from '@/utils/catalogRecentUsage';
+import { getStageLabel, getStageToneClass } from '@/utils/catalogStages';
 import {
   AppWindow,
   Boxes,

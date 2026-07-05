@@ -169,7 +169,8 @@
   gap: 12px;
   margin-top: 0;
   padding-top: 15px;
-  border-top: 1px solid color-mix(in srgb, var(--color-line-soft) 86%, transparent);
+  border-top: 1px solid
+    color-mix(in srgb, var(--color-line-soft) 86%, transparent);
 }
 
 .catalog-card-version,

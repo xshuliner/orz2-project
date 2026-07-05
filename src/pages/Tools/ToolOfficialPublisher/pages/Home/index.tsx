@@ -19,8 +19,7 @@ import { ORadio } from '@/components/ORadio';
 import { OTooltip } from '@/components/OTooltip';
 import { Seo } from '@/components/Seo';
 import { getToolSeo } from '@/config/seo';
-import { useI18n } from '@/i18n';
-import { getTools } from '@/i18n/catalog';
+import { getTools, useI18n } from '@/i18n';
 import {
   promptTemplates,
   type AutoFillKeyPattern,
@@ -926,7 +925,7 @@ export function OfficialPublisher() {
     [form, publisherCopy]
   );
   const completedCount = completionItems.filter(item => item.done).length;
-  // 页面标题 / 描述 / 面包屑文字统一从 tools.json 读取，
+  // 页面标题 / 描述 / 面包屑文字统一从 tools 配置读取，
   // 与目录卡片、SEO 数据保持单一数据源；slug 改了就同步更新。
   const publisherTool = useMemo(
     () => localizedTools.find(item => item.seo?.slug === 'official-publisher'),

@@ -1,5 +1,5 @@
-import type { CatalogStageCopy } from '@/i18n';
-import type { CatalogStage } from '@/types';
+import type { CatalogLocaleCatalog, CatalogStageCopy } from '@/i18n';
+import type { CatalogStage } from '@/types/catalog';
 
 export const messages = {
   common: {
@@ -1191,4 +1191,356 @@ export const messages = {
       ],
     },
   },
+  catalog: {
+    groupTranslations: {
+      运营与效率: 'Ops and Productivity',
+      图片与设计: 'Image and Design',
+      开发调试: 'Developer Debugging',
+      公众号工具: 'WeChat Tools',
+      图片处理: 'Image Processing',
+      效率工具: 'Productivity Tools',
+      开发工具: 'Developer Tools',
+      设计工具: 'Design Tools',
+      'AI 社区': 'AI Community',
+      Saas多端应用: 'SaaS Multi-Platform Apps',
+      浏览器与编辑器扩展: 'Browser and Editor Extensions',
+      互动游戏: 'Interactive Games',
+      个人博客: 'Personal Blog',
+    },
+    tools: {
+      'tool-wechat-publisher': {
+        name: 'WeChat Auto Publisher',
+        summary:
+          'Configure official account credentials, article prompts, cover image, and inline images in one task sheet for automated draft publishing.',
+        badges: ['AI', 'WeChat', 'Auto publish', 'LLM', 'Content ops'],
+        entries: { web: 'Tool entry' },
+        seo: {
+          title: 'WeChat Auto Publisher - ORZ2 Content Ops Tool',
+          description:
+            'Use ORZ2 WeChat Auto Publisher to configure appId, appSecret, article prompts, cover images, and assets for automated draft publishing.',
+          keywords: [
+            'WeChat publisher',
+            'WeChat official account tool',
+            'AI article generation',
+            'content operations tool',
+          ],
+        },
+      },
+      'tool-image': {
+        name: 'Batch Image Studio',
+        summary:
+          'Upload multiple images, apply one conversion, resize, and TinyPNG compression setup, then download the results as a ZIP.',
+        badges: ['Image', 'Batch', 'Convert', 'Resize', 'ZIP'],
+        entries: { web: 'Tool entry' },
+        seo: {
+          title: 'Batch Image Studio - ORZ2 Online Image Tool',
+          description:
+            'ORZ2 Batch Image Studio supports multi-image upload previews, unified format conversion, resizing, TinyPNG compression, and ZIP downloads.',
+          keywords: [
+            'batch image processing',
+            'image compression',
+            'format conversion',
+            'image resize',
+            'ZIP download',
+          ],
+        },
+      },
+      'tool-timezone': {
+        name: 'Time Zone Converter',
+        group: 'Ops and Productivity',
+        summary:
+          'Pick common countries, edit either local time, and convert the other side with daylight saving rules applied.',
+        badges: ['Time zone', 'Countries', 'DST', 'Productivity'],
+        entries: { web: 'Tool entry' },
+        seo: {
+          title: 'Time Zone Converter - ORZ2 Online Productivity Tool',
+          description:
+            'ORZ2 Time Zone Converter supports China, United States, Japan, United Kingdom, and other common country time conversions with IANA daylight saving rules.',
+          keywords: [
+            'time zone converter',
+            'time conversion',
+            'daylight saving time',
+            'United States time',
+            'China time',
+          ],
+        },
+      },
+      'tool-work-report-polisher': {
+        name: 'Daily / Weekly Report Polisher',
+        group: 'Ops and Productivity',
+        summary:
+          'Turn rough work notes into a natural, restrained daily or weekly report while keeping the facts intact.',
+        badges: ['AI', 'Daily report', 'Weekly report', 'Work writing'],
+        entries: { web: 'Tool entry' },
+        seo: {
+          title: 'Daily / Weekly Report Polisher - ORZ2 Productivity Tool',
+          description:
+            'ORZ2 Daily / Weekly Report Polisher turns work notes into natural, restrained reports that keep facts intact and avoid an AI-written tone.',
+          keywords: [
+            'daily report polishing',
+            'weekly report polishing',
+            'work summary',
+            'workplace writing',
+            'AI polishing',
+          ],
+        },
+      },
+      'tool-json': {
+        name: 'JSON Formatter',
+        summary:
+          'Format, validate, and beautify JSON data with syntax highlighting and error detection.',
+        badges: ['JSON', 'Dev', 'Validation'],
+        seo: {
+          title: 'JSON Formatter - ORZ2 Developer Tool',
+          description:
+            'Use ORZ2 JSON Formatter to organize, validate, and inspect JSON data online.',
+          keywords: ['JSON formatter', 'developer tool', 'JSON validation'],
+        },
+      },
+      'tool-color': {
+        name: 'Palette Lab',
+        summary:
+          'A professional color picker with multiple color formats and palette support.',
+        badges: ['Palette', 'Design', 'Accessibility'],
+        seo: {
+          title: 'Palette Lab - ORZ2 Online Design Tool',
+          description:
+            'ORZ2 Palette Lab helps designers and developers generate brand colors, check contrast, and export color values.',
+          keywords: ['online palette', 'design tool', 'color contrast'],
+        },
+      },
+      'tool-base64': {
+        name: 'Base64 Converter',
+        summary: 'Encode and decode text and files with Base64.',
+        badges: ['Base64', 'Encode', 'Decode'],
+        seo: {
+          title: 'Base64 Converter - ORZ2 Developer Tool',
+          description:
+            'ORZ2 Base64 Converter supports Base64 encoding and decoding for text and files during development and debugging.',
+          keywords: ['Base64 converter', 'encoding decoding', 'developer tool'],
+        },
+      },
+      'tool-markdown': {
+        name: 'Markdown Editor',
+        summary:
+          'A rich Markdown editor with live preview and export features.',
+        badges: ['Markdown', 'Editor', 'Preview'],
+        seo: {
+          title: 'Markdown Editor - ORZ2 Developer Tool',
+          description:
+            'ORZ2 Markdown Editor provides live preview, HTML export, file import, and practical editing features.',
+          keywords: ['Markdown editor', 'online editing', 'HTML export'],
+        },
+      },
+      'tool-qrcode': {
+        name: 'QR Code Generator',
+        summary:
+          'Create and customize QR codes for URLs, text, and contact information.',
+        badges: ['QR Code', 'Generator', 'Online'],
+        seo: {
+          title: 'QR Code Generator - ORZ2 Online Tool',
+          description:
+            'ORZ2 QR Code Generator creates QR codes for URLs, text, and contact information with customizable size.',
+          keywords: ['QR code generator', 'QR Code', 'online tool'],
+        },
+      },
+    },
+    products: {
+      silicon: {
+        name: 'Silicon Realm',
+        summary:
+          'Grant Agents identity and permission so they can seek, train, and prove themselves between virtual and real worlds.',
+        badges: ['AI Agent', 'Silicon Heroes', 'Realm Training'],
+        entries: { web: 'Web experience' },
+      },
+      weather: {
+        name: 'Rime Explorer',
+        summary:
+          'An interactive science app combining natural aesthetics and knowledge, with rime albums, simulation, quizzes, and articles.',
+        entries: { h5: 'H5 page', 'wechat-mini': 'WeChat mini program' },
+      },
+      zero: {
+        name: 'Toolbox Ready To Fly',
+        summary:
+          'An innovative app combining AI chat and game simulation calculators for both utility and playful interaction.',
+        entries: { h5: 'H5 page', 'wechat-mini': 'WeChat mini program' },
+      },
+      carbon: {
+        name: 'Toolkit Foundation',
+        summary:
+          'A foundation app that demonstrates SaaS infrastructure, cross-platform components, authentication, social sharing, and poster generation.',
+        entries: { h5: 'H5 page', 'wechat-mini': 'WeChat mini program' },
+      },
+      'code-maker': {
+        name: 'Code Assistant',
+        summary:
+          'A VS Code extension for improving development efficiency, including template generation, opening VS Code windows, and detecting unused assets.',
+      },
+      'chrome-maker': {
+        name: 'Chrome Assistant',
+        summary:
+          'A Chrome extension for office productivity with page optimization and quick actions.',
+      },
+      fiveball: {
+        name: 'Five Ball Lines',
+        summary:
+          'A classic puzzle game where you line up five or more same-colored balls to clear them and score before the board fills up.',
+        entries: { 'h5-game': 'H5 game' },
+      },
+      mathcookies: {
+        name: 'Math Cookies',
+        summary:
+          'A click-and-find game where players eat cookies matching the rule within limited time, making math more playful.',
+        entries: { 'h5-game': 'H5 game' },
+      },
+      'orz2-blog': {
+        name: 'Personal Blog',
+        summary:
+          'A web blog for engineering practice, product thinking, and long-term craft notes.',
+        entries: { web: 'Website' },
+      },
+    },
+    toolGroups: [
+      {
+        name: 'Ops and Productivity',
+        description:
+          'Tools for publishing, scheduling, coordination, and everyday decisions.',
+      },
+      {
+        name: 'Image and Design',
+        description:
+          'Handle images, palettes, visual checks, and frontend-ready assets.',
+      },
+      {
+        name: 'Developer Debugging',
+        description:
+          'Reduce formatting, conversion, validation, and debugging overhead.',
+      },
+    ],
+    productGroups: [
+      {
+        name: 'AI Community',
+        description:
+          'Product experiments around Agents, identity, and long-running interaction.',
+      },
+      {
+        name: 'SaaS Multi-Platform Apps',
+        description:
+          'Mobile entries across H5 and mini programs for lightweight business reach.',
+      },
+      {
+        name: 'Browser and Editor Extensions',
+        description:
+          'Workflow-adjacent capabilities placed close to development and everyday work.',
+      },
+      {
+        name: 'Interactive Games',
+        description:
+          'Small web-playable experiences that keep complete product shape.',
+      },
+      {
+        name: 'Personal Blog',
+        description:
+          'A place for engineering practice, product thinking, and long-term content.',
+      },
+    ],
+    heroMediaLabels: [
+      'Blue Shu',
+      'Green Shu',
+      'Purple Shu',
+      'Red Shu',
+      'Yellow Shu',
+      'Orange Shu',
+    ],
+    testimonials: [
+      {
+        id: 'ops',
+        quote:
+          'ORZ2 is direct enough that new teammates find the right tool without training.',
+        name: 'Lin Qing',
+        title: 'Growth Ops Lead',
+      },
+      {
+        id: 'studio',
+        quote:
+          'It feels light but complete, useful for everyday tasks and custom workflows.',
+        name: 'Mia Chen',
+        title: 'Studio Founder',
+      },
+      {
+        id: 'dev',
+        quote:
+          'The information and compliance notes are clear, which saves time for commercial tool sites.',
+        name: 'Zhou Yuan',
+        title: 'Full-stack Developer',
+      },
+      {
+        id: 'pm',
+        quote:
+          'The structure is clear and users get started with almost no friction.',
+        name: 'Zhang Ming',
+        title: 'Product Manager',
+      },
+      {
+        id: 'design',
+        quote:
+          'The color and motion are restrained, with a strong product feel.',
+        name: 'Li Wei',
+        title: 'UI Designer',
+      },
+      {
+        id: 'startup',
+        quote:
+          'Fast launch, complete compliance docs, and almost no integration surprises.',
+        name: 'Wang Hao',
+        title: 'Startup CTO',
+      },
+      {
+        id: 'freelance',
+        quote:
+          'A solo studio can have its own tool site without a full engineering team.',
+        name: 'Chen Jing',
+        title: 'Independent Developer',
+      },
+      {
+        id: 'marketing',
+        quote:
+          'The built-in compliance module works well for marketing review.',
+        name: 'Liu Yang',
+        title: 'Marketing Director',
+      },
+    ],
+    teamMemberProfiles: [
+      [
+        'Shu Xiaolan',
+        'Project Manager',
+        'Keeps project rhythm, requirement breakdown, and delivery quality steady from idea to launch.',
+      ],
+      [
+        'Shu Xiaolv',
+        'Full-stack Developer',
+        'Connects frontend, backend, and deployment while caring about performance and maintainability.',
+      ],
+      [
+        'Shu Xiaozi',
+        'Product Manager',
+        'Translates user scenes into clear features and balances business goals, experience, and cost.',
+      ],
+      [
+        'Shu Xiaohong',
+        'UI Designer',
+        'Builds a consistent interface language that feels professional, usable, and memorable.',
+      ],
+      [
+        'Shu Xiaohuang',
+        'Finance',
+        'Tracks cost, revenue, and commercial metrics for healthy long-term operation.',
+      ],
+      [
+        'Shu Xiaocheng',
+        'HR',
+        'Supports collaboration, growth, and team culture so people can work in the right place.',
+      ],
+    ],
+  } satisfies CatalogLocaleCatalog,
 } as const;

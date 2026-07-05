@@ -1,4 +1,4 @@
-import { siteConfig } from '@/config';
+import { siteConfig } from '@/config/site';
 import { useBuildInfo } from '@/hooks/useBuildInfo';
 import { useI18n } from '@/i18n';
 import { getBuildInfoCommit, getBuildInfoVersion } from '@/utils/buildInfo';

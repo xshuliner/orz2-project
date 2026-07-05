@@ -1,14 +1,13 @@
-import productsData from '@/config/products.json';
-import toolsData from '@/config/tools.json';
-import type {
-  CatalogGroup,
-  CatalogItem,
-  HeroMedia,
-  TeamMember,
-  Testimonial,
-} from '@/types';
+import productsData from '@/config/products';
+import toolsData from '@/config/tools';
+import type { CatalogGroup, CatalogItem } from '@/types/catalog';
+import type { HeroMedia, TeamMember, Testimonial } from '@/types/site';
 
 const heroBase = 'https://cos.orz2.online/Orz2/Hero';
+
+export const siteConfig = {
+  contactEmail: 'agjgj187076081@gmail.com',
+} as const;
 
 export const heroMedia: HeroMedia[] = [
   {
@@ -49,8 +48,8 @@ export const heroMedia: HeroMedia[] = [
   },
 ];
 
-export const tools = toolsData as CatalogItem[];
-export const products = productsData as CatalogItem[];
+export const tools: CatalogItem[] = toolsData;
+export const products: CatalogItem[] = productsData;
 
 /**
  * 跨页面共用的简短中文标签。

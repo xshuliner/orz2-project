@@ -1,8 +1,7 @@
 import { OButton } from '@/components/OButton';
-import { siteConfig } from '@/config';
-import { useI18n } from '@/i18n';
-import { getHeroMedia } from '@/i18n/catalog';
-import type { HeroMedia } from '@/types';
+import { siteConfig } from '@/config/site';
+import { getHeroMedia, useI18n } from '@/i18n';
+import type { HeroMedia } from '@/types/site';
 import { prefersReducedMotion } from '@/utils/motion';
 import { ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';

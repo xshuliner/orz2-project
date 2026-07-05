@@ -18,7 +18,8 @@
 .o-modal-panel {
   position: relative;
   width: min(100%, 520px);
-  border: 1px solid color-mix(in srgb, var(--color-green) 18%, var(--color-line));
+  border: 1px solid
+    color-mix(in srgb, var(--color-green) 18%, var(--color-line));
   border-radius: var(--radius-modal);
   background:
     linear-gradient(

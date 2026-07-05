@@ -1,10 +1,3 @@
-export interface HeroMedia {
-  id: string;
-  videoSrc: string;
-  posterSrc: string;
-  label: string;
-}
-
 export type CatalogIconName =
   | 'Braces'
   | 'ClipboardPenLine'
@@ -20,6 +13,12 @@ export type CatalogIconName =
 export type CatalogPlatform = 'web' | 'h5' | 'weapp' | 'app' | 'extension';
 
 export type CatalogStage = 'LIVE' | 'BETA' | 'PLANNING';
+
+export interface CatalogStageMeta {
+  label: string;
+  description: string;
+  tone: 'live' | 'beta' | 'planning';
+}
 
 export interface CatalogLifecycle {
   stage: CatalogStage;
@@ -81,31 +80,4 @@ export interface CatalogItem {
 export interface CatalogGroup {
   name: string;
   description: string;
-}
-
-export interface TeamMember {
-  id: string;
-  name: string;
-  role: string;
-  color: string;
-  bio: string;
-  avatarUrl: string;
-}
-
-export interface Testimonial {
-  id: string;
-  quote: string;
-  name: string;
-  title: string;
-}
-
-export interface SeoConfig {
-  title: string;
-  description: string;
-  canonicalPath: string;
-  ogImage?: string;
-  keywords?: string[];
-  locale?: import('@/i18n').Locale;
-  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
-  robots?: string;
 }

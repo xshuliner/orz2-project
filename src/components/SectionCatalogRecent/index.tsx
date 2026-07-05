@@ -1,5 +1,5 @@
 import { OCardCatalog } from '@/components/OCardCatalog';
-import type { CatalogItem } from '@/types';
+import type { CatalogItem } from '@/types/catalog';
 import type { CatalogRecentKind } from '@/utils/catalogRecentUsage';
 import { Clock3 } from 'lucide-react';
 import './index.css';

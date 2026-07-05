@@ -1,6 +1,5 @@
 import { OSectionHeading } from '@/components/OSectionHeading';
-import { useI18n } from '@/i18n';
-import { getTestimonials } from '@/i18n/catalog';
+import { getTestimonials, useI18n } from '@/i18n';
 import { prefersReducedMotion } from '@/utils/motion';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';

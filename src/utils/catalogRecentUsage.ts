@@ -1,4 +1,4 @@
-import type { CatalogItem } from '@/types';
+import type { CatalogItem } from '@/types/catalog';
 import CacheManager from '@/utils/CacheManager';
 
 export type CatalogRecentKind = 'product' | 'tool';

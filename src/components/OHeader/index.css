@@ -11,12 +11,11 @@
   height: var(--header-height);
   margin: 0;
   padding-inline: var(--header-page-gutter);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--color-panel) 92%, transparent),
-      color-mix(in srgb, var(--color-panel) 78%, transparent)
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-panel) 92%, transparent),
+    color-mix(in srgb, var(--color-panel) 78%, transparent)
+  );
   border-bottom: 1px solid
     color-mix(in srgb, var(--color-line) 72%, transparent);
   box-shadow: 0 1px 0 color-mix(in srgb, white 58%, transparent) inset;
@@ -171,12 +170,11 @@
 .site-header .theme-cycle-button:hover {
   transform: none;
   color: var(--color-green-deep);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--color-panel) 96%, transparent),
-      color-mix(in srgb, var(--color-green-soft-active) 76%, var(--color-panel))
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-panel) 96%, transparent),
+    color-mix(in srgb, var(--color-green-soft-active) 76%, var(--color-panel))
+  );
   box-shadow:
     0 8px 18px color-mix(in srgb, var(--color-ink) 7%, transparent),
     inset 0 1px 0 color-mix(in srgb, var(--color-panel) 90%, transparent);
@@ -212,12 +210,11 @@
 .desktop-locale-switch button:hover,
 .desktop-locale-switch button.active {
   color: var(--color-green-deep);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--color-panel) 96%, transparent),
-      color-mix(in srgb, var(--color-green-soft-active) 76%, var(--color-panel))
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-panel) 96%, transparent),
+    color-mix(in srgb, var(--color-green-soft-active) 76%, var(--color-panel))
+  );
   box-shadow:
     0 8px 18px color-mix(in srgb, var(--color-ink) 7%, transparent),
     inset 0 1px 0 color-mix(in srgb, var(--color-panel) 90%, transparent);
@@ -254,12 +251,11 @@
   transform: none;
   color: var(--color-green-deep);
   border-color: color-mix(in srgb, var(--color-line) 86%, transparent);
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--color-panel) 96%, transparent),
-      color-mix(in srgb, var(--color-green-soft-active) 76%, var(--color-panel))
-    );
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-panel) 96%, transparent),
+    color-mix(in srgb, var(--color-green-soft-active) 76%, var(--color-panel))
+  );
   box-shadow:
     0 8px 18px color-mix(in srgb, var(--color-ink) 7%, transparent),
     inset 0 1px 0 color-mix(in srgb, var(--color-panel) 90%, transparent);

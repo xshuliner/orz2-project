@@ -1,7 +1,14 @@
-import { siteConfig } from '@/config';
-import { defaultLocale, getMessages, localizePath, type Locale } from '@/i18n';
-import { getProducts, getTools } from '@/i18n/catalog';
-import type { CatalogEntry, CatalogItem, SeoConfig } from '@/types';
+import { siteConfig } from '@/config/site';
+import {
+  defaultLocale,
+  getMessages,
+  getProducts,
+  getTools,
+  localizePath,
+  type Locale,
+} from '@/i18n';
+import type { CatalogEntry, CatalogItem } from '@/types/catalog';
+import type { SeoConfig } from '@/types/seo';
 import { toSiteUrl } from '@/utils/siteUrl';
 
 export const siteName = 'ORZ2';

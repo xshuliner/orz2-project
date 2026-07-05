@@ -4,8 +4,7 @@ import { OCard } from '@/components/OCard';
 import { OPageHero } from '@/components/OPageHero';
 import { Seo } from '@/components/Seo';
 import { getToolSeo } from '@/config/seo';
-import { useI18n } from '@/i18n';
-import { getTools } from '@/i18n/catalog';
+import { getTools, useI18n } from '@/i18n';
 import CacheManager from '@/utils/CacheManager';
 import {
   ArrowLeft,

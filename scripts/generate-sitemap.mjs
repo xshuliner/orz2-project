@@ -1,7 +1,7 @@
-import { readFile, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadEnv } from 'vite';
+import { createServer, loadEnv } from 'vite';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = resolve(__dirname, '..');
@@ -60,9 +60,27 @@ const pages = [
   { path: '/design-system', changefreq: 'monthly', priority: '0.6' },
 ];
 
-const tools = JSON.parse(
-  await readFile(new URL('../src/config/tools.json', import.meta.url), 'utf8')
-);
+async function loadTools() {
+  const server = await createServer({
+    root: rootDir,
+    logLevel: 'error',
+    optimizeDeps: {
+      include: [],
+      noDiscovery: true,
+    },
+    server: { middlewareMode: true },
+    appType: 'custom',
+  });
+
+  try {
+    const module = await server.ssrLoadModule('/src/config/tools.ts');
+    return module.default;
+  } finally {
+    await server.close();
+  }
+}
+
+const tools = await loadTools();
 
 const urls = [
   ...pages,

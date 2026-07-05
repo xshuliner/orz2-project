@@ -3,8 +3,7 @@ import { OIconButton } from '@/components/OIconButton';
 import { OPageHero } from '@/components/OPageHero';
 import { Seo } from '@/components/Seo';
 import { getToolSeo } from '@/config/seo';
-import { useI18n, type Locale } from '@/i18n';
-import { getTools } from '@/i18n/catalog';
+import { getTools, useI18n, type Locale } from '@/i18n';
 import {
   ArrowLeft,
   ArrowRightLeft,

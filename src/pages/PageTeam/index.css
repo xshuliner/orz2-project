@@ -14,7 +14,11 @@
   gap: 18px;
   align-items: center;
   overflow: hidden;
-  border-color: color-mix(in srgb, var(--color-green) 14%, var(--color-line-card));
+  border-color: color-mix(
+    in srgb,
+    var(--color-green) 14%,
+    var(--color-line-card)
+  );
 }
 
 .team-card::before {
