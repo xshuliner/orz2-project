@@ -106,8 +106,8 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
     item.media.kind === 'icon' ? mediaIcons[item.media.name] : null;
 
   function getQrValue(entry: Extract<CatalogEntry, { kind: 'link' }>) {
-    if (!isInternalHref(entry.href)) return entry.qrValue;
-    return routeUrl(entry.href);
+    if (isInternalHref(entry.href)) return routeUrl(entry.href);
+    return entry.qrValue ?? entry.href;
   }
 
   return (
