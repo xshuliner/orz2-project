@@ -247,26 +247,23 @@ The project uses a lightweight custom i18n layer, not `react-intl` or `i18next`.
 | `en`    | `/en`      | `en`          | `en_US`   |
 | `ja`    | `/ja`      | `ja`          | `ja_JP`   |
 
-`src/i18n/locales/{zh-CN,en,ja}.ts` export `messages`. Add new user-visible
-message keys to all three locale files. Components should render copy through
-`const { messages } = useI18n()` and should not hard-code Chinese, English, or
-Japanese strings in shared UI.
+`src/i18n/` is split by concern:
 
-`src/i18n/index.tsx` exposes locale metadata, route localization helpers,
-message accessors, localized catalog accessors, `I18nProvider`, and the current
-`useI18n()` compatibility export. `I18nProvider` syncs
-`document.documentElement.lang` and persists the active locale to `orz2:locale`.
+- `locale.ts` — locale metadata, path/localization helpers
+- `messages.ts` — per-locale dictionaries; add new user-visible keys to all
+  three locale files in `src/i18n/locales/{zh-CN,en,ja}.ts`
+- `catalog.ts` — localized catalog accessors (`getTools`, `getProducts`,
+  hero media, testimonials, team members)
+- `context.tsx` — `I18nProvider`, which syncs `document.documentElement.lang`
+  and persists the active locale to `orz2:locale`
+- `types.ts` — i18n-related types
+- `index.tsx` — thin compatibility barrel re-exporting all of the above plus
+  `useI18n` from `src/hooks/useI18n.ts`
 
-When touching i18n boundaries, keep config/data separate from behavior:
-
-- Locale dictionaries stay in `src/i18n/locales/`.
-- Source catalog/site data stays in `src/config/`.
-- Shared React hook APIs should live in `src/hooks/` when extracted or newly
-  added; keep compatibility re-exports if existing imports rely on `@/i18n`.
-
-Use `localizePath()` or components that call it internally (`OButton` with `to`)
-for internal links. Use `routeUrl()` / `toSiteUrl()` for absolute canonical,
-alternate, and QR URLs.
+Components should read copy through `const { messages } = useI18n()` and never
+hard-code Chinese, English, or Japanese strings in shared UI. Use `localizePath()`
+or internal-link components (`OButton` with `to`) for in-app routes, and
+`toSiteUrl()` / `routeUrl()` for absolute canonical, alternate, and QR URLs.
 
 ### Theme & Styling
 
@@ -417,8 +414,10 @@ Key behaviors:
 - Browser-side canvas resize and format conversion for PNG/JPEG/WebP
 - Optional TinyPNG compression via `postTinifyImage`
 - AVIF input support with browser fallback output handling
-- Base64 image import/copy helpers in `ImageToolParts`
+- Base64 image import/copy helpers in `components/ImageToolParts/`
 - Batch processing with per-item status and ZIP download through `jszip`
+- Local structure: `config/index.ts` for tool id and SEO key,
+  `utils/imageProcessing.ts` for canvas transforms
 
 ### Tool: Timezone Converter
 
@@ -429,9 +428,9 @@ Key behaviors:
 - Converts local date/time between two selected IANA time zones
 - Uses `Intl.DateTimeFormat` for localized display names, offsets, and DST
   handling
-- Tool-specific zone options and conversion helpers currently live in the page;
-  move them to local `config/` or `utils/` only if they become hard to scan or
-  are reused
+- Local structure: `config/index.ts` for zone options and SEO keys,
+  `utils/dateTime.ts` for parsing/formatting, `components/TimezoneSideCard/`
+  for the per-side panel
 
 ### Tool: Work Report Polisher
 
@@ -505,16 +504,12 @@ Components and pages use noun-first PascalCase and folder-based modules:
   `SectionTestimonial`, `SectionContact`
 - Design system and shell components: `O*`, including `OHeader` and `OFooter`
 
-Within a product/tool module, prefer these local folders only when the feature
-needs them:
-
-- `routes/` for lazy route objects only
-- `pages/` for route-level screens
-- `components/` for feature-only JSX pieces
-- `config/` for feature-only static options, templates, defaults, and labels
-  that are not locale copy
-- `hooks/` for feature-only React hooks
-- `utils/` for feature-only pure functions
+Within a product/tool module, the same folder split (see Directory Ownership &
+Placement Rules) applies locally: `routes/` for lazy routes, `pages/` for
+route-level screens, `components/` for feature-only JSX, `config/` for
+feature-only static options and defaults, `hooks/` for local hooks,
+`utils/` for local pure functions. Promote code to `src/components`,
+`src/hooks`, or `src/utils` only after it is genuinely shared.
 
 ### Static Assets & Output
 
@@ -527,24 +522,16 @@ needs them:
 
 ### Practical Guidelines
 
-- Prefer `O*` components and existing helpers before adding raw UI.
-- Use `messages` for all shared user-facing text; add keys to all locales.
-- Use `getTools()` / `getProducts()` for rendered catalog data.
-- Use `localizePath()` for internal routes and `toSiteUrl()` / `routeUrl()` for
-  absolute URLs.
-- Put new global configuration in `src/config/`; put feature-only templates,
-  options, and defaults in the feature module's local `config/`.
-- Put reusable hooks in `src/hooks/`; put feature-only hooks in the feature
-  module's local `hooks/`.
-- Keep `src/i18n/index.tsx` focused on locale/message/path behavior. Do not add
-  unrelated feature constants or generic utilities there.
-- Avoid growing large route pages indefinitely. Split only along real concerns:
-  local components, local hooks, local config, and local utils.
+The Directory Ownership & Placement Rules already cover most daily decisions.
+In addition:
+
+- Prefer `O*` components and existing helpers before adding raw UI; reach for
+  raw DOM only when no design-system component fits.
 - Keep lifecycle values in catalog config as uppercase `LIVE`, `BETA`, or
-  `PLANNING`; do not render those enum values directly.
-- Keep component-local CSS next to the component and reuse global tokens instead
-  of inventing one-off colors or spacing.
-- Be careful with `CacheManager`: it stores namespaced keys and optional expiry
-  metadata.
-- Avoid changing generated `dist/`, `*.tsbuildinfo`, `test-results/`, or
+  `PLANNING`; render them through helpers, never inline.
+- Keep component-local CSS next to the component and reuse global tokens
+  instead of inventing one-off colors or spacing.
+- `CacheManager` stores namespaced keys and optional expiry metadata; remember
+  browser storage keys may not match the raw key string.
+- Do not edit generated `dist/`, `*.tsbuildinfo`, `test-results/`, or
   build-info artifacts unless the task explicitly calls for generated output.
