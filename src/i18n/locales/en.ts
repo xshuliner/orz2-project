@@ -642,12 +642,12 @@ export const messages = {
       {
         id: 'cookies',
         title: 'Cookies and Local Storage',
-        body: 'ORZ2 may use necessary cookies or local storage to save theme, language, sign-in state, form drafts, and recent usage. After Google AdSense is enabled, Google and other third-party advertising vendors may use cookies, similar technologies, or web beacons to serve, measure, and personalize ads based on visits to this site and other sites.',
+        body: 'ORZ2 may use necessary cookies or local storage to save theme, language, sign-in state, form drafts, and recent usage. After Google Analytics and Google AdSense are enabled, Google and other third-party service providers may use cookies, similar technologies, or web beacons to help measure site performance and to serve, measure, and personalize ads based on visits to this site and other sites.',
       },
       {
         id: 'third-party',
         title: 'Third-Party Services and Ads',
-        body: 'When this site uses Google AdSense, Google advertising cookies enable Google and its partners to serve ads based on visits to this site and other sites on the Internet. If third-party ad serving is not disabled, other third-party vendors or ad networks may also use cookies to serve ads. Users may manage personalized advertising through Google Ads Settings https://adssettings.google.com or https://www.aboutads.info.',
+        body: 'This site uses Google Analytics to measure traffic sources, page performance, and basic interaction trends. When this site uses Google AdSense, Google advertising cookies enable Google and its partners to serve ads based on visits to this site and other sites on the Internet. If third-party ad serving is not disabled, other third-party vendors or ad networks may also use cookies to serve ads. Users may manage related preferences through Google Data & Privacy https://myaccount.google.com/data-and-privacy, Google Ads Settings https://adssettings.google.com, or https://www.aboutads.info.',
       },
       {
         id: 'consent',

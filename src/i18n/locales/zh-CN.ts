@@ -612,12 +612,12 @@ export const messages = {
       {
         id: 'cookies',
         title: 'Cookie 与本地存储',
-        body: 'ORZ2 可使用必要 Cookie 或本地存储保存主题、语言、登录态、表单草稿和最近使用记录。接入 Google AdSense 后，Google 和其他第三方广告供应商可能使用 Cookie、类似技术或 Web beacon，根据用户访问本站或其他网站的情况展示、衡量和个性化广告。',
+        body: 'ORZ2 可使用必要 Cookie 或本地存储保存主题、语言、登录态、表单草稿和最近使用记录。接入 Google Analytics 和 Google AdSense 后，Google 和其他第三方服务商可能使用 Cookie、类似技术或 Web beacon，帮助统计访问表现，并根据用户访问本站或其他网站的情况展示、衡量和个性化广告。',
       },
       {
         id: 'third-party',
         title: '第三方服务与广告',
-        body: '本站使用 Google AdSense 时，Google 的广告 Cookie 可帮助 Google 及其合作伙伴基于用户访问本站或互联网上其他网站的情况投放广告。如未关闭第三方广告投放，其他第三方供应商或广告网络也可能使用 Cookie 投放广告。用户可访问 Google 广告设置 https://adssettings.google.com 或 https://www.aboutads.info 管理个性化广告偏好。',
+        body: '本站使用 Google Analytics 衡量访问来源、页面表现和基础互动趋势；使用 Google AdSense 时，Google 的广告 Cookie 可帮助 Google 及其合作伙伴基于用户访问本站或互联网上其他网站的情况投放广告。如未关闭第三方广告投放，其他第三方供应商或广告网络也可能使用 Cookie 投放广告。用户可访问 Google 隐私设置 https://myaccount.google.com/data-and-privacy、Google 广告设置 https://adssettings.google.com 或 https://www.aboutads.info 管理相关偏好。',
       },
       {
         id: 'consent',

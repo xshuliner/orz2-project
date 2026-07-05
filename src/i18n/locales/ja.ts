@@ -643,12 +643,12 @@ export const messages = {
       {
         id: 'cookies',
         title: 'Cookie とローカルストレージ',
-        body: 'ORZ2 は必要な Cookie またはローカルストレージを用いて、テーマ、言語、ログイン状態、フォーム下書き、最近の利用記録を保存する場合があります。Google AdSense 導入後、Google およびその他の第三者広告ベンダーは、Cookie、類似技術、Web beacon を利用し、本サイトまたは他サイトへの訪問に基づいて広告の配信、測定、パーソナライズを行う場合があります。',
+        body: 'ORZ2 は必要な Cookie またはローカルストレージを用いて、テーマ、言語、ログイン状態、フォーム下書き、最近の利用記録を保存する場合があります。Google Analytics および Google AdSense 導入後、Google とその他の第三者サービス提供者は、Cookie、類似技術、Web beacon を利用し、サイトの利用状況を測定し、本サイトまたは他サイトへの訪問に基づいて広告の配信、測定、パーソナライズを行う場合があります。',
       },
       {
         id: 'third-party',
         title: '第三者サービスと広告',
-        body: '本サイトで Google AdSense を使用する場合、Google の広告 Cookie により、Google とそのパートナーは本サイトおよびインターネット上の他サイトへの訪問に基づいて広告を配信できます。第三者広告配信を無効にしていない場合、その他の第三者ベンダーや広告ネットワークも Cookie を使用して広告を配信する場合があります。ユーザーは Google 広告設定 https://adssettings.google.com または https://www.aboutads.info でパーソナライズ広告の設定を管理できます。',
+        body: '本サイトは Google Analytics を使用して、流入元、ページ性能、基本的な操作傾向を測定します。本サイトで Google AdSense を使用する場合、Google の広告 Cookie により、Google とそのパートナーは本サイトおよびインターネット上の他サイトへの訪問に基づいて広告を配信できます。第三者広告配信を無効にしていない場合、その他の第三者ベンダーや広告ネットワークも Cookie を使用して広告を配信する場合があります。ユーザーは Google データとプライバシー https://myaccount.google.com/data-and-privacy、Google 広告設定 https://adssettings.google.com、または https://www.aboutads.info で関連する設定を管理できます。',
       },
       {
         id: 'consent',
