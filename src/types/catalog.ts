@@ -43,7 +43,7 @@ export type CatalogEntry =
       kind: 'link';
       label: string;
       href: string;
-      qrValue: string;
+      qrValue?: string;
       primary?: boolean;
     }
   | {

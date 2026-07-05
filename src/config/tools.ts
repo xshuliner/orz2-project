@@ -13,7 +13,7 @@ const tools = [
     },
     badges: ['AI', '公众号', '自动发布', 'LLM', '内容运营'],
     lifecycle: {
-      stage: 'BETA',
+      stage: 'LIVE',
       version: '0.6.0',
       updatedAt: '2026-06-03',
     },
@@ -56,7 +56,7 @@ const tools = [
     },
     badges: ['图片', '批量', '转换', '缩放', 'ZIP'],
     lifecycle: {
-      stage: 'BETA',
+      stage: 'LIVE',
       version: '0.2.0',
       updatedAt: '2026-06-08',
     },
@@ -100,7 +100,7 @@ const tools = [
     },
     badges: ['时区', '国家', '夏令时', '效率'],
     lifecycle: {
-      stage: 'BETA',
+      stage: 'LIVE',
       version: '0.1.0',
       updatedAt: '2026-07-03',
     },
@@ -138,7 +138,7 @@ const tools = [
     },
     badges: ['AI', '日报', '周报', '职场写作'],
     lifecycle: {
-      stage: 'BETA',
+      stage: 'LIVE',
       version: '0.1.0',
       updatedAt: '2026-07-04',
     },
