@@ -627,7 +627,7 @@ export const messages = {
       {
         id: 'overview',
         title: 'Overview',
-        body: 'This policy explains how ORZ2 may process information while providing online tools, product showcases, custom collaboration, and site analytics. Initial entity and contact details are placeholders and should be replaced before a formal launch.',
+        body: 'This policy explains how ORZ2 may process information while providing online tools, product showcases, custom collaboration, site analytics, and advertising services. We keep public pages, privacy links, and contact channels accessible.',
       },
       {
         id: 'collection',
@@ -642,12 +642,17 @@ export const messages = {
       {
         id: 'cookies',
         title: 'Cookies and Local Storage',
-        body: 'ORZ2 may use necessary cookies or local storage to save preferences, reduce repeated input, and provide required prompts and settings when analytics or advertising services are added.',
+        body: 'ORZ2 may use necessary cookies or local storage to save theme, language, sign-in state, form drafts, and recent usage. After Google AdSense is enabled, Google and other third-party advertising vendors may use cookies, similar technologies, or web beacons to serve, measure, and personalize ads based on visits to this site and other sites.',
       },
       {
         id: 'third-party',
         title: 'Third-Party Services and Ads',
-        body: 'If Google Ads, analytics, hosting, or email services are added later, those providers may process necessary data under their own policies. We will keep privacy links, contact channels, and ad disclosures visible.',
+        body: 'When this site uses Google AdSense, Google advertising cookies enable Google and its partners to serve ads based on visits to this site and other sites on the Internet. If third-party ad serving is not disabled, other third-party vendors or ad networks may also use cookies to serve ads. Users may manage personalized advertising through Google Ads Settings https://adssettings.google.com or https://www.aboutads.info.',
+      },
+      {
+        id: 'consent',
+        title: 'Regional Consent and Ad Preferences',
+        body: 'When ads are shown to users in the European Economic Area, the UK, or Switzerland, we will provide required disclosures and obtain consent for cookies, local storage, and personalized ads as required by applicable law and Google’s EU User Consent Policy, using Google CMP or a certified third-party CMP. Users may also limit or clear cookies through browser settings.',
       },
       {
         id: 'rights',
@@ -660,7 +665,7 @@ export const messages = {
         bodyBeforeEmail:
           'For questions about this policy or data processing, contact ',
         bodyAfterEmail:
-          '. Before launch, replace this email with the real operator contact channel.',
+          '. We will handle privacy, advertising, and data-use requests within a reasonable time.',
       },
     ],
   },

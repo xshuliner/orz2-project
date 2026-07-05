@@ -26,11 +26,12 @@ pnpm run start:prod   # 加载 .env.prod（用生产 API 排查线上问题）
 
 ## 环境配置
 
-| 文件         | API base                                  | 站点 base          |
-| ------------ | ----------------------------------------- | ------------------ |
-| `.env.dev`   | `http://localhost:9002/apilocal/smart/v1` | `https://orz2.online`     |
-| `.env.uat`   | `https://orz2.online/apiuat/smart/v1`     | `https://orz2.online/uat` |
-| `.env.prod`  | `https://orz2.online/api/smart/v1`        | `https://orz2.online`     |
+| 文件        | API base                                  | 站点 base                 | AdSense |
+| ----------- | ----------------------------------------- | ------------------------- | ------- |
+| `.env`      | -                                         | -                         | 空      |
+| `.env.dev`  | `http://localhost:9002/apilocal/smart/v1` | `https://orz2.online`     | 空      |
+| `.env.uat`  | `https://orz2.online/apiuat/smart/v1`     | `https://orz2.online/uat` | 空      |
+| `.env.prod` | `https://orz2.online/api/smart/v1`        | `https://orz2.online`     | 启用    |
 
 ## 构建与部署
 
@@ -78,3 +79,4 @@ public/       站点根目录静态文件、sitemap、build-info
 
 - `AGENTS.md` —— 面向编码 Agent：架构、目录归属与放置规则、命名约定
 - `docs/UI_UX_GUIDELINES.md` —— 新增页面时的 UI/UX 参考
+- `docs/ADSENSE_CHECKLIST.md` —— Google AdSense 接入、审核与发布检查清单

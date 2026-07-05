@@ -597,7 +597,7 @@ export const messages = {
       {
         id: 'overview',
         title: '协议概述',
-        body: '本协议说明 ORZ2 在提供在线工具、产品展示、定制合作沟通和网站分析时可能涉及的信息处理方式。首版联系和主体信息为可替换占位，正式上线前应替换为真实运营主体。',
+        body: '本协议说明 ORZ2 在提供在线工具、产品展示、定制合作沟通、网站分析和广告服务时可能涉及的信息处理方式。我们会保持公开页面、隐私入口和联系渠道可访问。',
       },
       {
         id: 'collection',
@@ -612,12 +612,17 @@ export const messages = {
       {
         id: 'cookies',
         title: 'Cookie 与本地存储',
-        body: 'ORZ2 可使用必要 Cookie 或本地存储保存偏好设置、减少重复输入，并在接入分析或广告服务时提供必要的提示与配置入口。',
+        body: 'ORZ2 可使用必要 Cookie 或本地存储保存主题、语言、登录态、表单草稿和最近使用记录。接入 Google AdSense 后，Google 和其他第三方广告供应商可能使用 Cookie、类似技术或 Web beacon，根据用户访问本站或其他网站的情况展示、衡量和个性化广告。',
       },
       {
         id: 'third-party',
         title: '第三方服务与广告',
-        body: '后续如接入 Google Ads、统计分析、托管服务或邮件服务，相关第三方可能依据其政策处理必要数据。我们会在页面中保持隐私入口、联系渠道和广告说明清晰可见。',
+        body: '本站使用 Google AdSense 时，Google 的广告 Cookie 可帮助 Google 及其合作伙伴基于用户访问本站或互联网上其他网站的情况投放广告。如未关闭第三方广告投放，其他第三方供应商或广告网络也可能使用 Cookie 投放广告。用户可访问 Google 广告设置 https://adssettings.google.com 或 https://www.aboutads.info 管理个性化广告偏好。',
+      },
+      {
+        id: 'consent',
+        title: '地区性同意与广告偏好',
+        body: '当服务面向欧洲经济区、英国或瑞士用户展示广告时，我们会按适用法律和 Google EU User Consent Policy 的要求，通过 Google CMP 或经认证的第三方 CMP 提供必要披露并获取 Cookie、本地存储和个性化广告所需同意。用户也可以通过浏览器设置限制或清除 Cookie。',
       },
       {
         id: 'rights',
@@ -629,7 +634,7 @@ export const messages = {
         title: '联系我们',
         bodyBeforeEmail: '如对本协议或数据处理方式有疑问，请联系 ',
         bodyAfterEmail:
-          '。正式上线前，请将该邮箱替换为真实运营主体的联系渠道。',
+          '。我们会在合理时间内处理与隐私、广告和数据使用相关的请求。',
       },
     ],
   },

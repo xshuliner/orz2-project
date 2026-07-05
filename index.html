@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#ffffff" />
+    <meta name="google-adsense-account" content="%VITE_GOOGLE_ADSENSE_CLIENT%" />
     <script>
       (function () {
         try {
@@ -29,6 +30,20 @@
         } catch (error) {
           document.documentElement.dataset.theme = 'light';
         }
+      })();
+    </script>
+    <script>
+      (function () {
+        var client = '%VITE_GOOGLE_ADSENSE_CLIENT%';
+        if (!/^ca-pub-\d{16}$/.test(client)) return;
+
+        var script = document.createElement('script');
+        script.async = true;
+        script.crossOrigin = 'anonymous';
+        script.src =
+          'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' +
+          encodeURIComponent(client);
+        document.head.appendChild(script);
       })();
     </script>
     <meta name="robots" content="index, follow" />
