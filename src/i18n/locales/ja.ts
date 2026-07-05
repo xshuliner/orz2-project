@@ -115,13 +115,6 @@ export const messages = {
       emptyState:
         '一致するツールがありません。別のキーワードを試してください。',
       allButton: 'すべてのツールを見る',
-      recent: {
-        title: '最近使用',
-        description:
-          '最近開いた、またはスキャンしたツールを保存し、次回すぐ戻れるようにします。',
-        emptyState:
-          '最近使用したツールはまだありません。任意のツールを開くとここに表示されます。',
-      },
     },
     products: {
       subtitle:
@@ -133,13 +126,6 @@ export const messages = {
       emptyState:
         '一致するプロダクトがありません。別のキーワードを試してください。',
       allButton: 'すべてのプロダクトを見る',
-      recent: {
-        title: '最近使用',
-        description:
-          '最近訪問した、またはスキャンしたプロダクトを保存し、次回すぐ戻れるようにします。',
-        emptyState:
-          '最近使用したプロダクトはまだありません。任意のプロダクトを開くとここに表示されます。',
-      },
     },
     testimonials: {
       title: 'ユーザーの声',

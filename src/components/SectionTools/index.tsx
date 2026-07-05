@@ -3,11 +3,8 @@ import { OCardCatalog } from '@/components/OCardCatalog';
 import { OEmptyState } from '@/components/OEmptyState';
 import { OSectionHeading } from '@/components/OSectionHeading';
 import { OTab } from '@/components/OTab';
-import { SectionCatalogRecent } from '@/components/SectionCatalogRecent';
-import { useCatalogRecentItems } from '@/hooks/useCatalogRecentUsage';
 import { useI18n } from '@/hooks/useI18n';
 import { getToolCategories, getToolGroups, getTools } from '@/i18n';
-import { mergeCatalogItemsWithRecent } from '@/utils/catalogRecentUsage';
 import { getStageLabel } from '@/utils/catalogStages';
 import { Search } from 'lucide-react';
 import { useMemo } from 'react';
@@ -28,7 +25,6 @@ export function SectionTools({
   const { locale, messages } = useI18n();
   const sectionCopy = messages.homeSections.tools;
   const tools = useMemo(() => getTools(locale), [locale]);
-  const recentTools = useCatalogRecentItems('tool', tools, 3);
   const toolGroups = useMemo(() => getToolGroups(locale), [locale]);
   const toolCategories = useMemo(
     () => getToolCategories(locale, messages.common.all),
@@ -41,14 +37,8 @@ export function SectionTools({
     ? (searchParams.get('category') ?? messages.common.all)
     : messages.common.all;
   const baseTools = useMemo(
-    () =>
-      compact
-        ? mergeCatalogItemsWithRecent(
-            recentTools,
-            tools.filter(tool => tool.compact)
-          )
-        : tools,
-    [compact, recentTools, tools]
+    () => (compact ? tools.filter(tool => tool.compact) : tools),
+    [compact, tools]
   );
   const groupMeta = new Map(toolGroups.map(group => [group.name, group]));
   const categoryOptions = toolCategories.map(item => ({
@@ -115,13 +105,6 @@ export function SectionTools({
           />
         </div>
       ) : null}
-      {showFilters ? (
-        <SectionCatalogRecent
-          catalogType='tool'
-          copy={sectionCopy.recent}
-          items={recentTools}
-        />
-      ) : null}
       <div className='tool-groups'>
         {groups.map(group => {
           const groupTools = visibleTools.filter(tool => tool.group === group);
@@ -137,7 +120,7 @@ export function SectionTools({
               </div>
               <div className='tool-grid'>
                 {groupTools.map(tool => (
-                  <OCardCatalog catalogType='tool' item={tool} key={tool.id} />
+                  <OCardCatalog item={tool} key={tool.id} />
                 ))}
               </div>
             </section>

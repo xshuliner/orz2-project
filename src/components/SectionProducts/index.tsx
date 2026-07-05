@@ -3,11 +3,8 @@ import { OCardCatalog } from '@/components/OCardCatalog';
 import { OEmptyState } from '@/components/OEmptyState';
 import { OSectionHeading } from '@/components/OSectionHeading';
 import { OTab } from '@/components/OTab';
-import { SectionCatalogRecent } from '@/components/SectionCatalogRecent';
-import { useCatalogRecentItems } from '@/hooks/useCatalogRecentUsage';
 import { useI18n } from '@/hooks/useI18n';
 import { getProductGroups, getProducts } from '@/i18n';
-import { mergeCatalogItemsWithRecent } from '@/utils/catalogRecentUsage';
 import { getStageLabel } from '@/utils/catalogStages';
 import { Search } from 'lucide-react';
 import { useMemo } from 'react';
@@ -28,7 +25,6 @@ export function SectionProducts({
   const { locale, messages } = useI18n();
   const sectionCopy = messages.homeSections.products;
   const products = useMemo(() => getProducts(locale), [locale]);
-  const recentProducts = useCatalogRecentItems('product', products, 3);
   const productGroups = useMemo(() => getProductGroups(locale), [locale]);
   const [searchParams, setSearchParams] = useSearchParams();
   const showFilters = !compact;
@@ -37,14 +33,8 @@ export function SectionProducts({
     ? (searchParams.get('category') ?? messages.common.all)
     : messages.common.all;
   const baseProducts = useMemo(
-    () =>
-      compact
-        ? mergeCatalogItemsWithRecent(
-            recentProducts,
-            products.filter(product => product.compact)
-          )
-        : products,
-    [compact, products, recentProducts]
+    () => (compact ? products.filter(product => product.compact) : products),
+    [compact, products]
   );
   const groupMeta = new Map(productGroups.map(group => [group.name, group]));
   const categoryOptions = [
@@ -114,13 +104,6 @@ export function SectionProducts({
           />
         </div>
       ) : null}
-      {showFilters ? (
-        <SectionCatalogRecent
-          catalogType='product'
-          copy={sectionCopy.recent}
-          items={recentProducts}
-        />
-      ) : null}
       <div className='product-groups'>
         {categories.map(category => {
           const categoryProducts = visibleProducts.filter(
@@ -138,11 +121,7 @@ export function SectionProducts({
               </div>
               <div className='catalog-grid'>
                 {categoryProducts.map(product => (
-                  <OCardCatalog
-                    catalogType='product'
-                    item={product}
-                    key={product.id}
-                  />
+                  <OCardCatalog item={product} key={product.id} />
                 ))}
               </div>
             </section>

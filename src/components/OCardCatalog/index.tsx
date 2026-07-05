@@ -10,10 +10,6 @@ import type {
   CatalogItem,
   CatalogPlatform,
 } from '@/types/catalog';
-import {
-  recordCatalogRecentUsage,
-  type CatalogRecentKind,
-} from '@/utils/catalogRecentUsage';
 import { getStageLabel, getStageToneClass } from '@/utils/catalogStages';
 import {
   AppWindow,
@@ -78,11 +74,10 @@ function isInternalHref(href: string) {
 }
 
 interface OCardCatalogProps {
-  catalogType?: CatalogRecentKind;
   item: CatalogItem;
 }
 
-export function OCardCatalog({ catalogType, item }: OCardCatalogProps) {
+export function OCardCatalog({ item }: OCardCatalogProps) {
   const { locale, localizePath, messages, routeUrl } = useI18n();
   const common = messages.common;
   const supportsMobileH5 = item.platform.includes('h5');
@@ -109,11 +104,6 @@ export function OCardCatalog({ catalogType, item }: OCardCatalogProps) {
   }));
   const MediaIcon =
     item.media.kind === 'icon' ? mediaIcons[item.media.name] : null;
-
-  function rememberUsage() {
-    if (!catalogType) return;
-    recordCatalogRecentUsage(catalogType, item.id);
-  }
 
   function getQrValue(entry: Extract<CatalogEntry, { kind: 'link' }>) {
     if (!isInternalHref(entry.href)) return entry.qrValue;
@@ -209,7 +199,6 @@ export function OCardCatalog({ catalogType, item }: OCardCatalogProps) {
               <Link
                 className='card-link interactive'
                 to={localizePath(primaryLink.href)}
-                onClick={rememberUsage}
               >
                 <LogIn size={15} aria-hidden='true' />
                 {common.openEntry}
@@ -220,7 +209,6 @@ export function OCardCatalog({ catalogType, item }: OCardCatalogProps) {
                 href={primaryLink.href}
                 target='_blank'
                 rel='noreferrer'
-                onClick={rememberUsage}
               >
                 <LogIn size={15} aria-hidden='true' />
                 {common.openEntry}
@@ -234,7 +222,6 @@ export function OCardCatalog({ catalogType, item }: OCardCatalogProps) {
               contentClassName='catalog-entry-tooltip'
               maxWidth={336}
               placement='top-end'
-              onTriggerClick={rememberUsage}
               content={
                 <div className='catalog-entry-panel'>
                   <div className='catalog-entry-panel-header'>
@@ -316,7 +303,6 @@ export function OCardCatalog({ catalogType, item }: OCardCatalogProps) {
                           <Link
                             className='catalog-entry-direct interactive'
                             to={localizePath(activeEntry.href)}
-                            onClick={rememberUsage}
                           >
                             <ExternalLink size={14} aria-hidden='true' />
                             {common.openLink}
@@ -327,7 +313,6 @@ export function OCardCatalog({ catalogType, item }: OCardCatalogProps) {
                             href={activeEntry.href}
                             target='_blank'
                             rel='noreferrer'
-                            onClick={rememberUsage}
                           >
                             <ExternalLink size={14} aria-hidden='true' />
                             {common.openLink}
