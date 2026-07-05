@@ -2,7 +2,7 @@ import { OPageHero } from '@/components/OPageHero';
 import { SectionTools } from '@/components/SectionTools';
 import { Seo } from '@/components/Seo';
 import { getPageSeo } from '@/config/seo';
-import { useI18n } from '@/i18n';
+import { useI18n } from '@/hooks/useI18n';
 
 export function PageTools() {
   const { locale, messages } = useI18n();

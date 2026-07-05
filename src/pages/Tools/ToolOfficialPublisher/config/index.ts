@@ -1,3 +1,6 @@
+import type { OfficialPublisherMode, OfficialPublisherProvider } from '@/api';
+import type { WechatPublisherForm } from '@/pages/Tools/ToolOfficialPublisher/types';
+
 /**
  * 公众号发布工具 · 智能填充模板配置
  *
@@ -76,6 +79,49 @@ export interface PromptTemplate {
    */
   defaultCheckedPatterns: AutoFillKeyPattern[];
 }
+
+export const officialPublisherToolId = 'tool-wechat-publisher';
+export const officialPublisherSeoKey = 'official-publisher';
+export const officialPublisherStorageKey = 'orz2:official-publisher-form';
+export const wechatConsoleUrl =
+  'https://developers.weixin.qq.com/console/index';
+export const wechatDraftBoxUrl =
+  'https://mp.weixin.qq.com/cgi-bin/appmsg?t=media/appmsg_list&action=list&begin=0&count=10&type=10&lang=zh_CN';
+export const apiWhitelistIp = '43.167.247.143';
+export const publisherStepKeys = [
+  'generate_article',
+  'prepare_cover',
+  'prepare_inline_images',
+  'assemble_draft',
+  'submit_draft',
+  'save_record',
+] as const;
+export const officialPublisherProviders: OfficialPublisherProvider[] = [
+  'AGNES',
+  'MINIMAX',
+];
+export const officialPublisherModes: OfficialPublisherMode[] = [
+  'create',
+  'rewrite',
+];
+export const defaultRewriteRequirement =
+  '请在保留原文核心事实、信息价值和读者收益的基础上，重写成一篇全新的公众号文章。标题、开头、段落顺序、表达方式和案例串联都要明显区别于原文；不要逐句同义替换，不要照搬原文金句；排版要适合微信公众号阅读，整体有层次、有留白、有编辑感。';
+export const defaultForm: WechatPublisherForm = {
+  publishMode: 'create',
+  appId: '',
+  appSecret: '',
+  provider: 'AGNES',
+  promptSystem: '',
+  promptContent: '',
+  sourceArticleUrl: '',
+  rewriteRequirement: defaultRewriteRequirement,
+  imageCover: { type: 'ai', value: '' },
+  imagesInlineList: [],
+  author: '',
+  digest: '',
+  sourceUrl: '',
+  comment: { open: 1, fansOnly: 0 },
+};
 
 export const promptTemplates: PromptTemplate[] = [
   {

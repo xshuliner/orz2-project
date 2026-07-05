@@ -4,7 +4,7 @@ import { OPageHero } from '@/components/OPageHero';
 import { Seo } from '@/components/Seo';
 import { getPageSeo } from '@/config/seo';
 import { useBuildInfo } from '@/hooks/useBuildInfo';
-import { useI18n } from '@/i18n';
+import { useI18n } from '@/hooks/useI18n';
 import type { XshulinerBuildInfo } from '@/types/buildInfo';
 import {
   buildInfoJsonPath,

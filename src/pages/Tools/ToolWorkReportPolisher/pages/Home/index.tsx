@@ -4,8 +4,20 @@ import { OCard } from '@/components/OCard';
 import { OPageHero } from '@/components/OPageHero';
 import { Seo } from '@/components/Seo';
 import { getToolSeo } from '@/config/seo';
-import { getTools, useI18n } from '@/i18n';
-import CacheManager from '@/utils/CacheManager';
+import { useI18n } from '@/hooks/useI18n';
+import { getTools } from '@/i18n';
+import {
+  reportPolisherPolishMode,
+  reportPolisherSeoKey,
+  reportPolisherToolId,
+  type CachedReportPolishForm,
+  type ReportType,
+} from '@/pages/Tools/ToolWorkReportPolisher/config';
+import {
+  getInitialReportPolishForm,
+  persistReportPolishForm,
+} from '@/pages/Tools/ToolWorkReportPolisher/utils/form';
+import { buildPolishContent } from '@/pages/Tools/ToolWorkReportPolisher/utils/prompt';
 import {
   ArrowLeft,
   CheckCircle2,
@@ -19,63 +31,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import './index.css';
 
-type ReportType = 'daily' | 'weekly';
-
-type CachedReportPolishForm = {
-  referenceContent?: string;
-  reportType?: ReportType;
-  source?: string;
-};
-
-const storageKey = 'orz2:work-report-polisher-form';
-
-function normalizeReportType(value: unknown): ReportType {
-  return value === 'weekly' ? 'weekly' : 'daily';
-}
-
-function getInitialForm(): Required<CachedReportPolishForm> {
-  const cached =
-    CacheManager.getLocalStorage<CachedReportPolishForm>(storageKey);
-
-  return {
-    referenceContent:
-      typeof cached?.referenceContent === 'string'
-        ? cached.referenceContent
-        : '',
-    reportType: normalizeReportType(cached?.reportType),
-    source: typeof cached?.source === 'string' ? cached.source : '',
-  };
-}
-
-function buildPolishContent({
-  referenceContent,
-  reportType,
-  source,
-}: {
-  referenceContent: string;
-  reportType: ReportType;
-  source: string;
-}) {
-  const reportTypeLabel = reportType === 'weekly' ? '周报' : '日报';
-  const blocks = [
-    `汇报类型：${reportTypeLabel}`,
-    [
-      '润色要求：',
-      '请只润色「原始记录」里的内容。',
-      '如果提供了「参考示例」，只参考它的结构、语气、详略和表达方式，不复制参考示例中的具体事实。',
-      '最终只输出润色后的汇报正文。',
-    ].join('\n'),
-    `原始记录：\n${source.trim()}`,
-  ];
-
-  const reference = referenceContent.trim();
-  if (reference) {
-    blocks.push(`参考示例：\n${reference}`);
-  }
-
-  return blocks.join('\n\n');
-}
-
 function cx(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(' ');
 }
@@ -83,7 +38,7 @@ function cx(...values: Array<string | false | null | undefined>) {
 export function WorkReportPolisher() {
   const { locale, localizePath, messages } = useI18n();
   const copy = messages.reportPolishTool;
-  const initialForm = useMemo(() => getInitialForm(), []);
+  const initialForm = useMemo(() => getInitialReportPolishForm(), []);
   const [reportType, setReportType] = useState<ReportType>(
     initialForm.reportType
   );
@@ -97,8 +52,7 @@ export function WorkReportPolisher() {
   const [isCopied, setIsCopied] = useState(false);
 
   const tool = useMemo(
-    () =>
-      getTools(locale).find(item => item.id === 'tool-work-report-polisher'),
+    () => getTools(locale).find(item => item.id === reportPolisherToolId),
     [locale]
   );
   const localizedToolSeo = useMemo(() => getToolSeo(locale), [locale]);
@@ -110,7 +64,7 @@ export function WorkReportPolisher() {
   const canPolish = charCount > 0 && !isPolishing;
 
   useEffect(() => {
-    CacheManager.setLocalStorage(storageKey, {
+    persistReportPolishForm({
       referenceContent,
       reportType,
       source,
@@ -163,7 +117,7 @@ export function WorkReportPolisher() {
           reportType,
           source: content,
         }),
-        mode: 'daily_weekly_report',
+        mode: reportPolisherPolishMode,
       });
       setResult(polished.content);
       setStatus(copy.success);
@@ -190,7 +144,7 @@ export function WorkReportPolisher() {
 
   return (
     <>
-      <Seo config={localizedToolSeo['work-report-polisher']} />
+      <Seo config={localizedToolSeo[reportPolisherSeoKey]} />
       <section className='report-polish-page'>
         <Link
           className='report-polish-back-link interactive'

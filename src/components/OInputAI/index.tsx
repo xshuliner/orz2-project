@@ -4,7 +4,7 @@ import {
   type PostPolishContentResult,
 } from '@/api';
 import { OButton } from '@/components/OButton';
-import { useI18n } from '@/i18n';
+import { useI18n } from '@/hooks/useI18n';
 import { Loader2, RotateCcw, Sparkles } from 'lucide-react';
 import {
   forwardRef,

@@ -55,6 +55,68 @@ there is no in-repo backend. Runtime features such as login, Silicon member
 data, content polishing, WeChat publishing, and TinyPNG compression call remote
 ORZ2 APIs from `src/api/orz2.ts`.
 
+### Directory Ownership & Placement Rules
+
+Keep ownership clear: code should live where future maintainers would first look
+for it. Do not dump unrelated concerns into a convenient file, and do not split
+a small cohesive feature just to create more folders.
+
+| Path                                      | Owns                                                                                                  | Do not put here                                                                        |
+| ----------------------------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `src/main.tsx`                            | React root, provider order, router basename, global CSS import                                        | App routes, page logic, feature state, data transforms                                 |
+| `src/App.tsx`                             | One-time app shell concerns such as global effects and `useRoutes(routes)`                            | Route definitions, providers, page-specific loading UI                                 |
+| `src/routes/`                             | Top-level locale-aware route tree and lazy route composition                                          | Page implementation, tool/product business logic, SEO config                           |
+| `src/api/`                                | Remote ORZ2 API functions and API request/response types                                              | UI state, localStorage form state, page formatting helpers                             |
+| `src/config/`                             | Static site/catalog/SEO configuration and source data shared across pages                             | React hooks, DOM reads/writes, runtime state, computed UI behavior                     |
+| `src/i18n/`                               | Locale metadata, locale dictionaries, path localization, message access, localized catalog projection | Non-i18n config, general hooks, page-only copy, unrelated utilities                    |
+| `src/hooks/`                              | Standalone reusable React hooks shared across pages/components                                        | Pure functions without React state/effects, page-only hooks                            |
+| `src/theme/`                              | Theme provider, theme preference state, `useTheme()`                                                  | Component CSS tokens, page themes, unrelated app providers                             |
+| `src/types/`                              | Shared TypeScript types for catalog, site, SEO, build-info                                            | Runtime helpers or feature logic unless they are tiny type-adjacent adapters           |
+| `src/utils/`                              | Shared pure utilities and infrastructure helpers used by multiple areas                               | React hooks, JSX, page-only helper functions, static catalog data                      |
+| `src/styles/`                             | Tailwind entry, global theme tokens, global base/common styles                                        | Component-specific CSS, product microsite CSS                                          |
+| `src/components/`                         | Shared design-system, shell, SEO, auth, and reusable section components                               | Product/tool-specific UI that is only used by one module                               |
+| `src/pages/`                              | Route page modules and feature implementations                                                        | Cross-page primitives that belong in `src/components`, global config, global utilities |
+| `src/assets/`                             | Assets imported by source modules at build time                                                       | Root-served public files or generated build output                                     |
+| `public/`                                 | Root-served static files, generated sitemap/build-info, public skill packages                         | Imported React source assets, editable app code                                        |
+| `scripts/`                                | Node scripts for build-time generation/maintenance                                                    | Runtime browser code                                                                   |
+| `tests/`                                  | Playwright E2E smoke tests                                                                            | Test artifacts or generated reports                                                    |
+| `docs/`                                   | Human-facing project references such as UI/UX guidelines                                              | Source-of-truth runtime config                                                         |
+| `dist/`, `test-results/`, `*.tsbuildinfo` | Generated output/artifacts                                                                            | Hand edits unless explicitly updating generated fixtures/output                        |
+| `resource/`                               | Source/reference media outside the shipped app                                                        | Runtime app assets unless wired into `src` or `public` intentionally                   |
+
+Placement rules:
+
+- `src/i18n/index.tsx` should stay a thin compatibility barrel for i18n exports.
+  Keep implementation in focused files such as `locale.ts`, `messages.ts`,
+  `catalog.ts`, `context.tsx`, and `types.ts`. Do not add generic config, page
+  state, API code, or unrelated helpers there.
+- Standalone hook-style APIs belong in `src/hooks/`. Provider-coupled hooks may
+  stay beside their provider until intentionally extracted. `useI18n()` lives in
+  `src/hooks/useI18n.ts`; `src/i18n/index.tsx` re-exports it only for backward
+  compatibility.
+- Static data belongs in `src/config/` when shared globally. Feature-only static
+  data belongs in that feature's local `config/` folder, for example
+  `src/pages/Tools/ToolOfficialPublisher/config/`.
+- Keep user-visible copy in `src/i18n/locales/{zh-CN,en,ja}.ts`. Shared
+  components and pages should read copy through `messages`; do not hard-code
+  Chinese, English, or Japanese strings in shared UI.
+- Pure transforms used in two or more modules belong in a named file under
+  `src/utils/`, not in `src/utils/utils.ts`. Page-only transforms should stay
+  beside the page in a local `utils/` folder or inside the page file if small.
+- Page modules may use local `routes/`, `pages/`, `components/`, `config/`,
+  `hooks/`, and `utils/` folders. Promote code to `src/components`, `src/hooks`,
+  or `src/utils` only after it is genuinely shared.
+- Route modules under feature folders should only define lazy route objects and
+  paths. Put route UI in `pages/`, route wrappers in local `components/`, and
+  route metadata/SEO in config/i18n as appropriate.
+- `pages/Home/index.tsx` files can orchestrate a feature, but when they become
+  hard to scan split by concern: reusable local JSX to `components/`, form
+  defaults/templates to `config/`, local React state machines to `hooks/`, and
+  pure parsing/formatting to `utils/`.
+- Add abstractions only when they reduce real duplication or clarify ownership.
+  A one-off helper can stay local; a second independent caller is usually the
+  signal to promote it.
+
 ### Stack
 
 - **React 18** + **Vite 6** + **TypeScript 5.7**
@@ -114,6 +176,8 @@ Current app routes:
 - `/tools` -> `PageTools`
 - `/tools/official-publisher` -> WeChat official-account publisher
 - `/tools/smart-image-compressor` -> batch image studio / compressor
+- `/tools/timezone-converter` -> time zone converter
+- `/tools/work-report-polisher` -> daily / weekly report polisher
 - `/team` -> `PageTeam`
 - `/privacy` -> `PagePrivacy`
 - `/design-system` -> internal component gallery
@@ -136,7 +200,7 @@ Static catalog and site data live in `src/config/`:
   lives outside `src/config/`.
 
 Render code should consume localized catalog accessors from
-`src/i18n/catalog.ts`:
+`src/i18n/catalog.ts` or from the compatibility exports in `src/i18n/index.tsx`:
 
 - `getTools(locale)`
 - `getProducts(locale)`
@@ -150,11 +214,10 @@ Render code should consume localized catalog accessors from
 Do not read `tools.ts` or `products.ts` directly from UI components unless you
 are intentionally bypassing localization.
 
-Shared catalog and SEO types live in `src/types/` and are re-exported from
-`src/types.ts`, including `CatalogLifecycle`, `CatalogIconName`,
-`CatalogPlatform`, `CatalogMedia`, `CatalogEntry`, `CatalogItem`,
-`CatalogGroup`, `HeroMedia`, `TeamMember`, `Testimonial`, and `SeoConfig`.
-Build-info types live in `src/types/buildInfo.ts`.
+Shared catalog, site, SEO, and build-info types live in `src/types/`, including
+`CatalogLifecycle`, `CatalogIconName`, `CatalogPlatform`, `CatalogMedia`,
+`CatalogEntry`, `CatalogItem`, `CatalogGroup`, `HeroMedia`, `TeamMember`,
+`Testimonial`, `SeoConfig`, and `XshulinerBuildInfo`.
 
 ### Catalog Behavior
 
@@ -189,9 +252,17 @@ message keys to all three locale files. Components should render copy through
 `const { messages } = useI18n()` and should not hard-code Chinese, English, or
 Japanese strings in shared UI.
 
-`src/i18n/index.tsx` exposes `I18nProvider`, `useI18n()`, route localization
-helpers, locale metadata, and `routeUrl()`. `I18nProvider` syncs
+`src/i18n/index.tsx` exposes locale metadata, route localization helpers,
+message accessors, localized catalog accessors, `I18nProvider`, and the current
+`useI18n()` compatibility export. `I18nProvider` syncs
 `document.documentElement.lang` and persists the active locale to `orz2:locale`.
+
+When touching i18n boundaries, keep config/data separate from behavior:
+
+- Locale dictionaries stay in `src/i18n/locales/`.
+- Source catalog/site data stays in `src/config/`.
+- Shared React hook APIs should live in `src/hooks/` when extracted or newly
+  added; keep compatibility re-exports if existing imports rely on `@/i18n`.
 
 Use `localizePath()` or components that call it internally (`OButton` with `to`)
 for internal links. Use `routeUrl()` / `toSiteUrl()` for absolute canonical,
@@ -349,6 +420,32 @@ Key behaviors:
 - Base64 image import/copy helpers in `ImageToolParts`
 - Batch processing with per-item status and ZIP download through `jszip`
 
+### Tool: Timezone Converter
+
+`src/pages/Tools/ToolTimezoneConverter/` powers `/tools/timezone-converter`.
+
+Key behaviors:
+
+- Converts local date/time between two selected IANA time zones
+- Uses `Intl.DateTimeFormat` for localized display names, offsets, and DST
+  handling
+- Tool-specific zone options and conversion helpers currently live in the page;
+  move them to local `config/` or `utils/` only if they become hard to scan or
+  are reused
+
+### Tool: Work Report Polisher
+
+`src/pages/Tools/ToolWorkReportPolisher/` powers `/tools/work-report-polisher`.
+
+Key behaviors:
+
+- Persists daily/weekly report form state to `orz2:work-report-polisher-form`
+- Builds a restrained polishing prompt from the selected report type, source
+  notes, and optional reference example
+- Calls `postPolishContent()` with `daily_weekly_report`
+- Keep prompt construction and form normalization local unless another tool
+  needs the same behavior
+
 ### Build Info
 
 Build scripts run `xbi generate` before TypeScript/Vite builds. Generated files
@@ -401,11 +498,23 @@ Components and pages use noun-first PascalCase and folder-based modules:
 - Pages: `PageHome`, `PageProducts`, `PageTools`, `PageTeam`, `PagePrivacy`,
   `PageDesignSystem`, `PageBuildInfo`
 - Product/tool modules: `Products/ProductSilicon`,
-  `Tools/ToolOfficialPublisher`, `Tools/ToolImageStudio`
+  `Tools/ToolOfficialPublisher`, `Tools/ToolImageStudio`,
+  `Tools/ToolTimezoneConverter`, `Tools/ToolWorkReportPolisher`
 - Shared components: `LayoutApp`, `ContextAuth`, `Seo`, `EffectsMotion`,
   `SectionHero`, `SectionTools`, `SectionProducts`, `SectionCatalogRecent`,
   `SectionTestimonial`, `SectionContact`
 - Design system and shell components: `O*`, including `OHeader` and `OFooter`
+
+Within a product/tool module, prefer these local folders only when the feature
+needs them:
+
+- `routes/` for lazy route objects only
+- `pages/` for route-level screens
+- `components/` for feature-only JSX pieces
+- `config/` for feature-only static options, templates, defaults, and labels
+  that are not locale copy
+- `hooks/` for feature-only React hooks
+- `utils/` for feature-only pure functions
 
 ### Static Assets & Output
 
@@ -423,6 +532,14 @@ Components and pages use noun-first PascalCase and folder-based modules:
 - Use `getTools()` / `getProducts()` for rendered catalog data.
 - Use `localizePath()` for internal routes and `toSiteUrl()` / `routeUrl()` for
   absolute URLs.
+- Put new global configuration in `src/config/`; put feature-only templates,
+  options, and defaults in the feature module's local `config/`.
+- Put reusable hooks in `src/hooks/`; put feature-only hooks in the feature
+  module's local `hooks/`.
+- Keep `src/i18n/index.tsx` focused on locale/message/path behavior. Do not add
+  unrelated feature constants or generic utilities there.
+- Avoid growing large route pages indefinitely. Split only along real concerns:
+  local components, local hooks, local config, and local utils.
 - Keep lifecycle values in catalog config as uppercase `LIVE`, `BETA`, or
   `PLANNING`; do not render those enum values directly.
 - Keep component-local CSS next to the component and reuse global tokens instead

@@ -1,4 +1,5 @@
-import { stripLocalePrefix, useI18n } from '@/i18n';
+import { useI18n } from '@/hooks/useI18n';
+import { stripLocalePrefix } from '@/i18n';
 import { ProductSiliconWatermark } from '@/pages/Products/ProductSilicon/components/ProductSiliconWatermark';
 import { ArrowLeft, ArrowUpRight } from 'lucide-react';
 import { useEffect, type ReactNode } from 'react';

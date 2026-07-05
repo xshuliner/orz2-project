@@ -1,7 +1,7 @@
 import { OButton } from '@/components/OButton';
 import { OIconButton } from '@/components/OIconButton';
 import { OModal } from '@/components/OModal';
-import { useI18n } from '@/i18n';
+import { useI18n } from '@/hooks/useI18n';
 import CacheManager from '@/utils/CacheManager';
 import { Loader2, MessageCircle, RefreshCw, X } from 'lucide-react';
 import {

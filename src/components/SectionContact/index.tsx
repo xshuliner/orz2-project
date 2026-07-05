@@ -1,7 +1,7 @@
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { siteConfig } from '@/config/site';
-import { useI18n } from '@/i18n';
+import { useI18n } from '@/hooks/useI18n';
 import { ArrowUpRight, Mail, Sparkles } from 'lucide-react';
 import './index.css';
 

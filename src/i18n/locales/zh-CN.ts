@@ -1,4 +1,4 @@
-import type { CatalogLocaleCatalog, CatalogStageCopy } from '@/i18n';
+import type { CatalogLocaleCatalog, CatalogStageCopy } from '@/i18n/types';
 import type { CatalogStage } from '@/types/catalog';
 
 export const messages = {

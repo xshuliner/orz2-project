@@ -3,10 +3,8 @@ import {
   type OfficialCommentConfig,
   type OfficialDraftResult,
   type OfficialImageConfig,
-  type OfficialImageSourceType,
   type OfficialPublisherMode,
   type OfficialPublisherProgressEvent,
-  type OfficialPublisherProvider,
   type PostOfficialPublisherBody,
 } from '@/api';
 import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
@@ -19,21 +17,50 @@ import { ORadio } from '@/components/ORadio';
 import { OTooltip } from '@/components/OTooltip';
 import { Seo } from '@/components/Seo';
 import { getToolSeo } from '@/config/seo';
-import { getTools, useI18n } from '@/i18n';
+import { useI18n } from '@/hooks/useI18n';
+import { getTools } from '@/i18n';
+import { AutoFillChip } from '@/pages/Tools/ToolOfficialPublisher/components/AutoFillChip';
+import { DraftSuccessModal } from '@/pages/Tools/ToolOfficialPublisher/components/DraftSuccessModal';
+import { PublisherProgressPanel } from '@/pages/Tools/ToolOfficialPublisher/components/PublisherProgressPanel';
 import {
+  apiWhitelistIp,
+  defaultForm,
+  defaultRewriteRequirement,
+  officialPublisherModes,
+  officialPublisherProviders,
+  officialPublisherSeoKey,
+  officialPublisherStorageKey,
+  officialPublisherToolId,
   promptTemplates,
-  type AutoFillKeyPattern,
+  wechatConsoleUrl,
   type PromptTemplate,
 } from '@/pages/Tools/ToolOfficialPublisher/config';
+import type {
+  AutoFillKey,
+  AutoFillSnapshot,
+  PublishPhase,
+  PublishStepStatus,
+  WechatPublisherForm,
+} from '@/pages/Tools/ToolOfficialPublisher/types';
+import {
+  expandDefaultCheckedPatterns,
+  newValueForKey,
+  pickInlinePrompt,
+  truncate,
+} from '@/pages/Tools/ToolOfficialPublisher/utils/autofill';
+import {
+  getCompletionItems,
+  getValidationErrors,
+  hasText,
+  normalizeForm,
+} from '@/pages/Tools/ToolOfficialPublisher/utils/form';
+import { createInitialPublishSteps } from '@/pages/Tools/ToolOfficialPublisher/utils/progress';
 import CacheManager from '@/utils/CacheManager';
 import {
-  Activity,
   ArrowLeft,
   CheckCheck,
   CheckCircle2,
-  Circle,
   Clipboard,
-  Clock3,
   Download,
   ExternalLink,
   FileJson,
@@ -47,7 +74,6 @@ import {
   Sparkles,
   Square,
   Trash2,
-  TriangleAlert,
   Upload,
   Wand2,
   X,
@@ -64,651 +90,6 @@ import {
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import './index.css';
-
-interface WechatPublisherForm {
-  publishMode: OfficialPublisherMode;
-  appId: string;
-  appSecret: string;
-  provider: OfficialPublisherProvider;
-  promptSystem: string;
-  promptContent: string;
-  sourceArticleUrl: string;
-  rewriteRequirement: string;
-  imageCover: OfficialImageConfig;
-  imagesInlineList: OfficialImageConfig[];
-  author: string;
-  digest: string;
-  sourceUrl: string;
-  comment: OfficialCommentConfig;
-}
-
-interface CompletionItem {
-  label: string;
-  done: boolean;
-}
-
-type PublishPhase =
-  | 'idle'
-  | 'connecting'
-  | 'publishing'
-  | 'completed'
-  | 'failed';
-type PublishStepStatus =
-  | 'pending'
-  | 'running'
-  | 'completed'
-  | 'warning'
-  | 'failed';
-
-interface PublishStep {
-  index: number;
-  key: string;
-  name: string;
-  status: PublishStepStatus;
-  message?: string;
-  durationMs?: number;
-  requestedCount?: number;
-}
-
-type PublisherCopy = ReturnType<typeof useI18n>['messages']['publisher'];
-
-const storageKey = 'orz2:official-publisher-form';
-const wechatConsoleUrl = 'https://developers.weixin.qq.com/console/index';
-const wechatDraftBoxUrl =
-  'https://mp.weixin.qq.com/cgi-bin/appmsg?t=media/appmsg_list&action=list&begin=0&count=10&type=10&lang=zh_CN';
-const apiWhitelistIp = '43.167.247.143';
-const publisherStepKeys = [
-  'generate_article',
-  'prepare_cover',
-  'prepare_inline_images',
-  'assemble_draft',
-  'submit_draft',
-  'save_record',
-] as const;
-const officialPublisherProviders: OfficialPublisherProvider[] = [
-  'AGNES',
-  'MINIMAX',
-];
-const officialPublisherModes: OfficialPublisherMode[] = ['create', 'rewrite'];
-const defaultRewriteRequirement =
-  '请在保留原文核心事实、信息价值和读者收益的基础上，重写成一篇全新的公众号文章。标题、开头、段落顺序、表达方式和案例串联都要明显区别于原文；不要逐句同义替换，不要照搬原文金句；排版要适合微信公众号阅读，整体有层次、有留白、有编辑感。';
-const defaultForm: WechatPublisherForm = {
-  publishMode: 'create',
-  appId: '',
-  appSecret: '',
-  provider: 'AGNES',
-  promptSystem: '',
-  promptContent: '',
-  sourceArticleUrl: '',
-  rewriteRequirement: defaultRewriteRequirement,
-  imageCover: { type: 'ai', value: '' },
-  imagesInlineList: [],
-  author: '',
-  digest: '',
-  sourceUrl: '',
-  comment: { open: 1, fansOnly: 0 },
-};
-
-function createInitialPublishSteps(
-  stepNames: readonly string[]
-): PublishStep[] {
-  return publisherStepKeys.map((key, index) => ({
-    key,
-    name: stepNames[index] ?? key,
-    index: index + 1,
-    status: 'pending',
-  }));
-}
-
-function formatDuration(durationMs: number) {
-  if (durationMs < 1000) return `${durationMs}ms`;
-  return `${(durationMs / 1000).toFixed(durationMs < 10000 ? 1 : 0)}s`;
-}
-
-function PublisherProgressPanel({
-  copy,
-  elapsedMs,
-  phase,
-  steps,
-}: {
-  copy: PublisherCopy;
-  elapsedMs: number;
-  phase: Exclude<PublishPhase, 'idle'>;
-  steps: PublishStep[];
-}) {
-  const completedCount = steps.filter(
-    step => step.status === 'completed'
-  ).length;
-  const activeStep = steps.find(
-    step => step.status === 'running' || step.status === 'warning'
-  );
-  const progress =
-    phase === 'completed'
-      ? 100
-      : Math.round(
-          ((completedCount + (activeStep ? 0.46 : 0)) / steps.length) * 100
-        );
-  const phaseLabel = copy.progress.phases[phase];
-
-  return (
-    <OCard
-      as='section'
-      className={`publish-progress-card is-${phase}`}
-      aria-label={copy.progress.ariaLabel}
-      padding='md'
-      tone='brand'
-    >
-      <div className='publish-progress-head'>
-        <div className='summary-heading'>
-          <Activity size={18} aria-hidden='true' />
-          <h2>{copy.progress.title}</h2>
-        </div>
-        <span className='publish-live-chip'>
-          <i aria-hidden='true' />
-          {phaseLabel}
-        </span>
-      </div>
-      <div className='publish-progress-meter' aria-hidden='true'>
-        <span style={{ width: `${progress}%` }} />
-      </div>
-      <div className='publish-progress-meta'>
-        <span>
-          {completedCount}/{steps.length} {copy.progress.completedSuffix}
-        </span>
-        <span>
-          <Clock3 size={13} aria-hidden='true' />
-          {formatDuration(elapsedMs)}
-        </span>
-      </div>
-      <ol className='publish-timeline'>
-        {steps.map(step => (
-          <li
-            className={`publish-timeline-step is-${step.status}`}
-            key={step.key}
-          >
-            <span className='publish-step-marker'>
-              {step.status === 'completed' ? (
-                <CheckCircle2 size={17} aria-hidden='true' />
-              ) : step.status === 'failed' || step.status === 'warning' ? (
-                <TriangleAlert size={16} aria-hidden='true' />
-              ) : step.status === 'running' ? (
-                <Loader2 className='spin' size={16} aria-hidden='true' />
-              ) : (
-                <Circle size={14} aria-hidden='true' />
-              )}
-            </span>
-            <div className='publish-step-body'>
-              <strong>
-                <em>{String(step.index).padStart(2, '0')}</em>
-                {step.name}
-              </strong>
-              <p>
-                {step.message ||
-                  (step.status === 'pending'
-                    ? copy.progress.pending
-                    : step.status === 'completed'
-                      ? copy.progress.completed
-                      : copy.progress.running)}
-              </p>
-            </div>
-            {step.durationMs !== undefined ? (
-              <small>{formatDuration(step.durationMs)}</small>
-            ) : null}
-          </li>
-        ))}
-      </ol>
-    </OCard>
-  );
-}
-
-function DraftSuccessModal({
-  copy,
-  draftResult,
-  onClose,
-}: {
-  copy: PublisherCopy;
-  draftResult: OfficialDraftResult | null;
-  onClose: () => void;
-}) {
-  const inlineImages = draftResult?.inlineImages ?? [];
-  const inlineImageCount =
-    inlineImages.length || draftResult?.inlineImagePaths?.length || 0;
-  const coverValue = draftResult?.coverImageUrl || draftResult?.imagePath || '';
-
-  return (
-    <OModal
-      className='draft-success-modal'
-      isOpen
-      onClose={onClose}
-      overlayClassName='draft-success-overlay'
-      titleId='draft-success-title'
-    >
-      <>
-        <OIconButton
-          className='draft-success-close'
-          variant='ghost'
-          onClick={onClose}
-          aria-label={copy.success.closeAriaLabel}
-          autoFocus
-        >
-          <X size={18} aria-hidden='true' />
-        </OIconButton>
-
-        <div className='draft-success-hero'>
-          <div className='draft-success-icon' aria-hidden='true'>
-            <CheckCheck size={31} strokeWidth={2.4} />
-          </div>
-          <p>{copy.success.kicker}</p>
-          <h2 id='draft-success-title'>{copy.success.title}</h2>
-          <span>{copy.success.description}</span>
-        </div>
-
-        <div className='draft-success-content'>
-          <div className='draft-success-highlight'>
-            <div>
-              <small>{copy.success.draftTitle}</small>
-              <strong>
-                {draftResult?.title || copy.success.fallbackTitle}
-              </strong>
-            </div>
-            <FileJson size={22} aria-hidden='true' />
-          </div>
-
-          <dl className='draft-success-grid'>
-            <div>
-              <dt>{copy.success.draftType}</dt>
-              <dd>
-                {draftResult?.articleType === 'newspic'
-                  ? copy.success.typeNewspic
-                  : copy.success.typeNews}
-              </dd>
-            </div>
-            <div>
-              <dt>{copy.success.generatedAt}</dt>
-              <dd>{draftResult?.time || copy.success.justNow}</dd>
-            </div>
-            <div>
-              <dt>{copy.success.cover}</dt>
-              <dd>
-                {coverValue
-                  ? copy.success.coverDone
-                  : copy.success.coverProcessed}
-              </dd>
-            </div>
-            <div>
-              <dt>{copy.success.inlineImages}</dt>
-              <dd>
-                {inlineImageCount
-                  ? `${inlineImageCount} ${copy.success.inlineUploadedSuffix}`
-                  : copy.success.noInline}
-              </dd>
-            </div>
-          </dl>
-
-          {draftResult?.mediaId ? (
-            <div className='draft-success-media'>
-              <span>media_id</span>
-              <code>{draftResult.mediaId}</code>
-            </div>
-          ) : null}
-
-          {coverValue || inlineImageCount ? (
-            <details className='draft-success-details'>
-              <summary className='interactive'>{copy.success.details}</summary>
-              <dl className='summary-list'>
-                {coverValue ? (
-                  <div>
-                    <dt>{copy.success.cover}</dt>
-                    <dd className='summary-mono'>{coverValue}</dd>
-                  </div>
-                ) : null}
-                {inlineImages.length ? (
-                  <div>
-                    <dt>{copy.success.inlineDetail}</dt>
-                    <dd>
-                      {inlineImages.map((image, index) => (
-                        <span
-                          className='summary-mono'
-                          key={`${image.url || image.mediaId}-${index}`}
-                        >
-                          {image.url || image.mediaId}
-                        </span>
-                      ))}
-                    </dd>
-                  </div>
-                ) : draftResult?.inlineImagePaths?.length ? (
-                  <div>
-                    <dt>{copy.success.inlineDetail}</dt>
-                    <dd>
-                      {draftResult.inlineImagePaths?.map((path, index) => (
-                        <span className='summary-mono' key={`${path}-${index}`}>
-                          {path}
-                        </span>
-                      ))}
-                    </dd>
-                  </div>
-                ) : null}
-              </dl>
-            </details>
-          ) : null}
-        </div>
-
-        <footer className='draft-success-actions'>
-          <OButton size='lg' type='button' variant='ghost' onClick={onClose}>
-            {copy.success.stay}
-          </OButton>
-          <OButton
-            href={wechatDraftBoxUrl}
-            size='lg'
-            target='_blank'
-            rel='noreferrer'
-          >
-            {copy.success.goDraftBox}
-            <ExternalLink size={17} aria-hidden='true' />
-          </OButton>
-        </footer>
-
-        <p className='draft-success-footnote'>{copy.success.footnote}</p>
-      </>
-    </OModal>
-  );
-}
-
-// 跟踪被智能填充的字段；key 是稳定路径，支持 imageCover.value 与
-// imagesInlineList.<index>.value 这类嵌套路径。
-type AutoFillKey =
-  | 'promptSystem'
-  | 'promptContent'
-  | 'digest'
-  | `imageCover.value`
-  | `imagesInlineList.${number}.value`;
-
-interface AutoFillSnapshot {
-  templateId: PromptTemplate['id'];
-  templateLabel: string;
-  previousValues: Partial<Record<AutoFillKey, string>>;
-  filledValues: Partial<Record<AutoFillKey, string>>;
-  filledKeys: AutoFillKey[];
-}
-
-function AutoFillChip({
-  copy,
-  onClear,
-}: {
-  copy: PublisherCopy;
-  onClear: () => void;
-}) {
-  return (
-    <span className='autofill-chip'>
-      <Wand2 size={13} aria-hidden='true' />
-      <span>{copy.autoFill.chip}</span>
-      <button
-        className='autofill-chip-clear interactive'
-        type='button'
-        onClick={onClear}
-        aria-label={copy.autoFill.clearAria}
-      >
-        {copy.autoFill.clear}
-      </button>
-    </span>
-  );
-}
-
-function normalizeOfficialPublisherProvider(
-  value: unknown
-): OfficialPublisherProvider {
-  const normalized =
-    typeof value === 'string' ? value.trim().toUpperCase() : '';
-  return officialPublisherProviders.includes(
-    normalized as OfficialPublisherProvider
-  )
-    ? (normalized as OfficialPublisherProvider)
-    : 'AGNES';
-}
-
-function normalizeOfficialPublisherMode(value: unknown): OfficialPublisherMode {
-  const normalized =
-    typeof value === 'string' ? value.trim().toLowerCase() : '';
-  return officialPublisherModes.includes(normalized as OfficialPublisherMode)
-    ? (normalized as OfficialPublisherMode)
-    : 'create';
-}
-
-function normalizeForm(input: unknown): WechatPublisherForm {
-  const source =
-    typeof input === 'object' && input
-      ? (input as Partial<WechatPublisherForm> & Record<string, any>)
-      : {};
-  const inlineList = Array.isArray(source.imagesInlineList)
-    ? source.imagesInlineList
-    : [];
-
-  // 兼容旧 localStorage：imageCoverType + imageCoverValue → imageCover
-  const legacyImageCoverType = source.imageCoverType as
-    | OfficialImageSourceType
-    | undefined;
-  const rawImageCover = (source.imageCover ??
-    {}) as Partial<OfficialImageConfig>;
-  const coverType: OfficialImageSourceType =
-    rawImageCover.type === 'url' || rawImageCover.type === 'base64'
-      ? rawImageCover.type
-      : legacyImageCoverType === 'url' || legacyImageCoverType === 'base64'
-        ? legacyImageCoverType
-        : 'ai';
-  const coverValue =
-    typeof rawImageCover.value === 'string'
-      ? rawImageCover.value
-      : typeof source.imageCoverValue === 'string'
-        ? source.imageCoverValue
-        : '';
-
-  // 兼容旧 localStorage：comment 字符串 → { open, fansOnly } 标志位
-  const rawComment = source.comment as
-    | OfficialCommentConfig
-    | 'open'
-    | 'fansOnly'
-    | undefined;
-  let comment: OfficialCommentConfig = { ...defaultForm.comment };
-  if (rawComment && typeof rawComment === 'object') {
-    comment = {
-      open: rawComment.open === 1 ? 1 : 0,
-      fansOnly: rawComment.fansOnly === 1 ? 1 : 0,
-    };
-  } else if (rawComment === 'fansOnly') {
-    comment = { open: 1, fansOnly: 1 };
-  } else if (rawComment === 'open') {
-    comment = { open: 1, fansOnly: 0 };
-  }
-
-  return {
-    ...defaultForm,
-    ...source,
-    publishMode: normalizeOfficialPublisherMode(
-      source.publishMode ?? source.mode ?? source.scene
-    ),
-    provider: normalizeOfficialPublisherProvider(
-      source.provider ?? source.aiProvider ?? source.ai?.provider
-    ),
-    sourceArticleUrl:
-      typeof source.sourceArticleUrl === 'string'
-        ? source.sourceArticleUrl
-        : typeof source.rewriteHref === 'string'
-          ? source.rewriteHref
-          : '',
-    rewriteRequirement:
-      typeof source.rewriteRequirement === 'string' &&
-      source.rewriteRequirement.trim()
-        ? source.rewriteRequirement
-        : defaultRewriteRequirement,
-    imageCover: { type: coverType, value: coverValue },
-    imagesInlineList: inlineList.slice(0, 9).map(item => ({
-      type: item?.type === 'url' || item?.type === 'base64' ? item.type : 'ai',
-      value: typeof item?.value === 'string' ? item.value : '',
-    })),
-    comment,
-  };
-}
-
-function hasText(value: string) {
-  return Boolean(value.trim());
-}
-
-function isWechatArticleUrl(value: string) {
-  try {
-    const url = new URL(value.trim());
-    return (
-      url.protocol === 'https:' &&
-      url.hostname === 'mp.weixin.qq.com' &&
-      (url.pathname === '/s' || url.pathname.startsWith('/s/'))
-    );
-  } catch {
-    return false;
-  }
-}
-
-function getCompletionItems(
-  form: WechatPublisherForm,
-  copy: PublisherCopy
-): CompletionItem[] {
-  if (form.publishMode === 'rewrite') {
-    return [
-      {
-        label: copy.completion.account,
-        done:
-          hasText(form.appId) &&
-          hasText(form.appSecret) &&
-          Boolean(form.provider),
-      },
-      {
-        label: copy.completion.rewriteSource,
-        done:
-          hasText(form.sourceArticleUrl) &&
-          isWechatArticleUrl(form.sourceArticleUrl),
-      },
-      {
-        label: copy.completion.rewriteRequirement,
-        done: hasText(form.rewriteRequirement),
-      },
-    ];
-  }
-  return [
-    {
-      label: copy.completion.account,
-      done:
-        hasText(form.appId) &&
-        hasText(form.appSecret) &&
-        Boolean(form.provider),
-    },
-    {
-      label: copy.completion.prompt,
-      done: hasText(form.promptSystem) && hasText(form.promptContent),
-    },
-    {
-      label: copy.completion.images,
-      done:
-        Boolean(form.imageCover.type) &&
-        hasText(form.imageCover.value) &&
-        form.imagesInlineList.every(
-          item => Boolean(item.type) && hasText(item.value)
-        ),
-    },
-    {
-      label: copy.completion.meta,
-      done: form.comment.open === 1 || form.comment.fansOnly === 1,
-    },
-  ];
-}
-
-function getValidationErrors(form: WechatPublisherForm, copy: PublisherCopy) {
-  const nextErrors: string[] = [];
-
-  if (!hasText(form.appId)) nextErrors.push(copy.validation.appId);
-  if (!hasText(form.appSecret)) nextErrors.push(copy.validation.appSecret);
-  if (!form.provider) nextErrors.push(copy.validation.provider);
-  if (form.publishMode === 'rewrite') {
-    if (!hasText(form.sourceArticleUrl)) {
-      nextErrors.push(copy.validation.rewriteSourceUrl);
-    } else if (!isWechatArticleUrl(form.sourceArticleUrl)) {
-      nextErrors.push(copy.validation.rewriteSourceUrlInvalid);
-    }
-    if (!hasText(form.rewriteRequirement)) {
-      nextErrors.push(copy.validation.rewriteRequirement);
-    }
-    return nextErrors;
-  }
-  if (!hasText(form.promptSystem))
-    nextErrors.push(copy.validation.promptSystem);
-  if (!hasText(form.promptContent))
-    nextErrors.push(copy.validation.promptContent);
-  if (!form.imageCover.type) nextErrors.push(copy.validation.coverType);
-  if (!hasText(form.imageCover.value))
-    nextErrors.push(copy.validation.coverValue);
-  form.imagesInlineList.forEach((item, index) => {
-    if (!item.type)
-      nextErrors.push(
-        `${copy.validation.inlineTypePrefix} ${index + 1} ${copy.validation.inlineTypeSuffix}`
-      );
-    if (!hasText(item.value))
-      nextErrors.push(
-        `${copy.validation.inlineTypePrefix} ${index + 1} ${copy.validation.inlineValueSuffix}`
-      );
-  });
-  if (form.comment.open === 0 && form.comment.fansOnly === 0) {
-    nextErrors.push(copy.validation.comment);
-  }
-
-  return nextErrors;
-}
-
-function truncate(value: string, max: number) {
-  const normalized = value.replace(/\s+/g, ' ').trim();
-  if (normalized.length <= max) return normalized;
-  return `${normalized.slice(0, max - 1)}…`;
-}
-
-function newValueForKey(template: PromptTemplate, key: AutoFillKey) {
-  if (key === 'promptSystem') return template.fields.promptSystem;
-  if (key === 'promptContent') return template.fields.promptContent;
-  if (key === 'digest') return template.fields.digest;
-  if (key === 'imageCover.value') return template.fields.coverValue;
-  if (key.startsWith('imagesInlineList.')) {
-    const idx = Number(key.split('.')[1]);
-    return pickInlinePrompt(template, idx);
-  }
-  return '';
-}
-
-// 按下标取第 idx + 1 张内嵌图的提示词；超出 inlineValueList 长度时回退到末位。
-function pickInlinePrompt(template: PromptTemplate, idx: number) {
-  const list = template.fields.inlineValueList;
-  if (idx >= 0 && idx < list.length) return list[idx];
-  return list[list.length - 1];
-}
-
-// 按模板的 defaultCheckedPatterns 把通配符展开为具体字段 key
-function expandDefaultCheckedPatterns(
-  patterns: AutoFillKeyPattern[],
-  currentForm: WechatPublisherForm,
-  planFilledKeys: AutoFillKey[]
-): AutoFillKey[] {
-  const expanded: AutoFillKey[] = [];
-  for (const pattern of patterns) {
-    if (pattern === 'imagesInlineList.*.value') {
-      // 展开为「所有 AI 类型内嵌图」的 key
-      planFilledKeys.forEach(key => {
-        if (key.startsWith('imagesInlineList.')) {
-          const idx = Number(key.split('.')[1]);
-          if (currentForm.imagesInlineList[idx]?.type === 'ai') {
-            expanded.push(key);
-          }
-        }
-      });
-    } else if (planFilledKeys.includes(pattern)) {
-      expanded.push(pattern);
-    }
-  }
-  return expanded;
-}
 
 export function OfficialPublisher() {
   const { locale, localizePath, messages } = useI18n();
@@ -755,7 +136,9 @@ export function OfficialPublisher() {
   }, [publisherCopy.modes]);
   const [form, setForm] = useState<WechatPublisherForm>(() => {
     try {
-      return normalizeForm(CacheManager.getLocalStorage(storageKey));
+      return normalizeForm(
+        CacheManager.getLocalStorage(officialPublisherStorageKey)
+      );
     } catch {
       return defaultForm;
     }
@@ -800,7 +183,7 @@ export function OfficialPublisher() {
   const publisherAbortRef = useRef<AbortController | null>(null);
   const publishStartedAtRef = useRef<number | null>(null);
   useEffect(() => {
-    CacheManager.setLocalStorage(storageKey, form);
+    CacheManager.setLocalStorage(officialPublisherStorageKey, form);
   }, [form]);
 
   useEffect(() => {
@@ -928,7 +311,9 @@ export function OfficialPublisher() {
   // 页面标题 / 描述 / 面包屑文字统一从 tools 配置读取，
   // 与目录卡片、SEO 数据保持单一数据源；slug 改了就同步更新。
   const publisherTool = useMemo(
-    () => localizedTools.find(item => item.seo?.slug === 'official-publisher'),
+    () =>
+      localizedTools.find(item => item.id === officialPublisherToolId) ??
+      localizedTools.find(item => item.seo?.slug === officialPublisherSeoKey),
     [localizedTools]
   );
 
@@ -1491,7 +876,7 @@ export function OfficialPublisher() {
 
   return (
     <>
-      <Seo config={localizedToolSeo['official-publisher']} />
+      <Seo config={localizedToolSeo[officialPublisherSeoKey]} />
       <section className='tool-form-page'>
         <div className='tool-form-topbar'>
           <Link className='back-link interactive' to={localizePath('/tools')}>

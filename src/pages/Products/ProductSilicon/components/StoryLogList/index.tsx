@@ -1,6 +1,6 @@
 import { getAvatarBorderColor, ossAvatarUrl, type StoryItem } from '@/api';
 import { getStoryList } from '@/api/orz2';
-import { useI18n } from '@/i18n';
+import { useI18n } from '@/hooks/useI18n';
 import { getStoryTypeLabel } from '@/pages/Products/ProductSilicon/config';
 import dayjs from 'dayjs';
 import gsap from 'gsap';

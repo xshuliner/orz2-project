@@ -4,7 +4,7 @@ import {
   type MemberSummaryBody,
 } from '@/api';
 import { getMemberSummary, postLoginMemberInfo } from '@/api/orz2';
-import { useI18n } from '@/i18n';
+import { useI18n } from '@/hooks/useI18n';
 import StoryLogList, {
   fetchStoryList,
   POLL_INTERVAL_MS,

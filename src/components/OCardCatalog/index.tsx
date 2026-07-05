@@ -3,7 +3,7 @@ import { OCard } from '@/components/OCard';
 import { OTab } from '@/components/OTab';
 import { OTooltip } from '@/components/OTooltip';
 import { catalogStages } from '@/config/catalog';
-import { useI18n } from '@/i18n';
+import { useI18n } from '@/hooks/useI18n';
 import type {
   CatalogEntry,
   CatalogIconName,

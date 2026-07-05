@@ -3,7 +3,7 @@ import { SectionProducts } from '@/components/SectionProducts';
 import { SectionTools } from '@/components/SectionTools';
 import { Seo } from '@/components/Seo';
 import { getPageSeo } from '@/config/seo';
-import { useI18n } from '@/i18n';
+import { useI18n } from '@/hooks/useI18n';
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 
 const SectionTestimonial = lazy(() =>

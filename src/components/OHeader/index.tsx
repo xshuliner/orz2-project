@@ -1,7 +1,8 @@
 import { useAuth } from '@/components/ContextAuth';
 import { OIconButton } from '@/components/OIconButton';
 import { ORadio, type ORadioOption } from '@/components/ORadio';
-import { localeNames, localeShortNames, useI18n, type Locale } from '@/i18n';
+import { useI18n } from '@/hooks/useI18n';
+import { localeNames, localeShortNames, type Locale } from '@/i18n';
 import { useTheme, type ThemePreference } from '@/theme';
 import { LogOut, Menu, Monitor, Moon, Sun, UserCircle, X } from 'lucide-react';
 import { useEffect, useState } from 'react';

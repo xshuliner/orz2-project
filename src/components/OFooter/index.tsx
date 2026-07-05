@@ -1,6 +1,6 @@
 import { siteConfig } from '@/config/site';
 import { useBuildInfo } from '@/hooks/useBuildInfo';
-import { useI18n } from '@/i18n';
+import { useI18n } from '@/hooks/useI18n';
 import { getBuildInfoCommit, getBuildInfoVersion } from '@/utils/buildInfo';
 import { Link } from 'react-router-dom';
 import './index.css';
