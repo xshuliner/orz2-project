@@ -1,7 +1,6 @@
 import {
   defaultLocale,
   localeHtmlLang,
-  localeNames,
   locales,
   localizePath,
   parseLocalizedPath,
@@ -52,6 +51,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     (to: string) => toSiteUrl(localizePath(to, locale)),
     [locale]
   );
+  const messages = getMessages(locale);
 
   const switchLocale = useCallback(
     (nextLocale: Locale) => {
@@ -71,14 +71,16 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const value = useMemo<I18nContextValue>(
     () => ({
       locale,
-      localeName: localeNames[locale] ?? localeNames[defaultLocale],
+      localeName:
+        messages.locale.names[locale] ??
+        getMessages(defaultLocale).locale.names[defaultLocale],
       locales,
-      messages: getMessages(locale),
+      messages,
       localizePath: toLocalizedPath,
       routeUrl: toRouteUrl,
       switchLocale,
     }),
-    [locale, switchLocale, toLocalizedPath, toRouteUrl]
+    [locale, messages, switchLocale, toLocalizedPath, toRouteUrl]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

@@ -68,7 +68,7 @@ function stopDefaultAction(value: unknown) {
 
 function toAuthUser(
   memberInfo: MemberInfo,
-  fallbackName = '微信用户'
+  fallbackName = 'WeChat user'
 ): AuthUser {
   return {
     id: memberInfo._id || memberInfo.sys_thirdId || 'wechat-user',

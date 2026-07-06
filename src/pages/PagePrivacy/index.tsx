@@ -8,7 +8,7 @@ import { Fragment } from 'react';
 import './index.css';
 
 const URL_PATTERN = /(https?:\/\/[^\s]+)/g;
-const URL_TRAILING_PUNCTUATION = /[.。,，、]+$/;
+const URL_TRAILING_PUNCTUATION = /[.\u3001\u3002\uff0c]+$/u;
 
 function renderLinkedText(text: string) {
   return text.split(URL_PATTERN).map((part, index) => {

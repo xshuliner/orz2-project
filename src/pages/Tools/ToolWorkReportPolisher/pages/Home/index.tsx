@@ -113,6 +113,7 @@ export function WorkReportPolisher() {
     try {
       const polished = await postPolishContent({
         content: buildPolishContent({
+          promptCopy: copy.polishPrompt,
           referenceContent,
           reportType,
           source: content,

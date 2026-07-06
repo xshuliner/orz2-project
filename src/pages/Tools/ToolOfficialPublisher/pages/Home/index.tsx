@@ -25,13 +25,12 @@ import { PublisherProgressPanel } from '@/pages/Tools/ToolOfficialPublisher/comp
 import {
   apiWhitelistIp,
   defaultForm,
-  defaultRewriteRequirement,
+  getPromptTemplates,
   officialPublisherModes,
   officialPublisherProviders,
   officialPublisherSeoKey,
   officialPublisherStorageKey,
   officialPublisherToolId,
-  promptTemplates,
   wechatConsoleUrl,
   type PromptTemplate,
 } from '@/pages/Tools/ToolOfficialPublisher/config';
@@ -94,6 +93,18 @@ import './index.css';
 export function OfficialPublisher() {
   const { locale, localizePath, messages } = useI18n();
   const publisherCopy = messages.publisher;
+  const defaultRewriteRequirement = publisherCopy.defaultRewriteRequirement;
+  const localizedDefaultForm = useMemo(
+    () => ({
+      ...defaultForm,
+      rewriteRequirement: defaultRewriteRequirement,
+    }),
+    [defaultRewriteRequirement]
+  );
+  const promptTemplates = useMemo(
+    () => getPromptTemplates(publisherCopy.promptTemplates),
+    [publisherCopy.promptTemplates]
+  );
   const localizedTools = useMemo(() => getTools(locale), [locale]);
   const localizedToolSeo = useMemo(() => getToolSeo(locale), [locale]);
   const commentOptions: Array<{
@@ -137,10 +148,11 @@ export function OfficialPublisher() {
   const [form, setForm] = useState<WechatPublisherForm>(() => {
     try {
       return normalizeForm(
-        CacheManager.getLocalStorage(officialPublisherStorageKey)
+        CacheManager.getLocalStorage(officialPublisherStorageKey),
+        defaultRewriteRequirement
       );
     } catch {
-      return defaultForm;
+      return localizedDefaultForm;
     }
   });
   const [isGenerating, setIsGenerating] = useState(false);
@@ -209,7 +221,7 @@ export function OfficialPublisher() {
     }
   }, [publishPhase]);
 
-  // 计算模板弹层在视口中的位置（fixed 定位 + Portal 渲染，避开 form-panel 的 overflow:hidden）
+  // Position the fixed template popover rendered through a portal.
   useLayoutEffect(() => {
     if (!isTemplateMenuOpen) {
       setPopoverPos(null);
@@ -222,7 +234,7 @@ export function OfficialPublisher() {
       const menuWidth = Math.min(380, window.innerWidth - 32);
       const right = Math.max(16, window.innerWidth - rect.right - 4);
       const top = rect.bottom + 8;
-      // 防止菜单超出左边界
+      // Keep the menu within the left viewport edge.
       if (right + menuWidth > window.innerWidth - 16) {
         setPopoverPos({ top, right: 16 });
       } else {
@@ -238,7 +250,7 @@ export function OfficialPublisher() {
     };
   }, [isTemplateMenuOpen]);
 
-  // 点击模板弹层外部 / Esc 键时收起弹层
+  // Close the template popover on outside click or Escape.
   useEffect(() => {
     if (!isTemplateMenuOpen && !pendingTemplate) return;
     function handleClickOutside(event: MouseEvent) {
@@ -246,7 +258,7 @@ export function OfficialPublisher() {
       if (!target) return;
       if (templateButtonRef.current?.contains(target)) return;
       if (templateMenuRef.current?.contains(target)) return;
-      // 关键：二次确认弹窗的内部点击绝不能关闭弹层
+      // Keep confirmation dialog clicks from closing the popover.
       if (confirmDialogRef.current?.contains(target)) return;
       setTemplateMenuOpen(false);
       if (pendingTemplate) {
@@ -271,7 +283,7 @@ export function OfficialPublisher() {
     };
   }, [isTemplateMenuOpen]);
 
-  // 字段被用户编辑时，自动从「已智能填充」标记中移除（用户接手了内容）
+  // Remove the auto-filled mark once the user edits a field.
   useEffect(() => {
     setAutoFilledKeys(prev => {
       if (prev.size === 0) return prev;
@@ -308,8 +320,7 @@ export function OfficialPublisher() {
     [form, publisherCopy]
   );
   const completedCount = completionItems.filter(item => item.done).length;
-  // 页面标题 / 描述 / 面包屑文字统一从 tools 配置读取，
-  // 与目录卡片、SEO 数据保持单一数据源；slug 改了就同步更新。
+  // Keep page title, description, breadcrumb, cards, and SEO on one catalog source.
   const publisherTool = useMemo(
     () =>
       localizedTools.find(item => item.id === officialPublisherToolId) ??
@@ -576,7 +587,7 @@ export function OfficialPublisher() {
   function handleReset() {
     const confirmed = window.confirm(publisherCopy.status.resetConfirm);
     if (!confirmed) return;
-    setForm(defaultForm);
+    setForm(localizedDefaultForm);
     setErrors([]);
     setDraftResult(null);
     setDraftResultOpen(false);
@@ -603,7 +614,10 @@ export function OfficialPublisher() {
     const file = event.target.files?.[0];
     if (!file) return;
     try {
-      const imported = normalizeForm(JSON.parse(await file.text()));
+      const imported = normalizeForm(
+        JSON.parse(await file.text()),
+        defaultRewriteRequirement
+      );
       setForm(imported);
       setErrors([]);
       setStatusText(publisherCopy.status.importDone);
@@ -626,7 +640,7 @@ export function OfficialPublisher() {
     }
   }
 
-  // 计算模板会填充的字段；AI 图片项即使为空也要进入计划。
+  // Compute fields a template can fill, including empty AI image fields.
   function buildApplyPlan(currentForm: WechatPublisherForm): {
     previousValues: Partial<Record<AutoFillKey, string>>;
     filledKeys: AutoFillKey[];
@@ -657,14 +671,13 @@ export function OfficialPublisher() {
   }
 
   function getTemplateDisplay(template: PromptTemplate) {
-    const meta = publisherCopy.promptTemplates[template.id];
     return {
-      label: meta?.[0] ?? template.label,
-      caption: meta?.[1] ?? template.caption,
+      label: template.label,
+      caption: template.caption,
     };
   }
 
-  // 用户在弹层里点击某个模板卡：若表单为空则直接应用，否则弹出确认
+  // Apply immediately for empty forms; otherwise ask for replacement confirmation.
   function requestApplyTemplate(template: PromptTemplate) {
     const plan = buildApplyPlan(form);
     const hasExistingValues = plan.filledKeys.some(key =>
@@ -675,7 +688,7 @@ export function OfficialPublisher() {
     } else {
       setTemplateMenuOpen(false);
       setPendingTemplate(template);
-      // 按模板的 defaultCheckedPatterns 预勾选；用户仍可在弹窗里手动调整
+      // Preselect fields from defaultCheckedPatterns; users can adjust in the dialog.
       const defaults = expandDefaultCheckedPatterns(
         template.defaultCheckedPatterns,
         form,
@@ -699,7 +712,7 @@ export function OfficialPublisher() {
     setForm(current => {
       const draft: WechatPublisherForm = { ...current };
 
-      // 只替换用户勾选过的字段
+      // Replace only user-selected fields.
       if (keySet.has('promptSystem')) {
         draft.promptSystem = template.fields.promptSystem;
       }
@@ -732,7 +745,7 @@ export function OfficialPublisher() {
       return draft;
     });
 
-    // 把所有被替换的字段都标记为「已智能填充」
+    // Mark replaced fields as auto-filled.
     setAutoFilledKeys(prev => {
       const next = new Set(prev);
       filledKeys.forEach(key => next.add(key));
@@ -756,7 +769,7 @@ export function OfficialPublisher() {
   function confirmPendingTemplate() {
     if (!pendingTemplate) return;
     const plan = buildApplyPlan(form);
-    // 只对用户当前勾选的字段进行替换
+    // Replace only the fields currently selected by the user.
     const filledKeys = plan.filledKeys.filter(key => selectedKeys.has(key));
     const previousValues: Partial<Record<AutoFillKey, string>> = {};
     for (const key of filledKeys) {
@@ -1534,7 +1547,7 @@ export function OfficialPublisher() {
                   const plan = buildApplyPlan(form);
                   const affectedKeys = plan.filledKeys;
                   const templateDisplay = getTemplateDisplay(template);
-                  // 预览该模板的默认预勾选数（用于在卡片上给用户预期）
+                  // Preview the default selected field count for this template card.
                   const defaultKeys = expandDefaultCheckedPatterns(
                     template.defaultCheckedPatterns,
                     form,

@@ -2,22 +2,16 @@ const localeMeta = {
   'zh-CN': {
     prefix: '',
     html: 'zh-CN',
-    name: '中文',
-    short: '中',
     openGraph: 'zh_CN',
   },
   en: {
     prefix: 'en',
     html: 'en',
-    name: 'English',
-    short: 'EN',
     openGraph: 'en_US',
   },
   ja: {
     prefix: 'ja',
     html: 'ja',
-    name: '日本語',
-    short: '日',
     openGraph: 'ja_JP',
   },
 } as const;
@@ -37,8 +31,6 @@ const project = <K extends keyof (typeof localeMeta)[Locale]>(
 
 export const localePrefixes = project('prefix');
 export const localeHtmlLang = project('html');
-export const localeNames = project('name');
-export const localeShortNames = project('short');
 export const localeOpenGraph = project('openGraph');
 
 const prefixedLocales = locales.filter(locale => locale !== defaultLocale);

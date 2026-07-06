@@ -6,7 +6,7 @@ export interface ICreateMiniCodeLoginParams {
   third: string;
 }
 
-// ===== 通用类型 =====
+// ===== Shared types =====
 
 export type TopRankItem = {
   _id: string;
@@ -16,9 +16,9 @@ export type TopRankItem = {
   user_title?: string;
   user_introduction?: string;
   user_exp?: number;
-  /** agent | human，用于头像边框展示 */
+  /** agent | human, used for avatar border rendering */
   identity_mode?: string;
-  /** 与本地 token 的 md5 一致时表示当前登录成员 */
+  /** Matches the md5 of the local token for the current logged-in member */
   identity_hash?: string;
 };
 
@@ -30,7 +30,7 @@ export type MemberSummaryBody = {
   latestRegisterTime?: string;
 };
 
-/** 根据 identity_mode 返回头像边框颜色：agent 红，human 蓝，否则灰 */
+/** Resolve avatar border color from identity_mode. */
 export function getAvatarBorderColor(identity_mode?: string): string {
   if (identity_mode === 'agent') return '#b91c1c';
   if (identity_mode === 'human') return '#2563eb';
@@ -38,7 +38,7 @@ export function getAvatarBorderColor(identity_mode?: string): string {
 }
 
 /**
- * 对来自 oss.xshuliner.online 的头像 URL 附加阿里云 OSS 图片处理参数
+ * Append Aliyun OSS image processing parameters for oss.xshuliner.online avatars.
  */
 export function ossAvatarUrl(url: string, displaySize: number): string {
   if (!url || !url.includes('oss.xshuliner.online')) return url;
@@ -47,7 +47,7 @@ export function ossAvatarUrl(url: string, displaySize: number): string {
   return `${url}${sep}x-oss-process=image/resize,w_${px},h_${px},m_fill/format,webp`;
 }
 
-// ===== 成员列表 & 详情 =====
+// ===== Member list and detail =====
 
 export type BackpackItemDetail = {
   name?: string;
@@ -116,7 +116,7 @@ export type MemberInfo = {
   identity_mode?: string;
 };
 
-// ===== 故事列表 =====
+// ===== Story list =====
 
 export type OperatorMemberInfo = {
   _id: string;
@@ -144,7 +144,7 @@ export type StoryListResult = {
   totalCount: number;
 };
 
-// ===== 公众号发布 =====
+// ===== Official publisher =====
 
 export type OfficialArticleType = 'news' | 'newspic';
 export type OfficialPublisherMode = 'create' | 'rewrite';
@@ -253,7 +253,7 @@ export interface OfficialPublisherProgressEvent {
   skippedInlineImageCount?: number;
 }
 
-// ===== 工具 API =====
+// ===== Tool APIs =====
 
 export interface TinifyImageResult {
   errcode?: number;

@@ -1,9 +1,9 @@
 /**
- * 工具函数集合
+ * Utility helpers.
  */
 
 /**
- * traverseObject - 遍历对象并对每个值应用修饰器
+ * traverseObject - Apply a modifier to every own value of an object.
  */
 const traverseObject = ({
   obj,
@@ -27,7 +27,7 @@ const traverseObject = ({
 };
 
 /**
- * router2url - 将路径和查询对象转换为URL字符串
+ * router2url - Convert a path and query object into a URL string.
  */
 const router2url = (
   path: string,

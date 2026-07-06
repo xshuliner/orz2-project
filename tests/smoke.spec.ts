@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 
+import { messages as enMessages } from '../src/i18n/locales/en';
+import { messages as zhMessages } from '../src/i18n/locales/zh-CN';
+
 const publicRoutes = [
   '/',
   '/en',
@@ -34,11 +37,15 @@ test('login modal opens and closes through the shared modal shell', async ({
 }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-  await page.getByRole('button', { name: '未登录' }).click();
-  await expect(page.getByRole('dialog', { name: '欢迎回来' })).toBeVisible();
+  await page.getByRole('button', { name: zhMessages.header.loggedOut }).click();
+  await expect(
+    page.getByRole('dialog', { name: zhMessages.login.title })
+  ).toBeVisible();
 
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('dialog', { name: '欢迎回来' })).toHaveCount(0);
+  await expect(
+    page.getByRole('dialog', { name: zhMessages.login.title })
+  ).toHaveCount(0);
 });
 
 test('language switching preserves the current route and localized navigation', async ({
@@ -65,7 +72,7 @@ test('language switching preserves the current route and localized navigation', 
 
   await page
     .locator('.header-preferences.desktop-only')
-    .getByRole('button', { name: /日/ })
+    .getByRole('button', { name: enMessages.locale.shortNames.ja })
     .click();
 
   await expect(page).toHaveURL(/\/ja\/products$/);
@@ -95,14 +102,18 @@ test('theme follows system dark mode and manual dark choice persists', async ({
   await themeButton.click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect
-    .poll(() => page.evaluate(() => localStorage.getItem('orz2:theme-preference')))
+    .poll(() =>
+      page.evaluate(() => localStorage.getItem('orz2:theme-preference'))
+    )
     .toBe('dark');
 
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 });
 
-test('localized SEO exposes canonical and alternate links', async ({ page }) => {
+test('localized SEO exposes canonical and alternate links', async ({
+  page,
+}) => {
   await page.goto('/en/tools', { waitUntil: 'domcontentloaded' });
 
   await expect(page).toHaveTitle('Online Tools - ORZ2');
@@ -110,18 +121,15 @@ test('localized SEO exposes canonical and alternate links', async ({ page }) => 
     'href',
     'https://orz2.online/en/tools'
   );
-  await expect(page.locator('link[rel="alternate"][hreflang="zh-CN"]')).toHaveAttribute(
-    'href',
-    'https://orz2.online/tools'
-  );
-  await expect(page.locator('link[rel="alternate"][hreflang="en"]')).toHaveAttribute(
-    'href',
-    'https://orz2.online/en/tools'
-  );
-  await expect(page.locator('link[rel="alternate"][hreflang="ja"]')).toHaveAttribute(
-    'href',
-    'https://orz2.online/ja/tools'
-  );
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="zh-CN"]')
+  ).toHaveAttribute('href', 'https://orz2.online/tools');
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="en"]')
+  ).toHaveAttribute('href', 'https://orz2.online/en/tools');
+  await expect(
+    page.locator('link[rel="alternate"][hreflang="ja"]')
+  ).toHaveAttribute('href', 'https://orz2.online/ja/tools');
   await expect(
     page.locator('link[rel="alternate"][hreflang="x-default"]')
   ).toHaveAttribute('href', 'https://orz2.online/tools');
@@ -139,7 +147,7 @@ test('timezone converter respects US daylight saving changes', async ({
 
   await inputs.first().fill('2026-07-03T20:00');
   await expect(inputs.nth(1)).toHaveValue('2026-07-03T08:00');
-  await expect(page.getByText('夏令时生效')).toBeVisible();
+  await expect(page.getByText(zhMessages.timezoneTool.dstActive)).toBeVisible();
 
   await selects.first().selectOption('japan');
   await expect(inputs.first()).toHaveValue('2026-07-03T21:00');
@@ -156,32 +164,51 @@ test('timezone converter respects US daylight saving changes', async ({
   await selects.nth(1).selectOption('unitedStates');
   await inputs.first().fill('2026-01-03T20:00');
   await expect(inputs.nth(1)).toHaveValue('2026-01-03T07:00');
-  await expect(page.getByText('标准时间 / 冬令时')).toBeVisible();
+  await expect(
+    page.getByText(zhMessages.timezoneTool.dstInactive)
+  ).toBeVisible();
 });
 
 test('work report polisher persists report and reference content', async ({
   page,
 }) => {
-  const reportContent = '本周完成日/周报润色工具页面调整，补充示例输入区域。';
+  const reportContent =
+    'Completed report-polisher page updates and added sample input area.';
   const referenceContent =
-    '本周主要完成页面调整和基础验证，下周继续根据反馈优化。';
+    'This week mainly covered page updates and basic validation. Next week will continue feedback-based refinements.';
 
   await page.goto('/tools/work-report-polisher', {
     waitUntil: 'domcontentloaded',
   });
 
   page.once('dialog', dialog => dialog.accept());
-  await page.getByRole('button', { exact: true, name: '周报' }).click();
-  await page.getByLabel('原始记录').fill(reportContent);
-  await page.getByLabel('示例内容').fill(referenceContent);
+  await page
+    .getByRole('button', {
+      exact: true,
+      name: zhMessages.reportPolishTool.weekly,
+    })
+    .click();
+  await page
+    .getByLabel(zhMessages.reportPolishTool.inputTitle)
+    .fill(reportContent);
+  await page
+    .getByLabel(zhMessages.reportPolishTool.referenceTitle)
+    .fill(referenceContent);
 
   await page.reload({ waitUntil: 'domcontentloaded' });
 
   await expect(
-    page.getByRole('button', { exact: true, name: '周报' })
+    page.getByRole('button', {
+      exact: true,
+      name: zhMessages.reportPolishTool.weekly,
+    })
   ).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByLabel('原始记录')).toHaveValue(reportContent);
-  await expect(page.getByLabel('示例内容')).toHaveValue(referenceContent);
+  await expect(
+    page.getByLabel(zhMessages.reportPolishTool.inputTitle)
+  ).toHaveValue(reportContent);
+  await expect(
+    page.getByLabel(zhMessages.reportPolishTool.referenceTitle)
+  ).toHaveValue(referenceContent);
   await expect
     .poll(() =>
       page.evaluate(() =>
@@ -196,8 +223,12 @@ test('design system modal supports button, backdrop and escape closing', async (
 }) => {
   await page.goto('/design-system', { waitUntil: 'domcontentloaded' });
 
-  const dialog = page.getByRole('dialog', { name: '统一的弹窗容器' });
-  const openModal = page.getByRole('button', { name: '查看弹窗实例' });
+  const dialog = page.getByRole('dialog', {
+    name: zhMessages.designSystem.labels.modalTitle,
+  });
+  const openModal = page.getByRole('button', {
+    name: zhMessages.designSystem.labels.openModal,
+  });
 
   await openModal.click();
   await expect(dialog).toBeVisible();
@@ -217,5 +248,7 @@ test('silicon product keeps its independent theme', async ({ page }) => {
   await expect(page.locator('.product-silicon-theme')).toBeVisible();
   await expect(page.locator('.silicon-nav')).toBeVisible();
   await expect(page.locator('.site-header')).toBeHidden();
-  await expect(page.getByRole('heading', { name: '硅基江湖' })).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: zhMessages.silicon.title })
+  ).toBeVisible();
 });

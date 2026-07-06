@@ -6,12 +6,16 @@ import type {
   CatalogItemTranslation,
   CatalogLocaleCatalog,
 } from '@/i18n/types';
-import type { CatalogGroup, CatalogItem } from '@/types/catalog';
+import type {
+  CatalogBaseItem,
+  CatalogGroup,
+  CatalogItem,
+} from '@/types/catalog';
 import type { HeroMedia, TeamMember, Testimonial } from '@/types/site';
 
 const heroBase = 'https://cos.orz2.online/Orz2/Hero';
-const baseTools: CatalogItem[] = toolsData;
-const baseProducts: CatalogItem[] = productsData;
+const baseTools: CatalogBaseItem[] = toolsData;
+const baseProducts: CatalogBaseItem[] = productsData;
 const heroMediaIds = [
   'shuxiaolan',
   'shuxiaolv',
@@ -43,36 +47,58 @@ function toCatalogGroup(group: CatalogGroup): CatalogGroup {
 }
 
 function localizeCatalogItem(
-  item: CatalogItem,
+  item: CatalogBaseItem,
   catalog: CatalogLocaleCatalog,
   translations: Readonly<Record<string, CatalogItemTranslation>>
 ): CatalogItem {
-  const translation = translations[item.id] ?? {};
+  const translation = translations[item.id];
+  if (!translation) {
+    throw new Error(`Missing catalog i18n mapping for "${item.id}".`);
+  }
+  if (!translation.name || !translation.summary || !translation.badges) {
+    throw new Error(`Incomplete catalog i18n mapping for "${item.id}".`);
+  }
+  if (item.seo && !translation.seo) {
+    throw new Error(`Missing catalog SEO i18n mapping for "${item.id}".`);
+  }
+  const group = catalog.groupTranslations[item.group];
+  if (!group) {
+    throw new Error(`Missing catalog group i18n mapping for "${item.group}".`);
+  }
+
   return {
     ...item,
-    name: translation.name ?? item.name,
-    group:
-      translation.group ?? catalog.groupTranslations[item.group] ?? item.group,
-    summary: translation.summary ?? item.summary,
+    name: translation.name,
+    group: translation.group ?? group,
+    summary: translation.summary,
     media:
       item.media.kind === 'image'
-        ? { ...item.media, alt: translation.mediaAlt ?? item.media.alt }
+        ? { ...item.media, alt: translation.mediaAlt ?? translation.name }
         : item.media,
-    badges: translation.badges ? [...translation.badges] : item.badges,
-    entries: item.entries.map(entry => ({
-      ...entry,
-      label: translation.entries?.[entry.id] ?? entry.label,
-    })),
-    seo: translation.seo
+    badges: [...translation.badges],
+    entries: item.entries.map(entry => {
+      const label = translation.entries?.[entry.id];
+      if (!label) {
+        throw new Error(
+          `Missing catalog entry i18n mapping for "${item.id}.${entry.id}".`
+        );
+      }
+
+      return {
+        ...entry,
+        label,
+      };
+    }),
+    seo: item.seo
       ? {
           ...item.seo,
-          title: translation.seo.title,
-          description: translation.seo.description,
-          keywords: translation.seo.keywords
-            ? [...translation.seo.keywords]
+          title: translation.seo!.title,
+          description: translation.seo!.description,
+          keywords: translation.seo!.keywords
+            ? [...translation.seo!.keywords]
             : undefined,
         }
-      : item.seo,
+      : undefined,
   };
 }
 

@@ -1,4 +1,4 @@
-// 持久化管理器
+// Persistent storage manager.
 class CacheManager {
   private static instance: CacheManager | null = null;
 
@@ -38,10 +38,10 @@ class CacheManager {
 
   /**
    * setStorageCore
-   * @param storage - localStorage 或 sessionStorage 实例
-   * @param key - 业务层 key
-   * @param value - 要保存的值
-   * @param seconds - 过期时间（秒），0 表示不过期
+   * @param storage - localStorage or sessionStorage instance.
+   * @param key - Business key.
+   * @param value - Value to store.
+   * @param seconds - Expiration in seconds; 0 means no expiration.
    */
   setStorageCore(
     storage: Storage,
@@ -63,9 +63,9 @@ class CacheManager {
 
   /**
    * getStorageCore
-   * @param storage - localStorage 或 sessionStorage 实例
-   * @param key - 业务层 key
-   * @param defaultValue - 未命中或解析失败、已过期时返回的默认值
+   * @param storage - localStorage or sessionStorage instance.
+   * @param key - Business key.
+   * @param defaultValue - Value returned when missing, expired, or invalid.
    */
   getStorageCore<T>(
     storage: Storage,
@@ -106,7 +106,7 @@ class CacheManager {
   }
 
   /**
-   * 只清理当前命名空间下的缓存，不清空整个 storage
+   * Clear only this namespace instead of the entire storage.
    */
   clearStorageCore(storage: Storage): void {
     const keysToRemove: string[] = [];

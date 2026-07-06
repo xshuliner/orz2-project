@@ -7,10 +7,10 @@ export interface CatalogStageCopy {
 }
 
 export interface CatalogItemTranslation {
-  name?: string;
+  name: string;
   group?: string;
-  summary?: string;
-  badges?: readonly string[];
+  summary: string;
+  badges: readonly string[];
   entries?: Readonly<Record<string, string>>;
   mediaAlt?: string;
   seo?: {

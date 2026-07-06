@@ -7,7 +7,6 @@ import type {
 } from '@/api';
 import {
   defaultForm,
-  defaultRewriteRequirement,
   officialPublisherModes,
   officialPublisherProviders,
 } from '@/pages/Tools/ToolOfficialPublisher/config';
@@ -37,7 +36,10 @@ function normalizeOfficialPublisherMode(value: unknown): OfficialPublisherMode {
     : 'create';
 }
 
-export function normalizeForm(input: unknown): WechatPublisherForm {
+export function normalizeForm(
+  input: unknown,
+  defaultRewriteRequirement: string
+): WechatPublisherForm {
   const source =
     typeof input === 'object' && input
       ? (input as Partial<WechatPublisherForm> & Record<string, any>)
@@ -46,7 +48,7 @@ export function normalizeForm(input: unknown): WechatPublisherForm {
     ? source.imagesInlineList
     : [];
 
-  // 兼容旧 localStorage：imageCoverType + imageCoverValue → imageCover
+  // Backward compatibility for old localStorage shape: imageCoverType + imageCoverValue.
   const legacyImageCoverType = source.imageCoverType as
     | OfficialImageSourceType
     | undefined;
@@ -65,7 +67,7 @@ export function normalizeForm(input: unknown): WechatPublisherForm {
         ? source.imageCoverValue
         : '';
 
-  // 兼容旧 localStorage：comment 字符串 → { open, fansOnly } 标志位
+  // Backward compatibility for old localStorage shape: comment string flags.
   const rawComment = source.comment as
     | OfficialCommentConfig
     | 'open'

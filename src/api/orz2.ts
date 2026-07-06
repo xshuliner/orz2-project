@@ -14,7 +14,7 @@ import type {
   TinifyImageResult,
 } from './orz2.modal';
 
-// ===== API 根路径 & URL 常量 =====
+// ===== API roots and URL constants =====
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || 'https://orz2.online/api/smart/v1';
@@ -35,8 +35,8 @@ export const OFFICIAL_PUBLISHER_API_URL = `${OFFICIAL_PREFIX}/postOfficialPublis
 export const POLISH_CONTENT_API_URL = `${LLM_PREFIX}/postPolishContent`;
 
 /**
- * 查询二维码登录状态
- * @param params.uuid.required 二维码UUID
+ * Query QR-code login status.
+ * @param params.uuid.required QR-code UUID.
  * @returns Promise
  */
 export const getQueryMiniCodeLogin = async (params: {
@@ -54,7 +54,7 @@ export const getQueryMiniCodeLogin = async (params: {
 };
 
 /**
- * 创建二维码登录
+ * Create QR-code login.
  * @returns Promise
  */
 export const postCreateMiniCodeLogin = async (): Promise<any> => {
@@ -70,7 +70,7 @@ export const postCreateMiniCodeLogin = async (): Promise<any> => {
 };
 
 /**
- * 查询用户信息
+ * Query user profile.
  * @returns Promise
  */
 export const getQueryMemberInfo = async (): Promise<any> => {
@@ -81,9 +81,9 @@ export const getQueryMemberInfo = async (): Promise<any> => {
 };
 
 /**
- * 登录函数
- * @param params.username.required 用户名
- * @param params.password.required 密码
+ * Password login.
+ * @param params.username.required Username.
+ * @param params.password.required Password.
  * @returns Promise<memberInfo, token>
  */
 export const postLoginMemberInfoForPassword = async (params: {
@@ -102,9 +102,9 @@ export const postLoginMemberInfoForPassword = async (params: {
   });
 };
 
-// ===== Silicon API 函数 =====
+// ===== Silicon APIs =====
 
-/** 获取成员汇总信息 */
+/** Query member summary. */
 export async function getMemberSummary(): Promise<MemberSummaryBody | null> {
   const { data } = await axios.get<{
     code: number;
@@ -116,7 +116,7 @@ export async function getMemberSummary(): Promise<MemberSummaryBody | null> {
   return null;
 }
 
-/** 获取成员分页列表 */
+/** Query paginated members. */
 export async function getMemberList(params: {
   pageNum: number;
   pageSize: number;
@@ -132,10 +132,10 @@ export async function getMemberList(params: {
   if (data?.code === 200 && data?.body) {
     return data.body;
   }
-  throw new Error('成员列表加载失败');
+  throw new Error('Member list failed to load');
 }
 
-/** 获取成员详情（支持 id 或 token 二选一） */
+/** Query member detail by either id or token. */
 export async function getMemberInfo(params: {
   id?: string;
   token?: string;
@@ -158,7 +158,7 @@ export async function getMemberInfo(params: {
   return null;
 }
 
-/** 获取故事列表（支持可选 memberId 分页） */
+/** Query story list, optionally scoped to one member. */
 export async function getStoryList(options: {
   pageNum?: number;
   pageSize?: number;
@@ -190,7 +190,7 @@ export async function getStoryList(options: {
   return { list: [], pageNum, pageSize, totalCount: 0 };
 }
 
-/** 提交昵称，获取下山链接 */
+/** Submit nickname and create a Silicon landing link. */
 export async function postLoginMemberInfo(nickName: string): Promise<{
   storyInfo?: import('./orz2.modal').StoryItem;
   memberInfo?: MemberInfo;
@@ -225,12 +225,12 @@ export default {
   postTinifyImage,
 };
 
-// ===== 工具 API =====
+// ===== Tool APIs =====
 
 /**
- * 调用后端 Tinify 压缩接口。
- * 后端路由：POST /smart/v1/tool/postTinifyImage
- * 内容类型：multipart/form-data，文件字段名 image。
+ * Call the backend Tinify compression endpoint.
+ * Backend route: POST /smart/v1/tool/postTinifyImage
+ * Content type: multipart/form-data, file field name: image.
  */
 export async function postTinifyImage(params: {
   image: Blob;
@@ -268,7 +268,10 @@ export async function postTinifyImage(params: {
 
   if (data?.code === 200 && body?.errcode && body.errcode !== 0) {
     throw new Error(
-      body.errmsg || data.message || data.content || 'TinyPNG 压缩失败'
+      body.errmsg ||
+        data.message ||
+        data.content ||
+        'TinyPNG compression failed'
     );
   }
 
@@ -277,15 +280,18 @@ export async function postTinifyImage(params: {
   }
 
   const message =
-    data?.message || data?.content || response.error || 'TinyPNG 压缩失败';
+    data?.message ||
+    data?.content ||
+    response.error ||
+    'TinyPNG compression failed';
   throw new Error(message);
 }
 
 // ===== LLM API =====
 
 /**
- * 调用后端 AI 内容润色接口。
- * 后端路由：POST /smart/v1/llm/postPolishContent
+ * Call the backend AI content-polishing endpoint.
+ * Backend route: POST /smart/v1/llm/postPolishContent
  */
 export async function postPolishContent(
   body: PostPolishContentBody
@@ -307,17 +313,17 @@ export async function postPolishContent(
     return data.body;
   }
 
-  const message = data?.message || data?.content || '内容润色失败';
+  const message = data?.message || data?.content || 'Content polishing failed';
   throw new Error(message);
 }
 
-// ===== 公众号发布 API =====
+// ===== Official publisher APIs =====
 
 /**
- * 调用后端生成微信公众号草稿并创建草稿。
- * 后端路由：POST /smart/v1/official/postOfficialPublisher
- * 后端 header 要求 brand=zero|weather|carbon、platform=WEAPP|WEB|OTHER，
- * 这里按 FetchManager 的默认常量覆盖成 brand='orz2'、platform='WEB'。
+ * Call the backend endpoint that generates and creates a WeChat draft.
+ * Backend route: POST /smart/v1/official/postOfficialPublisher
+ * Backend headers accept brand=zero|weather|carbon and platform=WEAPP|WEB|OTHER.
+ * This caller overrides them with brand='orz2' and platform='WEB'.
  */
 export async function postOfficialPublisher(
   body: PostOfficialPublisherBody
@@ -337,7 +343,8 @@ export async function postOfficialPublisher(
   if (data?.code === 200 && data?.body) {
     return data.body;
   }
-  const message = data?.message || data?.content || '发布任务提交失败';
+  const message =
+    data?.message || data?.content || 'Publishing task submission failed';
   throw new Error(message);
 }
 
@@ -355,7 +362,9 @@ interface OfficialPublisherStreamPayload {
 }
 
 function getPublisherError(payload: OfficialPublisherStreamPayload) {
-  return payload.message || payload.content || '发布任务提交失败';
+  return (
+    payload.message || payload.content || 'Publishing task submission failed'
+  );
 }
 
 function parsePublisherStreamPayload(
@@ -364,13 +373,13 @@ function parsePublisherStreamPayload(
   try {
     return JSON.parse(rawData) as OfficialPublisherStreamPayload;
   } catch {
-    throw new Error('发布进度数据解析失败');
+    throw new Error('Publishing progress payload parse failed');
   }
 }
 
 /**
- * 以 SSE 模式生成微信公众号草稿。
- * EventSource 不支持 POST body，因此使用 fetch 读取 text/event-stream。
+ * Generate a WeChat draft over SSE.
+ * EventSource cannot send a POST body, so fetch reads text/event-stream.
  */
 export async function streamPostOfficialPublisher(
   body: PostOfficialPublisherBody,
@@ -397,7 +406,7 @@ export async function streamPostOfficialPublisher(
   }
 
   if (!response.body) {
-    throw new Error('当前浏览器无法读取实时发布进度');
+    throw new Error('This browser cannot read live publishing progress');
   }
 
   const reader = response.body.getReader();
@@ -449,6 +458,8 @@ export async function streamPostOfficialPublisher(
   }
 
   if (buffer.trim()) processFrame(buffer);
-  if (!isCompleted) throw new Error('实时发布连接意外中断，请重新提交');
+  if (!isCompleted) {
+    throw new Error('Live publishing connection ended unexpectedly');
+  }
   return result;
 }

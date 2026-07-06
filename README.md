@@ -1,7 +1,8 @@
 # ORZ2
 
-ORZ2 是一个商用在线工具与产品展示站点的纯前端工程，基于 **React 18 + Vite 6 + TypeScript**。
-项目本身不包含后端；登录、Silicon 成员数据、内容润色、公众号发布、图片压缩等运行时能力通过 `src/api/orz2.ts` 调用远端 ORZ2 API。
+ORZ2 是一个商用在线工具与产品展示站点的纯前端工程，基于 **React 18 + Vite 6 +
+TypeScript**。项目本身不包含后端；登录、Silicon 成员数据、内容润色、公众号发布、图片压缩等运行时能力通过
+`src/api/orz2.ts` 调用远端 ORZ2 API。
 
 站点主域：`https://orz2.online`，支持中 / 英 / 日三语。
 
@@ -20,7 +21,8 @@ pnpm run start:uat    # 加载 .env.uat
 pnpm run start:prod   # 加载 .env.prod（用生产 API 排查线上问题）
 ```
 
-切到 prod 环境不需要重新打包：见 `AGENTS.md` 中的 *Debugging With The Production Environment*。
+切到 prod 环境不需要重新打包：见 `AGENTS.md` 中的 _Debugging With The Production
+Environment_。
 
 `.env.*` 文件改动后必须重启 dev server，Vite 不会热重载环境变量。
 
@@ -41,8 +43,9 @@ pnpm run build:uat    # base /uat/，部署到 https://orz2.online/uat
 pnpm run build:prod   # 部署到 https://orz2.online
 ```
 
-构建流水线：`clean` → `generate:sitemap` → `xbi generate` → `tsc -b` → `vite build`。
-构建元信息输出到 `public/__xshuliner__/build-info.{js,json}`，可通过 `/build-info` 页面查看。
+构建流水线：`clean` → `generate:sitemap` → `xbi generate` → `tsc -b` →
+`vite build`。构建元信息输出到
+`public/__xshuliner__/build-info.{js,json}`，可通过 `/build-info` 页面查看。
 
 ## 测试与代码规范
 
@@ -51,6 +54,18 @@ pnpm run test:e2e   # Playwright 烟雾测试，配置在 playwright.config.ts
 pnpm run lint       # ESLint --fix on src
 pnpm run format     # ESLint --fix + Prettier 写回
 ```
+
+## i18n 与文案规则
+
+除 `src/pages/Products/ProductSilicon/`
+这个独立产品微站外，项目内所有用户可见文案、catalog 展示字段、SEO 文案、LLM
+prompt 模板、兜底错误文案和测试选择器都应放在
+`src/i18n/locales/{zh-CN,en,ja}.ts`，组件和工具逻辑通过 `messages`
+或本地化 catalog 访问器读取。
+
+`src/config/products.ts`、`src/config/tools.ts` 和功能 config 只保留 id、group
+key、URL、媒体、生命周期、SEO
+slug 等结构信息，不再写中文基础文案。新增 catalog 条目时必须同步补齐三语 locale 映射，缺失映射应被视为错误，而不是回退到中文硬编码。
 
 ## 目录速览
 

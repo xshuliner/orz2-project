@@ -97,9 +97,13 @@ Placement rules:
 - Static data belongs in `src/config/` when shared globally. Feature-only static
   data belongs in that feature's local `config/` folder, for example
   `src/pages/Tools/ToolOfficialPublisher/config/`.
-- Keep user-visible copy in `src/i18n/locales/{zh-CN,en,ja}.ts`. Shared
-  components and pages should read copy through `messages`; do not hard-code
-  Chinese, English, or Japanese strings in shared UI.
+- Keep all user-visible copy, prompt templates, fallback messages, catalog
+  labels, SEO text, and test selectors in `src/i18n/locales/{zh-CN,en,ja}.ts`.
+  Shared components and pages should read copy through `messages`; do not
+  hard-code Chinese, English, or Japanese strings in shared UI, config files,
+  utility fallbacks, SVG text assets, or tests. The only intentional exception
+  is the independent Silicon product microsite under
+  `src/pages/Products/ProductSilicon/`.
 - Pure transforms used in two or more modules belong in a named file under
   `src/utils/`, not in `src/utils/utils.ts`. Page-only transforms should stay
   beside the page in a local `utils/` folder or inside the page file if small.
@@ -189,15 +193,14 @@ All non-home page modules and product/tool sub-routes are lazy-loaded.
 
 Static catalog and site data live in `src/config/`:
 
-- `products.ts` and `tools.ts` store the source `CatalogItem[]`.
-- `site.ts` exports `siteConfig`, Chinese base copy, and static collections such
-  as hero media, testimonials, team members, section copy, footer copy, login
-  copy, and header copy.
+- `products.ts` and `tools.ts` store Chinese-free `CatalogBaseItem[]` source
+  data: ids, group keys, media, lifecycle metadata, platform flags, entry URLs,
+  and SEO slugs/static metadata only.
+- `site.ts` exports `siteConfig` only.
 - `seo.ts` builds per-locale page SEO and per-tool SEO from `getMessages()`,
   `getProducts()`, and `getTools()`.
-- `catalog.ts` owns static catalog metadata such as the `LIVE` / `BETA` /
-  `PLANNING` display data; helper logic such as stage labels and tone classes
-  lives outside `src/config/`.
+- `catalog.ts` owns static catalog metadata such as `LIVE` / `BETA` / `PLANNING`
+  tone classes only. Stage labels and descriptions live in locale messages.
 
 Render code should consume localized catalog accessors from
 `src/i18n/catalog.ts` or from the compatibility exports in `src/i18n/index.tsx`:
@@ -213,6 +216,12 @@ Render code should consume localized catalog accessors from
 
 Do not read `tools.ts` or `products.ts` directly from UI components unless you
 are intentionally bypassing localization.
+
+When adding or editing catalog entries, keep `src/config/products.ts` and
+`src/config/tools.ts` free of display strings. Add `name`, `summary`, `badges`,
+`entries`, SEO text, and group labels to all three locale dictionaries. Missing
+catalog or entry translations are treated as errors instead of falling back to
+Chinese base data.
 
 Shared catalog, site, SEO, and build-info types live in `src/types/`, including
 `CatalogLifecycle`, `CatalogIconName`, `CatalogPlatform`, `CatalogMedia`,
@@ -252,8 +261,8 @@ The project uses a lightweight custom i18n layer, not `react-intl` or `i18next`.
 - `locale.ts` — locale metadata, path/localization helpers
 - `messages.ts` — per-locale dictionaries; add new user-visible keys to all
   three locale files in `src/i18n/locales/{zh-CN,en,ja}.ts`
-- `catalog.ts` — localized catalog accessors (`getTools`, `getProducts`,
-  hero media, testimonials, team members)
+- `catalog.ts` — localized catalog accessors (`getTools`, `getProducts`, hero
+  media, testimonials, team members)
 - `context.tsx` — `I18nProvider`, which syncs `document.documentElement.lang`
   and persists the active locale to `orz2:locale`
 - `types.ts` — i18n-related types
@@ -261,9 +270,13 @@ The project uses a lightweight custom i18n layer, not `react-intl` or `i18next`.
   `useI18n` from `src/hooks/useI18n.ts`
 
 Components should read copy through `const { messages } = useI18n()` and never
-hard-code Chinese, English, or Japanese strings in shared UI. Use `localizePath()`
-or internal-link components (`OButton` with `to`) for in-app routes, and
-`toSiteUrl()` / `routeUrl()` for absolute canonical, alternate, and QR URLs.
+hard-code Chinese, English, or Japanese strings in shared UI, feature configs,
+API fallback errors, tests, or generated text templates. Use `localizePath()` or
+internal-link components (`OButton` with `to`) for in-app routes, and
+`toSiteUrl()` / `routeUrl()` for absolute canonical, alternate, and QR URLs. If
+a feature needs LLM prompts or default generated content, keep those strings
+under the feature's locale message branch and pass them into pure helpers.
+Silicon product pages are intentionally exempt from this i18n requirement.
 
 ### Theme & Styling
 
@@ -429,8 +442,8 @@ Key behaviors:
 - Uses `Intl.DateTimeFormat` for localized display names, offsets, and DST
   handling
 - Local structure: `config/index.ts` for zone options and SEO keys,
-  `utils/dateTime.ts` for parsing/formatting, `components/TimezoneSideCard/`
-  for the per-side panel
+  `utils/dateTime.ts` for parsing/formatting, `components/TimezoneSideCard/` for
+  the per-side panel
 
 ### Tool: Work Report Polisher
 
@@ -507,9 +520,9 @@ Components and pages use noun-first PascalCase and folder-based modules:
 Within a product/tool module, the same folder split (see Directory Ownership &
 Placement Rules) applies locally: `routes/` for lazy routes, `pages/` for
 route-level screens, `components/` for feature-only JSX, `config/` for
-feature-only static options and defaults, `hooks/` for local hooks,
-`utils/` for local pure functions. Promote code to `src/components`,
-`src/hooks`, or `src/utils` only after it is genuinely shared.
+feature-only static options and defaults, `hooks/` for local hooks, `utils/` for
+local pure functions. Promote code to `src/components`, `src/hooks`, or
+`src/utils` only after it is genuinely shared.
 
 ### Static Assets & Output
 
@@ -522,16 +535,16 @@ feature-only static options and defaults, `hooks/` for local hooks,
 
 ### Practical Guidelines
 
-The Directory Ownership & Placement Rules already cover most daily decisions.
-In addition:
+The Directory Ownership & Placement Rules already cover most daily decisions. In
+addition:
 
 - Prefer `O*` components and existing helpers before adding raw UI; reach for
   raw DOM only when no design-system component fits.
 - Keep lifecycle values in catalog config as uppercase `LIVE`, `BETA`, or
   `PLANNING`; render them through helpers, never inline.
-- Keep component-local CSS next to the component and reuse global tokens
-  instead of inventing one-off colors or spacing.
+- Keep component-local CSS next to the component and reuse global tokens instead
+  of inventing one-off colors or spacing.
 - `CacheManager` stores namespaced keys and optional expiry metadata; remember
   browser storage keys may not match the raw key string.
-- Do not edit generated `dist/`, `*.tsbuildinfo`, `test-results/`, or
-  build-info artifacts unless the task explicitly calls for generated output.
+- Do not edit generated `dist/`, `*.tsbuildinfo`, `test-results/`, or build-info
+  artifacts unless the task explicitly calls for generated output.

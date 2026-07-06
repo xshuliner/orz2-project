@@ -25,7 +25,7 @@ export function newValueForKey(template: PromptTemplate, key: AutoFillKey) {
   return '';
 }
 
-// 按下标取第 idx + 1 张内嵌图的提示词；超出 inlineValueList 长度时回退到末位。
+// Pick the inline image prompt by index; fall back to the last prompt.
 export function pickInlinePrompt(template: PromptTemplate, idx: number) {
   const list = template.fields.inlineValueList;
   if (idx >= 0 && idx < list.length) return list[idx];
@@ -40,7 +40,7 @@ export function expandDefaultCheckedPatterns(
   const expanded: AutoFillKey[] = [];
   for (const pattern of patterns) {
     if (pattern === 'imagesInlineList.*.value') {
-      // 展开为「所有 AI 类型内嵌图」的 key
+      // Expand to every AI inline-image key.
       planFilledKeys.forEach(key => {
         if (key.startsWith('imagesInlineList.')) {
           const idx = Number(key.split('.')[1]);

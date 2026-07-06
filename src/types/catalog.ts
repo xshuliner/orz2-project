@@ -15,8 +15,6 @@ export type CatalogPlatform = 'web' | 'h5' | 'weapp' | 'app' | 'extension';
 export type CatalogStage = 'LIVE' | 'BETA' | 'PLANNING';
 
 export interface CatalogStageMeta {
-  label: string;
-  description: string;
   tone: 'live' | 'beta' | 'planning';
 }
 
@@ -54,6 +52,21 @@ export type CatalogEntry =
       primary?: boolean;
     };
 
+export type CatalogBaseEntry =
+  | {
+      id: string;
+      kind: 'link';
+      href: string;
+      qrValue?: string;
+      primary?: boolean;
+    }
+  | {
+      id: string;
+      kind: 'sunCode';
+      imageUrl: string;
+      primary?: boolean;
+    };
+
 export interface CatalogSeo {
   slug?: string;
   title: string;
@@ -61,6 +74,23 @@ export interface CatalogSeo {
   keywords?: string[];
   ogImage?: string;
   schemaType?: 'SoftwareApplication';
+}
+
+export interface CatalogBaseSeo {
+  slug?: string;
+  ogImage?: string;
+  schemaType?: 'SoftwareApplication';
+}
+
+export interface CatalogBaseItem {
+  id: string;
+  group: string;
+  media: CatalogMedia;
+  lifecycle: CatalogLifecycle;
+  platform: CatalogPlatform[];
+  entries: CatalogBaseEntry[];
+  compact?: boolean;
+  seo?: CatalogBaseSeo;
 }
 
 export interface CatalogItem {

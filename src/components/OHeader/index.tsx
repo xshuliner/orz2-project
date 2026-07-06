@@ -2,7 +2,7 @@ import { useAuth } from '@/components/ContextAuth';
 import { OIconButton } from '@/components/OIconButton';
 import { ORadio, type ORadioOption } from '@/components/ORadio';
 import { useI18n } from '@/hooks/useI18n';
-import { localeNames, localeShortNames, type Locale } from '@/i18n';
+import type { Locale } from '@/i18n';
 import { useTheme, type ThemePreference } from '@/theme';
 import { LogOut, Menu, Monitor, Moon, Sun, UserCircle, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -132,12 +132,12 @@ function OHeaderPreferenceControls({
   const { messages } = useI18n();
   const localeOptions: ORadioOption<Locale>[] = locales.map(item => ({
     value: item,
-    label: localeNames[item],
-    ariaLabel: `${messages.locale.switchTo} ${localeNames[item]}`,
+    label: messages.locale.names[item],
+    ariaLabel: `${messages.locale.switchTo} ${messages.locale.names[item]}`,
   }));
   const desktopLocaleOptions: ORadioOption<Locale>[] = locales.map(item => ({
     value: item,
-    label: localeShortNames[item],
+    label: messages.locale.shortNames[item],
   }));
   const themeOptions: ORadioOption<ThemePreference>[] = [
     {

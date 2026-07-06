@@ -312,7 +312,7 @@ export async function tinypngCompress(blob: Blob, filename: string) {
     image: uploadFile,
   });
   if (result.errcode && result.errcode !== 0) {
-    throw new Error(result.errmsg || 'TinyPNG 压缩失败');
+    throw new Error(result.errmsg || 'TinyPNG compression failed');
   }
   const dataUrl = normalizeBase64Image(result.data);
   const compressedBlob = dataUrlToBlob(dataUrl);
