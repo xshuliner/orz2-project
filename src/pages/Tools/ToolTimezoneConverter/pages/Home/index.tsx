@@ -39,7 +39,7 @@ export function TimezoneConverter() {
   const { locale, localizePath, messages } = useI18n();
   const copy = messages.timezoneTool;
   const [leftZoneId, setLeftZoneId] = useState<TimeZoneId>('china');
-  const [rightZoneId, setRightZoneId] = useState<TimeZoneId>('unitedStates');
+  const [rightZoneId, setRightZoneId] = useState<TimeZoneId>('us-pacific');
   const [sourceSide, setSourceSide] = useState<ConverterSide>('left');
   const [instantMs, setInstantMs] = useState(() => Date.now());
 
@@ -122,6 +122,7 @@ export function TimezoneConverter() {
             copy={copy}
             details={leftDetails}
             inputValue={leftInputValue}
+            instant={instant}
             isSource={sourceSide === 'left'}
             locale={locale}
             option={leftOption}
@@ -153,6 +154,7 @@ export function TimezoneConverter() {
             copy={copy}
             details={rightDetails}
             inputValue={rightInputValue}
+            instant={instant}
             isSource={sourceSide === 'right'}
             locale={locale}
             option={rightOption}

@@ -502,6 +502,30 @@ export const messages = {
         country: '美国',
         city: '纽约 / 美东时间',
       },
+      'us-east': {
+        country: '美国',
+        city: '美东时间（EST / EDT）',
+      },
+      'us-central': {
+        country: '美国',
+        city: '中部时间（CST / CDT）',
+      },
+      'us-mountain': {
+        country: '美国',
+        city: '山地时间（MST / MDT）',
+      },
+      'us-pacific': {
+        country: '美国',
+        city: '太平洋时间（PST / PDT）',
+      },
+      'us-alaska': {
+        country: '美国',
+        city: '阿拉斯加时间（AKST / AKDT）',
+      },
+      'us-hawaii': {
+        country: '美国',
+        city: '夏威夷时间（HST）',
+      },
       unitedKingdom: {
         country: '英国',
         city: '伦敦',

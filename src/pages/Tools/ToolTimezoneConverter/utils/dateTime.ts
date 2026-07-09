@@ -125,12 +125,20 @@ export function zonedTimeToUtc(fields: DateTimeFields, timeZone: string) {
 }
 
 export function formatOffset(offsetMs: number) {
+  return formatOffsetWithPrefix(offsetMs, 'UTC');
+}
+
+export function formatGmtOffset(offsetMs: number) {
+  return formatOffsetWithPrefix(offsetMs, 'GMT');
+}
+
+function formatOffsetWithPrefix(offsetMs: number, prefix: string) {
   const totalMinutes = Math.round(offsetMs / 60000);
   const sign = totalMinutes >= 0 ? '+' : '-';
   const absoluteMinutes = Math.abs(totalMinutes);
   const hours = Math.floor(absoluteMinutes / 60);
   const minutes = absoluteMinutes % 60;
-  return `UTC${sign}${padDatePart(hours)}:${padDatePart(minutes)}`;
+  return `${prefix}${sign}${padDatePart(hours)}:${padDatePart(minutes)}`;
 }
 
 export function getTimeZoneName(date: Date, timeZone: string, locale: Locale) {

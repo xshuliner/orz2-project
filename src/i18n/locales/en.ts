@@ -532,6 +532,30 @@ export const messages = {
         country: 'United States',
         city: 'New York / Eastern Time',
       },
+      'us-east': {
+        country: 'United States',
+        city: 'Eastern Time (EST / EDT)',
+      },
+      'us-central': {
+        country: 'United States',
+        city: 'Central Time (CST / CDT)',
+      },
+      'us-mountain': {
+        country: 'United States',
+        city: 'Mountain Time (MST / MDT)',
+      },
+      'us-pacific': {
+        country: 'United States',
+        city: 'Pacific Time (PST / PDT)',
+      },
+      'us-alaska': {
+        country: 'United States',
+        city: 'Alaska Time (AKST / AKDT)',
+      },
+      'us-hawaii': {
+        country: 'United States',
+        city: 'Hawaii Time (HST)',
+      },
       unitedKingdom: {
         country: 'United Kingdom',
         city: 'London',

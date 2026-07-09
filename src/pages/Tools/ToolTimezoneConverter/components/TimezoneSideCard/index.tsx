@@ -6,9 +6,14 @@ import {
   type TimeZoneId,
   type TimeZoneOption,
 } from '@/pages/Tools/ToolTimezoneConverter/config';
-import { toIntlLocale } from '@/pages/Tools/ToolTimezoneConverter/utils/dateTime';
-import { ChevronDown, Clock3 } from 'lucide-react';
-import { ChangeEvent } from 'react';
+import {
+  formatGmtOffset,
+  formatOffset,
+  getTimeZoneOffsetMs,
+  toIntlLocale,
+} from '@/pages/Tools/ToolTimezoneConverter/utils/dateTime';
+import { ChevronDown } from 'lucide-react';
+import { ChangeEvent, useMemo } from 'react';
 
 type TimezoneCopy = I18nContextValue['messages']['timezoneTool'];
 
@@ -21,18 +26,26 @@ export interface TimezoneDetails {
 
 function getZoneLabel(option: TimeZoneOption, copy: TimezoneCopy) {
   const zone = copy.zones[option.id];
-  return `${option.flag} ${zone.country}`;
+  return zone.country;
 }
 
-function getZoneOptionLabel(option: TimeZoneOption, copy: TimezoneCopy) {
+function getZoneOptionLabel(
+  option: TimeZoneOption,
+  copy: TimezoneCopy,
+  instant: Date
+) {
   const zone = copy.zones[option.id];
-  return `${option.flag} ${zone.country} · ${zone.city}`;
+  const offsetMs = getTimeZoneOffsetMs(instant, option.timeZone);
+  return `${option.flag} ${formatGmtOffset(
+    offsetMs
+  )} · ${formatOffset(offsetMs)} · ${zone.country} · ${zone.city}`;
 }
 
 export function TimezoneSideCard({
   copy,
   details,
   inputValue,
+  instant,
   isSource,
   locale,
   onTimeChange,
@@ -44,6 +57,7 @@ export function TimezoneSideCard({
   copy: TimezoneCopy;
   details: TimezoneDetails;
   inputValue: string;
+  instant: Date;
   isSource: boolean;
   locale: Locale;
   onTimeChange: (value: string) => void;
@@ -53,6 +67,15 @@ export function TimezoneSideCard({
   zoneId: TimeZoneId;
 }) {
   const zoneCopy = copy.zones[option.id];
+  const zoneOptionLabels = useMemo(() => {
+    const enriched = timeZoneOptions.map(zoneOption => ({
+      id: zoneOption.id,
+      label: getZoneOptionLabel(zoneOption, copy, instant),
+      offsetMs: getTimeZoneOffsetMs(instant, zoneOption.timeZone),
+    }));
+    enriched.sort((a, b) => a.offsetMs - b.offsetMs);
+    return enriched.map(({ id, label }) => ({ id, label }));
+  }, [copy, instant]);
 
   return (
     <OCard
@@ -67,8 +90,11 @@ export function TimezoneSideCard({
     >
       <div className='timezone-card-heading'>
         <div className='timezone-card-title-group'>
-          <span className='timezone-card-icon' aria-hidden='true'>
-            <Clock3 size={19} strokeWidth={1.9} />
+          <span
+            className='timezone-card-icon timezone-card-flag'
+            aria-hidden='true'
+          >
+            {option.flag}
           </span>
           <div>
             <span className='timezone-card-kicker'>{sideTitle}</span>
@@ -89,9 +115,9 @@ export function TimezoneSideCard({
               onZoneChange(event.target.value as TimeZoneId)
             }
           >
-            {timeZoneOptions.map(zoneOption => (
+            {zoneOptionLabels.map(zoneOption => (
               <option key={zoneOption.id} value={zoneOption.id}>
-                {getZoneOptionLabel(zoneOption, copy)}
+                {zoneOption.label}
               </option>
             ))}
           </select>

@@ -126,6 +126,11 @@
   color: var(--color-green-action);
 }
 
+.timezone-card-flag {
+  font-size: 22px;
+  line-height: 1;
+}
+
 .timezone-card-kicker {
   display: block;
   color: var(--color-muted);

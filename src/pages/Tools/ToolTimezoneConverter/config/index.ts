@@ -5,7 +5,12 @@ export type ConverterSide = 'left' | 'right';
 
 export const timeZoneOptions = [
   { id: 'china', flag: '🇨🇳', timeZone: 'Asia/Shanghai' },
-  { id: 'unitedStates', flag: '🇺🇸', timeZone: 'America/New_York' },
+  { id: 'us-east', flag: '🇺🇸', timeZone: 'America/New_York' },
+  { id: 'us-central', flag: '🇺🇸', timeZone: 'America/Chicago' },
+  { id: 'us-mountain', flag: '🇺🇸', timeZone: 'America/Denver' },
+  { id: 'us-pacific', flag: '🇺🇸', timeZone: 'America/Los_Angeles' },
+  { id: 'us-alaska', flag: '🇺🇸', timeZone: 'America/Anchorage' },
+  { id: 'us-hawaii', flag: '🇺🇸', timeZone: 'Pacific/Honolulu' },
   { id: 'unitedKingdom', flag: '🇬🇧', timeZone: 'Europe/London' },
   { id: 'japan', flag: '🇯🇵', timeZone: 'Asia/Tokyo' },
   { id: 'southKorea', flag: '🇰🇷', timeZone: 'Asia/Seoul' },

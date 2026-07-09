@@ -533,6 +533,30 @@ export const messages = {
         country: '米国',
         city: 'ニューヨーク / 東部時間',
       },
+      'us-east': {
+        country: '米国',
+        city: '東部時間（EST / EDT）',
+      },
+      'us-central': {
+        country: '米国',
+        city: '中部時間（CST / CDT）',
+      },
+      'us-mountain': {
+        country: '米国',
+        city: '山地時間（MST / MDT）',
+      },
+      'us-pacific': {
+        country: '米国',
+        city: '太平洋時間（PST / PDT）',
+      },
+      'us-alaska': {
+        country: '米国',
+        city: 'アラスカ時間（AKST / AKDT）',
+      },
+      'us-hawaii': {
+        country: '米国',
+        city: 'ハワイ時間（HST）',
+      },
       unitedKingdom: {
         country: '英国',
         city: 'ロンドン',
