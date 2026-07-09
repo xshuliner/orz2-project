@@ -1,6 +1,6 @@
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.35fr 0.7fr 1fr 1fr;
+  grid-template-columns: 1.4fr 1fr 1fr 1.4fr;
   gap: var(--space-8);
   width: var(--page-content-width);
   margin: 0 auto;

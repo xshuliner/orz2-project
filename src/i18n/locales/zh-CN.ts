@@ -80,15 +80,21 @@ export const messages = {
       nav: '导航',
       contact: '联系',
       compliance: '合规',
+      friendlyLinks: '友情链接',
     },
     navAriaLabel: '页脚导航',
     contactSupport: '支持工具定制、商业化落地与效率工作流搭建。',
     complianceNote: '清晰标注数据使用、第三方服务、广告说明与用户权利。',
-    viewPrivacy: '查看隐私协议',
     copyright: '© 2026 ORZ2. All rights reserved.',
     tagline: 'Built for useful, compliant online tools.',
     buildInfoLabel: '当前版本',
     buildInfoAriaLabel: '查看 ORZ2 编译信息',
+    friendlyLinks: [
+      {
+        name: 'Parry Loves Coding',
+        url: 'https://www.parryqiu.com/',
+      },
+    ],
   },
   login: {
     closeAriaLabel: '关闭登录窗口',

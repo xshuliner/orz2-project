@@ -80,17 +80,23 @@ export const messages = {
       nav: 'Navigate',
       contact: 'Contact',
       compliance: 'Compliance',
+      friendlyLinks: 'Friendly Links',
     },
     navAriaLabel: 'Footer navigation',
     contactSupport:
       'Tool customization, commercial launch support, and workflow setup.',
     complianceNote:
       'Clear notes for data use, third-party services, advertising, and user rights.',
-    viewPrivacy: 'View privacy policy',
     copyright: '© 2026 ORZ2. All rights reserved.',
     tagline: 'Built for useful, compliant online tools.',
     buildInfoLabel: 'Current build',
     buildInfoAriaLabel: 'View ORZ2 build information',
+    friendlyLinks: [
+      {
+        name: 'Parry Loves Coding',
+        url: 'https://www.parryqiu.com/',
+      },
+    ],
   },
   login: {
     closeAriaLabel: 'Close login dialog',

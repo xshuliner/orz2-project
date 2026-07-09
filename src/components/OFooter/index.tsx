@@ -15,6 +15,11 @@ export function OFooter() {
   const buildInfoSummary = [buildInfoVersion, buildInfoCommit]
     .filter(Boolean)
     .join(' · ');
+  const footerNavItems = [
+    { label: pageTitles.privacy, to: '/privacy' },
+    { label: pageTitles.designSystem, to: '/design-system' },
+    { label: pageTitles.buildInfo, to: '/build-info' },
+  ];
   return (
     <footer className='bg-footer text-footer-text'>
       <div className='footer-grid'>
@@ -35,49 +40,35 @@ export function OFooter() {
           <h2 className='!mb-[14px] text-[15px] !text-white'>
             {footerCopy.sections.nav}
           </h2>
-          <Link
-            className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to={localizePath('/')}
-          >
-            {pageTitles.home}
-          </Link>
-          <Link
-            className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to={localizePath('/tools')}
-          >
-            {pageTitles.onlineTools}
-          </Link>
-          <Link
-            className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to={localizePath('/products')}
-          >
-            {pageTitles.products}
-          </Link>
-          <Link
-            className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to={localizePath('/team')}
-          >
-            {pageTitles.team}
-          </Link>
-          <Link
-            className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to={localizePath('/privacy')}
-          >
-            {pageTitles.privacy}
-          </Link>
-          <Link
-            className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to={localizePath('/design-system')}
-          >
-            {pageTitles.designSystem}
-          </Link>
-          <Link
-            className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to={localizePath('/build-info')}
-          >
-            {pageTitles.buildInfo}
-          </Link>
+          {footerNavItems.map(item => (
+            <Link
+              key={item.to}
+              className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
+              to={localizePath(item.to)}
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
+        <div className='grid content-start gap-2'>
+          <h2 className='!mb-[14px] text-[15px] !text-white'>
+            {footerCopy.sections.friendlyLinks}
+          </h2>
+          {footerCopy.friendlyLinks.map(link => {
+            const key = `${link.name}-${link.url}`;
+            return (
+              <a
+                key={key}
+                className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
+                href={link.url}
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                {link.name}
+              </a>
+            );
+          })}
+        </div>
         <div className='grid content-start gap-2'>
           <h2 className='!mb-[14px] text-[15px] !text-white'>
             {footerCopy.sections.contact}
@@ -92,20 +83,14 @@ export function OFooter() {
             {footerCopy.contactSupport}
           </p>
         </div>
-        <div className='grid content-start gap-2'>
+        {/* <div className='grid content-start gap-2'>
           <h2 className='!mb-[14px] text-[15px] !text-white'>
             {footerCopy.sections.compliance}
           </h2>
           <p className='text-sm leading-relaxed text-footer-copy'>
             {footerCopy.complianceNote}
           </p>
-          <Link
-            className='interactive w-fit text-sm leading-relaxed text-footer-copy underline-offset-[3px] hover:!text-white hover:underline'
-            to={localizePath('/privacy')}
-          >
-            {footerCopy.viewPrivacy}
-          </Link>
-        </div>
+        </div> */}
       </div>
       <div className='footer-bottom mx-auto flex justify-between gap-4 border-t border-white/10 px-0 pt-[18px] pb-[26px] text-[13px] text-footer-muted max-sm:flex-col'>
         <span>{footerCopy.copyright}</span>

@@ -21,7 +21,6 @@ export function OHeader() {
     { label: pageTitles.onlineTools, to: '/tools' },
     { label: pageTitles.products, to: '/products' },
     { label: pageTitles.team, to: '/team' },
-    { label: pageTitles.privacy, to: '/privacy' },
   ];
 
   useEffect(() => {

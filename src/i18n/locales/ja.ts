@@ -80,17 +80,23 @@ export const messages = {
       nav: 'ナビ',
       contact: '連絡先',
       compliance: 'コンプライアンス',
+      friendlyLinks: 'フレンドリーリンク',
     },
     navAriaLabel: 'フッターナビゲーション',
     contactSupport:
       'ツールのカスタム、商用展開、効率化ワークフロー構築を支援します。',
     complianceNote:
       'データ利用、第三者サービス、広告説明、ユーザー権利を明確に示します。',
-    viewPrivacy: 'プライバシーを見る',
     copyright: '© 2026 ORZ2. All rights reserved.',
     tagline: 'Built for useful, compliant online tools.',
     buildInfoLabel: '現在のビルド',
     buildInfoAriaLabel: 'ORZ2 のビルド情報を見る',
+    friendlyLinks: [
+      {
+        name: 'Parry Loves Coding',
+        url: 'https://www.parryqiu.com/',
+      },
+    ],
   },
   login: {
     closeAriaLabel: 'ログイン画面を閉じる',

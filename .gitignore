@@ -7,7 +7,9 @@ test-results/
 .env.*.local
 
 # Agents
-.agent/
-.claude/
-.codex/
-.cursor/
+settings.local.json
+.claude
+.codex
+.cursor
+.omc
+.omx
