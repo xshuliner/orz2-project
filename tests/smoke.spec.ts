@@ -218,6 +218,87 @@ test('work report polisher persists report and reference content', async ({
     .toContain('referenceContent');
 });
 
+test('official publisher keeps simple and advanced preferences per workflow', async ({
+  page,
+}) => {
+  const publisher = zhMessages.publisher;
+  const editorModeName = (mode: 'simple' | 'advanced') =>
+    `${publisher.editorModes[mode].label} ${publisher.editorModes[mode].description}`;
+  const publishModeName = (mode: 'create' | 'rewrite') =>
+    `${publisher.modes[mode].label} ${publisher.modes[mode].description}`;
+  const insuranceTemplate = publisher.promptTemplates.insurance_advisor;
+
+  await page.goto('/tools/official-publisher', {
+    waitUntil: 'domcontentloaded',
+  });
+
+  await expect(
+    page.getByRole('radio', { name: editorModeName('simple') })
+  ).toHaveAttribute('aria-checked', 'true');
+  await expect(
+    page.getByRole('heading', { name: publisher.simpleMode.title })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: publisher.sections.prompt.title })
+  ).toHaveCount(0);
+
+  await page
+    .getByRole('button', { name: publisher.simpleMode.selectorAriaLabel })
+    .click();
+  await page
+    .getByRole('option', {
+      name: `${insuranceTemplate.label} ${insuranceTemplate.caption}`,
+    })
+    .click();
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await expect(
+    page.getByRole('heading', { name: insuranceTemplate.label })
+  ).toBeVisible();
+
+  await page.getByRole('radio', { name: editorModeName('advanced') }).click();
+  await expect(
+    page.getByRole('heading', { name: publisher.sections.prompt.title })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: publisher.sections.images.title })
+  ).toBeVisible();
+  await expect(
+    page.getByRole('heading', { name: publisher.sections.meta.title })
+  ).toBeVisible();
+  await expect(
+    page.getByLabel(publisher.sections.prompt.systemLabel)
+  ).toHaveValue(insuranceTemplate.fields.promptSystem);
+  await expect(page.locator('.inline-image-item')).toHaveCount(3);
+
+  await page.getByRole('radio', { name: publishModeName('rewrite') }).click();
+  await expect(
+    page.getByRole('radio', { name: editorModeName('simple') })
+  ).toHaveAttribute('aria-checked', 'true');
+  await expect(
+    page.getByLabel(publisher.sections.rewrite.sourceUrl)
+  ).toBeVisible();
+  await expect(
+    page.getByLabel(publisher.sections.rewrite.requirement)
+  ).toHaveCount(0);
+
+  await page.getByRole('radio', { name: editorModeName('advanced') }).click();
+  await expect(
+    page.getByLabel(publisher.sections.rewrite.requirement)
+  ).toBeVisible();
+
+  await page.getByRole('radio', { name: publishModeName('create') }).click();
+  await expect(
+    page.getByRole('radio', { name: editorModeName('advanced') })
+  ).toHaveAttribute('aria-checked', 'true');
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        window.localStorage.getItem('CACHE_orz2:official-publisher-form')
+      )
+    )
+    .toContain('insurance_advisor');
+});
+
 test('design system modal supports button, backdrop and escape closing', async ({
   page,
 }) => {

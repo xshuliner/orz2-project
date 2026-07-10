@@ -1,5 +1,8 @@
 import type { OfficialPublisherMode, OfficialPublisherProvider } from '@/api';
-import type { WechatPublisherForm } from '@/pages/Tools/ToolOfficialPublisher/types';
+import type {
+  PublisherEditorMode,
+  WechatPublisherForm,
+} from '@/pages/Tools/ToolOfficialPublisher/types';
 
 export type PromptTemplateId =
   | 'general'
@@ -17,7 +20,6 @@ export type PromptTemplateId =
 export type AutoFillKeyPattern =
   | 'promptSystem'
   | 'promptContent'
-  | 'digest'
   | 'imageCover.value'
   | 'imagesInlineList.*.value';
 
@@ -47,7 +49,6 @@ export interface PromptTemplateCopy {
 
 export interface PromptTemplateConfig {
   id: PromptTemplateId;
-  accent: string;
   defaultCheckedPatterns: AutoFillKeyPattern[];
 }
 
@@ -62,7 +63,6 @@ export type PromptTemplateCopyMap = Record<
 const defaultCheckedPatterns: AutoFillKeyPattern[] = [
   'promptSystem',
   'promptContent',
-  'digest',
   'imageCover.value',
   'imagesInlineList.*.value',
 ];
@@ -70,6 +70,9 @@ const defaultCheckedPatterns: AutoFillKeyPattern[] = [
 export const officialPublisherToolId = 'tool-wechat-publisher';
 export const officialPublisherSeoKey = 'official-publisher';
 export const officialPublisherStorageKey = 'orz2:official-publisher-form';
+export const officialPublisherScheduleEmail = 'agjgj187076081@gmail.com';
+export const defaultPromptTemplateId: PromptTemplateId = 'general';
+export const defaultSimpleInlineImageCount = 3;
 export const wechatConsoleUrl =
   'https://developers.weixin.qq.com/console/index';
 export const wechatDraftBoxUrl =
@@ -91,9 +94,17 @@ export const officialPublisherModes: OfficialPublisherMode[] = [
   'create',
   'rewrite',
 ];
+export const publisherEditorModes: PublisherEditorMode[] = [
+  'simple',
+  'advanced',
+];
 
 export const defaultForm: WechatPublisherForm = {
   publishMode: 'create',
+  modeSettings: {
+    create: { editorMode: 'simple', templateId: defaultPromptTemplateId },
+    rewrite: { editorMode: 'simple', templateId: defaultPromptTemplateId },
+  },
   appId: '',
   appSecret: '',
   provider: 'AGNES',
@@ -104,23 +115,21 @@ export const defaultForm: WechatPublisherForm = {
   imageCover: { type: 'ai', value: '' },
   imagesInlineList: [],
   author: '',
-  digest: '',
-  sourceUrl: '',
   comment: { open: 1, fansOnly: 0 },
 };
 
 export const promptTemplateConfigs: PromptTemplateConfig[] = [
-  { id: 'general', accent: '🗞️', defaultCheckedPatterns },
-  { id: 'insurance_advisor', accent: '🛡️', defaultCheckedPatterns },
-  { id: 'culture', accent: '🏮', defaultCheckedPatterns },
-  { id: 'tech', accent: '💻', defaultCheckedPatterns },
-  { id: 'lifestyle', accent: '🌿', defaultCheckedPatterns },
-  { id: 'business', accent: '📈', defaultCheckedPatterns },
-  { id: 'education', accent: '📚', defaultCheckedPatterns },
-  { id: 'emotion', accent: '🌙', defaultCheckedPatterns },
-  { id: 'travel', accent: '🗺️', defaultCheckedPatterns },
-  { id: 'food', accent: '🍜', defaultCheckedPatterns },
-  { id: 'fitness', accent: '🏃', defaultCheckedPatterns },
+  { id: 'general', defaultCheckedPatterns },
+  { id: 'insurance_advisor', defaultCheckedPatterns },
+  { id: 'culture', defaultCheckedPatterns },
+  { id: 'tech', defaultCheckedPatterns },
+  { id: 'lifestyle', defaultCheckedPatterns },
+  { id: 'business', defaultCheckedPatterns },
+  { id: 'education', defaultCheckedPatterns },
+  { id: 'emotion', defaultCheckedPatterns },
+  { id: 'travel', defaultCheckedPatterns },
+  { id: 'food', defaultCheckedPatterns },
+  { id: 'fitness', defaultCheckedPatterns },
 ];
 
 export function getPromptTemplates(

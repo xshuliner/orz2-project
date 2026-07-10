@@ -773,7 +773,7 @@ export const messages = {
   publisher: {
     fallbackName: '公众号发布',
     fallbackSummary:
-      '把账号、提示词、图片素材和发布元信息整理成一张清晰的任务单，发布前的关键信息一眼可查。',
+      '选择内容模板，一键生成文章、封面、正文配图和摘要，也可进入高级模式逐项定制。',
     defaultRewriteRequirement:
       '请在保留原文核心事实、信息价值和读者收益的基础上，重写成一篇全新的公众号文章。标题、开头、段落顺序、表达方式和案例串联都要明显区别于原文；不要逐句同义替换，不要照搬原文金句；排版要适合微信公众号阅读，整体有层次、有留白、有编辑感。',
     backLabel: '在线工具',
@@ -809,6 +809,43 @@ export const messages = {
         label: 'AI 洗稿公众号',
         description: '输入公众号原文链接和特殊要求，自动重写文字、图片与排版。',
       },
+    },
+    editorModes: {
+      legend: '操作模式',
+      description: '简单模式一键生成，高级模式可逐项编辑；选择会自动保存。',
+      simple: {
+        label: '简单模式',
+        description: '选模板即可生成',
+      },
+      advanced: {
+        label: '高级模式',
+        description: '手动调整全部配置',
+      },
+    },
+    automation: {
+      eyebrow: '定时草稿服务',
+      title: '让公众号草稿按计划自动生成',
+      description:
+        '可按固定时间、选题规则或业务数据，定制自动生成并写入公众号草稿箱的任务。',
+      action: '邮件咨询定制方案',
+      emailSubject: '咨询公众号定时草稿任务',
+    },
+    simpleMode: {
+      title: '选择一个内容模板',
+      description: '无需填写提示词和图片配置，选好模板就可以直接生成。',
+      templateLabel: '内容模板 *',
+      selectorAriaLabel: '选择公众号内容模板',
+      ready: '一键生成配置已就绪',
+      promptFact: '模板提示词',
+      coverFact: 'AI 封面图',
+      inlineFact: '前 3 张正文配图',
+      digestFact: 'LLM 自动摘要',
+      createHint:
+        '生成时会直接使用该模板的提示词、封面提示词和前 3 张正文配图提示词。',
+      rewriteHint:
+        '生成时会结合原文、模板配置和默认洗稿要求，自动完成文字、配图与排版。',
+      selectedPrefix: '已选择',
+      selectedSuffix: '模板，可以直接生成草稿。',
     },
     autoFill: {
       chip: '已智能填充',
@@ -846,7 +883,6 @@ export const messages = {
       fieldLabels: {
         promptSystem: '系统提示词',
         promptContent: '主体内容提示词',
-        digest: '摘要',
         cover: '封面图描述（AI）',
         inline: '内嵌图',
         inlineSuffix: '描述（AI）',
@@ -891,18 +927,17 @@ export const messages = {
       },
       meta: {
         title: '文章元信息',
-        description: '补齐作者、摘要、来源与评论策略。',
+        description: '仅需设置作者与评论；摘要会由 LLM 自动生成。',
         author: '作者',
         authorPlaceholder: '作者名称',
-        sourceUrl: '原文链接',
-        digest: '摘要',
-        digestPlaceholder: '用于公众号摘要展示的短文案',
         comment: '评论配置 *',
       },
       rewrite: {
         title: '洗稿公众号配置',
         description:
-          '只需要原文链接和特殊要求，服务端会补齐洗稿提示词、图片和排版策略。',
+          '编辑原文链接和洗稿要求，并继续调整提示词、图片和排版策略。',
+        simpleDescription: '粘贴公众号原文链接，其他配置交给模板和 AI。',
+        simpleHint: '简单模式会自动使用默认洗稿要求，并生成 3 张正文配图。',
         sourceUrl: '需要洗稿的公众号链接 *',
         sourceUrlPlaceholder:
           'https://mp.weixin.qq.com/s/5b9Z4EOs3wsMgc6GqAGHBQ',
@@ -924,6 +959,7 @@ export const messages = {
     },
     completion: {
       account: '公众号配置',
+      template: '内容模板',
       prompt: '文章生成提示词',
       images: '封面与内嵌图片',
       meta: '文章元信息',
@@ -985,6 +1021,7 @@ export const messages = {
       appSecret: '请填写公众号 appSecret。',
       articleType: '请选择草稿类型。',
       provider: '请选择 AI 提供商。',
+      template: '请选择内容模板。',
       promptSystem: '请填写系统提示词。',
       promptContent: '请填写主体内容提示词。',
       rewriteSourceUrl: '请填写需要洗稿的公众号链接。',
@@ -1443,13 +1480,13 @@ export const messages = {
       'tool-wechat-publisher': {
         name: '公众号自动发布',
         summary:
-          '配置公众号凭据、文章提示词、封面图和内嵌图片，一站式准备自动发布任务。',
+          '选择内容模板，一键生成文章、封面、正文配图和摘要并写入公众号草稿箱。',
         badges: ['AI', '公众号', '自动发布', 'LLM', '内容运营'],
         entries: { web: '工具入口' },
         seo: {
           title: '公众号自动发布工具 - ORZ2 内容运营工具',
           description:
-            '使用 ORZ2 公众号自动发布工具配置 appId、appSecret、文章提示词、封面图和图片素材，准备自动化发布任务。',
+            '使用 ORZ2 公众号自动发布工具选择模板，一键生成文章、封面、正文配图和摘要，也可在高级模式定制完整提示词。',
           keywords: [
             '公众号自动发布',
             '微信公众号工具',

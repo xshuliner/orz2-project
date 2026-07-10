@@ -16,7 +16,6 @@ export function truncate(value: string, max: number) {
 export function newValueForKey(template: PromptTemplate, key: AutoFillKey) {
   if (key === 'promptSystem') return template.fields.promptSystem;
   if (key === 'promptContent') return template.fields.promptContent;
-  if (key === 'digest') return template.fields.digest;
   if (key === 'imageCover.value') return template.fields.coverValue;
   if (key.startsWith('imagesInlineList.')) {
     const idx = Number(key.split('.')[1]);

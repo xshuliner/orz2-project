@@ -79,14 +79,14 @@
 }
 
 .o-selector-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  z-index: var(--z-popover);
+  /* Position is set via inline styles to support fixed/portal layout. */
+  position: fixed;
+  z-index: var(--z-tooltip);
   display: grid;
   gap: 4px;
-  min-width: max(100%, 168px);
+  min-width: 0;
   padding: 6px;
+  overflow-y: auto;
   border: 1px solid color-mix(in srgb, var(--color-line) 92%, transparent);
   border-radius: 8px;
   background: color-mix(in srgb, var(--color-panel) 98%, transparent);
@@ -94,6 +94,11 @@
   backdrop-filter: blur(18px);
   animation: o-selector-menu-in 140ms ease-out;
   transform-origin: top right;
+}
+
+.o-selector-menu.is-placement-top {
+  transform-origin: bottom right;
+  animation-name: o-selector-menu-in-top;
 }
 
 .o-selector-option {
@@ -186,6 +191,18 @@
   from {
     opacity: 0;
     transform: translateY(-4px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes o-selector-menu-in-top {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.98);
   }
 
   to {

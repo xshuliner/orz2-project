@@ -1,20 +1,38 @@
 import type {
   OfficialCommentConfig,
-  OfficialImageConfig,
   OfficialImageSourceType,
   OfficialPublisherMode,
   OfficialPublisherProvider,
+  PostOfficialPublisherBody,
 } from '@/api';
 import {
   defaultForm,
+  defaultPromptTemplateId,
+  defaultSimpleInlineImageCount,
   officialPublisherModes,
   officialPublisherProviders,
+  promptTemplateConfigs,
+  publisherEditorModes,
+  type PromptTemplate,
+  type PromptTemplateId,
 } from '@/pages/Tools/ToolOfficialPublisher/config';
 import type {
   CompletionItem,
   PublisherCopy,
+  PublisherEditorMode,
+  PublisherModeSetting,
   WechatPublisherForm,
 } from '@/pages/Tools/ToolOfficialPublisher/types';
+
+function asRecord(value: unknown): Record<string, unknown> {
+  return typeof value === 'object' && value
+    ? (value as Record<string, unknown>)
+    : {};
+}
+
+function readString(value: unknown, fallback = '') {
+  return typeof value === 'string' ? value : fallback;
+}
 
 function normalizeOfficialPublisherProvider(
   value: unknown
@@ -36,36 +54,62 @@ function normalizeOfficialPublisherMode(value: unknown): OfficialPublisherMode {
     : 'create';
 }
 
+function normalizePublisherEditorMode(value: unknown): PublisherEditorMode {
+  const normalized =
+    typeof value === 'string' ? value.trim().toLowerCase() : '';
+  return publisherEditorModes.includes(normalized as PublisherEditorMode)
+    ? (normalized as PublisherEditorMode)
+    : 'simple';
+}
+
+function normalizePromptTemplateId(value: unknown): PromptTemplateId {
+  return promptTemplateConfigs.some(config => config.id === value)
+    ? (value as PromptTemplateId)
+    : defaultPromptTemplateId;
+}
+
 export function normalizeForm(
   input: unknown,
   defaultRewriteRequirement: string
 ): WechatPublisherForm {
-  const source =
-    typeof input === 'object' && input
-      ? (input as Partial<WechatPublisherForm> & Record<string, any>)
-      : {};
+  const source = asRecord(input);
+  const rawAi = asRecord(source.ai);
+  const rawModeSettings = asRecord(source.modeSettings);
+  const legacyEditorModes = asRecord(source.editorModes);
   const inlineList = Array.isArray(source.imagesInlineList)
     ? source.imagesInlineList
     : [];
+
+  function normalizeModeSetting(mode: OfficialPublisherMode) {
+    const rawSetting = asRecord(rawModeSettings[mode]);
+    return {
+      editorMode: normalizePublisherEditorMode(
+        rawSetting.editorMode ??
+          legacyEditorModes[mode] ??
+          source.editorMode ??
+          source.experienceMode
+      ),
+      templateId: normalizePromptTemplateId(
+        rawSetting.templateId ?? source.selectedTemplateId
+      ),
+    } satisfies PublisherModeSetting;
+  }
 
   // Backward compatibility for old localStorage shape: imageCoverType + imageCoverValue.
   const legacyImageCoverType = source.imageCoverType as
     | OfficialImageSourceType
     | undefined;
-  const rawImageCover = (source.imageCover ??
-    {}) as Partial<OfficialImageConfig>;
+  const rawImageCover = asRecord(source.imageCover);
   const coverType: OfficialImageSourceType =
     rawImageCover.type === 'url' || rawImageCover.type === 'base64'
       ? rawImageCover.type
       : legacyImageCoverType === 'url' || legacyImageCoverType === 'base64'
         ? legacyImageCoverType
         : 'ai';
-  const coverValue =
-    typeof rawImageCover.value === 'string'
-      ? rawImageCover.value
-      : typeof source.imageCoverValue === 'string'
-        ? source.imageCoverValue
-        : '';
+  const coverValue = readString(
+    rawImageCover.value,
+    readString(source.imageCoverValue)
+  );
 
   // Backward compatibility for old localStorage shape: comment string flags.
   const rawComment = source.comment as
@@ -85,31 +129,42 @@ export function normalizeForm(
     comment = { open: 1, fansOnly: 0 };
   }
 
+  const rewriteRequirement = readString(source.rewriteRequirement);
+
   return {
-    ...defaultForm,
-    ...source,
     publishMode: normalizeOfficialPublisherMode(
       source.publishMode ?? source.mode ?? source.scene
     ),
+    modeSettings: {
+      create: normalizeModeSetting('create'),
+      rewrite: normalizeModeSetting('rewrite'),
+    },
+    appId: readString(source.appId),
+    appSecret: readString(source.appSecret),
     provider: normalizeOfficialPublisherProvider(
-      source.provider ?? source.aiProvider ?? source.ai?.provider
+      source.provider ?? source.aiProvider ?? rawAi.provider
     ),
-    sourceArticleUrl:
-      typeof source.sourceArticleUrl === 'string'
-        ? source.sourceArticleUrl
-        : typeof source.rewriteHref === 'string'
-          ? source.rewriteHref
-          : '',
-    rewriteRequirement:
-      typeof source.rewriteRequirement === 'string' &&
-      source.rewriteRequirement.trim()
-        ? source.rewriteRequirement
-        : defaultRewriteRequirement,
+    promptSystem: readString(source.promptSystem),
+    promptContent: readString(source.promptContent),
+    sourceArticleUrl: readString(
+      source.sourceArticleUrl,
+      readString(source.rewriteHref)
+    ),
+    rewriteRequirement: rewriteRequirement.trim()
+      ? rewriteRequirement
+      : defaultRewriteRequirement,
     imageCover: { type: coverType, value: coverValue },
-    imagesInlineList: inlineList.slice(0, 9).map(item => ({
-      type: item?.type === 'url' || item?.type === 'base64' ? item.type : 'ai',
-      value: typeof item?.value === 'string' ? item.value : '',
-    })),
+    imagesInlineList: inlineList.slice(0, 9).map(item => {
+      const rawItem = asRecord(item);
+      return {
+        type:
+          rawItem.type === 'url' || rawItem.type === 'base64'
+            ? rawItem.type
+            : 'ai',
+        value: readString(rawItem.value),
+      };
+    }),
+    author: readString(source.author),
     comment,
   };
 }
@@ -131,32 +186,34 @@ export function isWechatArticleUrl(value: string) {
   }
 }
 
+export function getActiveModeSetting(form: WechatPublisherForm) {
+  return form.modeSettings[form.publishMode];
+}
+
+export function getTemplateContent(
+  template: PromptTemplate,
+  inlineImageCount = defaultSimpleInlineImageCount
+): Pick<
+  WechatPublisherForm,
+  'promptSystem' | 'promptContent' | 'imageCover' | 'imagesInlineList'
+> {
+  return {
+    promptSystem: template.fields.promptSystem,
+    promptContent: template.fields.promptContent,
+    imageCover: { type: 'ai', value: template.fields.coverValue },
+    imagesInlineList: template.fields.inlineValueList
+      .slice(0, Math.max(0, Math.min(inlineImageCount, 9)))
+      .map(value => ({ type: 'ai', value })),
+  };
+}
+
 export function getCompletionItems(
   form: WechatPublisherForm,
-  copy: PublisherCopy
+  copy: PublisherCopy,
+  selectedTemplate?: PromptTemplate
 ): CompletionItem[] {
-  if (form.publishMode === 'rewrite') {
-    return [
-      {
-        label: copy.completion.account,
-        done:
-          hasText(form.appId) &&
-          hasText(form.appSecret) &&
-          Boolean(form.provider),
-      },
-      {
-        label: copy.completion.rewriteSource,
-        done:
-          hasText(form.sourceArticleUrl) &&
-          isWechatArticleUrl(form.sourceArticleUrl),
-      },
-      {
-        label: copy.completion.rewriteRequirement,
-        done: hasText(form.rewriteRequirement),
-      },
-    ];
-  }
-  return [
+  const { editorMode } = getActiveModeSetting(form);
+  const items: CompletionItem[] = [
     {
       label: copy.completion.account,
       done:
@@ -164,6 +221,33 @@ export function getCompletionItems(
         hasText(form.appSecret) &&
         Boolean(form.provider),
     },
+  ];
+
+  if (form.publishMode === 'rewrite') {
+    items.push({
+      label: copy.completion.rewriteSource,
+      done:
+        hasText(form.sourceArticleUrl) &&
+        isWechatArticleUrl(form.sourceArticleUrl),
+    });
+  }
+
+  if (editorMode === 'simple') {
+    items.push({
+      label: copy.completion.template,
+      done: Boolean(selectedTemplate),
+    });
+    return items;
+  }
+
+  if (form.publishMode === 'rewrite') {
+    items.push({
+      label: copy.completion.rewriteRequirement,
+      done: hasText(form.rewriteRequirement),
+    });
+  }
+
+  items.push(
     {
       label: copy.completion.prompt,
       done: hasText(form.promptSystem) && hasText(form.promptContent),
@@ -176,19 +260,19 @@ export function getCompletionItems(
         form.imagesInlineList.every(
           item => Boolean(item.type) && hasText(item.value)
         ),
-    },
-    {
-      label: copy.completion.meta,
-      done: form.comment.open === 1 || form.comment.fansOnly === 1,
-    },
-  ];
+    }
+  );
+
+  return items;
 }
 
 export function getValidationErrors(
   form: WechatPublisherForm,
-  copy: PublisherCopy
+  copy: PublisherCopy,
+  selectedTemplate?: PromptTemplate
 ) {
   const nextErrors: string[] = [];
+  const { editorMode } = getActiveModeSetting(form);
 
   if (!hasText(form.appId)) nextErrors.push(copy.validation.appId);
   if (!hasText(form.appSecret)) nextErrors.push(copy.validation.appSecret);
@@ -199,31 +283,86 @@ export function getValidationErrors(
     } else if (!isWechatArticleUrl(form.sourceArticleUrl)) {
       nextErrors.push(copy.validation.rewriteSourceUrlInvalid);
     }
-    if (!hasText(form.rewriteRequirement)) {
+    if (editorMode === 'advanced' && !hasText(form.rewriteRequirement)) {
       nextErrors.push(copy.validation.rewriteRequirement);
     }
+  }
+
+  if (editorMode === 'simple') {
+    if (!selectedTemplate) nextErrors.push(copy.validation.template);
     return nextErrors;
   }
-  if (!hasText(form.promptSystem))
+
+  if (!hasText(form.promptSystem)) {
     nextErrors.push(copy.validation.promptSystem);
-  if (!hasText(form.promptContent))
+  }
+  if (!hasText(form.promptContent)) {
     nextErrors.push(copy.validation.promptContent);
+  }
   if (!form.imageCover.type) nextErrors.push(copy.validation.coverType);
-  if (!hasText(form.imageCover.value))
+  if (!hasText(form.imageCover.value)) {
     nextErrors.push(copy.validation.coverValue);
+  }
   form.imagesInlineList.forEach((item, index) => {
-    if (!item.type)
+    if (!item.type) {
       nextErrors.push(
         `${copy.validation.inlineTypePrefix} ${index + 1} ${copy.validation.inlineTypeSuffix}`
       );
-    if (!hasText(item.value))
+    }
+    if (!hasText(item.value)) {
       nextErrors.push(
         `${copy.validation.inlineTypePrefix} ${index + 1} ${copy.validation.inlineValueSuffix}`
       );
+    }
   });
-  if (form.comment.open === 0 && form.comment.fansOnly === 0) {
-    nextErrors.push(copy.validation.comment);
-  }
 
   return nextErrors;
+}
+
+export function buildPublisherRequestBody(
+  form: WechatPublisherForm,
+  selectedTemplate: PromptTemplate,
+  defaultRewriteRequirement: string
+): PostOfficialPublisherBody {
+  const { editorMode } = getActiveModeSetting(form);
+  const content =
+    editorMode === 'simple' ? getTemplateContent(selectedTemplate) : form;
+  const body: PostOfficialPublisherBody = {
+    appId: form.appId.trim(),
+    appSecret: form.appSecret.trim(),
+    publishMode: form.publishMode,
+    articleType: 'news',
+    provider: form.provider,
+    comment: {
+      open: form.comment.open === 1 ? 1 : 0,
+      fansOnly: form.comment.fansOnly === 1 ? 1 : 0,
+    },
+    promptSystem: content.promptSystem.trim(),
+    promptContent: content.promptContent.trim(),
+    imageCover: {
+      type: content.imageCover.type,
+      value: content.imageCover.value.trim(),
+    },
+    imagesInlineList: content.imagesInlineList.map(item => ({
+      type: item.type,
+      value: item.value.trim(),
+    })),
+  };
+
+  const author = form.author.trim();
+  if (author) body.author = author;
+  // Digest is intentionally omitted so the publishing service generates it
+  // from the final article with the LLM instead of trusting stale user input.
+
+  if (form.publishMode === 'rewrite') {
+    body.sourceArticleUrl = form.sourceArticleUrl.trim();
+    body.rewriteRequirement = (
+      editorMode === 'simple'
+        ? defaultRewriteRequirement
+        : form.rewriteRequirement
+    ).trim();
+    body.inlineImageCount = content.imagesInlineList.length;
+  }
+
+  return body;
 }

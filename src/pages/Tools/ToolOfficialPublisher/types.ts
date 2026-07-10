@@ -5,10 +5,21 @@ import type {
   OfficialPublisherProvider,
 } from '@/api';
 import type { I18nContextValue } from '@/i18n/context';
-import type { PromptTemplate } from '@/pages/Tools/ToolOfficialPublisher/config';
+import type {
+  PromptTemplate,
+  PromptTemplateId,
+} from '@/pages/Tools/ToolOfficialPublisher/config';
+
+export type PublisherEditorMode = 'simple' | 'advanced';
+
+export interface PublisherModeSetting {
+  editorMode: PublisherEditorMode;
+  templateId: PromptTemplateId;
+}
 
 export interface WechatPublisherForm {
   publishMode: OfficialPublisherMode;
+  modeSettings: Record<OfficialPublisherMode, PublisherModeSetting>;
   appId: string;
   appSecret: string;
   provider: OfficialPublisherProvider;
@@ -19,8 +30,6 @@ export interface WechatPublisherForm {
   imageCover: OfficialImageConfig;
   imagesInlineList: OfficialImageConfig[];
   author: string;
-  digest: string;
-  sourceUrl: string;
   comment: OfficialCommentConfig;
 }
 
@@ -58,7 +67,6 @@ export type PublisherCopy = I18nContextValue['messages']['publisher'];
 export type AutoFillKey =
   | 'promptSystem'
   | 'promptContent'
-  | 'digest'
   | `imageCover.value`
   | `imagesInlineList.${number}.value`;
 

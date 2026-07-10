@@ -808,7 +808,7 @@ export const messages = {
   publisher: {
     fallbackName: '公众号发布',
     fallbackSummary:
-      'アカウント、プロンプト、画像素材、公開メタ情報を一つのタスクシートに整理し、生成前に重要情報を確認できます。',
+      'テンプレートを選ぶだけで記事、カバー、本文画像、摘要を生成し、高度設定では全項目を編集できます。',
     defaultRewriteRequirement:
       '原文の中心事実、情報価値、読者メリットを保ちながら、新しい WeChat 記事として書き直してください。タイトル、導入、段落順、表現、事例のつなぎ方は原文と明確に変えてください。文単位の言い換えや印象的な表現の流用は避け、WeChat で読みやすい構成、余白、編集感のあるレイアウトにしてください。',
     backLabel: 'ツール',
@@ -849,6 +849,45 @@ export const messages = {
           '公众号原文リンクと要件から、文章・画像・レイアウトを再構成します。',
       },
     },
+    editorModes: {
+      legend: '操作モード',
+      description:
+        'シンプルはワンクリック、高度設定では全項目を編集できます。選択内容は自動保存されます。',
+      simple: {
+        label: 'シンプル',
+        description: 'テンプレートを選ぶだけ',
+      },
+      advanced: {
+        label: '高度設定',
+        description: '全設定を手動調整',
+      },
+    },
+    automation: {
+      eyebrow: '定時草稿サービス',
+      title: '予定に合わせて公众号草稿を自動生成',
+      description:
+        '時刻、テーマルール、業務データに合わせて草稿を生成し、WeChat 草稿箱へ保存するタスクをカスタマイズできます。',
+      action: 'メールで相談',
+      emailSubject: '公众号定時草稿タスクの相談',
+    },
+    simpleMode: {
+      title: 'コンテンツテンプレートを選択',
+      description:
+        'プロンプトや画像設定は不要です。テンプレートを選ぶだけで生成できます。',
+      templateLabel: 'コンテンツテンプレート *',
+      selectorAriaLabel: '公众号コンテンツテンプレートを選択',
+      ready: 'ワンクリック設定完了',
+      promptFact: 'テンプレートプロンプト',
+      coverFact: 'AI カバー',
+      inlineFact: '本文画像 3 枚',
+      digestFact: 'LLM 自動摘要',
+      createHint:
+        '選択したテンプレートのプロンプト、カバープロンプト、先頭 3 件の本文画像プロンプトを使用します。',
+      rewriteHint:
+        '原文、テンプレート、既定のリライト要件を組み合わせ、文章・画像・レイアウトを自動生成します。',
+      selectedPrefix: '',
+      selectedSuffix: 'テンプレートを選択しました。草稿を生成できます。',
+    },
     autoFill: {
       chip: '自動入力済み',
       clear: 'クリア',
@@ -886,7 +925,6 @@ export const messages = {
       fieldLabels: {
         promptSystem: 'システムプロンプト',
         promptContent: '本文プロンプト',
-        digest: '摘要',
         cover: 'カバー画像説明（AI）',
         inline: '本文画像',
         inlineSuffix: '説明（AI）',
@@ -932,18 +970,19 @@ export const messages = {
       },
       meta: {
         title: '記事メタ情報',
-        description: '作者、摘要、出典、コメント設定を補完します。',
+        description: '作者とコメントのみ設定し、摘要は LLM が自動生成します。',
         author: '作者',
         authorPlaceholder: '作者名',
-        sourceUrl: '原文リンク',
-        digest: '摘要',
-        digestPlaceholder: '公众号摘要に表示する短い文',
         comment: 'コメント設定 *',
       },
       rewrite: {
         title: 'リライト設定',
         description:
-          '原文リンクと特別要件だけで進められます。サーバー側でリライト用プロンプト、画像、レイアウト方針を補います。',
+          '原文リンクとリライト要件を編集し、プロンプト、画像、レイアウト方針を細かく調整します。',
+        simpleDescription:
+          '公众号原文リンクを貼り付ければ、残りはテンプレートと AI が処理します。',
+        simpleHint:
+          'シンプルモードでは既定のリライト要件を使い、本文画像を 3 枚生成します。',
         sourceUrl: 'リライトする公众号リンク *',
         sourceUrlPlaceholder:
           'https://mp.weixin.qq.com/s/5b9Z4EOs3wsMgc6GqAGHBQ',
@@ -964,6 +1003,7 @@ export const messages = {
     },
     completion: {
       account: '公众号設定',
+      template: 'コンテンツテンプレート',
       prompt: '記事プロンプト',
       images: 'カバーと本文画像',
       meta: '記事メタ情報',
@@ -1028,6 +1068,7 @@ export const messages = {
       appSecret: '公众号 appSecret を入力してください。',
       articleType: '草稿タイプを選択してください。',
       provider: 'AI プロバイダーを選択してください。',
+      template: 'コンテンツテンプレートを選択してください。',
       promptSystem: 'システムプロンプトを入力してください。',
       promptContent: '本文プロンプトを入力してください。',
       rewriteSourceUrl: 'リライトする公众号リンクを入力してください。',
@@ -1488,13 +1529,13 @@ export const messages = {
       'tool-wechat-publisher': {
         name: '公众号 自動投稿',
         summary:
-          '公众号の認証情報、記事プロンプト、カバー画像、本文画像を一つのタスクシートで設定し、自動草稿作成を準備します。',
+          'テンプレートから記事、カバー、本文画像、摘要を生成し、公众号草稿箱へ保存します。',
         badges: ['AI', '公众号', '自動投稿', 'LLM', 'コンテンツ運用'],
         entries: { web: 'ツール入口' },
         seo: {
           title: '公众号 自動投稿ツール - ORZ2 コンテンツ運用ツール',
           description:
-            'ORZ2 公众号自動投稿ツールで appId、appSecret、記事プロンプト、カバー画像、素材を設定し、自動草稿作成を準備できます。',
+            'ORZ2 公众号自動投稿ツールでテンプレートを選び、記事、カバー、本文画像、摘要をワンクリック生成できます。高度設定では全プロンプトを編集できます。',
           keywords: [
             '公众号自動投稿',
             'WeChat ツール',

@@ -5,7 +5,6 @@ import {
   type OfficialImageConfig,
   type OfficialPublisherMode,
   type OfficialPublisherProgressEvent,
-  type PostOfficialPublisherBody,
 } from '@/api';
 import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
 import { OButton } from '@/components/OButton';
@@ -14,6 +13,7 @@ import { OIconButton } from '@/components/OIconButton';
 import { OInputAI } from '@/components/OInputAI';
 import { OModal } from '@/components/OModal';
 import { ORadio } from '@/components/ORadio';
+import { OSelector } from '@/components/OSelector';
 import { OTooltip } from '@/components/OTooltip';
 import { Seo } from '@/components/Seo';
 import { getToolSeo } from '@/config/seo';
@@ -28,17 +28,21 @@ import {
   getPromptTemplates,
   officialPublisherModes,
   officialPublisherProviders,
+  officialPublisherScheduleEmail,
   officialPublisherSeoKey,
   officialPublisherStorageKey,
   officialPublisherToolId,
+  publisherEditorModes,
   wechatConsoleUrl,
   type PromptTemplate,
+  type PromptTemplateId,
 } from '@/pages/Tools/ToolOfficialPublisher/config';
 import type {
   AutoFillKey,
   AutoFillSnapshot,
   PublishPhase,
   PublishStepStatus,
+  PublisherEditorMode,
   WechatPublisherForm,
 } from '@/pages/Tools/ToolOfficialPublisher/types';
 import {
@@ -48,7 +52,10 @@ import {
   truncate,
 } from '@/pages/Tools/ToolOfficialPublisher/utils/autofill';
 import {
+  buildPublisherRequestBody,
+  getActiveModeSetting,
   getCompletionItems,
+  getTemplateContent,
   getValidationErrors,
   hasText,
   normalizeForm,
@@ -57,6 +64,7 @@ import { createInitialPublishSteps } from '@/pages/Tools/ToolOfficialPublisher/u
 import CacheManager from '@/utils/CacheManager';
 import {
   ArrowLeft,
+  CalendarClock,
   CheckCheck,
   CheckCircle2,
   Clipboard,
@@ -65,17 +73,21 @@ import {
   FileJson,
   Image,
   KeyRound,
+  LayoutTemplate,
   Loader2,
+  Mail,
   Newspaper,
   PenLine,
   Plus,
   RotateCcw,
+  SlidersHorizontal,
   Sparkles,
   Square,
   Trash2,
   Upload,
   Wand2,
   X,
+  Zap,
 } from 'lucide-react';
 import {
   ChangeEvent,
@@ -97,6 +109,10 @@ export function OfficialPublisher() {
   const localizedDefaultForm = useMemo(
     () => ({
       ...defaultForm,
+      modeSettings: {
+        create: { ...defaultForm.modeSettings.create },
+        rewrite: { ...defaultForm.modeSettings.rewrite },
+      },
       rewriteRequirement: defaultRewriteRequirement,
     }),
     [defaultRewriteRequirement]
@@ -145,6 +161,28 @@ export function OfficialPublisher() {
       icon: mode === 'create' ? Newspaper : PenLine,
     }));
   }, [publisherCopy.modes]);
+  const editorModeOptions = useMemo(() => {
+    const editorModeCopy = publisherCopy.editorModes as Record<
+      PublisherEditorMode,
+      { label: string; description: string }
+    >;
+    return publisherEditorModes.map(mode => ({
+      value: mode,
+      label: editorModeCopy[mode].label,
+      description: editorModeCopy[mode].description,
+      icon: mode === 'simple' ? Zap : SlidersHorizontal,
+    }));
+  }, [publisherCopy.editorModes]);
+  const templateOptions = useMemo(
+    () =>
+      promptTemplates.map(template => ({
+        value: template.id,
+        label: template.label,
+        description: template.caption,
+        icon: LayoutTemplate,
+      })),
+    [promptTemplates]
+  );
   const [form, setForm] = useState<WechatPublisherForm>(() => {
     try {
       return normalizeForm(
@@ -187,6 +225,12 @@ export function OfficialPublisher() {
   const [lastAutoFill, setLastAutoFill] = useState<AutoFillSnapshot | null>(
     null
   );
+  const activeModeSetting = getActiveModeSetting(form);
+  const isAdvancedMode = activeModeSetting.editorMode === 'advanced';
+  const selectedPromptTemplate =
+    promptTemplates.find(
+      template => template.id === activeModeSetting.templateId
+    ) ?? promptTemplates[0]!;
   const importInputRef = useRef<HTMLInputElement | null>(null);
   const templateMenuRef = useRef<HTMLDivElement | null>(null);
   const templateButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -294,8 +338,6 @@ export function OfficialPublisher() {
             return form.promptSystem;
           case 'promptContent':
             return form.promptContent;
-          case 'digest':
-            return form.digest;
           case 'imageCover.value':
             return form.imageCover.value;
           default:
@@ -316,8 +358,8 @@ export function OfficialPublisher() {
 
   const exportedJson = useMemo(() => JSON.stringify(form, null, 2), [form]);
   const completionItems = useMemo(
-    () => getCompletionItems(form, publisherCopy),
-    [form, publisherCopy]
+    () => getCompletionItems(form, publisherCopy, selectedPromptTemplate),
+    [form, publisherCopy, selectedPromptTemplate]
   );
   const completedCount = completionItems.filter(item => item.done).length;
   // Keep page title, description, breadcrumb, cards, and SEO on one catalog source.
@@ -351,6 +393,60 @@ export function OfficialPublisher() {
     }));
   }
 
+  function updateEditorMode(editorMode: PublisherEditorMode) {
+    setTemplateMenuOpen(false);
+    setPendingTemplate(null);
+    setSelectedKeys(new Set());
+    setLastAutoFill(null);
+    setAutoFilledKeys(new Set());
+    setErrors([]);
+    setForm(current => {
+      const currentSetting = getActiveModeSetting(current);
+      const next: WechatPublisherForm = {
+        ...current,
+        modeSettings: {
+          ...current.modeSettings,
+          [current.publishMode]: {
+            ...currentSetting,
+            editorMode,
+          },
+        },
+      };
+      const shouldSeedAdvancedFields =
+        editorMode === 'advanced' &&
+        !hasText(current.promptSystem) &&
+        !hasText(current.promptContent) &&
+        !hasText(current.imageCover.value) &&
+        current.imagesInlineList.length === 0;
+      if (!shouldSeedAdvancedFields) return next;
+
+      const template =
+        promptTemplates.find(item => item.id === currentSetting.templateId) ??
+        promptTemplates[0]!;
+      return { ...next, ...getTemplateContent(template) };
+    });
+  }
+
+  function updateSelectedTemplate(templateId: PromptTemplateId) {
+    setErrors([]);
+    setForm(current => ({
+      ...current,
+      modeSettings: {
+        ...current.modeSettings,
+        [current.publishMode]: {
+          ...getActiveModeSetting(current),
+          templateId,
+        },
+      },
+    }));
+    const template = promptTemplates.find(item => item.id === templateId);
+    if (template) {
+      setStatusText(
+        `${publisherCopy.simpleMode.selectedPrefix}「${template.label}」${publisherCopy.simpleMode.selectedSuffix}`
+      );
+    }
+  }
+
   function updateCoverImageValue(value: string) {
     setForm(current => ({
       ...current,
@@ -363,7 +459,11 @@ export function OfficialPublisher() {
   }
 
   function validate() {
-    const nextErrors = getValidationErrors(form, publisherCopy);
+    const nextErrors = getValidationErrors(
+      form,
+      publisherCopy,
+      selectedPromptTemplate
+    );
     setErrors(nextErrors);
     return nextErrors.length === 0;
   }
@@ -501,43 +601,11 @@ export function OfficialPublisher() {
     setPublishElapsedMs(0);
     setStatusText(publisherCopy.status.connecting);
 
-    const body: PostOfficialPublisherBody = {
-      appId: form.appId.trim(),
-      appSecret: form.appSecret.trim(),
-      publishMode: form.publishMode,
-      articleType: 'news',
-      provider: form.provider,
-      comment: {
-        open: form.comment.open === 1 ? 1 : 0,
-        fansOnly: form.comment.fansOnly === 1 ? 1 : 0,
-      },
-    };
-    if (form.publishMode === 'rewrite') {
-      body.sourceArticleUrl = form.sourceArticleUrl.trim();
-      body.rewriteRequirement = form.rewriteRequirement.trim();
-      body.inlineImageCount = 3;
-    } else {
-      body.imageCover = {
-        type: form.imageCover.type,
-        value: form.imageCover.value,
-      };
-      body.imagesInlineList = form.imagesInlineList.map(item => ({
-        type: item.type,
-        value: item.value,
-      }));
-    }
-    const promptSystem = form.promptSystem.trim();
-    const promptContent = form.promptContent.trim();
-    const author = form.author.trim();
-    const digest = form.digest.trim();
-    const sourceUrl = form.sourceUrl.trim();
-    if (form.publishMode === 'create') {
-      if (promptSystem) body.promptSystem = promptSystem;
-      if (promptContent) body.promptContent = promptContent;
-      if (author) body.author = author;
-      if (digest) body.digest = digest;
-      if (sourceUrl) body.sourceUrl = sourceUrl;
-    }
+    const body = buildPublisherRequestBody(
+      form,
+      selectedPromptTemplate,
+      defaultRewriteRequirement
+    );
 
     try {
       publisherAbortRef.current?.abort();
@@ -646,15 +714,10 @@ export function OfficialPublisher() {
     filledKeys: AutoFillKey[];
   } {
     const previousValues: Partial<Record<AutoFillKey, string>> = {};
-    const filledKeys: AutoFillKey[] = [
-      'promptSystem',
-      'promptContent',
-      'digest',
-    ];
+    const filledKeys: AutoFillKey[] = ['promptSystem', 'promptContent'];
 
     previousValues['promptSystem'] = currentForm.promptSystem;
     previousValues['promptContent'] = currentForm.promptContent;
-    previousValues['digest'] = currentForm.digest;
     if (currentForm.imageCover.type === 'ai') {
       previousValues['imageCover.value'] = currentForm.imageCover.value;
       filledKeys.push('imageCover.value');
@@ -710,7 +773,16 @@ export function OfficialPublisher() {
       filledValues[key] = newValueForKey(template, key);
     });
     setForm(current => {
-      const draft: WechatPublisherForm = { ...current };
+      const draft: WechatPublisherForm = {
+        ...current,
+        modeSettings: {
+          ...current.modeSettings,
+          [current.publishMode]: {
+            ...getActiveModeSetting(current),
+            templateId: template.id,
+          },
+        },
+      };
 
       // Replace only user-selected fields.
       if (keySet.has('promptSystem')) {
@@ -718,9 +790,6 @@ export function OfficialPublisher() {
       }
       if (keySet.has('promptContent')) {
         draft.promptContent = template.fields.promptContent;
-      }
-      if (keySet.has('digest')) {
-        draft.digest = template.fields.digest;
       }
       if (keySet.has('imageCover.value') && draft.imageCover.type === 'ai') {
         draft.imageCover = {
@@ -821,9 +890,6 @@ export function OfficialPublisher() {
           case 'promptContent':
             draft.promptContent = previous;
             break;
-          case 'digest':
-            draft.digest = previous;
-            break;
           case 'imageCover.value':
             draft.imageCover = { ...draft.imageCover, value: previous };
             break;
@@ -861,9 +927,6 @@ export function OfficialPublisher() {
           break;
         case 'promptContent':
           draft.promptContent = previous;
-          break;
-        case 'digest':
-          draft.digest = previous;
           break;
         case 'imageCover.value':
           draft.imageCover = { ...draft.imageCover, value: previous };
@@ -972,7 +1035,38 @@ export function OfficialPublisher() {
           </div>
         </OCard>
 
-        <form className='publisher-form' onSubmit={handleGenerate}>
+        <OCard
+          as='section'
+          className='publisher-automation-card'
+          aria-labelledby='publisher-automation-title'
+          padding='sm'
+          tone='soft'
+        >
+          <span className='publisher-automation-icon' aria-hidden='true'>
+            <CalendarClock size={21} />
+          </span>
+          <div className='publisher-automation-copy'>
+            <span>{publisherCopy.automation.eyebrow}</span>
+            <h2 id='publisher-automation-title'>
+              {publisherCopy.automation.title}
+            </h2>
+            <p>{publisherCopy.automation.description}</p>
+          </div>
+          <OButton
+            href={`mailto:${officialPublisherScheduleEmail}?subject=${encodeURIComponent(
+              publisherCopy.automation.emailSubject
+            )}`}
+            variant='secondary'
+          >
+            <Mail size={16} aria-hidden='true' />
+            {publisherCopy.automation.action}
+          </OButton>
+        </OCard>
+
+        <form
+          className='publisher-form box-border pb-4'
+          onSubmit={handleGenerate}
+        >
           <OCard
             as='section'
             className='form-panel publisher-mode-card'
@@ -999,9 +1093,24 @@ export function OfficialPublisher() {
                 onChange={updatePublishMode}
               />
             </div>
+            <div className='editor-mode-field'>
+              <div className='editor-mode-copy'>
+                <span className='mode-choice-label'>
+                  {publisherCopy.editorModes.legend}
+                </span>
+                <p>{publisherCopy.editorModes.description}</p>
+              </div>
+              <ORadio
+                ariaLabel={publisherCopy.editorModes.legend}
+                className='publisher-editor-mode-radio'
+                options={editorModeOptions}
+                value={activeModeSetting.editorMode}
+                onChange={updateEditorMode}
+              />
+            </div>
           </OCard>
 
-          {form.publishMode === 'create' && lastAutoFill ? (
+          {isAdvancedMode && lastAutoFill ? (
             <div className='autofill-banner' role='status'>
               <Sparkles size={16} aria-hidden='true' />
               <span>
@@ -1084,7 +1193,129 @@ export function OfficialPublisher() {
                 </fieldset>
               </OCard>
 
-              {form.publishMode === 'create' ? (
+              {form.publishMode === 'rewrite' ? (
+                <OCard
+                  as='section'
+                  className='form-panel rewrite-panel'
+                  padding='md'
+                >
+                  <div className='form-panel-heading'>
+                    <span className='panel-icon'>
+                      <Newspaper size={19} aria-hidden='true' />
+                    </span>
+                    <div>
+                      <h2>{publisherCopy.sections.rewrite.title}</h2>
+                      <p>
+                        {isAdvancedMode
+                          ? publisherCopy.sections.rewrite.description
+                          : publisherCopy.sections.rewrite.simpleDescription}
+                      </p>
+                    </div>
+                  </div>
+                  <label className='field'>
+                    <span>{publisherCopy.sections.rewrite.sourceUrl}</span>
+                    <input
+                      value={form.sourceArticleUrl}
+                      onChange={event =>
+                        updateField('sourceArticleUrl', event.target.value)
+                      }
+                      placeholder={
+                        publisherCopy.sections.rewrite.sourceUrlPlaceholder
+                      }
+                      required
+                    />
+                    <small>
+                      {publisherCopy.sections.rewrite.sourceUrlHint}
+                    </small>
+                  </label>
+                  {isAdvancedMode ? (
+                    <label className='field'>
+                      <span>{publisherCopy.sections.rewrite.requirement}</span>
+                      <textarea
+                        value={form.rewriteRequirement}
+                        onChange={event =>
+                          updateField('rewriteRequirement', event.target.value)
+                        }
+                        rows={6}
+                        placeholder={
+                          publisherCopy.sections.rewrite.requirementPlaceholder
+                        }
+                      />
+                      <small>
+                        {publisherCopy.sections.rewrite.requirementHint}
+                      </small>
+                    </label>
+                  ) : (
+                    <div className='rewrite-simple-note'>
+                      <Zap size={16} aria-hidden='true' />
+                      <span>{publisherCopy.sections.rewrite.simpleHint}</span>
+                    </div>
+                  )}
+                </OCard>
+              ) : null}
+
+              {!isAdvancedMode ? (
+                <OCard
+                  as='section'
+                  className='form-panel simple-workflow-card'
+                  padding='md'
+                  tone='soft'
+                >
+                  <div className='form-panel-heading simple-template-heading'>
+                    <span className='panel-icon'>
+                      <LayoutTemplate size={19} aria-hidden='true' />
+                    </span>
+                    <div>
+                      <h2>{publisherCopy.simpleMode.title}</h2>
+                      <p>{publisherCopy.simpleMode.description}</p>
+                    </div>
+                  </div>
+                  <div className='simple-template-layout'>
+                    <label className='simple-template-field'>
+                      <span>{publisherCopy.simpleMode.templateLabel}</span>
+                      <OSelector
+                        ariaLabel={publisherCopy.simpleMode.selectorAriaLabel}
+                        className='simple-template-selector'
+                        options={templateOptions}
+                        placement='bottom'
+                        value={activeModeSetting.templateId}
+                        onChange={updateSelectedTemplate}
+                      />
+                    </label>
+                    <div className='simple-template-preview'>
+                      <span className='simple-template-ready'>
+                        <CheckCircle2 size={15} aria-hidden='true' />
+                        {publisherCopy.simpleMode.ready}
+                      </span>
+                      <h3>{selectedPromptTemplate.label}</h3>
+                      <p>{selectedPromptTemplate.caption}</p>
+                      <div className='simple-template-facts'>
+                        <span>
+                          <Sparkles size={15} aria-hidden='true' />
+                          {publisherCopy.simpleMode.promptFact}
+                        </span>
+                        <span>
+                          <Image size={15} aria-hidden='true' />
+                          {publisherCopy.simpleMode.coverFact}
+                        </span>
+                        <span>
+                          <LayoutTemplate size={15} aria-hidden='true' />
+                          {publisherCopy.simpleMode.inlineFact}
+                        </span>
+                        <span>
+                          <Newspaper size={15} aria-hidden='true' />
+                          {publisherCopy.simpleMode.digestFact}
+                        </span>
+                      </div>
+                      <small>
+                        {form.publishMode === 'rewrite'
+                          ? publisherCopy.simpleMode.rewriteHint
+                          : publisherCopy.simpleMode.createHint}
+                      </small>
+                    </div>
+                  </div>
+                </OCard>
+              ) : (
                 <>
                   <OCard as='section' className='form-panel' padding='md'>
                     <div className='form-panel-heading'>
@@ -1239,9 +1470,7 @@ export function OfficialPublisher() {
                             <OInputAI
                               value={item.value}
                               onValueChange={value =>
-                                updateInlineImage(index, {
-                                  value,
-                                })
+                                updateInlineImage(index, { value })
                               }
                               polishMode='official_image_prompt'
                               disabledPolish={item.type !== 'ai'}
@@ -1281,48 +1510,17 @@ export function OfficialPublisher() {
                         <p>{publisherCopy.sections.meta.description}</p>
                       </div>
                     </div>
-                    <div className='form-grid two'>
-                      <label className='field'>
-                        <span>{publisherCopy.sections.meta.author}</span>
-                        <input
-                          value={form.author}
-                          onChange={event =>
-                            updateField('author', event.target.value)
-                          }
-                          placeholder={
-                            publisherCopy.sections.meta.authorPlaceholder
-                          }
-                        />
-                      </label>
-                      <label className='field'>
-                        <span>{publisherCopy.sections.meta.sourceUrl}</span>
-                        <input
-                          value={form.sourceUrl}
-                          onChange={event =>
-                            updateField('sourceUrl', event.target.value)
-                          }
-                          placeholder='https://example.com/source'
-                        />
-                      </label>
-                    </div>
                     <label className='field'>
-                      <span>{publisherCopy.sections.meta.digest}</span>
-                      <textarea
-                        value={form.digest}
+                      <span>{publisherCopy.sections.meta.author}</span>
+                      <input
+                        value={form.author}
                         onChange={event =>
-                          updateField('digest', event.target.value)
+                          updateField('author', event.target.value)
                         }
-                        rows={3}
                         placeholder={
-                          publisherCopy.sections.meta.digestPlaceholder
+                          publisherCopy.sections.meta.authorPlaceholder
                         }
                       />
-                      {autoFilledKeys.has('digest') ? (
-                        <AutoFillChip
-                          copy={publisherCopy}
-                          onClear={() => clearAutoFillField('digest')}
-                        />
-                      ) : null}
                     </label>
                     <fieldset className='choice-field'>
                       <legend>{publisherCopy.sections.meta.comment}</legend>
@@ -1342,54 +1540,6 @@ export function OfficialPublisher() {
                     </fieldset>
                   </OCard>
                 </>
-              ) : (
-                <OCard
-                  as='section'
-                  className='form-panel rewrite-panel'
-                  padding='md'
-                >
-                  <div className='form-panel-heading'>
-                    <span className='panel-icon'>
-                      <Newspaper size={19} aria-hidden='true' />
-                    </span>
-                    <div>
-                      <h2>{publisherCopy.sections.rewrite.title}</h2>
-                      <p>{publisherCopy.sections.rewrite.description}</p>
-                    </div>
-                  </div>
-                  <label className='field'>
-                    <span>{publisherCopy.sections.rewrite.sourceUrl}</span>
-                    <input
-                      value={form.sourceArticleUrl}
-                      onChange={event =>
-                        updateField('sourceArticleUrl', event.target.value)
-                      }
-                      placeholder={
-                        publisherCopy.sections.rewrite.sourceUrlPlaceholder
-                      }
-                      required
-                    />
-                    <small>
-                      {publisherCopy.sections.rewrite.sourceUrlHint}
-                    </small>
-                  </label>
-                  <label className='field'>
-                    <span>{publisherCopy.sections.rewrite.requirement}</span>
-                    <textarea
-                      value={form.rewriteRequirement}
-                      onChange={event =>
-                        updateField('rewriteRequirement', event.target.value)
-                      }
-                      rows={6}
-                      placeholder={
-                        publisherCopy.sections.rewrite.requirementPlaceholder
-                      }
-                    />
-                    <small>
-                      {publisherCopy.sections.rewrite.requirementHint}
-                    </small>
-                  </label>
-                </OCard>
               )}
             </div>
 
@@ -1523,7 +1673,7 @@ export function OfficialPublisher() {
         />
       ) : null}
 
-      {form.publishMode === 'create' && isTemplateMenuOpen && popoverPos
+      {isAdvancedMode && isTemplateMenuOpen && popoverPos
         ? createPortal(
             <OCard
               className='autofill-menu'
@@ -1561,7 +1711,7 @@ export function OfficialPublisher() {
                       onClick={() => requestApplyTemplate(template)}
                     >
                       <span className='autofill-card-accent' aria-hidden='true'>
-                        {template.accent}
+                        <LayoutTemplate size={18} />
                       </span>
                       <span className='autofill-card-body'>
                         <span className='autofill-card-title'>
@@ -1596,7 +1746,7 @@ export function OfficialPublisher() {
           )
         : null}
 
-      {form.publishMode === 'create' && pendingTemplate ? (
+      {isAdvancedMode && pendingTemplate ? (
         <OModal
           className='autofill-confirm'
           isOpen
@@ -1666,8 +1816,6 @@ export function OfficialPublisher() {
                     return publisherCopy.autoFill.fieldLabels.promptSystem;
                   if (key === 'promptContent')
                     return publisherCopy.autoFill.fieldLabels.promptContent;
-                  if (key === 'digest')
-                    return publisherCopy.autoFill.fieldLabels.digest;
                   if (key === 'imageCover.value')
                     return publisherCopy.autoFill.fieldLabels.cover;
                   if (key.startsWith('imagesInlineList.')) {
