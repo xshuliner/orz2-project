@@ -136,33 +136,6 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orz2.online/design-system</loc>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/design-system" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/design-system" />
-    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/design-system" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/design-system" />
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://orz2.online/en/design-system</loc>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/design-system" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/design-system" />
-    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/design-system" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/design-system" />
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://orz2.online/ja/design-system</loc>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/design-system" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/design-system" />
-    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/design-system" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/design-system" />
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
     <loc>https://orz2.online/tools/official-publisher</loc>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/official-publisher" />
     <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/official-publisher" />

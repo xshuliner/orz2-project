@@ -34,6 +34,32 @@ function getPrimaryLink(item: CatalogItem) {
   );
 }
 
+function getPrimaryEntryUrl(item: CatalogItem, locale: Locale) {
+  const primaryLink = getPrimaryLink(item);
+  return primaryLink ? entryUrl(primaryLink, locale) : undefined;
+}
+
+function pageJsonLd(
+  locale: Locale,
+  name: string,
+  description: string,
+  canonicalPath: string
+) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    name,
+    description,
+    url: routeUrl(canonicalPath, locale),
+    inLanguage: locale,
+    isPartOf: {
+      '@type': 'WebSite',
+      name: siteName,
+      url: routeUrl('/', locale),
+    },
+  };
+}
+
 function entryUrl(
   entry: Extract<CatalogEntry, { kind: 'link' }>,
   locale: Locale
@@ -77,6 +103,7 @@ export function getPageSeo(locale: Locale): Record<string, SeoConfig> {
             'query-input': 'required name=search_term_string',
           },
         },
+        pageJsonLd(locale, m.seo.home.title, m.seo.home.description, '/'),
       ],
     },
     products: {
@@ -94,8 +121,17 @@ export function getPageSeo(locale: Locale): Record<string, SeoConfig> {
             '@type': 'ListItem',
             position: index + 1,
             name: product.name,
+            ...(getPrimaryEntryUrl(product, locale)
+              ? { url: getPrimaryEntryUrl(product, locale) }
+              : {}),
           })),
         },
+        pageJsonLd(
+          locale,
+          m.seo.products.title,
+          m.seo.products.description,
+          '/products'
+        ),
       ],
     },
     tools: {
@@ -112,12 +148,18 @@ export function getPageSeo(locale: Locale): Record<string, SeoConfig> {
           itemListElement: tools.map((tool, index) => ({
             '@type': 'ListItem',
             position: index + 1,
-            ...(getPrimaryLink(tool)
-              ? { url: entryUrl(getPrimaryLink(tool)!, locale) }
+            ...(getPrimaryEntryUrl(tool, locale)
+              ? { url: getPrimaryEntryUrl(tool, locale) }
               : {}),
             name: tool.name,
           })),
         },
+        pageJsonLd(
+          locale,
+          m.seo.tools.title,
+          m.seo.tools.description,
+          '/tools'
+        ),
       ],
     },
     team: {
@@ -133,6 +175,7 @@ export function getPageSeo(locale: Locale): Record<string, SeoConfig> {
           name: m.seo.team.pageName,
           url: routeUrl('/team', locale),
         },
+        pageJsonLd(locale, m.seo.team.title, m.seo.team.description, '/team'),
       ],
     },
     privacy: {
@@ -141,6 +184,12 @@ export function getPageSeo(locale: Locale): Record<string, SeoConfig> {
       canonicalPath: '/privacy',
       ogImage: defaultImageOg,
       locale,
+      jsonLd: pageJsonLd(
+        locale,
+        m.seo.privacy.title,
+        m.seo.privacy.description,
+        '/privacy'
+      ),
     },
     designSystem: {
       title: m.seo.designSystem.title,
@@ -148,6 +197,7 @@ export function getPageSeo(locale: Locale): Record<string, SeoConfig> {
       canonicalPath: '/design-system',
       ogImage: defaultImageOg,
       locale,
+      robots: 'noindex, follow',
     },
     buildInfo: {
       title: m.seo.buildInfo.title,

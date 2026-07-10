@@ -184,7 +184,7 @@ Current app routes:
 - `/tools/work-report-polisher` -> daily / weekly report polisher
 - `/team` -> `PageTeam`
 - `/privacy` -> `PagePrivacy`
-- `/design-system` -> internal component gallery
+- `/design-system` -> internal component gallery, `robots: noindex, follow`
 - `/build-info` -> deployment build metadata viewer, `robots: noindex, follow`
 
 All non-home page modules and product/tool sub-routes are lazy-loaded.
@@ -479,14 +479,45 @@ fixtures or static generated output.
 `src/config/seo.ts` is the source for page SEO and tool SEO. Use localized
 messages and catalog accessors when adding routes.
 
+SEO rules:
+
+- Page components should only select the localized `SeoConfig`; keep title,
+  description, canonical path, robots, keywords, OpenGraph image, and JSON-LD in
+  `src/config/seo.ts`.
+- Every public indexable route needs title, description, canonical, alternate
+  locale links, OpenGraph/Twitter tags, and useful JSON-LD when the page has a
+  known schema. Use `routeUrl()` / `toSiteUrl()` for all absolute URLs.
+- Internal, diagnostic, or design-only routes should use
+  `robots: noindex, follow` and must not be added to the sitemap.
+- Catalog list JSON-LD should include item names and canonical entry URLs when a
+  primary link exists.
+
 `scripts/generate-sitemap.mjs` writes `public/sitemap.xml`. It includes:
 
-- Static pages: `/`, `/products`, `/tools`, `/team`, `/privacy`,
-  `/design-system`
+- Static indexable pages: `/`, `/products`, `/tools`, `/team`, `/privacy`
 - Internal primary tool entries from `tools.ts`
 - All three locales plus `x-default` alternates
 
-It does not currently include product detail routes or `/build-info`.
+It does not currently include product detail routes, `/design-system`, or
+`/build-info`.
+
+### Semantic HTML Rules
+
+Prefer semantic elements over neutral containers when the element's purpose is
+clear:
+
+- Page content belongs under the single app `<main id="main-content">`.
+- Page heroes and section headings should use `<header>` with one page-level
+  `<h1>` per route and nested `<h2>` / `<h3>` headings in order.
+- Navigation belongs in `<nav>` with a localized accessible name.
+- Repeated standalone catalog/team cards should render as `<article>`.
+- Supporting summaries, table-of-contents blocks, and side notes should render
+  as `<aside>`.
+- Search/filter regions should use `<search>` when supported by the local
+  toolchain; otherwise use a container with `role="search"`.
+- Data label/value rows should use `<dl>`, `<dt>`, and `<dd>`.
+- Give titled `section` elements `aria-labelledby` pointing at the local
+  heading. Use localized `aria-label` only when there is no visible heading.
 
 ### Tests
 

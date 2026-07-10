@@ -2,7 +2,7 @@ import type { HTMLAttributes, ReactNode } from 'react';
 import './index.css';
 
 interface OSectionHeadingProps extends Omit<
-  HTMLAttributes<HTMLDivElement>,
+  HTMLAttributes<HTMLElement>,
   'title'
 > {
   description?: ReactNode;
@@ -16,7 +16,7 @@ export function OSectionHeading({
   ...props
 }: OSectionHeadingProps) {
   return (
-    <div
+    <header
       {...props}
       className={['o-section-heading', 'section-heading', className]
         .filter(Boolean)
@@ -24,6 +24,6 @@ export function OSectionHeading({
     >
       <h2>{title}</h2>
       {description ? <p>{description}</p> : null}
-    </div>
+    </header>
   );
 }

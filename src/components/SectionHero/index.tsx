@@ -314,7 +314,7 @@ export function SectionHero() {
   const heroCopy = messages.homeSections.hero;
   const heroMedia = getHeroMedia(locale);
   return (
-    <section className='hero-section'>
+    <header className='hero-section'>
       <div className='hero-copy'>
         <h1>{heroCopy.title}</h1>
         <p>{heroCopy.description}</p>
@@ -345,6 +345,6 @@ export function SectionHero() {
         </div>
       </div>
       <SectionHeroVideo media={heroMedia} />
-    </section>
+    </header>
   );
 }

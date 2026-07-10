@@ -57,7 +57,6 @@ const pages = [
   { path: '/tools', changefreq: 'weekly', priority: '0.9' },
   { path: '/team', changefreq: 'monthly', priority: '0.7' },
   { path: '/privacy', changefreq: 'monthly', priority: '0.6' },
-  { path: '/design-system', changefreq: 'monthly', priority: '0.6' },
 ];
 
 async function loadTools() {

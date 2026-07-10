@@ -45,6 +45,7 @@ export function SectionTools({
     label: item,
     value: item,
   }));
+  const sectionHeadingId = title ? 'tools-directory-heading' : undefined;
 
   function updateFilters(nextQuery: string, nextCategory = category) {
     const next = new URLSearchParams();
@@ -82,11 +83,21 @@ export function SectionTools({
   return (
     <section
       className={compact ? 'tool-directory compact' : 'tool-directory'}
-      aria-label={sectionCopy.ariaLabel}
+      aria-labelledby={sectionHeadingId}
+      aria-label={sectionHeadingId ? undefined : sectionCopy.ariaLabel}
     >
-      {title ? <OSectionHeading description={subtitle} title={title} /> : null}
+      {title ? (
+        <OSectionHeading
+          id={sectionHeadingId}
+          description={subtitle}
+          title={title}
+        />
+      ) : null}
       {showFilters ? (
-        <div className='directory-controls'>
+        <search
+          className='directory-controls'
+          aria-label={sectionCopy.ariaLabel}
+        >
           <label className='search-box'>
             <Search size={18} aria-hidden='true' />
             <span className='sr-only'>{sectionCopy.searchAriaLabel}</span>
@@ -103,18 +114,23 @@ export function SectionTools({
             value={category}
             onChange={nextCategory => updateFilters(query, nextCategory)}
           />
-        </div>
+        </search>
       ) : null}
       <div className='tool-groups'>
-        {groups.map(group => {
+        {groups.map((group, index) => {
           const groupTools = visibleTools.filter(tool => tool.group === group);
           const meta = groupMeta.get(group);
+          const groupHeadingId = `tool-group-${index}`;
 
           return (
-            <section className='tool-group' key={group}>
+            <section
+              className='tool-group'
+              key={group}
+              aria-labelledby={groupHeadingId}
+            >
               <div className='tool-group-heading'>
                 <div>
-                  <h3>{group}</h3>
+                  <h3 id={groupHeadingId}>{group}</h3>
                   {meta?.description ? <p>{meta.description}</p> : null}
                 </div>
               </div>

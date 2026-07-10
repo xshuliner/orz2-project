@@ -41,6 +41,7 @@ export function SectionProducts({
     { label: messages.common.all, value: messages.common.all },
     ...productGroups.map(group => ({ label: group.name, value: group.name })),
   ];
+  const sectionHeadingId = title ? 'products-directory-heading' : undefined;
 
   function updateFilters(nextQuery: string, nextCategory = category) {
     const next = new URLSearchParams();
@@ -81,11 +82,21 @@ export function SectionProducts({
   return (
     <section
       className={compact ? 'product-directory compact' : 'product-directory'}
-      aria-label={sectionCopy.ariaLabel}
+      aria-labelledby={sectionHeadingId}
+      aria-label={sectionHeadingId ? undefined : sectionCopy.ariaLabel}
     >
-      {title ? <OSectionHeading description={subtitle} title={title} /> : null}
+      {title ? (
+        <OSectionHeading
+          id={sectionHeadingId}
+          description={subtitle}
+          title={title}
+        />
+      ) : null}
       {showFilters ? (
-        <div className='directory-controls'>
+        <search
+          className='directory-controls'
+          aria-label={sectionCopy.ariaLabel}
+        >
           <label className='search-box'>
             <Search size={18} aria-hidden='true' />
             <span className='sr-only'>{sectionCopy.searchAriaLabel}</span>
@@ -102,20 +113,25 @@ export function SectionProducts({
             value={category}
             onChange={nextCategory => updateFilters(query, nextCategory)}
           />
-        </div>
+        </search>
       ) : null}
       <div className='product-groups'>
-        {categories.map(category => {
+        {categories.map((category, index) => {
           const categoryProducts = visibleProducts.filter(
             product => product.group === category
           );
           const meta = groupMeta.get(category);
+          const groupHeadingId = `product-group-${index}`;
 
           return (
-            <section className='product-group' key={category}>
+            <section
+              className='product-group'
+              key={category}
+              aria-labelledby={groupHeadingId}
+            >
               <div className='product-group-heading'>
                 <div>
-                  <h3>{category}</h3>
+                  <h3 id={groupHeadingId}>{category}</h3>
                   {meta?.description ? <p>{meta.description}</p> : null}
                 </div>
               </div>

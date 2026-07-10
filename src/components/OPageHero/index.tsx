@@ -17,7 +17,7 @@ export function OPageHero({
   title,
 }: OPageHeroProps) {
   return (
-    <section
+    <header
       className={[
         'o-page-hero',
         'page-hero',
@@ -30,6 +30,6 @@ export function OPageHero({
       <h1>{title}</h1>
       {description ? <p>{description}</p> : null}
       {children}
-    </section>
+    </header>
   );
 }

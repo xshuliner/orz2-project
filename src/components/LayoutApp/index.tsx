@@ -47,7 +47,7 @@ export function LayoutApp() {
   return (
     <div className='app-shell'>
       <OHeader />
-      <main>
+      <main id='main-content'>
         <Outlet />
       </main>
       <OFooter />

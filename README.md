@@ -67,6 +67,21 @@ prompt 模板、兜底错误文案和测试选择器都应放在
 key、URL、媒体、生命周期、SEO
 slug 等结构信息，不再写中文基础文案。新增 catalog 条目时必须同步补齐三语 locale 映射，缺失映射应被视为错误，而不是回退到中文硬编码。
 
+## SEO 与语义化
+
+- 页面 SEO 以 `src/config/seo.ts` 为唯一入口，页面组件只负责调用 `Seo`
+  并传入当前 locale 的配置。
+- 公开页面必须有明确的 `title`、`description`、canonical、alternate locale
+  links 和必要的 JSON-LD；内部调试页使用 `robots: noindex, follow`。
+- `scripts/generate-sitemap.mjs` 只收录允许索引的公开入口。新增 `noindex`
+  页面时不要加入 sitemap；页面索引策略变更后需要同步脚本与文档。
+- 每个路由渲染在唯一的 `<main id="main-content">` 中，页面级 hero 使用
+  `<header>` + 一个 `<h1>`。
+- 内容分区优先使用语义标签：导航用 `<nav>`，独立卡片用 `<article>`，补充信息用
+  `<aside>`，目录过滤用 `<search>` 或 `role="search"`，定义型信息用 `<dl>`。
+- 可见分区优先通过标题建立结构：`section` 使用 `aria-labelledby`
+  指向本区标题；无标题时再使用本地化 `aria-label`。
+
 ## 目录速览
 
 ```
