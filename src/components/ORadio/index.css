@@ -64,6 +64,7 @@
   gap: 7px;
   min-width: 0;
   min-height: 36px;
+  cursor: pointer;
   padding: 6px 10px;
   border: 0;
   border-radius: 7px;

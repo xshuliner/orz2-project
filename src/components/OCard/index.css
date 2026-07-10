@@ -85,6 +85,7 @@
 }
 
 .o-card--interactive {
+  cursor: pointer;
   transform-style: preserve-3d;
 }
 

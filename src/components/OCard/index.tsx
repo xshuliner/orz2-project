@@ -41,7 +41,7 @@ export const OCard = forwardRef<HTMLElement, OCardProps>(function OCard(
         'o-card',
         `o-card--${tone}`,
         `o-card--padding-${padding}`,
-        interactive ? 'o-card--interactive' : '',
+        interactive ? 'o-card--interactive interactive' : '',
         accentBar ? 'o-card--accent' : '',
         className,
       ]

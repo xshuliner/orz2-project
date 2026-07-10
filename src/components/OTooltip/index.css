@@ -1,6 +1,12 @@
 .o-tooltip-trigger {
   display: inline-block;
   outline: none;
+  cursor: pointer;
+}
+
+.o-tooltip-trigger:disabled,
+.o-tooltip-trigger[aria-disabled='true'] {
+  cursor: not-allowed;
 }
 
 .o-tooltip {
