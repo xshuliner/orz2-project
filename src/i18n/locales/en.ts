@@ -1046,6 +1046,7 @@ export const messages = {
       autosave: 'The form is saved automatically in this browser.',
       validationFailed:
         'Complete required fields before generating the publishing task.',
+      confirmTitle: 'Start the publishing task?',
       confirmGenerate:
         'Generating a publishing task may take a while. Start now?',
       confirmRewrite:
@@ -1063,6 +1064,7 @@ export const messages = {
       draftCreatedSuffix: '. Check it in the WeChat console.',
       draftCreated: 'Draft generated. Check it in the WeChat console.',
       submitFailed: 'Publishing task submission failed',
+      resetTitle: 'Reset the form?',
       resetConfirm:
         'Resetting clears the form and overwrites local autosave. Continue?',
       resetDone: 'Form reset and local autosave updated.',

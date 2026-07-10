@@ -994,6 +994,7 @@ export const messages = {
     status: {
       autosave: '表单会自动保存到本机浏览器。',
       validationFailed: '请先补齐必填项，再生成公众号发布任务。',
+      confirmTitle: '确认开始发布任务？',
       confirmGenerate: '生成公众号发布任务可能耗时较长，请确认是否开始？',
       confirmRewrite:
         '洗稿公众号任务会抓取原文并生成文字、图片与排版，可能耗时较长，请确认是否开始？',
@@ -1008,6 +1009,7 @@ export const messages = {
       draftCreatedSuffix: '，请在公众号后台查看。',
       draftCreated: '草稿已生成，请在公众号后台查看。',
       submitFailed: '发布任务提交失败',
+      resetTitle: '重置表单？',
       resetConfirm: '重置会清空当前表单并覆盖本机自动保存内容，确认继续？',
       resetDone: '表单已重置，并已同步更新本机保存内容。',
       exportDone: 'JSON 配置已导出。',

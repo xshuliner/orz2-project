@@ -1036,6 +1036,7 @@ export const messages = {
     status: {
       autosave: 'フォームはこのブラウザに自動保存されます。',
       validationFailed: '必須項目を入力してから公開タスクを生成してください。',
+      confirmTitle: '公開タスクを開始しますか？',
       confirmGenerate:
         '公開タスクの生成には時間がかかる場合があります。開始しますか？',
       confirmRewrite:
@@ -1051,6 +1052,7 @@ export const messages = {
       draftCreatedSuffix: 'を生成しました。WeChat 管理画面で確認してください。',
       draftCreated: '草稿を生成しました。WeChat 管理画面で確認してください。',
       submitFailed: '公開タスクの送信に失敗しました',
+      resetTitle: 'フォームをリセットしますか？',
       resetConfirm:
         'リセットするとフォームとローカル自動保存内容が消えます。続行しますか？',
       resetDone: 'フォームをリセットし、ローカル保存も更新しました。',

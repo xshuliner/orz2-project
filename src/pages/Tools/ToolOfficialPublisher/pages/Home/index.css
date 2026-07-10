@@ -2772,35 +2772,6 @@
   justify-content: center;
 }
 
-.template-replace-modal {
-  width: min(440px, calc(100vw - 32px));
-  display: grid;
-  gap: 20px;
-}
-
-.template-replace-modal-copy h2 {
-  margin: 0;
-  color: var(--color-ink);
-  font-size: 18px;
-}
-
-.template-replace-modal-copy p {
-  margin: 8px 0 0;
-  color: var(--color-muted);
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-.template-replace-modal-copy strong {
-  color: var(--color-ink);
-}
-
-.template-replace-modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
 @media (max-width: 760px) {
   .account-mode-switch,
   .template-picker {

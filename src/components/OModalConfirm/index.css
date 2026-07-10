@@ -1,0 +1,29 @@
+.o-modal-confirm {
+  width: min(440px, calc(100vw - 32px));
+  display: grid;
+  gap: 20px;
+  padding: var(--space-8);
+}
+
+.o-modal-confirm-copy h2 {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: 18px;
+}
+
+.o-modal-confirm-copy p {
+  margin: 8px 0 0;
+  color: var(--color-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.o-modal-confirm-copy strong {
+  color: var(--color-ink);
+}
+
+.o-modal-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

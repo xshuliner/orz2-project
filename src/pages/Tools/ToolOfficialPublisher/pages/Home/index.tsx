@@ -12,7 +12,7 @@ import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { OIconButton } from '@/components/OIconButton';
 import { OInputAI } from '@/components/OInputAI';
-import { OModal } from '@/components/OModal';
+import { OModalConfirm } from '@/components/OModalConfirm';
 import { ORadio } from '@/components/ORadio';
 import { OSelector } from '@/components/OSelector';
 import { OTooltip } from '@/components/OTooltip';
@@ -215,6 +215,8 @@ export function OfficialPublisher() {
   const [copiedIp, setCopiedIp] = useState(false);
   const [pendingTemplateId, setPendingTemplateId] =
     useState<PromptTemplateId | null>(null);
+  const [isGenerateConfirmOpen, setGenerateConfirmOpen] = useState(false);
+  const [isResetConfirmOpen, setResetConfirmOpen] = useState(false);
   const selectedCommentOption: CommentOptionValue =
     form.comment.open === 0
       ? 'closed'
@@ -494,19 +496,17 @@ export function OfficialPublisher() {
     }
   }
 
-  async function handleGenerate(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!validate()) {
       setStatusText(publisherCopy.status.validationFailed);
       return;
     }
-    const confirmed = window.confirm(
-      form.publishMode === 'rewrite'
-        ? publisherCopy.status.confirmRewrite
-        : publisherCopy.status.confirmGenerate
-    );
-    if (!confirmed) return;
+    setGenerateConfirmOpen(true);
+  }
 
+  async function runGenerate() {
+    setGenerateConfirmOpen(false);
     setIsGenerating(true);
     setDraftResult(null);
     setDraftResultOpen(false);
@@ -566,9 +566,8 @@ export function OfficialPublisher() {
     }
   }
 
-  function handleReset() {
-    const confirmed = window.confirm(publisherCopy.status.resetConfirm);
-    if (!confirmed) return;
+  function confirmReset() {
+    setResetConfirmOpen(false);
     setForm(localizedDefaultForm);
     setErrors([]);
     setDraftResult(null);
@@ -733,7 +732,7 @@ export function OfficialPublisher() {
 
         <form
           className='publisher-form box-border pb-4'
-          onSubmit={handleGenerate}
+          onSubmit={handleSubmit}
         >
           <div className='publisher-workspace'>
             <div className='publisher-main'>
@@ -1137,7 +1136,7 @@ export function OfficialPublisher() {
                     className='publisher-reset'
                     type='button'
                     variant='ghost'
-                    onClick={handleReset}
+                    onClick={() => setResetConfirmOpen(true)}
                     disabled={isGenerating}
                   >
                     <RotateCcw size={17} aria-hidden='true' />
@@ -1198,33 +1197,60 @@ export function OfficialPublisher() {
         />
       ) : null}
 
-      <OModal
+      <OModalConfirm
         ariaLabel={publisherCopy.customization.replaceAriaLabel}
-        className='template-replace-modal'
         isOpen={Boolean(pendingTemplate)}
-        onClose={() => setPendingTemplateId(null)}
-      >
-        <div className='template-replace-modal-copy'>
-          <h2>{publisherCopy.customization.replaceTitle}</h2>
-          <p>
+        title={publisherCopy.customization.replaceTitle}
+        description={
+          <>
             {publisherCopy.customization.replaceDescriptionPrefix}
             <strong>{pendingTemplate?.label}</strong>
             {publisherCopy.customization.replaceDescriptionSuffix}
-          </p>
-        </div>
-        <div className='template-replace-modal-actions'>
-          <OButton
-            type='button'
-            variant='ghost'
-            onClick={() => setPendingTemplateId(null)}
-          >
-            {publisherCopy.customization.cancel}
-          </OButton>
-          <OButton type='button' onClick={confirmTemplateReplacement}>
-            {publisherCopy.customization.replace}
-          </OButton>
-        </div>
-      </OModal>
+          </>
+        }
+        cancelLabel={publisherCopy.customization.cancel}
+        confirmLabel={publisherCopy.customization.replace}
+        onCancel={() => setPendingTemplateId(null)}
+        onConfirm={confirmTemplateReplacement}
+      />
+
+      <OModalConfirm
+        ariaLabel={publisherCopy.status.confirmTitle}
+        isOpen={isGenerateConfirmOpen}
+        title={publisherCopy.status.confirmTitle}
+        description={
+          form.publishMode === 'rewrite'
+            ? publisherCopy.status.confirmRewrite
+            : publisherCopy.status.confirmGenerate
+        }
+        cancelLabel={publisherCopy.customization.cancel}
+        confirmLabel={
+          form.publishMode === 'rewrite'
+            ? publisherCopy.aside.generateRewrite
+            : publisherCopy.aside.generate
+        }
+        confirmIcon={
+          form.publishMode === 'rewrite' ? (
+            <FileDiff size={17} aria-hidden='true' />
+          ) : (
+            <Send size={17} aria-hidden='true' />
+          )
+        }
+        onCancel={() => setGenerateConfirmOpen(false)}
+        onConfirm={runGenerate}
+      />
+
+      <OModalConfirm
+        ariaLabel={publisherCopy.status.resetTitle}
+        isOpen={isResetConfirmOpen}
+        title={publisherCopy.status.resetTitle}
+        description={publisherCopy.status.resetConfirm}
+        cancelLabel={publisherCopy.customization.cancel}
+        confirmLabel={publisherCopy.aside.reset}
+        confirmIcon={<RotateCcw size={17} aria-hidden='true' />}
+        onCancel={() => setResetConfirmOpen(false)}
+        onConfirm={confirmReset}
+      />
     </>
   );
 }
