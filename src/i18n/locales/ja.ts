@@ -832,10 +832,9 @@ export const messages = {
       MINIMAX: 'MINIMAX',
     },
     modeSwitch: {
-      title: '公開モードを選択',
-      description:
-        'タスク種別に合わせてフォームを切り替え、同じ公開フローで草稿を作成します。',
-      legend: '公開モード *',
+      title: '操作モード',
+      description: '新規作成または既存記事のリライトを選択します。',
+      legend: '操作モード *',
     },
     modes: {
       create: {
@@ -850,11 +849,10 @@ export const messages = {
       },
     },
     editorModes: {
-      legend: '操作モード',
-      description:
-        'シンプルはワンクリック、高度設定では全項目を編集できます。選択内容は自動保存されます。',
+      legend: '設定モード',
+      description: '通常モードですぐ開始し、必要な場合だけ高度設定を使います。',
       simple: {
-        label: 'シンプル',
+        label: '通常モード',
         description: 'テンプレートを選ぶだけ',
       },
       advanced: {
@@ -871,9 +869,9 @@ export const messages = {
       emailSubject: '公众号定時草稿タスクの相談',
     },
     simpleMode: {
-      title: 'コンテンツテンプレートを選択',
+      title: 'コンテンツテンプレート',
       description:
-        'プロンプトや画像設定は不要です。テンプレートを選ぶだけで生成できます。',
+        'テンプレートを選んで開始し、必要な場合だけ高度設定を使います。',
       templateLabel: 'コンテンツテンプレート *',
       selectorAriaLabel: '公众号コンテンツテンプレートを選択',
       ready: 'ワンクリック設定完了',

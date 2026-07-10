@@ -17,12 +17,6 @@ export type PromptTemplateId =
   | 'food'
   | 'fitness';
 
-export type AutoFillKeyPattern =
-  | 'promptSystem'
-  | 'promptContent'
-  | 'imageCover.value'
-  | 'imagesInlineList.*.value';
-
 export interface PromptTemplateFields {
   promptSystem: string;
   promptContent: string;
@@ -49,7 +43,6 @@ export interface PromptTemplateCopy {
 
 export interface PromptTemplateConfig {
   id: PromptTemplateId;
-  defaultCheckedPatterns: AutoFillKeyPattern[];
 }
 
 export interface PromptTemplate
@@ -59,13 +52,6 @@ export type PromptTemplateCopyMap = Record<
   PromptTemplateId,
   PromptTemplateCopy
 >;
-
-const defaultCheckedPatterns: AutoFillKeyPattern[] = [
-  'promptSystem',
-  'promptContent',
-  'imageCover.value',
-  'imagesInlineList.*.value',
-];
 
 export const officialPublisherToolId = 'tool-wechat-publisher';
 export const officialPublisherSeoKey = 'official-publisher';
@@ -119,17 +105,17 @@ export const defaultForm: WechatPublisherForm = {
 };
 
 export const promptTemplateConfigs: PromptTemplateConfig[] = [
-  { id: 'general', defaultCheckedPatterns },
-  { id: 'insurance_advisor', defaultCheckedPatterns },
-  { id: 'culture', defaultCheckedPatterns },
-  { id: 'tech', defaultCheckedPatterns },
-  { id: 'lifestyle', defaultCheckedPatterns },
-  { id: 'business', defaultCheckedPatterns },
-  { id: 'education', defaultCheckedPatterns },
-  { id: 'emotion', defaultCheckedPatterns },
-  { id: 'travel', defaultCheckedPatterns },
-  { id: 'food', defaultCheckedPatterns },
-  { id: 'fitness', defaultCheckedPatterns },
+  { id: 'general' },
+  { id: 'insurance_advisor' },
+  { id: 'culture' },
+  { id: 'tech' },
+  { id: 'lifestyle' },
+  { id: 'business' },
+  { id: 'education' },
+  { id: 'emotion' },
+  { id: 'travel' },
+  { id: 'food' },
+  { id: 'fitness' },
 ];
 
 export function getPromptTemplates(

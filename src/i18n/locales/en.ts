@@ -837,10 +837,9 @@ export const messages = {
       MINIMAX: 'MINIMAX',
     },
     modeSwitch: {
-      title: 'Choose publishing mode',
-      description:
-        'Switch the form by task type while keeping the same publishing flow.',
-      legend: 'Publishing mode *',
+      title: 'Operation mode',
+      description: 'Create a new article or rewrite an existing one.',
+      legend: 'Operation mode *',
     },
     modes: {
       create: {
@@ -855,11 +854,10 @@ export const messages = {
       },
     },
     editorModes: {
-      legend: 'Editing mode',
-      description:
-        'Simple mode is one-click; Advanced mode exposes every setting. Your choice is saved automatically.',
+      legend: 'Configuration',
+      description: 'Standard gets you started; Advanced exposes every setting.',
       simple: {
-        label: 'Simple',
+        label: 'Standard',
         description: 'Choose a template and go',
       },
       advanced: {
@@ -876,9 +874,9 @@ export const messages = {
       emailSubject: 'WeChat scheduled draft automation inquiry',
     },
     simpleMode: {
-      title: 'Choose a content template',
+      title: 'Content template',
       description:
-        'No prompt or image setup required. Pick a template and generate the draft.',
+        'Choose a template to start, then use Advanced only if needed.',
       templateLabel: 'Content template *',
       selectorAriaLabel: 'Choose a WeChat content template',
       ready: 'One-click setup is ready',

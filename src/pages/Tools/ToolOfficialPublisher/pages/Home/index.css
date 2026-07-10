@@ -2525,9 +2525,7 @@
   }
 
   .setup-steps {
-    gap: 4px;
-    font-size: 13px;
-    line-height: 1.42;
+    display: none;
   }
 
   .setup-actions {
@@ -2536,6 +2534,16 @@
 
   .setup-actions .button {
     min-height: var(--control-height-md);
+  }
+
+  .publisher-automation-copy > span,
+  .publisher-automation-copy p {
+    display: none;
+  }
+
+  .publisher-automation-copy h2 {
+    margin: 0;
+    font-size: 16px;
   }
 
   .form-panel {
@@ -2549,5 +2557,214 @@
   .draft-success-hero h2 {
     max-width: 250px;
     font-size: 22px;
+  }
+}
+
+/* Publisher flow: keep every task in the same compact, progressive card model. */
+.account-mode-switch {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 118px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid color-mix(in srgb, var(--color-line) 86%, transparent);
+}
+
+.publisher-mode-radio.compact,
+.publisher-editor-mode-radio.compact {
+  min-height: 42px;
+  padding: 3px;
+  border-radius: var(--radius-control);
+}
+
+.publisher-mode-radio.compact .o-radio-thumb,
+.publisher-editor-mode-radio.compact .o-radio-thumb {
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / var(--o-radio-count));
+  border-radius: 7px;
+}
+
+.publisher-mode-radio.compact .o-radio-option,
+.publisher-editor-mode-radio.compact .o-radio-option {
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 6px 10px;
+  gap: 7px;
+  text-align: center;
+}
+
+.publisher-mode-radio.compact .o-radio-icon {
+  width: auto;
+  height: auto;
+  margin: 0;
+  border: 0;
+  background: transparent;
+}
+
+.publisher-mode-radio.compact .o-radio-copy {
+  display: block;
+}
+
+.publisher-mode-radio.compact .o-radio-copy span {
+  font-size: 12.5px;
+  font-weight: 740;
+}
+
+.publisher-config-card {
+  overflow: visible;
+}
+
+.module-heading {
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.module-mode-switch {
+  display: grid;
+  grid-template-columns: auto minmax(220px, 280px);
+  gap: 10px;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.module-mode-switch > span {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 680;
+  white-space: nowrap;
+}
+
+.template-picker {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(220px, 0.78fr) minmax(0, 1.22fr);
+  gap: 12px;
+  align-items: end;
+  margin-top: 14px;
+}
+
+.template-summary {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 9px 12px;
+  border: 1px solid color-mix(in srgb, var(--color-green) 18%, transparent);
+  border-radius: 8px;
+  color: var(--color-green-label);
+  background: color-mix(in srgb, var(--color-green-soft) 70%, transparent);
+}
+
+.template-summary > span {
+  display: flex;
+  min-width: 0;
+  gap: 7px;
+  align-items: baseline;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.template-summary strong {
+  flex: 0 0 auto;
+  color: var(--color-ink);
+  font-size: 13px;
+}
+
+.advanced-config {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0;
+  margin-top: 18px;
+  border-top: 1px solid color-mix(in srgb, var(--color-line) 88%, transparent);
+}
+
+.advanced-config-section {
+  display: grid;
+  gap: 13px;
+  padding: 18px 0;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-line) 76%, transparent);
+}
+
+.advanced-config-section:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.advanced-section-heading h3 {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: 15px;
+  line-height: 1.3;
+}
+
+.advanced-section-heading p {
+  margin: 3px 0 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.advanced-config-section .inline-image-head {
+  margin-top: 2px;
+}
+
+.advanced-config-section .choice-field.compact {
+  align-content: start;
+  margin-top: 0;
+}
+
+@media (max-width: 760px) {
+  .account-mode-switch,
+  .template-picker {
+    grid-template-columns: 1fr;
+  }
+
+  .module-heading {
+    align-items: stretch;
+  }
+
+  .module-mode-switch {
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .module-mode-switch > span {
+    display: none;
+  }
+
+  .publisher-mode-radio.compact {
+    grid-auto-flow: column;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    min-height: 42px;
+    padding: 3px;
+    overflow: hidden;
+  }
+
+  .publisher-mode-radio.compact .o-radio-thumb {
+    display: block;
+  }
+
+  .publisher-mode-radio.compact .o-radio-option {
+    min-height: 36px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .template-summary > span {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1px;
   }
 }

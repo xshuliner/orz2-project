@@ -796,9 +796,9 @@ export const messages = {
       MINIMAX: 'MINIMAX',
     },
     modeSwitch: {
-      title: '选择发布维度',
-      description: '按任务类型切换表单，创作和洗稿共用同一套发布流程。',
-      legend: '发布维度 *',
+      title: '操作模式',
+      description: '选择创作新文章或洗稿现有文章。',
+      legend: '操作模式 *',
     },
     modes: {
       create: {
@@ -811,10 +811,10 @@ export const messages = {
       },
     },
     editorModes: {
-      legend: '操作模式',
-      description: '简单模式一键生成，高级模式可逐项编辑；选择会自动保存。',
+      legend: '配置模式',
+      description: '普通模式快速开始，高级模式可逐项调整。',
       simple: {
-        label: '简单模式',
+        label: '普通模式',
         description: '选模板即可生成',
       },
       advanced: {
@@ -831,8 +831,8 @@ export const messages = {
       emailSubject: '咨询公众号定时草稿任务',
     },
     simpleMode: {
-      title: '选择一个内容模板',
-      description: '无需填写提示词和图片配置，选好模板就可以直接生成。',
+      title: '内容模板',
+      description: '选择模板即可开始，需要时再进入高级模式调整。',
       templateLabel: '内容模板 *',
       selectorAriaLabel: '选择公众号内容模板',
       ready: '一键生成配置已就绪',

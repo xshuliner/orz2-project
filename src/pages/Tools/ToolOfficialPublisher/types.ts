@@ -5,10 +5,7 @@ import type {
   OfficialPublisherProvider,
 } from '@/api';
 import type { I18nContextValue } from '@/i18n/context';
-import type {
-  PromptTemplate,
-  PromptTemplateId,
-} from '@/pages/Tools/ToolOfficialPublisher/config';
+import type { PromptTemplateId } from '@/pages/Tools/ToolOfficialPublisher/config';
 
 export type PublisherEditorMode = 'simple' | 'advanced';
 
@@ -63,17 +60,3 @@ export interface PublishStep {
 }
 
 export type PublisherCopy = I18nContextValue['messages']['publisher'];
-
-export type AutoFillKey =
-  | 'promptSystem'
-  | 'promptContent'
-  | `imageCover.value`
-  | `imagesInlineList.${number}.value`;
-
-export interface AutoFillSnapshot {
-  templateId: PromptTemplate['id'];
-  templateLabel: string;
-  previousValues: Partial<Record<AutoFillKey, string>>;
-  filledValues: Partial<Record<AutoFillKey, string>>;
-  filledKeys: AutoFillKey[];
-}
