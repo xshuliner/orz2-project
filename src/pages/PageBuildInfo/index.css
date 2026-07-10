@@ -117,12 +117,16 @@
 
 .build-info-commits li {
   display: grid;
-  grid-template-columns: 78px minmax(0, 1fr) max-content;
+  grid-template-columns: max-content minmax(96px, 160px) 78px minmax(0, 1fr);
   gap: 12px;
   align-items: baseline;
   padding-bottom: 10px;
   border-bottom: 1px solid
     color-mix(in srgb, var(--color-line) 78%, transparent);
+  font-family:
+    'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    monospace;
+  font-size: 13px;
 }
 
 .build-info-commits li:last-child {
@@ -130,24 +134,35 @@
   border-bottom: 0;
 }
 
-.build-info-commits code {
-  color: var(--color-green-dark);
-  font-family:
-    'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-    monospace;
-  font-size: 13px;
+.build-info-commits code,
+.build-info-commits time,
+.build-info-commit-author,
+.build-info-commit-message {
+  min-width: 0;
+  font-size: inherit;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
-.build-info-commits span {
-  min-width: 0;
-  color: var(--color-ink);
-  overflow-wrap: anywhere;
+.build-info-commits code {
+  color: var(--color-green-dark);
+  font-family: inherit;
 }
 
 .build-info-commits time {
   color: var(--color-muted);
-  font-size: 12px;
   white-space: nowrap;
+}
+
+.build-info-commit-author {
+  color: var(--color-ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.build-info-commit-message {
+  color: var(--color-ink);
 }
 
 .build-info-empty {
@@ -167,11 +182,7 @@
   }
 
   .build-info-commits li {
-    grid-template-columns: 76px minmax(0, 1fr);
-  }
-
-  .build-info-commits time {
-    grid-column: 2;
+    grid-template-columns: max-content minmax(96px, 160px) 78px minmax(0, 1fr);
   }
 }
 
@@ -184,9 +195,5 @@
   .build-info-commits li {
     grid-template-columns: 1fr;
     gap: 4px;
-  }
-
-  .build-info-commits time {
-    grid-column: auto;
   }
 }

@@ -223,11 +223,16 @@ export function PageBuildInfo() {
                 <ol>
                   {info.git.latestCommits.map(commit => (
                     <li key={commit.hash}>
-                      <code>{commit.shortHash}</code>
-                      <span>{commit.message}</span>
                       <time dateTime={commit.date}>
                         {formatBuildInfoDateTime(commit.date, locale)}
                       </time>
+                      <span className='build-info-commit-author'>
+                        {commit.author}
+                      </span>
+                      <code>{commit.shortHash}</code>
+                      <span className='build-info-commit-message'>
+                        {commit.message}
+                      </span>
                     </li>
                   ))}
                 </ol>
