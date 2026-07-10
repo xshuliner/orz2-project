@@ -7,10 +7,8 @@ import type {
 import type { I18nContextValue } from '@/i18n/context';
 import type { PromptTemplateId } from '@/pages/Tools/ToolOfficialPublisher/config';
 
-export type PublisherEditorMode = 'simple' | 'advanced';
-
 export interface PublisherModeSetting {
-  editorMode: PublisherEditorMode;
+  isCustomizationOpen: boolean;
   templateId: PromptTemplateId;
 }
 

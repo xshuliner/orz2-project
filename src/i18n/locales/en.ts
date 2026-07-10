@@ -853,18 +853,6 @@ export const messages = {
           'Use a WeChat article URL and requirements to rewrite copy, images, and layout.',
       },
     },
-    editorModes: {
-      legend: 'Configuration',
-      description: 'Standard gets you started; Advanced exposes every setting.',
-      simple: {
-        label: 'Standard',
-        description: 'Choose a template and go',
-      },
-      advanced: {
-        label: 'Advanced',
-        description: 'Edit every setting',
-      },
-    },
     automation: {
       eyebrow: 'Scheduled draft service',
       title: 'Generate WeChat drafts on your schedule',
@@ -876,7 +864,7 @@ export const messages = {
     simpleMode: {
       title: 'Content template',
       description:
-        'Choose a template to start, then use Advanced only if needed.',
+        'Choose a template to start, then customize it only when needed.',
       templateLabel: 'Content template *',
       selectorAriaLabel: 'Choose a WeChat content template',
       ready: 'One-click setup is ready',
@@ -890,6 +878,17 @@ export const messages = {
         'Generation combines the source article, selected template, and default rewrite rules for copy, images, and layout.',
       selectedPrefix: 'Selected',
       selectedSuffix: 'template. The draft is ready to generate.',
+    },
+    customization: {
+      show: 'Customize this template',
+      hide: 'Hide customization',
+      replaceAriaLabel: 'Confirm template configuration replacement',
+      replaceTitle: 'Replace the current customization?',
+      replaceDescriptionPrefix: 'Switching to “',
+      replaceDescriptionSuffix:
+        '” replaces the current prompts and image configuration.',
+      cancel: 'Cancel',
+      replace: 'Replace configuration',
     },
     autoFill: {
       chip: 'Auto-filled',
@@ -942,7 +941,8 @@ export const messages = {
         appSecretPlaceholder: 'Enter official account appSecret',
         draftType: 'Draft type *',
         newsType: 'news article message',
-        provider: 'AI provider *',
+        provider: 'AI model *',
+        modelSelectorAriaLabel: 'Choose AI provider (model)',
       },
       prompt: {
         title: 'Article Generation Prompts',
@@ -988,8 +988,8 @@ export const messages = {
           'Edit the source URL and rewrite requirements, then fine-tune prompts, images, and layout strategy.',
         simpleDescription:
           'Paste the source WeChat article URL; the template and AI handle the rest.',
-        simpleHint:
-          'Simple mode uses the default rewrite rules and generates three inline images.',
+        templateHint:
+          'The current template configuration will be used. Expand customization to adjust rewrite rules and inline images.',
         sourceUrl: 'WeChat article URL to rewrite *',
         sourceUrlPlaceholder:
           'https://mp.weixin.qq.com/s/5b9Z4EOs3wsMgc6GqAGHBQ',

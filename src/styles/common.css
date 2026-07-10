@@ -179,7 +179,9 @@
   background: linear-gradient(
     90deg,
     transparent,
-    color-mix(in srgb, var(--color-panel) 52%, transparent),
+    color-mix(in srgb, var(--color-green) 5%, transparent) 32%,
+    color-mix(in srgb, var(--color-panel) 82%, var(--color-green)) 50%,
+    color-mix(in srgb, var(--color-green) 5%, transparent) 68%,
     transparent
   );
   transform: skewX(-18deg);
@@ -187,7 +189,7 @@
 }
 
 .nav-cta:hover::before,
-.button:hover::before {
+.button:not(:disabled):hover::before {
   transform: translateX(360%) skewX(-18deg);
 }
 

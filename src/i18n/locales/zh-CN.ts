@@ -810,18 +810,6 @@ export const messages = {
         description: '输入公众号原文链接和特殊要求，自动重写文字、图片与排版。',
       },
     },
-    editorModes: {
-      legend: '配置模式',
-      description: '普通模式快速开始，高级模式可逐项调整。',
-      simple: {
-        label: '普通模式',
-        description: '选模板即可生成',
-      },
-      advanced: {
-        label: '高级模式',
-        description: '手动调整全部配置',
-      },
-    },
     automation: {
       eyebrow: '定时草稿服务',
       title: '让公众号草稿按计划自动生成',
@@ -832,7 +820,7 @@ export const messages = {
     },
     simpleMode: {
       title: '内容模板',
-      description: '选择模板即可开始，需要时再进入高级模式调整。',
+      description: '选择模板即可开始，也可按需自定义这份模板。',
       templateLabel: '内容模板 *',
       selectorAriaLabel: '选择公众号内容模板',
       ready: '一键生成配置已就绪',
@@ -846,6 +834,16 @@ export const messages = {
         '生成时会结合原文、模板配置和默认洗稿要求，自动完成文字、配图与排版。',
       selectedPrefix: '已选择',
       selectedSuffix: '模板，可以直接生成草稿。',
+    },
+    customization: {
+      show: '自定义这份模板',
+      hide: '收起自定义',
+      replaceAriaLabel: '确认替换内容模板配置',
+      replaceTitle: '替换当前自定义配置？',
+      replaceDescriptionPrefix: '切换到“',
+      replaceDescriptionSuffix: '”会覆盖当前的提示词和图片配置。',
+      cancel: '取消',
+      replace: '替换配置',
     },
     autoFill: {
       chip: '已智能填充',
@@ -896,7 +894,8 @@ export const messages = {
         appSecretPlaceholder: '请输入公众号 appSecret',
         draftType: '草稿类型 *',
         newsType: 'news 图文消息',
-        provider: 'AI 提供商 *',
+        provider: 'AI 模型 *',
+        modelSelectorAriaLabel: '选择 AI 提供商（模型）',
       },
       prompt: {
         title: '文章生成提示词',
@@ -937,7 +936,8 @@ export const messages = {
         description:
           '编辑原文链接和洗稿要求，并继续调整提示词、图片和排版策略。',
         simpleDescription: '粘贴公众号原文链接，其他配置交给模板和 AI。',
-        simpleHint: '简单模式会自动使用默认洗稿要求，并生成 3 张正文配图。',
+        templateHint:
+          '将使用当前模板配置；展开自定义可调整洗稿要求与正文配图。',
         sourceUrl: '需要洗稿的公众号链接 *',
         sourceUrlPlaceholder:
           'https://mp.weixin.qq.com/s/5b9Z4EOs3wsMgc6GqAGHBQ',

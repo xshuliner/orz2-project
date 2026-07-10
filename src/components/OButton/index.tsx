@@ -7,7 +7,6 @@ import {
   type Ref,
 } from 'react';
 import { Link, type LinkProps } from 'react-router-dom';
-import './index.css';
 
 export type OButtonVariant = 'primary' | 'secondary' | 'ghost';
 export type OButtonSize = 'sm' | 'md' | 'lg';
@@ -50,9 +49,14 @@ function buttonClassName(
   className: string | undefined
 ) {
   return [
-    'o-button',
-    `o-button--${size}`,
-    !hoverTranslate && 'o-button--no-hover-translate',
+    'rounded-[var(--radius-control)]',
+    {
+      sm: 'min-h-[var(--control-height-sm)] px-[var(--control-padding-sm)]',
+      md: 'min-h-[var(--control-height-md)] px-[var(--control-padding-md)]',
+      lg: 'min-h-[var(--control-height-lg)] px-[var(--control-padding-lg)]',
+    }[size],
+    !hoverTranslate &&
+      'hover:!transform-[var(--o-button-transform,none)] hover:[&_svg]:!transform-none',
     'button',
     variant,
     'interactive',

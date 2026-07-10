@@ -1,8 +1,5 @@
 import type { OfficialPublisherMode, OfficialPublisherProvider } from '@/api';
-import type {
-  PublisherEditorMode,
-  WechatPublisherForm,
-} from '@/pages/Tools/ToolOfficialPublisher/types';
+import type { WechatPublisherForm } from '@/pages/Tools/ToolOfficialPublisher/types';
 
 export type PromptTemplateId =
   | 'general'
@@ -80,20 +77,18 @@ export const officialPublisherModes: OfficialPublisherMode[] = [
   'create',
   'rewrite',
 ];
-export const publisherEditorModes: PublisherEditorMode[] = [
-  'simple',
-  'advanced',
-];
-
 export const defaultForm: WechatPublisherForm = {
   publishMode: 'create',
   modeSettings: {
-    create: { editorMode: 'simple', templateId: defaultPromptTemplateId },
-    rewrite: { editorMode: 'simple', templateId: defaultPromptTemplateId },
+    create: { isCustomizationOpen: false, templateId: defaultPromptTemplateId },
+    rewrite: {
+      isCustomizationOpen: false,
+      templateId: defaultPromptTemplateId,
+    },
   },
   appId: '',
   appSecret: '',
-  provider: 'AGNES',
+  provider: 'MINIMAX',
   promptSystem: '',
   promptContent: '',
   sourceArticleUrl: '',

@@ -10,7 +10,6 @@ import {
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
-import './index.css';
 
 type OTooltipPlacement =
   | 'top'
@@ -241,7 +240,12 @@ export function OTooltip({
   return (
     <span
       ref={triggerRef}
-      className={['o-tooltip-trigger', className].filter(Boolean).join(' ')}
+      className={[
+        'inline-block cursor-pointer outline-none aria-disabled:cursor-not-allowed',
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
       tabIndex={0}
       aria-describedby={open ? tooltipId : undefined}
       aria-label={ariaLabel}
@@ -258,7 +262,10 @@ export function OTooltip({
             <div
               ref={tooltipRef}
               id={tooltipId}
-              className={['o-tooltip', contentClassName]
+              className={[
+                'pointer-events-none fixed z-[var(--z-tooltip)] opacity-100 data-[interactive=true]:pointer-events-auto',
+                contentClassName,
+              ]
                 .filter(Boolean)
                 .join(' ')}
               data-interactive={interactive ? 'true' : undefined}

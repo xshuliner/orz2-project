@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import './index.css';
 
 interface OPageHeroProps {
   children?: ReactNode;
@@ -19,8 +18,8 @@ export function OPageHero({
   return (
     <header
       className={[
-        'o-page-hero',
         'page-hero',
+        'relative [&_p]:max-w-[760px]',
         compact ? 'compact-hero' : '',
         className,
       ]

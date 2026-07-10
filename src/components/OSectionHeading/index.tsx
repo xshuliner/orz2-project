@@ -1,5 +1,4 @@
 import type { HTMLAttributes, ReactNode } from 'react';
-import './index.css';
 
 interface OSectionHeadingProps extends Omit<
   HTMLAttributes<HTMLElement>,
@@ -18,7 +17,7 @@ export function OSectionHeading({
   return (
     <header
       {...props}
-      className={['o-section-heading', 'section-heading', className]
+      className={['section-heading', 'relative', className]
         .filter(Boolean)
         .join(' ')}
     >

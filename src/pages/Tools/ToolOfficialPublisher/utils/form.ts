@@ -12,14 +12,12 @@ import {
   officialPublisherModes,
   officialPublisherProviders,
   promptTemplateConfigs,
-  publisherEditorModes,
   type PromptTemplate,
   type PromptTemplateId,
 } from '@/pages/Tools/ToolOfficialPublisher/config';
 import type {
   CompletionItem,
   PublisherCopy,
-  PublisherEditorMode,
   PublisherModeSetting,
   WechatPublisherForm,
 } from '@/pages/Tools/ToolOfficialPublisher/types';
@@ -43,7 +41,7 @@ function normalizeOfficialPublisherProvider(
     normalized as OfficialPublisherProvider
   )
     ? (normalized as OfficialPublisherProvider)
-    : 'AGNES';
+    : 'MINIMAX';
 }
 
 function normalizeOfficialPublisherMode(value: unknown): OfficialPublisherMode {
@@ -54,12 +52,9 @@ function normalizeOfficialPublisherMode(value: unknown): OfficialPublisherMode {
     : 'create';
 }
 
-function normalizePublisherEditorMode(value: unknown): PublisherEditorMode {
-  const normalized =
-    typeof value === 'string' ? value.trim().toLowerCase() : '';
-  return publisherEditorModes.includes(normalized as PublisherEditorMode)
-    ? (normalized as PublisherEditorMode)
-    : 'simple';
+function normalizeCustomizationOpen(value: unknown) {
+  if (typeof value === 'boolean') return value;
+  return typeof value === 'string' && value.trim().toLowerCase() === 'advanced';
 }
 
 function normalizePromptTemplateId(value: unknown): PromptTemplateId {
@@ -83,8 +78,9 @@ export function normalizeForm(
   function normalizeModeSetting(mode: OfficialPublisherMode) {
     const rawSetting = asRecord(rawModeSettings[mode]);
     return {
-      editorMode: normalizePublisherEditorMode(
-        rawSetting.editorMode ??
+      isCustomizationOpen: normalizeCustomizationOpen(
+        rawSetting.isCustomizationOpen ??
+          rawSetting.editorMode ??
           legacyEditorModes[mode] ??
           source.editorMode ??
           source.experienceMode
@@ -207,12 +203,38 @@ export function getTemplateContent(
   };
 }
 
+export function hasTemplateCustomizations(
+  form: WechatPublisherForm,
+  template?: PromptTemplate
+) {
+  if (!template) return false;
+  const hasConfiguredContent =
+    hasText(form.promptSystem) ||
+    hasText(form.promptContent) ||
+    hasText(form.imageCover.value) ||
+    form.imagesInlineList.some(item => hasText(item.value));
+  if (!hasConfiguredContent) return false;
+  const templateContent = getTemplateContent(template);
+  return (
+    form.promptSystem !== templateContent.promptSystem ||
+    form.promptContent !== templateContent.promptContent ||
+    form.imageCover.type !== templateContent.imageCover.type ||
+    form.imageCover.value !== templateContent.imageCover.value ||
+    form.imagesInlineList.length !== templateContent.imagesInlineList.length ||
+    form.imagesInlineList.some(
+      (item, index) =>
+        item.type !== templateContent.imagesInlineList[index]?.type ||
+        item.value !== templateContent.imagesInlineList[index]?.value
+    )
+  );
+}
+
 export function getCompletionItems(
   form: WechatPublisherForm,
   copy: PublisherCopy,
   selectedTemplate?: PromptTemplate
 ): CompletionItem[] {
-  const { editorMode } = getActiveModeSetting(form);
+  const hasCustomizations = hasTemplateCustomizations(form, selectedTemplate);
   const items: CompletionItem[] = [
     {
       label: copy.completion.account,
@@ -232,7 +254,7 @@ export function getCompletionItems(
     });
   }
 
-  if (editorMode === 'simple') {
+  if (!hasCustomizations) {
     items.push({
       label: copy.completion.template,
       done: Boolean(selectedTemplate),
@@ -272,7 +294,7 @@ export function getValidationErrors(
   selectedTemplate?: PromptTemplate
 ) {
   const nextErrors: string[] = [];
-  const { editorMode } = getActiveModeSetting(form);
+  const hasCustomizations = hasTemplateCustomizations(form, selectedTemplate);
 
   if (!hasText(form.appId)) nextErrors.push(copy.validation.appId);
   if (!hasText(form.appSecret)) nextErrors.push(copy.validation.appSecret);
@@ -283,12 +305,12 @@ export function getValidationErrors(
     } else if (!isWechatArticleUrl(form.sourceArticleUrl)) {
       nextErrors.push(copy.validation.rewriteSourceUrlInvalid);
     }
-    if (editorMode === 'advanced' && !hasText(form.rewriteRequirement)) {
+    if (hasCustomizations && !hasText(form.rewriteRequirement)) {
       nextErrors.push(copy.validation.rewriteRequirement);
     }
   }
 
-  if (editorMode === 'simple') {
+  if (!hasCustomizations) {
     if (!selectedTemplate) nextErrors.push(copy.validation.template);
     return nextErrors;
   }
@@ -324,9 +346,10 @@ export function buildPublisherRequestBody(
   selectedTemplate: PromptTemplate,
   defaultRewriteRequirement: string
 ): PostOfficialPublisherBody {
-  const { editorMode } = getActiveModeSetting(form);
-  const content =
-    editorMode === 'simple' ? getTemplateContent(selectedTemplate) : form;
+  const hasCustomizations = hasTemplateCustomizations(form, selectedTemplate);
+  const content = hasCustomizations
+    ? form
+    : getTemplateContent(selectedTemplate);
   const body: PostOfficialPublisherBody = {
     appId: form.appId.trim(),
     appSecret: form.appSecret.trim(),
@@ -357,9 +380,7 @@ export function buildPublisherRequestBody(
   if (form.publishMode === 'rewrite') {
     body.sourceArticleUrl = form.sourceArticleUrl.trim();
     body.rewriteRequirement = (
-      editorMode === 'simple'
-        ? defaultRewriteRequirement
-        : form.rewriteRequirement
+      !hasCustomizations ? defaultRewriteRequirement : form.rewriteRequirement
     ).trim();
     body.inlineImageCount = content.imagesInlineList.length;
   }

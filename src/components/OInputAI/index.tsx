@@ -131,13 +131,13 @@ export const OInputAI = forwardRef<
       {isPolishing ? (
         <Loader2
           className='o-input-ai__loading-icon'
-          size={15}
+          size={14}
           aria-hidden='true'
         />
       ) : canRestore ? (
-        <RotateCcw size={15} aria-hidden='true' />
+        <RotateCcw size={14} aria-hidden='true' />
       ) : (
-        <Sparkles size={15} aria-hidden='true' />
+        <Sparkles size={14} aria-hidden='true' />
       )}
       {isPolishing ? copy.polishing : canRestore ? copy.restore : copy.polish}
     </OButton>
@@ -159,7 +159,7 @@ export const OInputAI = forwardRef<
 
     return (
       <div
-        className={cx('o-input-ai', 'o-input-ai--textarea', className)}
+        className={cx('o-input-ai o-input-ai--textarea', className)}
         aria-busy={isPolishing}
       >
         <div className='o-input-ai__textarea-wrap'>
@@ -197,7 +197,7 @@ export const OInputAI = forwardRef<
 
   return (
     <div
-      className={cx('o-input-ai', 'o-input-ai--input', className)}
+      className={cx('o-input-ai o-input-ai--input', className)}
       aria-busy={isPolishing}
     >
       <input
@@ -208,7 +208,7 @@ export const OInputAI = forwardRef<
         onChange={event => onValueChange(event.target.value)}
         value={value}
       />
-      {button}
+      <div className='o-input-ai__input-action'>{button}</div>
       {feedback ? (
         <small className='o-input-ai__feedback' role='alert'>
           {feedback}

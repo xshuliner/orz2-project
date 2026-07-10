@@ -1,5 +1,4 @@
 import type { HTMLAttributes, ReactNode } from 'react';
-import './index.css';
 
 export type OBadgeTone = 'neutral' | 'brand' | 'warning' | 'danger';
 
@@ -20,9 +19,18 @@ export function OBadge({
     <span
       {...props}
       className={[
-        'o-badge',
-        `o-badge--${tone}`,
-        pill ? 'o-badge--pill' : '',
+        'o-badge inline-flex min-h-[var(--badge-height)] items-center rounded-[var(--radius-control)] border px-[9px] text-xs font-[720]',
+        pill ? 'rounded-full' : '',
+        {
+          neutral:
+            'border-[var(--color-line-soft)] bg-[var(--color-soft)] text-[var(--color-text-status)]',
+          brand:
+            'border-[color:color-mix(in_srgb,var(--color-green)_20%,transparent)] bg-[var(--color-green-soft)] text-[var(--color-green-label)]',
+          warning:
+            'border-[color:color-mix(in_srgb,var(--color-gold)_28%,transparent)] bg-[var(--color-warning-soft)] text-[var(--color-warning-text)]',
+          danger:
+            'border-[color:color-mix(in_srgb,var(--color-danger)_24%,transparent)] bg-[var(--color-panel-danger)] text-[var(--color-danger)]',
+        }[tone],
         className,
       ]
         .filter(Boolean)

@@ -7,10 +7,12 @@ import {
   type OfficialPublisherProgressEvent,
 } from '@/api';
 import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
+import { OBadge } from '@/components/OBadge';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { OIconButton } from '@/components/OIconButton';
 import { OInputAI } from '@/components/OInputAI';
+import { OModal } from '@/components/OModal';
 import { ORadio } from '@/components/ORadio';
 import { OSelector } from '@/components/OSelector';
 import { OTooltip } from '@/components/OTooltip';
@@ -19,6 +21,7 @@ import { getToolSeo } from '@/config/seo';
 import { useI18n } from '@/hooks/useI18n';
 import { getTools } from '@/i18n';
 import { DraftSuccessModal } from '@/pages/Tools/ToolOfficialPublisher/components/DraftSuccessModal';
+import { PublisherModuleCard } from '@/pages/Tools/ToolOfficialPublisher/components/PublisherModuleCard';
 import { PublisherProgressPanel } from '@/pages/Tools/ToolOfficialPublisher/components/PublisherProgressPanel';
 import {
   apiWhitelistIp,
@@ -30,14 +33,12 @@ import {
   officialPublisherSeoKey,
   officialPublisherStorageKey,
   officialPublisherToolId,
-  publisherEditorModes,
   wechatConsoleUrl,
   type PromptTemplateId,
 } from '@/pages/Tools/ToolOfficialPublisher/config';
 import type {
   PublishPhase,
   PublishStepStatus,
-  PublisherEditorMode,
   WechatPublisherForm,
 } from '@/pages/Tools/ToolOfficialPublisher/types';
 import {
@@ -46,31 +47,44 @@ import {
   getCompletionItems,
   getTemplateContent,
   getValidationErrors,
+  hasTemplateCustomizations,
   hasText,
   normalizeForm,
 } from '@/pages/Tools/ToolOfficialPublisher/utils/form';
+
 import { createInitialPublishSteps } from '@/pages/Tools/ToolOfficialPublisher/utils/progress';
 import CacheManager from '@/utils/CacheManager';
+import type { LucideIcon } from 'lucide-react';
 import {
   ArrowLeft,
+  BriefcaseBusiness,
   CalendarClock,
   CheckCircle2,
+  ChevronsDown,
+  ChevronsUp,
   Clipboard,
+  ClipboardPenLine,
+  CookingPot,
+  Cpu,
   Download,
+  Dumbbell,
   ExternalLink,
-  FileJson,
+  FileDiff,
+  FilePenLine,
+  GraduationCap,
+  Heart,
+  HeartHandshake,
   KeyRound,
-  LayoutTemplate,
+  Landmark,
   Loader2,
   Mail,
-  Newspaper,
-  PenLine,
+  Plane,
   Plus,
   RotateCcw,
-  Sparkles,
+  Send,
+  ShieldCheck,
   Trash2,
   Upload,
-  Zap,
 } from 'lucide-react';
 import {
   ChangeEvent,
@@ -82,6 +96,29 @@ import {
 } from 'react';
 import { Link } from 'react-router-dom';
 import './index.css';
+
+type CommentOptionValue = 'closed' | 'open' | 'fansOnly';
+
+const commentConfigByValue: Record<CommentOptionValue, OfficialCommentConfig> =
+  {
+    closed: { open: 0, fansOnly: 0 },
+    open: { open: 1, fansOnly: 0 },
+    fansOnly: { open: 1, fansOnly: 1 },
+  };
+
+const promptTemplateIcons: Record<PromptTemplateId, LucideIcon> = {
+  general: ClipboardPenLine,
+  insurance_advisor: ShieldCheck,
+  culture: Landmark,
+  tech: Cpu,
+  lifestyle: Heart,
+  business: BriefcaseBusiness,
+  education: GraduationCap,
+  emotion: HeartHandshake,
+  travel: Plane,
+  food: CookingPot,
+  fitness: Dumbbell,
+};
 
 export function OfficialPublisher() {
   const { locale, localizePath, messages } = useI18n();
@@ -104,16 +141,15 @@ export function OfficialPublisher() {
   );
   const localizedTools = useMemo(() => getTools(locale), [locale]);
   const localizedToolSeo = useMemo(() => getToolSeo(locale), [locale]);
-  const commentOptions: Array<{
-    label: string;
-    value: OfficialCommentConfig;
-  }> = useMemo(
+  const commentOptions = useMemo<
+    Array<{ label: string; value: CommentOptionValue }>
+  >(
     () => [
-      { label: publisherCopy.comments.closed, value: { open: 0, fansOnly: 0 } },
-      { label: publisherCopy.comments.open, value: { open: 1, fansOnly: 0 } },
+      { label: publisherCopy.comments.closed, value: 'closed' },
+      { label: publisherCopy.comments.open, value: 'open' },
       {
         label: publisherCopy.comments.fansOnly,
-        value: { open: 1, fansOnly: 1 },
+        value: 'fansOnly',
       },
     ],
     [
@@ -138,26 +174,17 @@ export function OfficialPublisher() {
     return officialPublisherModes.map(mode => ({
       value: mode,
       label: modeCopy[mode].label,
-      icon: mode === 'create' ? Newspaper : PenLine,
+      description: modeCopy[mode].description,
+      icon: mode === 'create' ? FilePenLine : FileDiff,
     }));
   }, [publisherCopy.modes]);
-  const editorModeOptions = useMemo(() => {
-    const editorModeCopy = publisherCopy.editorModes as Record<
-      PublisherEditorMode,
-      { label: string; description: string }
-    >;
-    return publisherEditorModes.map(mode => ({
-      value: mode,
-      label: editorModeCopy[mode].label,
-    }));
-  }, [publisherCopy.editorModes]);
   const templateOptions = useMemo(
     () =>
       promptTemplates.map(template => ({
         value: template.id,
         label: template.label,
         description: template.caption,
-        icon: LayoutTemplate,
+        icon: promptTemplateIcons[template.id],
       })),
     [promptTemplates]
   );
@@ -186,12 +213,23 @@ export function OfficialPublisher() {
   );
   const [isDraftResultOpen, setDraftResultOpen] = useState(false);
   const [copiedIp, setCopiedIp] = useState(false);
+  const [pendingTemplateId, setPendingTemplateId] =
+    useState<PromptTemplateId | null>(null);
+  const selectedCommentOption: CommentOptionValue =
+    form.comment.open === 0
+      ? 'closed'
+      : form.comment.fansOnly === 1
+        ? 'fansOnly'
+        : 'open';
   const activeModeSetting = getActiveModeSetting(form);
-  const isAdvancedMode = activeModeSetting.editorMode === 'advanced';
+  const isCustomizationOpen = activeModeSetting.isCustomizationOpen;
   const selectedPromptTemplate =
     promptTemplates.find(
       template => template.id === activeModeSetting.templateId
     ) ?? promptTemplates[0]!;
+  const pendingTemplate = pendingTemplateId
+    ? promptTemplates.find(template => template.id === pendingTemplateId)
+    : undefined;
   const importInputRef = useRef<HTMLInputElement | null>(null);
   const publisherAsideRef = useRef<HTMLElement | null>(null);
   const publisherAbortRef = useRef<AbortController | null>(null);
@@ -255,7 +293,7 @@ export function OfficialPublisher() {
     }));
   }
 
-  function updateEditorMode(editorMode: PublisherEditorMode) {
+  function updateCustomizationOpen(isOpen: boolean) {
     setErrors([]);
     setForm(current => {
       const currentSetting = getActiveModeSetting(current);
@@ -265,12 +303,12 @@ export function OfficialPublisher() {
           ...current.modeSettings,
           [current.publishMode]: {
             ...currentSetting,
-            editorMode,
+            isCustomizationOpen: isOpen,
           },
         },
       };
       const shouldSeedAdvancedFields =
-        editorMode === 'advanced' &&
+        isOpen &&
         !hasText(current.promptSystem) &&
         !hasText(current.promptContent) &&
         !hasText(current.imageCover.value) &&
@@ -284,7 +322,7 @@ export function OfficialPublisher() {
     });
   }
 
-  function updateSelectedTemplate(templateId: PromptTemplateId) {
+  function applyTemplate(templateId: PromptTemplateId) {
     setErrors([]);
     const template = promptTemplates.find(item => item.id === templateId);
     if (!template) return;
@@ -301,13 +339,26 @@ export function OfficialPublisher() {
         },
       };
 
-      return activeSetting.editorMode === 'advanced'
-        ? { ...next, ...getTemplateContent(template) }
-        : next;
+      return { ...next, ...getTemplateContent(template) };
     });
     setStatusText(
       `${publisherCopy.simpleMode.selectedPrefix}「${template.label}」${publisherCopy.simpleMode.selectedSuffix}`
     );
+  }
+
+  function updateSelectedTemplate(templateId: PromptTemplateId) {
+    if (templateId === activeModeSetting.templateId) return;
+    if (hasTemplateCustomizations(form, selectedPromptTemplate)) {
+      setPendingTemplateId(templateId);
+      return;
+    }
+    applyTemplate(templateId);
+  }
+
+  function confirmTemplateReplacement() {
+    if (!pendingTemplateId) return;
+    applyTemplate(pendingTemplateId);
+    setPendingTemplateId(null);
   }
 
   function updateCoverImageValue(value: string) {
@@ -656,33 +707,29 @@ export function OfficialPublisher() {
           </div>
         </OCard>
 
-        <OCard
-          as='section'
+        <PublisherModuleCard
           className='publisher-automation-card'
-          aria-labelledby='publisher-automation-title'
+          description={publisherCopy.automation.description}
+          headingExtra={
+            <OBadge tone='warning'>{publisherCopy.automation.eyebrow}</OBadge>
+          }
+          icon={CalendarClock}
           padding='sm'
           tone='soft'
-        >
-          <span className='publisher-automation-icon' aria-hidden='true'>
-            <CalendarClock size={21} />
-          </span>
-          <div className='publisher-automation-copy'>
-            <span>{publisherCopy.automation.eyebrow}</span>
-            <h2 id='publisher-automation-title'>
-              {publisherCopy.automation.title}
-            </h2>
-            <p>{publisherCopy.automation.description}</p>
-          </div>
-          <OButton
-            href={`mailto:${officialPublisherScheduleEmail}?subject=${encodeURIComponent(
-              publisherCopy.automation.emailSubject
-            )}`}
-            variant='secondary'
-          >
-            <Mail size={16} aria-hidden='true' />
-            {publisherCopy.automation.action}
-          </OButton>
-        </OCard>
+          title={publisherCopy.automation.title}
+          titleId='publisher-automation-title'
+          action={
+            <OButton
+              href={`mailto:${officialPublisherScheduleEmail}?subject=${encodeURIComponent(
+                publisherCopy.automation.emailSubject
+              )}`}
+              variant='secondary'
+            >
+              <Mail size={16} aria-hidden='true' />
+              {publisherCopy.automation.action}
+            </OButton>
+          }
+        />
 
         <form
           className='publisher-form box-border pb-4'
@@ -690,17 +737,12 @@ export function OfficialPublisher() {
         >
           <div className='publisher-workspace'>
             <div className='publisher-main'>
-              <OCard as='section' className='form-panel' padding='md'>
-                <div className='form-panel-heading'>
-                  <span className='panel-icon'>
-                    <KeyRound size={19} aria-hidden='true' />
-                  </span>
-                  <div>
-                    <h2>{publisherCopy.sections.account.title}</h2>
-                    <p>{publisherCopy.sections.account.description}</p>
-                  </div>
-                </div>
-                <div className='form-grid two'>
+              <PublisherModuleCard
+                description={publisherCopy.sections.account.description}
+                icon={KeyRound}
+                title={publisherCopy.sections.account.title}
+              >
+                <div className='form-grid account-config-grid'>
                   <label className='field'>
                     <span>appId *</span>
                     <input
@@ -728,75 +770,38 @@ export function OfficialPublisher() {
                       required
                     />
                   </label>
+                  <label className='field'>
+                    <span>{publisherCopy.sections.account.provider}</span>
+                    <OSelector
+                      ariaLabel={
+                        publisherCopy.sections.account.modelSelectorAriaLabel
+                      }
+                      className='account-model-selector'
+                      options={providerOptions}
+                      value={form.provider}
+                      onChange={provider => updateField('provider', provider)}
+                    />
+                  </label>
                 </div>
-                <fieldset className='choice-field'>
-                  <legend>{publisherCopy.sections.account.provider}</legend>
-                  {providerOptions.map(option => (
-                    <label className='interactive' key={option.value}>
-                      <input
-                        type='radio'
-                        checked={form.provider === option.value}
-                        onChange={() => updateField('provider', option.value)}
-                      />
-                      {option.label}
-                    </label>
-                  ))}
-                </fieldset>
-                <div className='account-mode-switch'>
-                  <span className='mode-choice-label'>
-                    {publisherCopy.modeSwitch.title}
-                  </span>
+              </PublisherModuleCard>
+
+              <PublisherModuleCard
+                className='publisher-mode-card'
+                description={publisherCopy.modeSwitch.description}
+                icon={FileDiff}
+                title={publisherCopy.modeSwitch.title}
+              >
+                <div className='mode-choice-field'>
                   <ORadio
                     ariaLabel={publisherCopy.modeSwitch.legend}
-                    className='publisher-mode-radio compact'
+                    className='publisher-mode-radio'
                     options={modeOptions}
                     value={form.publishMode}
                     onChange={updatePublishMode}
                   />
                 </div>
-              </OCard>
-
-              <OCard
-                as='section'
-                className='form-panel publisher-config-card'
-                padding='md'
-              >
-                <div className='form-panel-heading module-heading'>
-                  <span className='panel-icon'>
-                    {form.publishMode === 'rewrite' ? (
-                      <PenLine size={19} aria-hidden='true' />
-                    ) : (
-                      <LayoutTemplate size={19} aria-hidden='true' />
-                    )}
-                  </span>
-                  <div className='form-panel-heading-main'>
-                    <h2>
-                      {form.publishMode === 'rewrite'
-                        ? publisherCopy.sections.rewrite.title
-                        : publisherCopy.simpleMode.title}
-                    </h2>
-                    <p>
-                      {form.publishMode === 'rewrite'
-                        ? isAdvancedMode
-                          ? publisherCopy.sections.rewrite.description
-                          : publisherCopy.sections.rewrite.simpleDescription
-                        : publisherCopy.simpleMode.description}
-                    </p>
-                  </div>
-                  <div className='module-mode-switch'>
-                    <span>{publisherCopy.editorModes.legend}</span>
-                    <ORadio
-                      ariaLabel={publisherCopy.editorModes.legend}
-                      className='publisher-editor-mode-radio compact'
-                      options={editorModeOptions}
-                      value={activeModeSetting.editorMode}
-                      onChange={updateEditorMode}
-                    />
-                  </div>
-                </div>
-
                 {form.publishMode === 'rewrite' ? (
-                  <label className='field'>
+                  <label className='field rewrite-source-field'>
                     <span>{publisherCopy.sections.rewrite.sourceUrl}</span>
                     <input
                       value={form.sourceArticleUrl}
@@ -810,7 +815,14 @@ export function OfficialPublisher() {
                     />
                   </label>
                 ) : null}
+              </PublisherModuleCard>
 
+              <PublisherModuleCard
+                className='publisher-config-card'
+                description={publisherCopy.simpleMode.description}
+                icon={ClipboardPenLine}
+                title={publisherCopy.simpleMode.title}
+              >
                 <div className='template-picker'>
                   <label className='simple-template-field'>
                     <span>{publisherCopy.simpleMode.templateLabel}</span>
@@ -832,14 +844,14 @@ export function OfficialPublisher() {
                   </div>
                 </div>
 
-                {!isAdvancedMode && form.publishMode === 'rewrite' ? (
+                {!isCustomizationOpen && form.publishMode === 'rewrite' ? (
                   <div className='rewrite-simple-note'>
-                    <Zap size={16} aria-hidden='true' />
-                    <span>{publisherCopy.sections.rewrite.simpleHint}</span>
+                    <FileDiff size={16} aria-hidden='true' />
+                    <span>{publisherCopy.sections.rewrite.templateHint}</span>
                   </div>
                 ) : null}
 
-                {isAdvancedMode ? (
+                {isCustomizationOpen ? (
                   <div className='advanced-config'>
                     {form.publishMode === 'rewrite' ? (
                       <div className='advanced-config-section'>
@@ -959,34 +971,13 @@ export function OfficialPublisher() {
                       </div>
                       <div className='inline-image-list'>
                         {form.imagesInlineList.map((item, index) => (
-                          <OCard
-                            as='article'
-                            className='inline-image-item'
-                            key={index}
-                            padding='sm'
-                            tone='soft'
-                          >
-                            <div className='inline-image-title'>
-                              <strong>
-                                {publisherCopy.sections.images.inlineImage}{' '}
-                                {index + 1}
-                              </strong>
-                              <OIconButton
-                                type='button'
-                                aria-label={
-                                  publisherCopy.sections.images
-                                    .deleteInlineImage +
-                                  ' ' +
-                                  (index + 1)
-                                }
-                                onClick={() => removeInlineImage(index)}
-                                size='sm'
-                              >
-                                <Trash2 size={17} />
-                              </OIconButton>
-                            </div>
-                            <label className='field'>
-                              <span>
+                          <article className='inline-image-item' key={index}>
+                            <strong className='inline-image-title'>
+                              {publisherCopy.sections.images.inlineImage}{' '}
+                              {index + 1}
+                            </strong>
+                            <label className='field inline-image-value'>
+                              <span className='sr-only'>
                                 {publisherCopy.sections.images.imageValueLabel}
                               </span>
                               <OInputAI
@@ -1005,7 +996,20 @@ export function OfficialPublisher() {
                                 }
                               />
                             </label>
-                          </OCard>
+                            <OIconButton
+                              type='button'
+                              aria-label={
+                                publisherCopy.sections.images
+                                  .deleteInlineImage +
+                                ' ' +
+                                (index + 1)
+                              }
+                              onClick={() => removeInlineImage(index)}
+                              size='sm'
+                            >
+                              <Trash2 size={17} />
+                            </OIconButton>
+                          </article>
                         ))}
                       </div>
                     </div>
@@ -1028,28 +1032,38 @@ export function OfficialPublisher() {
                             }
                           />
                         </label>
-                        <fieldset className='choice-field compact'>
-                          <legend>{publisherCopy.sections.meta.comment}</legend>
-                          {commentOptions.map(option => (
-                            <label className='interactive' key={option.label}>
-                              <input
-                                type='radio'
-                                checked={
-                                  option.value.open === form.comment.open &&
-                                  option.value.fansOnly ===
-                                    form.comment.fansOnly
-                                }
-                                onChange={() => updateComment(option.value)}
-                              />
-                              {option.label}
-                            </label>
-                          ))}
-                        </fieldset>
+                        <label className='field'>
+                          <span>{publisherCopy.sections.meta.comment}</span>
+                          <OSelector
+                            ariaLabel={publisherCopy.sections.meta.comment}
+                            className='advanced-comment-selector'
+                            options={commentOptions}
+                            value={selectedCommentOption}
+                            onChange={value =>
+                              updateComment(commentConfigByValue[value])
+                            }
+                          />
+                        </label>
                       </div>
                     </div>
                   </div>
                 ) : null}
-              </OCard>
+                <OButton
+                  className='editor-mode-toggle'
+                  type='button'
+                  variant='ghost'
+                  onClick={() => updateCustomizationOpen(!isCustomizationOpen)}
+                >
+                  {isCustomizationOpen ? (
+                    <ChevronsUp size={17} aria-hidden='true' />
+                  ) : (
+                    <ChevronsDown size={17} aria-hidden='true' />
+                  )}
+                  {isCustomizationOpen
+                    ? publisherCopy.customization.hide
+                    : publisherCopy.customization.show}
+                </OButton>
+              </PublisherModuleCard>
             </div>
 
             <aside
@@ -1114,7 +1128,7 @@ export function OfficialPublisher() {
                     type='button'
                     onClick={() => setDraftResultOpen(true)}
                   >
-                    <FileJson size={15} aria-hidden='true' />
+                    <FilePenLine size={15} aria-hidden='true' />
                     {publisherCopy.aside.viewResult}
                   </button>
                 ) : null}
@@ -1136,8 +1150,10 @@ export function OfficialPublisher() {
                   >
                     {isGenerating ? (
                       <Loader2 className='spin' size={17} aria-hidden='true' />
+                    ) : form.publishMode === 'rewrite' ? (
+                      <FileDiff size={17} aria-hidden='true' />
                     ) : (
-                      <Sparkles size={17} aria-hidden='true' />
+                      <Send size={17} aria-hidden='true' />
                     )}
                     {isGenerating
                       ? publisherCopy.aside.generating
@@ -1181,6 +1197,34 @@ export function OfficialPublisher() {
           onClose={() => setDraftResultOpen(false)}
         />
       ) : null}
+
+      <OModal
+        ariaLabel={publisherCopy.customization.replaceAriaLabel}
+        className='template-replace-modal'
+        isOpen={Boolean(pendingTemplate)}
+        onClose={() => setPendingTemplateId(null)}
+      >
+        <div className='template-replace-modal-copy'>
+          <h2>{publisherCopy.customization.replaceTitle}</h2>
+          <p>
+            {publisherCopy.customization.replaceDescriptionPrefix}
+            <strong>{pendingTemplate?.label}</strong>
+            {publisherCopy.customization.replaceDescriptionSuffix}
+          </p>
+        </div>
+        <div className='template-replace-modal-actions'>
+          <OButton
+            type='button'
+            variant='ghost'
+            onClick={() => setPendingTemplateId(null)}
+          >
+            {publisherCopy.customization.cancel}
+          </OButton>
+          <OButton type='button' onClick={confirmTemplateReplacement}>
+            {publisherCopy.customization.replace}
+          </OButton>
+        </div>
+      </OModal>
     </>
   );
 }

@@ -6,12 +6,12 @@ import type {
 } from '@/pages/Tools/ToolOfficialPublisher/types';
 import { formatDuration } from '@/pages/Tools/ToolOfficialPublisher/utils/progress';
 import {
-  Activity,
   CheckCircle2,
   Circle,
   Clock3,
   Loader2,
   TriangleAlert,
+  Workflow,
 } from 'lucide-react';
 
 export function PublisherProgressPanel({
@@ -49,7 +49,7 @@ export function PublisherProgressPanel({
     >
       <div className='publish-progress-head'>
         <div className='summary-heading'>
-          <Activity size={18} aria-hidden='true' />
+          <Workflow size={18} aria-hidden='true' />
           <h2>{copy.progress.title}</h2>
         </div>
         <span className='publish-live-chip'>

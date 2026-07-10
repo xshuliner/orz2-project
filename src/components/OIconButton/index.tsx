@@ -1,5 +1,4 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
-import './index.css';
 
 export type OIconButtonVariant = 'default' | 'ghost';
 export type OIconButtonSize = 'sm' | 'md' | 'lg';
@@ -28,12 +27,17 @@ export function OIconButton({
     <button
       {...props}
       className={[
-        'o-icon-button',
+        'rounded-[var(--radius-control)]',
         'icon-button',
         'interactive',
-        `o-icon-button--${variant}`,
-        `o-icon-button--${size}`,
-        !hoverTranslate && 'o-icon-button--no-hover-translate',
+        variant === 'ghost' && 'border-transparent bg-transparent shadow-none',
+        {
+          sm: 'size-[var(--control-height-sm)]',
+          md: 'size-[var(--control-height-md)]',
+          lg: 'size-[var(--control-height-lg)]',
+        }[size],
+        !hoverTranslate &&
+          'o-icon-button--no-hover-translate hover:!transform-none',
         className,
       ]
         .filter(Boolean)

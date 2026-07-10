@@ -2,29 +2,42 @@
   width: 100%;
 }
 
-.o-input-ai--input {
+:root .o-input-ai__control {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--color-line-input);
+  border-radius: var(--radius-md);
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-panel-input) 94%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 58%, transparent);
+  outline: 0;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+:root input.o-input-ai__control {
+  min-height: var(--control-height-lg);
+  padding: 0 108px 0 14px;
+}
+
+:root textarea.o-input-ai__control {
+  min-height: 92px;
+  padding: 12px 13px 58px;
+  resize: vertical;
+  line-height: 1.58;
+}
+
+:root .o-input-ai__control:focus {
+  border-color: color-mix(in srgb, var(--color-green) 65%, transparent);
+  background: var(--color-panel);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-green) 12%, transparent);
+}
+
+.o-input-ai--input,
+.o-input-ai__textarea-wrap {
   position: relative;
-}
-
-.field .o-input-ai--input input.o-input-ai__control {
-  padding-inline-end: 92px;
-}
-
-.o-input-ai--input .o-input-ai__button {
-  --o-button-transform: translateY(-50%);
-
-  position: absolute;
-  inset-block-start: 50%;
-  inset-inline-end: 6px;
-  min-height: calc(var(--control-height-lg) - 12px);
-  transform: var(--o-button-transform);
-  z-index: 1;
-}
-
-.o-input-ai--input .o-input-ai__button:hover,
-.o-input-ai--input .o-input-ai__button:focus-visible,
-.o-input-ai--input .o-input-ai__button:disabled {
-  transform: var(--o-button-transform);
 }
 
 .o-input-ai--textarea {
@@ -32,26 +45,32 @@
   gap: 8px;
 }
 
-.o-input-ai__textarea-wrap {
-  position: relative;
-}
-
-.field .o-input-ai__textarea-wrap textarea.o-input-ai__control {
-  padding-block-end: 48px;
+.o-input-ai__input-action {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 10px;
+  z-index: 1;
+  transform: translateY(-50%);
 }
 
 .o-input-ai__textarea-action {
   position: absolute;
-  inset-block-end: 12px;
-  inset-inline-end: 12px;
-  display: flex;
-  justify-content: flex-end;
+  inset-block-end: 10px;
+  inset-inline-end: 10px;
   z-index: 1;
 }
 
 .o-input-ai__button {
-  gap: 6px;
+  gap: 4px;
+  min-height: 32px !important;
+  padding-inline: 10px !important;
+  font-size: 13px !important;
+  line-height: 1;
   white-space: nowrap;
+}
+
+.o-input-ai__button svg {
+  flex: none;
 }
 
 .o-input-ai__loading-icon {
@@ -65,11 +84,5 @@
 @keyframes o-input-ai-spin {
   to {
     transform: rotate(360deg);
-  }
-}
-
-@media (max-width: 480px) {
-  .field .o-input-ai--input input.o-input-ai__control {
-    padding-inline-end: 82px;
   }
 }

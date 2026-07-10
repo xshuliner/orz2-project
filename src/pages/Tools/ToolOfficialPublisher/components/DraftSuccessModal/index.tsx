@@ -4,7 +4,7 @@ import { OIconButton } from '@/components/OIconButton';
 import { OModal } from '@/components/OModal';
 import { wechatDraftBoxUrl } from '@/pages/Tools/ToolOfficialPublisher/config';
 import type { PublisherCopy } from '@/pages/Tools/ToolOfficialPublisher/types';
-import { CheckCheck, ExternalLink, FileJson, X } from 'lucide-react';
+import { CheckCheck, ExternalLink, FileText, X } from 'lucide-react';
 
 export function DraftSuccessModal({
   copy,
@@ -56,7 +56,7 @@ export function DraftSuccessModal({
                 {draftResult?.title || copy.success.fallbackTitle}
               </strong>
             </div>
-            <FileJson size={22} aria-hidden='true' />
+            <FileText size={22} aria-hidden='true' />
           </div>
 
           <dl className='draft-success-grid'>

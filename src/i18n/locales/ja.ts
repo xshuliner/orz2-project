@@ -848,18 +848,6 @@ export const messages = {
           '公众号原文リンクと要件から、文章・画像・レイアウトを再構成します。',
       },
     },
-    editorModes: {
-      legend: '設定モード',
-      description: '通常モードですぐ開始し、必要な場合だけ高度設定を使います。',
-      simple: {
-        label: '通常モード',
-        description: 'テンプレートを選ぶだけ',
-      },
-      advanced: {
-        label: '高度設定',
-        description: '全設定を手動調整',
-      },
-    },
     automation: {
       eyebrow: '定時草稿サービス',
       title: '予定に合わせて公众号草稿を自動生成',
@@ -871,7 +859,7 @@ export const messages = {
     simpleMode: {
       title: 'コンテンツテンプレート',
       description:
-        'テンプレートを選んで開始し、必要な場合だけ高度設定を使います。',
+        'テンプレートを選んで開始し、必要な場合だけこのテンプレートを調整できます。',
       templateLabel: 'コンテンツテンプレート *',
       selectorAriaLabel: '公众号コンテンツテンプレートを選択',
       ready: 'ワンクリック設定完了',
@@ -885,6 +873,17 @@ export const messages = {
         '原文、テンプレート、既定のリライト要件を組み合わせ、文章・画像・レイアウトを自動生成します。',
       selectedPrefix: '',
       selectedSuffix: 'テンプレートを選択しました。草稿を生成できます。',
+    },
+    customization: {
+      show: 'このテンプレートをカスタマイズ',
+      hide: 'カスタマイズを閉じる',
+      replaceAriaLabel: 'テンプレート設定の置換を確認',
+      replaceTitle: '現在のカスタマイズを置き換えますか？',
+      replaceDescriptionPrefix: '「',
+      replaceDescriptionSuffix:
+        '」に切り替えると、現在のプロンプトと画像設定が上書きされます。',
+      cancel: 'キャンセル',
+      replace: '設定を置き換える',
     },
     autoFill: {
       chip: '自動入力済み',
@@ -936,7 +935,8 @@ export const messages = {
         appSecretPlaceholder: '公众号 appSecret を入力',
         draftType: '草稿タイプ *',
         newsType: 'news 图文消息',
-        provider: 'AI プロバイダー *',
+        provider: 'AI モデル *',
+        modelSelectorAriaLabel: 'AI プロバイダー（モデル）を選択',
       },
       prompt: {
         title: '記事生成プロンプト',
@@ -979,8 +979,8 @@ export const messages = {
           '原文リンクとリライト要件を編集し、プロンプト、画像、レイアウト方針を細かく調整します。',
         simpleDescription:
           '公众号原文リンクを貼り付ければ、残りはテンプレートと AI が処理します。',
-        simpleHint:
-          'シンプルモードでは既定のリライト要件を使い、本文画像を 3 枚生成します。',
+        templateHint:
+          '現在のテンプレート設定を使用します。カスタマイズを開くと、リライト要件と本文画像を調整できます。',
         sourceUrl: 'リライトする公众号リンク *',
         sourceUrlPlaceholder:
           'https://mp.weixin.qq.com/s/5b9Z4EOs3wsMgc6GqAGHBQ',
