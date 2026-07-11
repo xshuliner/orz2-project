@@ -25,8 +25,9 @@ pnpm run format           # ESLint --fix + Prettier write on src
 ```
 
 `playwright.config.ts` currently uses `http://localhost:5173` and starts
-`npm run dev -- --port 5173` as its web server command, so keep that config in
-sync if the dev command changes.
+`npm run dev -- --port 5173` as its web server command, while the repository
+itself is pinned to pnpm. Keep the Playwright webServer command and package
+manager convention in sync if either changes.
 
 ## Debugging With The Production Environment
 
@@ -53,7 +54,19 @@ pnpm run start:prod
 **React 18 + Vite 6 + TypeScript**. The repository ships a static frontend;
 there is no in-repo backend. Runtime features such as login, Silicon member
 data, content polishing, WeChat publishing, and TinyPNG compression call remote
-ORZ2 APIs from `src/api/orz2.ts`.
+ORZ2 APIs from `src/api/orz2.ts`. Production monetization/measurement is wired
+through Google AdSense in `index.html` and Google Analytics in
+`src/components/GoogleAnalytics/`.
+
+### Agent Workflow
+
+For non-trivial web changes, actively use the `standardize-web-code` skill.
+Identify the current framework and runtime from `AGENTS.md`, `package.json`,
+lock/config files, routes, target modules, call sites, and tests before editing.
+For this repository that means applying the React + common workflow rules: keep
+ownership by feature/domain, keep routes as composition, avoid derived React
+state, localize user-visible copy, search references before renaming/deleting
+contracts, and run the smallest useful verification after the change.
 
 ### Directory Ownership & Placement Rules
 
@@ -123,19 +136,22 @@ Placement rules:
 
 ### Stack
 
-- **React 18** + **Vite 6** + **TypeScript 5.7**
-- **react-router-dom v6** with future flags `v7_relativeSplatPath` and
+- **React 18.3** + **Vite 6** + **TypeScript 5.7**
+- **react-router-dom v6.28** with future flags `v7_relativeSplatPath` and
   `v7_startTransition`
 - **Tailwind CSS v4** via `@tailwindcss/vite`; tokens live in
   `src/styles/theme.css`, not in `tailwind.config.js`
 - **GSAP 3** + `ScrollTrigger` for reveal, header, tilt, and Silicon page motion
 - **react-helmet-async** for SEO, canonical/alternate links, and JSON-LD
-- **lucide-react** for icons
-- **axios**, `FetchManager`, **blueimp-md5**, **uuid**, **dayjs**,
+- **lucide-react 0.468** for icons
+- **axios 1.16**, `FetchManager`, **blueimp-md5**, **uuid 14**, **dayjs**,
   **qrcode.react**, and **jszip** for APIs, signed requests, QR codes, date
   display, and image ZIP export
+- **Google AdSense** (`VITE_GOOGLE_ADSENSE_CLIENT`) and **Google Analytics 4**
+  (`VITE_GOOGLE_ANALYTICS_ID`) for production monetization/measurement
 - **@xshuliner/build-info** (`xbi generate`) for static deployment metadata
-- **Playwright** for E2E smoke tests
+- **Playwright 1.60**, **ESLint 10**, and **Prettier 3.8** for verification and
+  formatting
 - Path alias `@/*` -> `src/*`
 
 ### Entry & Providers
@@ -151,8 +167,8 @@ theme script that reads `orz2:theme-preference`, applies `data-theme`, updates
 `color-scheme`, and loads `%BASE_URL%__xshuliner__/build-info.js` before React
 boots.
 
-`src/App.tsx` mounts `EffectsMotion` once, then renders `useRoutes(routes)` in a
-`Suspense` boundary.
+`src/App.tsx` mounts `EffectsMotion` and `GoogleAnalytics` once, then renders
+`useRoutes(routes)` in a `Suspense` boundary.
 
 ### Routing
 
@@ -232,19 +248,12 @@ Shared catalog, site, SEO, and build-info types live in `src/types/`, including
 
 `OCardCatalog` renders tool/product cards, lifecycle stage, platform chips,
 badges, primary links, QR codes for H5/internal links, and WeChat sun-code
-images. When `catalogType` is provided, opening a primary link or QR tooltip
-records recent usage through `recordCatalogRecentUsage()`.
-
-Recent usage is stored through `CacheManager` under `orz2:catalog-recent-usage`
-and surfaced by:
-
-- `src/hooks/useCatalogRecentUsage.ts`
-- `src/utils/catalogRecentUsage.ts`
-- `SectionCatalogRecent`
+images. It derives internal QR values through `routeUrl()` and localizes
+internal entry links through `localizePath()`.
 
 `SectionTools` and `SectionProducts` use URL search params `q` and `category` on
-full listing pages. Their compact homepage mode merges recent items ahead of
-items marked `compact: true`.
+full listing pages. Their compact homepage mode shows items marked
+`compact: true` and omits directory filters.
 
 ### i18n
 
@@ -336,8 +345,8 @@ names are not current.
   DOM meta updates for dynamic changes.
 - `SectionHero` renders localized hero copy and a crossfading remote
   video/poster rotator with reduced-motion fallback and delayed video loading.
-- `SectionTools` / `SectionProducts` render catalog directories, filters, recent
-  usage, grouped cards, and homepage compact variants.
+- `SectionTools` / `SectionProducts` render catalog directories, filters,
+  grouped cards, and homepage compact variants.
 - `SectionTestimonial` is lazy-loaded from the homepage when near viewport.
 - `SectionContact` still exists, but the current homepage does not mount it
   directly; contact actions are in `SectionHero`, `OFooter`, and privacy copy.
@@ -382,6 +391,23 @@ Current env files:
 - `.env.dev` -> local API at `http://localhost:9002/apilocal/smart/v1`
 - `.env.uat` -> `https://orz2.online/apiuat/smart/v1`, site `/uat`
 - `.env.prod` -> `https://orz2.online/api/smart/v1`
+
+### Analytics & Ads
+
+`index.html` writes the AdSense account meta tag and loads the AdSense script
+when `VITE_GOOGLE_ADSENSE_CLIENT` matches `ca-pub-...`. The current `.env`,
+`.env.dev`, `.env.uat`, and `.env.prod` files all provide
+`ca-pub-1170288004693232`; override it with an empty value when a local run must
+avoid loading AdSense.
+
+`GoogleAnalytics` is mounted from `src/App.tsx`, but `canUseGoogleAnalytics()`
+only loads GA4 when `VITE_GOOGLE_ANALYTICS_ID` is valid, `VITE_APP_ENV` is
+`prod`, and the runtime hostname matches `VITE_SITE_URL` (or `www.` plus that
+hostname). Localhost, loopback, and `.local` hosts are blocked.
+
+Privacy copy and AdSense launch notes live in locale dictionaries and
+`docs/ADSENSE_CHECKLIST.md`. Keep those in sync when measurement or ad behavior
+changes.
 
 ### Product: Silicon
 
@@ -544,7 +570,7 @@ Components and pages use noun-first PascalCase and folder-based modules:
   `Tools/ToolOfficialPublisher`, `Tools/ToolImageStudio`,
   `Tools/ToolTimezoneConverter`, `Tools/ToolWorkReportPolisher`
 - Shared components: `LayoutApp`, `ContextAuth`, `Seo`, `EffectsMotion`,
-  `SectionHero`, `SectionTools`, `SectionProducts`, `SectionCatalogRecent`,
+  `GoogleAnalytics`, `SectionHero`, `SectionTools`, `SectionProducts`,
   `SectionTestimonial`, `SectionContact`
 - Design system and shell components: `O*`, including `OHeader` and `OFooter`
 
@@ -571,6 +597,9 @@ addition:
 
 - Prefer `O*` components and existing helpers before adding raw UI; reach for
   raw DOM only when no design-system component fits.
+- Use `standardize-web-code` during development and reviews for React/Vite
+  changes: confirm placement, naming, data flow, localization, accessibility,
+  API boundaries, deletion safety, and verification scope before editing.
 - Keep lifecycle values in catalog config as uppercase `LIVE`, `BETA`, or
   `PLANNING`; render them through helpers, never inline.
 - Keep component-local CSS next to the component and reuse global tokens instead

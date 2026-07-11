@@ -4,7 +4,8 @@ ORZ2 是一个商用在线工具与产品展示站点的纯前端工程，基于
 TypeScript**。项目本身不包含后端；登录、Silicon 成员数据、内容润色、公众号发布、图片压缩等运行时能力通过
 `src/api/orz2.ts` 调用远端 ORZ2 API。
 
-站点主域：`https://orz2.online`，支持中 / 英 / 日三语。
+站点主域：`https://orz2.online`，支持中 / 英 / 日三语。生产侧已接入 Google
+AdSense 与 GA4；本地运行时如需彻底避免广告脚本，可临时清空对应环境变量。
 
 ## 准备工作
 
@@ -28,12 +29,16 @@ Environment_。
 
 ## 环境配置
 
-| 文件        | API base                                  | 站点 base                 | AdSense |
-| ----------- | ----------------------------------------- | ------------------------- | ------- |
-| `.env`      | -                                         | -                         | 空      |
-| `.env.dev`  | `http://localhost:9002/apilocal/smart/v1` | `https://orz2.online`     | 空      |
-| `.env.uat`  | `https://orz2.online/apiuat/smart/v1`     | `https://orz2.online/uat` | 空      |
-| `.env.prod` | `https://orz2.online/api/smart/v1`        | `https://orz2.online`     | 启用    |
+| 文件        | `VITE_APP_ENV` | API base                                  | 站点 base                 | Ads / Analytics                         |
+| ----------- | -------------- | ----------------------------------------- | ------------------------- | --------------------------------------- |
+| `.env`      | `prod`         | `https://orz2.online/api/smart/v1`        | `https://orz2.online`     | AdSense + GA4 变量已配置                |
+| `.env.dev`  | `local`        | `http://localhost:9002/apilocal/smart/v1` | `https://orz2.online`     | AdSense + GA4 变量已配置，GA 本地不加载 |
+| `.env.uat`  | `uat`          | `https://orz2.online/apiuat/smart/v1`     | `https://orz2.online/uat` | AdSense + GA4 变量已配置，GA 不加载     |
+| `.env.prod` | `prod`         | `https://orz2.online/api/smart/v1`        | `https://orz2.online`     | AdSense + GA4 生产启用                  |
+
+GA4 还有运行时保护：只有 `VITE_APP_ENV=prod`、GA ID 合法且当前域名匹配
+`VITE_SITE_URL` 时才会加载。AdSense 在 `index.html` 中按
+`VITE_GOOGLE_ADSENSE_CLIENT` 是否为合法 `ca-pub-...` 客户端号加载。
 
 ## 构建与部署
 
@@ -54,6 +59,9 @@ pnpm run test:e2e   # Playwright 烟雾测试，配置在 playwright.config.ts
 pnpm run lint       # ESLint --fix on src
 pnpm run format     # ESLint --fix + Prettier 写回
 ```
+
+日常开发和评审中请善用 `standardize-web-code` SKILL：先根据
+`AGENTS.md`、`package.json`、路由、目标模块、调用方和测试确认当前 React/Vite 边界，再检查文件归属、命名、状态是否可派生、i18n 文案归位、API/缓存契约、安全删除和验证范围。它适合用来给新增页面、工具模块、重构、评审和目录治理兜底。
 
 ## i18n 与文案规则
 
@@ -88,7 +96,7 @@ slug 等结构信息，不再写中文基础文案。新增 catalog 条目时必
 src/
   api/        远端 ORZ2 API 封装
   assets/     构建期被源码引用的静态资源
-  components/ 共享设计系统、Shell、Section 组件
+  components/ 共享设计系统、Shell、Section、SEO、Auth、Analytics 组件
   config/     静态目录、站点、SEO 配置
   hooks/      跨页面复用的 React hooks
   i18n/       自研轻量 i18n：locale 元数据、消息字典、catalog 投影
@@ -104,6 +112,9 @@ scripts/      构建期脚本（sitemap 生成器）
 tests/        Playwright E2E
 public/       站点根目录静态文件、sitemap、build-info
 ```
+
+当前主要路由包括首页、产品目录、Silicon 产品页与成员页、工具目录、公众号发布助手、批量图片工作室、时区转换器、日报周报润色器、团队页、隐私页、设计系统页和构建信息页。新增公开页面时，同步
+`src/routes/`、`src/config/seo.ts`、三语 locale、必要的 sitemap 生成逻辑与 Playwright 覆盖。
 
 ## 相关文档
 
