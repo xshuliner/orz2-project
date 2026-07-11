@@ -146,12 +146,12 @@ test('timezone converter respects US daylight saving changes', async ({
   const selects = page.locator('select');
 
   await inputs.first().fill('2026-07-03T20:00');
-  await expect(inputs.nth(1)).toHaveValue('2026-07-03T08:00');
+  await expect(inputs.nth(1)).toHaveValue('2026-07-03T05:00');
   await expect(page.getByText(zhMessages.timezoneTool.dstActive)).toBeVisible();
 
   await selects.first().selectOption('japan');
   await expect(inputs.first()).toHaveValue('2026-07-03T21:00');
-  await expect(inputs.nth(1)).toHaveValue('2026-07-03T08:00');
+  await expect(inputs.nth(1)).toHaveValue('2026-07-03T05:00');
 
   await selects.nth(1).selectOption('unitedKingdom');
   await expect(inputs.first()).toHaveValue('2026-07-03T21:00');
@@ -161,9 +161,9 @@ test('timezone converter respects US daylight saving changes', async ({
   await expect(inputs.first()).toHaveValue('2026-07-03T18:00');
 
   await selects.first().selectOption('china');
-  await selects.nth(1).selectOption('unitedStates');
+  await selects.nth(1).selectOption('us-pacific');
   await inputs.first().fill('2026-01-03T20:00');
-  await expect(inputs.nth(1)).toHaveValue('2026-01-03T07:00');
+  await expect(inputs.nth(1)).toHaveValue('2026-01-03T04:00');
   await expect(
     page.getByText(zhMessages.timezoneTool.dstInactive)
   ).toBeVisible();

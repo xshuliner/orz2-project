@@ -818,7 +818,7 @@ export function PageOfficialPublisher() {
                       ariaLabel={publisherCopy.simpleMode.selectorAriaLabel}
                       className='simple-template-selector'
                       options={templateOptions}
-                      placement='bottom'
+                      placement='auto'
                       value={activeModeSetting.templateId}
                       onChange={updateSelectedTemplate}
                     />
