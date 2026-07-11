@@ -10,6 +10,7 @@ export {
   postTinifyImage,
   streamPostOfficialPublisher,
 } from './orz2';
+export type { AuthMemberInfo } from './orz2';
 export { getAvatarBorderColor, ossAvatarUrl } from './orz2.modal';
 export type {
   BackpackItem,

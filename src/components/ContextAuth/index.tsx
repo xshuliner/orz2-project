@@ -1,3 +1,4 @@
+import type { AuthMemberInfo } from '@/api';
 import { OButton } from '@/components/OButton';
 import { OIconButton } from '@/components/OIconButton';
 import { OModal } from '@/components/OModal';
@@ -15,15 +16,6 @@ import {
   useState,
 } from 'react';
 import './index.css';
-
-interface MemberInfo {
-  _id?: string;
-  sys_thirdId?: string;
-  identity_email?: string;
-  identity_username?: string;
-  user_avatarUrl?: string;
-  user_nickName?: string;
-}
 
 interface AuthUser {
   id: string;
@@ -67,7 +59,7 @@ function stopDefaultAction(value: unknown) {
 }
 
 function toAuthUser(
-  memberInfo: MemberInfo,
+  memberInfo: AuthMemberInfo,
   fallbackName = 'WeChat user'
 ): AuthUser {
   return {
@@ -133,9 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then(api => api.getQueryMemberInfo())
       .then(response => {
         if (!isActive) return;
-        const memberInfo = response?.data?.body?.memberInfo as
-          | MemberInfo
-          | undefined;
+        const memberInfo = response?.data?.body?.memberInfo;
         if (!memberInfo) {
           removeAuthStorage();
           setUser(null);
@@ -268,9 +258,7 @@ function LoginModal({
           persistTokens(token, refreshToken);
           const memberResponse = await api.getQueryMemberInfo();
           if (session !== sessionRef.current) return;
-          const memberInfo = memberResponse?.data?.body?.memberInfo as
-            | MemberInfo
-            | undefined;
+          const memberInfo = memberResponse?.data?.body?.memberInfo;
           if (!memberInfo) {
             removeAuthStorage();
             setError(loginCopy.errors.loginFailed);

@@ -1,4 +1,4 @@
-import FetchManager from '@/utils/FetchManager';
+import FetchManager, { type FetchResponse } from '@/utils/FetchManager';
 import axios from 'axios';
 import md5 from 'blueimp-md5';
 import type {
@@ -39,9 +39,44 @@ export const POLISH_CONTENT_API_URL = `${LLM_PREFIX}/postPolishContent`;
  * @param params.uuid.required QR-code UUID.
  * @returns Promise
  */
+interface LegacyApiPayload<TBody> {
+  code?: number;
+  body?: TBody;
+  content?: string;
+  message?: string;
+}
+
+interface MiniCodeLoginStatus {
+  refreshToken?: string;
+  timer?: number;
+  token?: string;
+}
+
+interface MiniCodeLoginQrCode {
+  data?: unknown;
+}
+
+interface MiniCodeLoginQrCodeBody {
+  data?: MiniCodeLoginQrCode;
+  uuid?: string;
+}
+
+export interface AuthMemberInfo {
+  _id?: string;
+  identity_email?: string;
+  identity_username?: string;
+  sys_thirdId?: string;
+  user_avatarUrl?: string;
+  user_nickName?: string;
+}
+
+interface MemberInfoBody {
+  memberInfo?: AuthMemberInfo;
+}
+
 export const getQueryMiniCodeLogin = async (params: {
   uuid: string;
-}): Promise<any> => {
+}): Promise<FetchResponse<LegacyApiPayload<MiniCodeLoginStatus>>> => {
   const query = {
     uuid: params.uuid,
   };
@@ -57,8 +92,10 @@ export const getQueryMiniCodeLogin = async (params: {
  * Create QR-code login.
  * @returns Promise
  */
-export const postCreateMiniCodeLogin = async (): Promise<any> => {
-  return await FetchManager.request({
+export const postCreateMiniCodeLogin = async (): Promise<
+  FetchResponse<LegacyApiPayload<MiniCodeLoginQrCodeBody>>
+> => {
+  return FetchManager.request({
     method: 'POST',
     url: '/smart/v1/minicode/postCreateMiniCodeLogin',
     body: {
@@ -73,8 +110,10 @@ export const postCreateMiniCodeLogin = async (): Promise<any> => {
  * Query user profile.
  * @returns Promise
  */
-export const getQueryMemberInfo = async (): Promise<any> => {
-  return await FetchManager.request({
+export const getQueryMemberInfo = async (): Promise<
+  FetchResponse<LegacyApiPayload<MemberInfoBody>>
+> => {
+  return FetchManager.request({
     method: 'GET',
     url: '/smart/v1/member/getQueryMemberInfo',
   });
@@ -89,13 +128,13 @@ export const getQueryMemberInfo = async (): Promise<any> => {
 export const postLoginMemberInfoForPassword = async (params: {
   username: string;
   password: string;
-}): Promise<any> => {
+}): Promise<FetchResponse<LegacyApiPayload<MemberInfoBody>>> => {
   const body = {
     username: params.username,
     password: md5(params.password),
   };
 
-  return await FetchManager.request({
+  return FetchManager.request({
     method: 'POST',
     url: '/smart/v1/member/postLoginMemberInfoForPassword',
     body,
@@ -247,7 +286,12 @@ export async function postTinifyImage(params: {
           lastModified: Date.now(),
           type: params.image.type || 'application/octet-stream',
         });
-  const response = await FetchManager.upload({
+  const response = await FetchManager.upload<{
+    code?: number;
+    body?: TinifyImageResult | null;
+    content?: string;
+    message?: string;
+  }>({
     file: {
       blob: uploadFile,
       fieldName: 'image',
@@ -258,12 +302,7 @@ export async function postTinifyImage(params: {
     timeout: 120000,
     url: TINIFY_IMAGE_API_PATH,
   });
-  const data = response.data as {
-    code?: number;
-    body?: TinifyImageResult | null;
-    message?: string;
-    content?: string;
-  };
+  const data = response.data;
   const body = data?.body;
 
   if (data?.code === 200 && body?.errcode && body.errcode !== 0) {

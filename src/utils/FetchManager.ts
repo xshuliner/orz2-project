@@ -1,159 +1,208 @@
 import axios, {
-  type AxiosError,
   type AxiosInstance,
   type AxiosRequestConfig,
   type AxiosResponse,
+  type AxiosResponseHeaders,
+  type RawAxiosResponseHeaders,
 } from 'axios';
 import md5 from 'blueimp-md5';
 import { v4 as uuidV4 } from 'uuid';
 import CacheManager from './CacheManager';
-import Utils from './utils';
 
-const webenv =
-  (import.meta.env.VITE_APP_ENV as 'local' | 'uat' | 'prod') || 'prod';
-const env = 'EXTENSION';
+type WebEnvironment = 'local' | 'uat' | 'prod';
+type HttpMethod = NonNullable<AxiosRequestConfig['method']>;
+type RequestValues = Record<string, unknown>;
+type ResponseHeaders = AxiosResponseHeaders | RawAxiosResponseHeaders;
+
+const webEnvironment =
+  (import.meta.env.VITE_APP_ENV as WebEnvironment | undefined) || 'prod';
+const platform = 'EXTENSION';
 const brand = 'gatling';
 const secretKey = 'I@, ha*ve #187076081$ dream(s)!~';
+const tokenStorageKey = 'token';
+const defaultTimeoutMs = 20000;
 
-const web = {
-  prod: {
-    baseUrl: 'https://orz2.online/api',
-  },
-  uat: {
-    baseUrl: 'https://orz2.online/apiuat',
-  },
-  local: {
-    baseUrl: 'http://localhost:9002/apilocal',
-  },
+const apiOrigins: Record<WebEnvironment, string> = {
+  prod: 'https://orz2.online/api',
+  uat: 'https://orz2.online/apiuat',
+  local: 'http://localhost:9002/apilocal',
 };
 
-function getFallbackBaseUrl() {
-  const objWeb = web[webenv] ? web[webenv] : web.prod;
-  return objWeb.baseUrl;
+function getFallbackBaseUrl(): string {
+  return apiOrigins[webEnvironment];
 }
 
-function resolveBaseUrl() {
+function resolveBaseUrl(): string {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, '');
   if (!apiBaseUrl) return getFallbackBaseUrl();
 
   try {
-    const parsed = new URL(apiBaseUrl);
-    parsed.pathname = parsed.pathname.replace(/\/smart\/v1\/?$/, '');
-    return parsed.toString().replace(/\/$/, '');
+    const parsedUrl = new URL(apiBaseUrl);
+    parsedUrl.pathname = parsedUrl.pathname.replace(/\/smart\/v1\/?$/, '');
+    return parsedUrl.toString().replace(/\/$/, '');
   } catch {
     return getFallbackBaseUrl();
   }
 }
 
-interface RequestConfig {
-  method?: string;
+function stringifyRequestValues(values: RequestValues): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(values).map(([key, value]) => [key, String(value)])
+  );
+}
+
+function buildUrlWithQuery(path: string, query: RequestValues): string {
+  const searchParams = new URLSearchParams();
+  Object.entries(query).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      searchParams.set(key, String(value));
+    }
+  });
+  const queryString = searchParams.toString();
+  return queryString ? `${path}?${queryString}` : path;
+}
+
+function isBodyMethod(method: HttpMethod): boolean {
+  return method.toUpperCase() !== 'GET' && method.toUpperCase() !== 'HEAD';
+}
+
+function getErrorMessage(data: unknown, fallback: string): string {
+  if (typeof data !== 'object' || data === null) return fallback;
+  const record = data as Record<string, unknown>;
+  return typeof record.message === 'string' ? record.message : fallback;
+}
+
+function getResponseHeaders(response: AxiosResponse): ResponseHeaders {
+  return response.headers;
+}
+
+function getRequestErrorResponse(error: unknown): FetchResponse {
+  if (!axios.isAxiosError(error)) {
+    return {
+      statusCode: 0,
+      data: error,
+      error: error instanceof Error ? error.message : 'Network error',
+      headers: {},
+    };
+  }
+
+  return {
+    statusCode: error.response?.status || 0,
+    data: error.response?.data || error,
+    error: error.message || 'Network error',
+    headers: error.response?.headers || {},
+  };
+}
+
+function showLoading(): void {
+  console.debug('FetchManager: showLoading');
+}
+
+function hideLoading(): void {
+  console.debug('FetchManager: hideLoading');
+}
+
+function showToast(message: string): void {
+  console.debug('FetchManager: showToast', message);
+}
+
+export interface FetchRequestConfig extends Omit<
+  AxiosRequestConfig,
+  'data' | 'headers' | 'method' | 'params' | 'timeout' | 'url'
+> {
+  method?: HttpMethod;
   url: string;
   header?: Record<string, string>;
-  query?: Record<string, any>;
-  body?: Record<string, any>;
+  query?: RequestValues;
+  body?: RequestValues;
   isShowLoading?: boolean;
   isShowToast?: boolean;
   isRepeatAuth?: boolean;
   timeout?: number;
-  [key: string]: any;
 }
 
-interface UploadConfig extends RequestConfig {
+export interface FetchUploadConfig extends FetchRequestConfig {
   signPath?: string;
   file?: {
     blob?: Blob;
     fieldName?: string;
     filename?: string;
     filePath?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
-interface ApiResponse {
+export interface FetchResponse<TData = unknown> {
   statusCode?: number;
-  data?: any;
-  [key: string]: any;
+  data?: TData;
+  error?: string;
+  headers?: ResponseHeaders;
 }
 
-const getApiHeaders = async (params: {
-  path: string;
-  query: Record<string, any>;
-  body: Record<string, any>;
-  token: string;
-}): Promise<{
-  urlAndQuery: string;
-  token: string;
+interface RequestSignature {
+  requestid: string;
   t: string;
   k: string;
-  requestid: string;
-}> => {
-  const { path: url, query: queryReq = {}, body: bodyReq = {} } = params || {};
-  const queryReqReal = Utils.traverseObject({
-    obj: queryReq,
-    modifier: (key, value) => {
-      return String(value);
-    },
-  });
-  const urlAndQuery = Utils.router2url(url, queryReqReal) as string;
-  const token = CacheManager.getLocalStorage<string>('token') || '';
+}
+
+async function createRequestSignature(params: {
+  path: string;
+  query: RequestValues;
+  body: RequestValues;
+}): Promise<RequestSignature> {
+  const queryForSignature = stringifyRequestValues(params.query);
   const requestid = uuidV4();
-  const t = String(new Date().getTime());
+  const t = String(Date.now());
+  const path = params.path;
   const k = md5(
-    `${requestid.slice(-10)}${t}${url[url.length - 2]}${env}${secretKey}${requestid.slice(0, 10)}${url[url.length - 3]}${t}${brand}` +
-      `\t${JSON.stringify(queryReqReal)}\t${JSON.stringify(bodyReq)}`
+    `${requestid.slice(-10)}${t}${path[path.length - 2]}${platform}${secretKey}${requestid.slice(0, 10)}${path[path.length - 3]}${t}${brand}` +
+      `\t${JSON.stringify(queryForSignature)}\t${JSON.stringify(params.body)}`
   );
 
+  return { requestid, t, k };
+}
+
+function createRequestHeaders(
+  signature: RequestSignature,
+  token: string,
+  header: Record<string, string>,
+  contentType?: string
+): Record<string, string> {
   return {
-    urlAndQuery,
-    token,
-    t,
-    k,
-    requestid,
+    platform,
+    brand,
+    authorization: token ? `Bearer ${token}` : '',
+    requestid: signature.requestid,
+    t: signature.t,
+    k: signature.k,
+    ...(contentType ? { 'Content-Type': contentType } : {}),
+    ...header,
   };
-};
-
-const showLoading = (): void => {
-  console.debug('FetchManager: showLoading');
-};
-
-const hideLoading = (): void => {
-  console.debug('FetchManager: hideLoading');
-};
-
-const showToast = (message: string): void => {
-  console.debug('FetchManager: showToast', message);
-};
+}
 
 class FetchManager {
   static instance: FetchManager | null = null;
 
-  private baseUrl: string;
-  private axiosInstance: AxiosInstance;
+  private readonly baseUrl: string;
+  private readonly axiosInstance: AxiosInstance;
 
-  constructor() {
+  private constructor() {
     this.baseUrl = resolveBaseUrl();
-
     this.axiosInstance = axios.create({
       baseURL: this.baseUrl,
-      timeout: 20000,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      timeout: defaultTimeoutMs,
+      headers: { 'Content-Type': 'application/json' },
     });
-
-    console.log('FetchManager getInstance', webenv, this.baseUrl);
   }
 
   static getInstance(): FetchManager {
-    if (!this.instance) {
-      this.instance = new FetchManager();
-    }
+    this.instance ??= new FetchManager();
     return this.instance;
   }
 
-  request = async (objConfig: RequestConfig): Promise<ApiResponse> => {
-    let result: ApiResponse;
-
+  async request<TData = unknown>(
+    config: FetchRequestConfig
+  ): Promise<FetchResponse<TData>> {
     const {
       method = 'GET',
       url,
@@ -163,89 +212,55 @@ class FetchManager {
       isShowLoading = false,
       isShowToast = false,
       isRepeatAuth: _isRepeatAuth = true,
-      timeout = 20000,
-      ...otherConfig
-    } = objConfig || {};
-
-    const token = CacheManager.getLocalStorage<string>('token') || '';
-
-    const { t, k, requestid } = await getApiHeaders({
-      path: url,
-      query,
-      body,
-      token,
-    });
-
-    const fullUrl = url.includes('://') ? url : `${this.baseUrl}${url}`;
-
-    const headers: Record<string, string> = {
-      platform: env,
-      brand: brand,
-      authorization: token ? `Bearer ${token}` : '',
-      requestid,
-      t,
-      k,
-      'Content-Type': 'application/json',
-      ...header,
-    };
-
+      timeout = defaultTimeoutMs,
+      ...axiosOptions
+    } = config;
+    const token = CacheManager.getLocalStorage<string>(tokenStorageKey) || '';
+    const signature = await createRequestSignature({ path: url, query, body });
+    const responseUrl = url.includes('://') ? url : `${this.baseUrl}${url}`;
     const axiosConfig: AxiosRequestConfig = {
-      method: method.toLowerCase() as any,
-      url: fullUrl,
-      headers,
-      params: method === 'GET' || method === 'HEAD' ? query : undefined,
-      data: method !== 'GET' && method !== 'HEAD' ? body : undefined,
+      ...axiosOptions,
+      method,
+      url: responseUrl,
+      headers: createRequestHeaders(
+        signature,
+        token,
+        header,
+        'application/json'
+      ),
+      params: isBodyMethod(method) ? undefined : query,
+      data: isBodyMethod(method) ? body : undefined,
       timeout,
-      ...otherConfig,
     };
 
-    console.debug('FetchManager options', JSON.stringify(axiosConfig, null, 2));
-
+    if (isShowLoading) showLoading();
     try {
-      if (isShowLoading) {
-        showLoading();
-      }
-
-      const response: AxiosResponse =
-        await this.axiosInstance.request(axiosConfig);
-
-      result = {
+      const response = await this.axiosInstance.request<TData>(axiosConfig);
+      const result: FetchResponse<TData> = {
         statusCode: response.status,
         data: response.data,
-        headers: response.headers as Record<string, any>,
+        headers: getResponseHeaders(response),
       };
-
-      if (isShowLoading) {
-        hideLoading();
+      if (isShowToast && result.statusCode !== 200) {
+        showToast(getErrorMessage(result.data, 'Request failed'));
       }
-
-      if (isShowToast && result?.statusCode !== 200) {
-        showToast(result?.data?.message || 'Request failed');
-      }
-    } catch (error: any) {
-      const axiosError = error as AxiosError;
-      const errorData = axiosError.response?.data as any;
-      result = {
-        statusCode: axiosError.response?.status || 0,
-        data: axiosError.response?.data || error,
-        error: axiosError.message || 'Network error',
-        headers: (axiosError.response?.headers as Record<string, any>) || {},
-      };
-      if (isShowLoading) {
-        hideLoading();
-      }
+      return result;
+    } catch (error) {
+      const result = getRequestErrorResponse(error) as FetchResponse<TData>;
       if (isShowToast) {
-        showToast(errorData?.message || axiosError.message || 'Network error');
+        showToast(
+          getErrorMessage(result.data, result.error || 'Network error')
+        );
       }
+      return result;
+    } finally {
+      if (isShowLoading) hideLoading();
     }
+  }
 
-    console.debug('FetchManager request', result);
-    return result;
-  };
-
-  upload = async (objConfig: UploadConfig): Promise<ApiResponse> => {
-    let result: ApiResponse;
-
+  async upload<TData = unknown>(
+    config: FetchUploadConfig
+  ): Promise<FetchResponse<TData>> {
     const {
       method = 'POST',
       signPath,
@@ -256,129 +271,76 @@ class FetchManager {
       file = {},
       isShowLoading = false,
       isRepeatAuth: _isRepeatAuth = true,
-      timeout = 20000,
-      ...otherConfig
-    } = objConfig || {};
-
+      timeout = defaultTimeoutMs,
+      ...axiosOptions
+    } = config;
     const {
       blob,
       fieldName = 'file',
       filename,
       filePath,
-      ...otherParams
-    } = file || {};
-
-    const token = CacheManager.getLocalStorage<string>('token') || '';
-
-    const { t, k, requestid } = await getApiHeaders({
+      ...fileFields
+    } = file;
+    const token = CacheManager.getLocalStorage<string>(tokenStorageKey) || '';
+    const signature = await createRequestSignature({
       path: signPath || url,
       query,
       body: {},
-      token,
     });
-    const queryReqReal = Utils.traverseObject({
-      obj: query,
-      modifier: (key, value) => {
-        return String(value);
-      },
-    });
-    const urlAndQuery = Utils.router2url(url, queryReqReal) as string;
-
-    console.log('verifyLegal', {
-      requestid,
-      t,
-      url,
-      platform: env,
-      secretKey,
-      brand,
-      queryReq: JSON.stringify(query),
-      bodyReq: JSON.stringify(body),
-    });
-
-    const fullUrl = urlAndQuery.includes('://')
-      ? urlAndQuery
-      : `${this.baseUrl}${urlAndQuery}`;
-
-    const headers: Record<string, string> = {
-      platform: env,
-      brand: brand,
-      authorization: token ? `Bearer ${token}` : '',
-      requestid,
-      t,
-      k,
-      ...header,
-    };
-
+    const uploadUrl = buildUrlWithQuery(url, query);
+    const responseUrl = uploadUrl.includes('://')
+      ? uploadUrl
+      : `${this.baseUrl}${uploadUrl}`;
     const formData = new FormData();
 
     if (blob) {
       formData.append(fieldName, blob, filename);
     } else if (filePath) {
       try {
-        const fileBlob = await fetch(filePath).then(r => r.blob());
+        const fileBlob = await fetch(filePath).then(response =>
+          response.blob()
+        );
         formData.append(fieldName, fileBlob, filename);
       } catch (error) {
-        console.error('Failed to load file:', error);
+        console.error('Failed to load upload file:', error);
       }
     }
 
-    Object.keys(otherParams).forEach(key => {
-      formData.append(key, String(otherParams[key]));
+    Object.entries(fileFields).forEach(([key, value]) => {
+      formData.append(key, String(value));
     });
-
-    Object.keys(body).forEach(key => {
-      formData.append(key, String(body[key]));
+    Object.entries(body).forEach(([key, value]) => {
+      formData.append(key, String(value));
     });
 
     const axiosConfig: AxiosRequestConfig = {
-      method: method.toLowerCase() as any,
-      url: fullUrl,
-      headers: {
-        ...headers,
-      },
+      ...axiosOptions,
+      method,
+      url: responseUrl,
+      headers: createRequestHeaders(signature, token, header),
       data: formData,
       params: query,
       timeout,
-      ...otherConfig,
     };
 
+    if (isShowLoading) showLoading();
     try {
-      if (isShowLoading) {
-        showLoading();
-      }
-
-      const response: AxiosResponse = await axios.request(axiosConfig);
-
-      result = {
+      const response = await axios.request<TData>(axiosConfig);
+      return {
         statusCode: response.status,
         data: response.data,
-        headers: response.headers as Record<string, any>,
+        headers: getResponseHeaders(response),
       };
-    } catch (error: any) {
-      const axiosError = error as AxiosError;
-      result = {
-        statusCode: axiosError.response?.status || 0,
-        data: axiosError.response?.data || error,
-        error: axiosError.message || 'Network error',
-        headers: (axiosError.response?.headers as Record<string, any>) || {},
-      };
+    } catch (error) {
+      return getRequestErrorResponse(error) as FetchResponse<TData>;
+    } finally {
+      if (isShowLoading) hideLoading();
     }
+  }
 
-    if (isShowLoading) {
-      hideLoading();
-    }
-
-    console.debug(
-      'FetchManager upload',
-      JSON.stringify(objConfig),
-      JSON.stringify(result)
-    );
-    return result;
-  };
-
-  stream = async (objConfig: RequestConfig): Promise<ApiResponse> => {
-    let result: ApiResponse;
-
+  async stream<TData = ReadableStream<Uint8Array>>(
+    config: FetchRequestConfig
+  ): Promise<FetchResponse<TData>> {
     const {
       method = 'GET',
       url,
@@ -387,87 +349,51 @@ class FetchManager {
       body = {},
       isShowLoading = false,
       isShowToast = false,
-      timeout = 20000,
-      ...otherConfig
-    } = objConfig || {};
-
-    const token = CacheManager.getLocalStorage<string>('token') || '';
-
-    const { urlAndQuery, t, k, requestid } = await getApiHeaders({
-      path: url,
-      query,
-      body,
-      token,
-    });
-
-    const fullUrl = urlAndQuery.includes('://')
-      ? urlAndQuery
-      : `${this.baseUrl}${urlAndQuery}`;
-
-    const headers: Record<string, string> = {
-      platform: env,
-      brand: brand,
-      authorization: token ? `Bearer ${token}` : '',
-      requestid,
-      t,
-      k,
-      'Content-Type': 'application/json',
-      ...header,
-    };
-
+      timeout = defaultTimeoutMs,
+      ...axiosOptions
+    } = config;
+    const token = CacheManager.getLocalStorage<string>(tokenStorageKey) || '';
+    const signature = await createRequestSignature({ path: url, query, body });
+    const urlWithQuery = buildUrlWithQuery(url, stringifyRequestValues(query));
+    const responseUrl = urlWithQuery.includes('://')
+      ? urlWithQuery
+      : `${this.baseUrl}${urlWithQuery}`;
     const axiosConfig: AxiosRequestConfig = {
-      method: method.toLowerCase() as any,
-      url: fullUrl,
-      headers,
-      params: method === 'GET' || method === 'HEAD' ? query : undefined,
-      data: method !== 'GET' && method !== 'HEAD' ? body : undefined,
+      ...axiosOptions,
+      method,
+      url: responseUrl,
+      headers: createRequestHeaders(
+        signature,
+        token,
+        header,
+        'application/json'
+      ),
+      params: isBodyMethod(method) ? undefined : query,
+      data: isBodyMethod(method) ? body : undefined,
       timeout,
       responseType: 'blob',
-      ...otherConfig,
     };
 
-    console.debug('FetchManager options', JSON.stringify(axiosConfig, null, 2));
-
+    if (isShowLoading) showLoading();
     try {
-      if (isShowLoading) {
-        showLoading();
-      }
-
-      const response: AxiosResponse<Blob> =
-        await this.axiosInstance.request(axiosConfig);
-
-      const blob = response.data;
-      const stream = blob.stream();
-
-      result = {
+      const response = await this.axiosInstance.request<Blob>(axiosConfig);
+      return {
         statusCode: response.status,
-        data: stream,
-        headers: response.headers as Record<string, any>,
+        data: response.data.stream() as TData,
+        headers: getResponseHeaders(response),
       };
-
-      if (isShowLoading) {
-        hideLoading();
-      }
-    } catch (error: any) {
-      const axiosError = error as AxiosError;
-      const errorData = axiosError.response?.data as any;
-      result = {
-        statusCode: axiosError.response?.status || 0,
-        data: axiosError.response?.data || error,
-        error: axiosError.message || 'Network error',
-        headers: (axiosError.response?.headers as Record<string, any>) || {},
-      };
-      if (isShowLoading) {
-        hideLoading();
-      }
+    } catch (error) {
+      const result = getRequestErrorResponse(error) as FetchResponse<TData>;
       if (isShowToast) {
-        showToast(errorData?.message || axiosError.message || 'Network error');
+        showToast(
+          getErrorMessage(result.data, result.error || 'Network error')
+        );
       }
+      return result;
+    } finally {
+      if (isShowLoading) hideLoading();
     }
-
-    console.debug('FetchManager stream', result);
-    return result;
-  };
+  }
 }
 
 export default FetchManager.getInstance();
