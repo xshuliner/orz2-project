@@ -240,11 +240,6 @@
   transform: translateX(2px);
 }
 
-.catalog-scan-tooltip {
-  display: inline-flex;
-  flex: 0 0 auto;
-}
-
 .catalog-entry-panel {
   width: min(336px, calc(100vw - 32px));
   height: min(446px, calc(100vh - 32px));

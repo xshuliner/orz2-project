@@ -91,7 +91,9 @@ export function OPopover({
       <PopoverPrimitive.Portal>
         <PopoverPrimitive.Content
           aria-label={ariaLabel}
-          className={contentClassName}
+          className={['z-[var(--z-popover)] outline-none', contentClassName]
+            .filter(Boolean)
+            .join(' ')}
           side={side}
           align={align}
           sideOffset={sideOffset}

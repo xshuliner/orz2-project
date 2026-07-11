@@ -189,6 +189,27 @@ test('authenticated mobile header opens and dismisses the profile popover', asyn
   await expect(menu).toHaveCount(0);
 });
 
+test('catalog scan experience popover remains open after clicking a product card', async ({
+  page,
+}) => {
+  await page.goto('/products', { waitUntil: 'domcontentloaded' });
+
+  const productCard = page.locator('.catalog-card').filter({
+    hasText: zhMessages.catalog.products.weather.name,
+  });
+  const trigger = productCard.getByRole('button', {
+    name: zhMessages.common.scanExperience,
+  });
+  const popover = page.locator('.catalog-entry-panel');
+
+  await trigger.click();
+  await expect(popover).toBeVisible();
+  await page.locator('main').hover({ position: { x: 10, y: 10 } });
+  await expect(popover).toBeVisible();
+  await page.locator('main').click({ position: { x: 10, y: 10 } });
+  await expect(popover).toHaveCount(0);
+});
+
 test('language switching preserves the current route and localized navigation', async ({
   page,
 }) => {

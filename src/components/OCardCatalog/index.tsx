@@ -1,7 +1,7 @@
 import { OBadge } from '@/components/OBadge';
 import { OCard } from '@/components/OCard';
+import { OPopover } from '@/components/OPopover';
 import { OTab } from '@/components/OTab';
-import { OTooltip } from '@/components/OTooltip';
 import { useI18n } from '@/hooks/useI18n';
 import type {
   CatalogEntry,
@@ -212,14 +212,13 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
             )
           ) : null}
           {activeEntry ? (
-            <OTooltip
-              interactive
-              className='catalog-scan-tooltip'
-              contentClassName='catalog-entry-tooltip'
-              maxWidth={336}
-              placement='top-end'
+            <OPopover
+              align='end'
+              ariaLabel={`${item.name} ${common.qrTitle}`}
+              contentClassName='catalog-entry-panel'
+              side='top'
               content={
-                <div className='catalog-entry-panel'>
+                <div>
                   <div className='catalog-entry-panel-header'>
                     <div>
                       <span>{item.name}</span>
@@ -326,7 +325,7 @@ export function OCardCatalog({ item }: OCardCatalogProps) {
                 <QrCode size={15} strokeWidth={2} aria-hidden='true' />
                 {common.scanExperience}
               </button>
-            </OTooltip>
+            </OPopover>
           ) : null}
           {!primaryLink && !defaultScanEntry ? (
             <span className='catalog-card-muted'>{common.preparing}</span>
