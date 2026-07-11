@@ -69,6 +69,126 @@ test('login modal opens and closes through the shared modal shell', async ({
   ).toHaveCount(0);
 });
 
+test('authenticated header profile popover distinguishes hover and click', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem('CACHE_token', JSON.stringify('test-token'));
+    window.localStorage.setItem(
+      'CACHE_orz2:auth-user',
+      JSON.stringify({
+        id: 'test-user',
+        name: 'Popover User',
+        email: '',
+        gender: 0,
+        province: '',
+        provinceCode: '',
+        city: '',
+        cityCode: '',
+        area: '',
+        areaCode: '',
+        title: '',
+        level: 0,
+        experience: 0,
+        score: 8,
+      })
+    );
+  });
+  await page.route('**/smart/v1/member/getQueryMemberInfo**', route =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        body: {
+          memberInfo: {
+            _id: 'test-user',
+            user_nickName: 'Popover User',
+            user_score: 8,
+          },
+        },
+      }),
+    })
+  );
+
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+  const trigger = page.getByRole('button', { name: 'Popover User' });
+  const menu = page.locator('.nav-user-menu');
+  await expect(trigger).toBeVisible();
+  expect(
+    await trigger.evaluate(element => element.getBoundingClientRect().height)
+  ).toBe(36);
+
+  await trigger.hover();
+  await expect(menu).toBeVisible();
+  await page.locator('.brand-link').hover();
+  await expect(menu).toHaveCount(0);
+
+  await trigger.click();
+  await expect(menu).toBeVisible();
+  await page.locator('.brand-link').hover();
+  await expect(menu).toBeVisible();
+  await page.locator('main').click({ position: { x: 10, y: 10 } });
+  await expect(menu).toHaveCount(0);
+});
+
+test('authenticated mobile header opens and dismisses the profile popover', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    window.localStorage.setItem('CACHE_token', JSON.stringify('test-token'));
+    window.localStorage.setItem(
+      'CACHE_orz2:auth-user',
+      JSON.stringify({
+        id: 'mobile-test-user',
+        name: 'Mobile Popover User',
+        email: '',
+        gender: 0,
+        province: '',
+        provinceCode: '',
+        city: '',
+        cityCode: '',
+        area: '',
+        areaCode: '',
+        title: '',
+        level: 0,
+        experience: 0,
+        score: 5,
+      })
+    );
+  });
+  await page.route('**/smart/v1/member/getQueryMemberInfo**', route =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        body: {
+          memberInfo: {
+            _id: 'mobile-test-user',
+            user_nickName: 'Mobile Popover User',
+            user_score: 5,
+          },
+        },
+      }),
+    })
+  );
+
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page
+    .getByRole('button', { name: zhMessages.header.openNavAriaLabel })
+    .click();
+
+  const mobileMember = page.locator('.mobile-nav-member');
+  const trigger = mobileMember.getByRole('button', {
+    name: 'Mobile Popover User',
+  });
+  const menu = page.locator('.nav-user-menu');
+  await expect(trigger).toBeVisible();
+  await trigger.click();
+  await expect(menu).toBeVisible();
+  await page.locator('main').click({ position: { x: 10, y: 120 } });
+  await expect(menu).toHaveCount(0);
+});
+
 test('language switching preserves the current route and localized navigation', async ({
   page,
 }) => {

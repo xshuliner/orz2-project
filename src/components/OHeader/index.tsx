@@ -1,5 +1,6 @@
 import { useAuth } from '@/components/ContextAuth';
 import { OIconButton } from '@/components/OIconButton';
+import { OPopover } from '@/components/OPopover';
 import { ORadio, type ORadioOption } from '@/components/ORadio';
 import { useI18n } from '@/hooks/useI18n';
 import type { Locale } from '@/i18n';
@@ -272,9 +273,53 @@ function UserInfoModule({
     );
   }
 
+  const menu = (
+    <div className='nav-user-menu'>
+      <div className='nav-user-menu-heading'>
+        <span className='nav-user-avatar' aria-hidden='true'>
+          {avatarUrl ? (
+            <img alt='' src={avatarUrl} />
+          ) : (
+            userName?.slice(0, 1) || headerCopy.defaultAvatar
+          )}
+        </span>
+        <div>
+          <strong>{userName || headerCopy.defaultUserName}</strong>
+          <span>
+            {headerCopy.scoreLabel}: {score ?? 0}
+          </span>
+        </div>
+      </div>
+      <Link className='nav-user-menu-link interactive' to='/member/detail'>
+        <CircleUserRound size={16} aria-hidden='true' />
+        {headerCopy.profile}
+      </Link>
+      <Link className='nav-user-menu-link interactive' to='/member/score-list'>
+        <Coins size={16} aria-hidden='true' />
+        {headerCopy.scores}
+      </Link>
+      <button
+        className='nav-user-menu-link nav-user-menu-logout interactive'
+        type='button'
+        onClick={onLogout}
+      >
+        <LogOut size={16} aria-hidden='true' />
+        {headerCopy.logout}
+      </button>
+    </div>
+  );
+
   return (
-    <details className={`${className} logged-in`}>
-      <summary className='nav-user-trigger interactive'>
+    <OPopover
+      align={variant === 'mobile' ? 'start' : 'end'}
+      ariaLabel={`${userName || headerCopy.defaultUserName} ${headerCopy.profile}`}
+      content={menu}
+      side='bottom'
+    >
+      <button
+        className={`${className} logged-in nav-user-trigger interactive`}
+        type='button'
+      >
         <span className='nav-user-avatar' aria-hidden='true'>
           {avatarUrl ? (
             <img alt='' src={avatarUrl} />
@@ -283,43 +328,7 @@ function UserInfoModule({
           )}
         </span>
         <strong>{userName || headerCopy.defaultUserName}</strong>
-      </summary>
-      <div className='nav-user-menu'>
-        <div className='nav-user-menu-heading'>
-          <span className='nav-user-avatar' aria-hidden='true'>
-            {avatarUrl ? (
-              <img alt='' src={avatarUrl} />
-            ) : (
-              userName?.slice(0, 1) || headerCopy.defaultAvatar
-            )}
-          </span>
-          <div>
-            <strong>{userName || headerCopy.defaultUserName}</strong>
-            <span>
-              {headerCopy.scoreLabel}: {score ?? 0}
-            </span>
-          </div>
-        </div>
-        <Link className='nav-user-menu-link interactive' to='/member/detail'>
-          <CircleUserRound size={16} aria-hidden='true' />
-          {headerCopy.profile}
-        </Link>
-        <Link
-          className='nav-user-menu-link interactive'
-          to='/member/score-list'
-        >
-          <Coins size={16} aria-hidden='true' />
-          {headerCopy.scores}
-        </Link>
-        <button
-          className='nav-user-menu-link nav-user-menu-logout interactive'
-          type='button'
-          onClick={onLogout}
-        >
-          <LogOut size={16} aria-hidden='true' />
-          {headerCopy.logout}
-        </button>
-      </div>
-    </details>
+      </button>
+    </OPopover>
   );
 }

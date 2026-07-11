@@ -31,7 +31,7 @@
 }
 
 .o-selector-trigger:hover,
-.o-selector.is-open .o-selector-trigger {
+.o-selector-trigger[data-state='open'] {
   color: var(--color-ink);
   border-color: color-mix(in srgb, var(--color-green) 34%, var(--color-line));
   background: var(--color-green-soft-button);
@@ -73,17 +73,17 @@
     transform var(--motion-fast) ease;
 }
 
-.o-selector.is-open .o-selector-chevron {
+.o-selector-trigger[data-state='open'] .o-selector-chevron {
   color: var(--color-green-dark);
   transform: rotate(180deg);
 }
 
 .o-selector-menu {
-  /* Position is set via inline styles to support fixed/portal layout. */
-  position: fixed;
   z-index: var(--z-tooltip);
   display: grid;
   gap: 4px;
+  width: var(--radix-select-trigger-width);
+  max-height: var(--radix-select-content-available-height);
   min-width: 0;
   padding: 6px;
   overflow-y: auto;
@@ -93,11 +93,10 @@
   box-shadow: var(--shadow-card);
   backdrop-filter: blur(18px);
   animation: o-selector-menu-in 140ms ease-out;
-  transform-origin: top right;
+  transform-origin: var(--radix-select-content-transform-origin);
 }
 
-.o-selector-menu.is-placement-top {
-  transform-origin: bottom right;
+.o-selector-menu[data-side='top'] {
   animation-name: o-selector-menu-in-top;
 }
 
@@ -121,14 +120,14 @@
     transform var(--motion-fast) ease;
 }
 
-.o-selector-option.is-highlighted,
+.o-selector-option[data-highlighted],
 .o-selector-option:hover {
   color: var(--color-ink);
   background: var(--color-green-soft-button);
   transform: translateX(1px);
 }
 
-.o-selector-option.is-selected {
+.o-selector-option[data-state='checked'] {
   color: var(--color-green-deep);
   background: var(--color-green-soft-active);
 }
@@ -144,7 +143,7 @@
     transform var(--motion-fast) ease;
 }
 
-.o-selector-option.is-selected .o-selector-option-icon {
+.o-selector-option[data-state='checked'] .o-selector-option-icon {
   color: var(--color-green-dark);
 }
 
@@ -184,7 +183,7 @@
   opacity: 0;
 }
 
-.o-selector-option.is-selected .o-selector-check {
+.o-selector-option[data-state='checked'] .o-selector-check {
   opacity: 1;
 }
 

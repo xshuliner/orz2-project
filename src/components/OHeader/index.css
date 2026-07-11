@@ -263,8 +263,11 @@
 
 .nav-user.logged-in {
   position: relative;
-  padding: 0;
-  background: var(--color-green-soft-button);
+  height: var(--header-control-height);
+  padding-left: 4px;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
 }
 
 .nav-user-trigger {
@@ -272,13 +275,11 @@
   align-items: center;
   gap: 8px;
   height: 100%;
-  padding: 3px 10px 3px 5px;
+  padding: 3px 10px 3px 8px;
   cursor: pointer;
-  list-style: none;
-}
-
-.nav-user-trigger::-webkit-details-marker {
-  display: none;
+  border: 0;
+  color: inherit;
+  background: transparent;
 }
 .nav-user-trigger strong {
   max-width: 116px;
@@ -308,17 +309,27 @@
 }
 
 .nav-user-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  z-index: 2;
   display: grid;
-  width: 216px;
+  width: min(216px, calc(100vw - 24px));
   padding: 8px;
   border: 1px solid var(--color-line);
   border-radius: var(--radius-card);
   background: var(--color-panel);
   box-shadow: var(--shadow-card);
+  transform-origin: var(--radix-popover-content-transform-origin);
+  animation: nav-user-menu-in 140ms ease-out;
+}
+
+@keyframes nav-user-menu-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .nav-user-menu-heading {
@@ -487,9 +498,8 @@
     justify-content: flex-start;
   }
 
-  .mobile-nav .nav-user.logged-in {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+  .mobile-nav .nav-user-trigger {
+    justify-content: flex-start;
   }
 }
 

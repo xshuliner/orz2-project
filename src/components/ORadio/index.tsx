@@ -1,5 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
-import { useId, type CSSProperties, type KeyboardEvent } from 'react';
+import { RadioGroup as RadioGroupPrimitive } from 'radix-ui';
+import { type CSSProperties } from 'react';
 import './index.css';
 
 export interface ORadioOption<TValue extends string> {
@@ -25,62 +26,37 @@ export function ORadio<TValue extends string>({
   value,
   onChange,
 }: ORadioProps<TValue>) {
-  const radioId = useId();
   const selectedIndex = Math.max(
     options.findIndex(option => option.value === value),
     0
   );
 
-  function moveSelection(direction: 1 | -1) {
-    const nextIndex =
-      (selectedIndex + direction + options.length) % options.length;
-    onChange(options[nextIndex].value);
-  }
-
-  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-      event.preventDefault();
-      moveSelection(1);
-      return;
-    }
-
-    if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-      event.preventDefault();
-      moveSelection(-1);
-    }
-  }
-
   return (
-    <div
+    <RadioGroupPrimitive.Root
       className={['o-radio', className].filter(Boolean).join(' ')}
-      role='radiogroup'
       aria-label={ariaLabel}
+      value={value}
+      onValueChange={nextValue => onChange(nextValue as TValue)}
       style={
         {
           '--o-radio-count': options.length,
           '--o-radio-index': selectedIndex,
         } as CSSProperties
       }
-      onKeyDown={handleKeyDown}
     >
       <span className='o-radio-thumb' aria-hidden='true' />
-      {options.map((option, index) => {
+      {options.map(option => {
         const Icon = option.icon;
         const isSelected = option.value === value;
 
         return (
-          <button
-            id={`${radioId}-${option.value}`}
+          <RadioGroupPrimitive.Item
             key={option.value}
+            value={option.value}
             className={['o-radio-option', isSelected ? 'is-selected' : null]
               .filter(Boolean)
               .join(' ')}
-            type='button'
-            role='radio'
             aria-label={option.ariaLabel}
-            aria-checked={isSelected}
-            tabIndex={index === selectedIndex ? 0 : -1}
-            onClick={() => onChange(option.value)}
           >
             {Icon ? (
               <span className='o-radio-icon' aria-hidden='true'>
@@ -91,9 +67,9 @@ export function ORadio<TValue extends string>({
               <span>{option.label}</span>
               {option.description ? <small>{option.description}</small> : null}
             </span>
-          </button>
+          </RadioGroupPrimitive.Item>
         );
       })}
-    </div>
+    </RadioGroupPrimitive.Root>
   );
 }

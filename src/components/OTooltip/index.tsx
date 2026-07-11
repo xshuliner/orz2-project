@@ -1,15 +1,8 @@
 import {
-  useCallback,
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type FocusEvent,
-  type ReactNode,
-} from 'react';
-import { createPortal } from 'react-dom';
+  Popover as PopoverPrimitive,
+  Tooltip as TooltipPrimitive,
+} from 'radix-ui';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 type OTooltipPlacement =
   | 'top'
@@ -20,11 +13,6 @@ type OTooltipPlacement =
   | 'bottom-start'
   | 'top-end'
   | 'bottom-end';
-
-interface TooltipPosition {
-  left: number;
-  top: number;
-}
 
 interface OTooltipProps {
   ariaLabel?: string;
@@ -40,68 +28,32 @@ interface OTooltipProps {
   placement?: OTooltipPlacement;
 }
 
-const viewportPadding = 16;
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
+function getPlacement(placement: OTooltipPlacement) {
+  const [side, alignment] = placement.split('-') as [
+    'top' | 'bottom' | 'left' | 'right',
+    'start' | 'end' | undefined,
+  ];
+  return { align: alignment, side };
 }
 
-function calculatePosition({
-  maxWidth,
-  offset,
-  placement,
-  tooltipRect,
-  triggerRect,
-}: {
-  maxWidth: number;
-  offset: number;
-  placement: OTooltipPlacement;
-  tooltipRect: DOMRect;
-  triggerRect: DOMRect;
-}): TooltipPosition {
-  const width = Math.min(tooltipRect.width || maxWidth, window.innerWidth - 32);
-  const height = tooltipRect.height || 0;
-  const align = placement.split('-')[1];
-  const side = placement.split('-')[0];
-  let left = triggerRect.left + triggerRect.width / 2 - width / 2;
-  let top = triggerRect.top - height - offset;
-
-  if (side === 'bottom') {
-    top = triggerRect.bottom + offset;
-  }
-
-  if (side === 'left') {
-    left = triggerRect.left - width - offset;
-    top = triggerRect.top + triggerRect.height / 2 - height / 2;
-  }
-
-  if (side === 'right') {
-    left = triggerRect.right + offset;
-    top = triggerRect.top + triggerRect.height / 2 - height / 2;
-  }
-
-  if (align === 'start') {
-    left = triggerRect.left;
-  }
-
-  if (align === 'end') {
-    left = triggerRect.right - width;
-  }
-
-  return {
-    left: clamp(
-      left,
-      viewportPadding,
-      window.innerWidth - width - viewportPadding
-    ),
-    top: clamp(
-      top,
-      viewportPadding,
-      Math.max(viewportPadding, window.innerHeight - height - viewportPadding)
-    ),
-  };
+function triggerClassName(className: string | undefined) {
+  return [
+    'inline-block cursor-pointer outline-none aria-disabled:cursor-not-allowed',
+    className,
+  ]
+    .filter(Boolean)
+    .join(' ');
 }
 
+function contentStyle(maxWidth: number) {
+  return { maxWidth: `min(${maxWidth}px, calc(100vw - 32px))` };
+}
+
+/**
+ * A shadcn/Radix-backed hint. Interactive content uses a Popover so its tabs
+ * and links remain keyboard reachable; ordinary explanatory content is a
+ * standard Tooltip.
+ */
 export function OTooltip({
   ariaLabel,
   children,
@@ -115,172 +67,98 @@ export function OTooltip({
   onTriggerClick,
   placement = 'top',
 }: OTooltipProps) {
-  const tooltipId = useId();
-  const triggerRef = useRef<HTMLSpanElement | null>(null);
-  const tooltipRef = useRef<HTMLDivElement | null>(null);
+  const { align, side } = getPlacement(placement);
+  const [isOpen, setIsOpen] = useState(false);
   const closeTimerRef = useRef<number | null>(null);
-  const [open, setOpen] = useState(false);
-  const [position, setPosition] = useState<TooltipPosition | null>(null);
 
-  const cancelClose = useCallback(() => {
+  function cancelClose() {
     if (closeTimerRef.current === null) return;
     window.clearTimeout(closeTimerRef.current);
     closeTimerRef.current = null;
-  }, []);
+  }
 
-  const showTooltip = useCallback(() => {
+  function scheduleClose() {
     cancelClose();
-    setOpen(true);
-  }, [cancelClose]);
-
-  const hideTooltip = useCallback(() => {
-    cancelClose();
-    if (!interactive) {
-      setOpen(false);
-      return;
-    }
-
     closeTimerRef.current = window.setTimeout(() => {
-      setOpen(false);
+      setIsOpen(false);
       closeTimerRef.current = null;
     }, closeDelay);
-  }, [cancelClose, closeDelay, interactive]);
-
-  const updatePosition = useCallback(() => {
-    const trigger = triggerRef.current;
-    const tooltip = tooltipRef.current;
-    if (!trigger || !tooltip) return;
-
-    setPosition(
-      calculatePosition({
-        maxWidth,
-        offset,
-        placement,
-        tooltipRect: tooltip.getBoundingClientRect(),
-        triggerRect: trigger.getBoundingClientRect(),
-      })
-    );
-  }, [maxWidth, offset, placement]);
-
-  useLayoutEffect(() => {
-    if (!open) {
-      setPosition(null);
-      return;
-    }
-
-    updatePosition();
-    const frame = window.requestAnimationFrame(updatePosition);
-    return () => window.cancelAnimationFrame(frame);
-  }, [open, updatePosition]);
-
-  useEffect(() => {
-    if (!open) return;
-
-    window.addEventListener('resize', updatePosition);
-    window.addEventListener('scroll', updatePosition, true);
-    return () => {
-      window.removeEventListener('resize', updatePosition);
-      window.removeEventListener('scroll', updatePosition, true);
-    };
-  }, [open, updatePosition]);
-
-  useEffect(() => {
-    const tooltip = tooltipRef.current;
-    if (!open || !tooltip || typeof ResizeObserver === 'undefined') return;
-
-    const observer = new ResizeObserver(() => updatePosition());
-    observer.observe(tooltip);
-    return () => observer.disconnect();
-  }, [open, updatePosition]);
-
-  useEffect(() => {
-    if (!open) return;
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') setOpen(false);
-    }
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [open]);
-
-  useEffect(() => () => cancelClose(), [cancelClose]);
-
-  function handleBlur(event: FocusEvent<HTMLSpanElement>) {
-    const nextTarget = event.relatedTarget as Node | null;
-    if (
-      !event.currentTarget.contains(nextTarget) &&
-      !tooltipRef.current?.contains(nextTarget)
-    ) {
-      hideTooltip();
-    }
   }
 
-  function handleTooltipBlur(event: FocusEvent<HTMLDivElement>) {
-    const nextTarget = event.relatedTarget as Node | null;
-    if (
-      !event.currentTarget.contains(nextTarget) &&
-      !triggerRef.current?.contains(nextTarget)
-    ) {
-      hideTooltip();
-    }
-  }
-
-  function handleTriggerClick() {
-    onTriggerClick?.();
-    showTooltip();
-  }
-
-  const tooltipStyle: CSSProperties = {
-    left: position?.left ?? -9999,
-    maxWidth: `min(${maxWidth}px, calc(100vw - 32px))`,
-    top: position?.top ?? -9999,
-  };
-
-  return (
+  useEffect(() => () => cancelClose(), []);
+  const trigger = (
     <span
-      ref={triggerRef}
-      className={[
-        'inline-block cursor-pointer outline-none aria-disabled:cursor-not-allowed',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+      className={triggerClassName(className)}
       tabIndex={0}
-      aria-describedby={open ? tooltipId : undefined}
       aria-label={ariaLabel}
-      onBlur={handleBlur}
-      onClick={handleTriggerClick}
-      onFocus={showTooltip}
-      onMouseEnter={showTooltip}
-      onMouseLeave={hideTooltip}
-      onMouseMove={showTooltip}
+      onClick={onTriggerClick}
+      onFocus={() => {
+        if (interactive) {
+          cancelClose();
+          setIsOpen(true);
+        }
+      }}
+      onPointerEnter={() => {
+        if (interactive) {
+          cancelClose();
+          setIsOpen(true);
+        }
+      }}
+      onPointerLeave={() => {
+        if (interactive) scheduleClose();
+      }}
     >
       {children}
-      {open
-        ? createPortal(
-            <div
-              ref={tooltipRef}
-              id={tooltipId}
-              className={[
-                'pointer-events-none fixed z-[var(--z-tooltip)] opacity-100 data-[interactive=true]:pointer-events-auto',
-                contentClassName,
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              data-interactive={interactive ? 'true' : undefined}
-              onBlur={handleTooltipBlur}
-              onFocus={showTooltip}
-              onMouseEnter={showTooltip}
-              onMouseLeave={hideTooltip}
-              role='tooltip'
-              style={tooltipStyle}
-            >
-              {content}
-            </div>,
-            document.body
-          )
-        : null}
     </span>
+  );
+
+  if (interactive) {
+    return (
+      <PopoverPrimitive.Root
+        modal={false}
+        open={isOpen}
+        onOpenChange={setIsOpen}
+      >
+        <PopoverPrimitive.Trigger asChild>{trigger}</PopoverPrimitive.Trigger>
+        <PopoverPrimitive.Portal>
+          <PopoverPrimitive.Content
+            aria-label={ariaLabel}
+            className={['z-[var(--z-tooltip)] outline-none', contentClassName]
+              .filter(Boolean)
+              .join(' ')}
+            side={side}
+            align={align}
+            sideOffset={offset}
+            style={contentStyle(maxWidth)}
+            onOpenAutoFocus={event => event.preventDefault()}
+            onPointerEnter={cancelClose}
+            onPointerLeave={scheduleClose}
+          >
+            {content}
+          </PopoverPrimitive.Content>
+        </PopoverPrimitive.Portal>
+      </PopoverPrimitive.Root>
+    );
+  }
+
+  return (
+    <TooltipPrimitive.Provider delayDuration={0} skipDelayDuration={0}>
+      <TooltipPrimitive.Root delayDuration={0}>
+        <TooltipPrimitive.Trigger asChild>{trigger}</TooltipPrimitive.Trigger>
+        <TooltipPrimitive.Portal>
+          <TooltipPrimitive.Content
+            className={['z-[var(--z-tooltip)]', contentClassName]
+              .filter(Boolean)
+              .join(' ')}
+            side={side}
+            align={align}
+            sideOffset={offset}
+            style={contentStyle(maxWidth)}
+          >
+            {content}
+          </TooltipPrimitive.Content>
+        </TooltipPrimitive.Portal>
+      </TooltipPrimitive.Root>
+    </TooltipPrimitive.Provider>
   );
 }
