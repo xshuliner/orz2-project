@@ -11,41 +11,41 @@ import { routesToolPaletteLab } from '@/pages/Tools/ToolPaletteLab/routes';
 import { routesToolQrcodeGenerator } from '@/pages/Tools/ToolQrcodeGenerator/routes';
 import { routesToolTimezoneConverter } from '@/pages/Tools/ToolTimezoneConverter/routes';
 import { routesToolWorkReportPolisher } from '@/pages/Tools/ToolWorkReportPolisher/routes';
-import { lazy } from 'react';
+import { lazyNavigationRoute } from '@/utils/loadingPriority';
 import { Navigate, RouteObject, useParams } from 'react-router-dom';
 
-const PagePrivacy = lazy(() =>
+const PagePrivacy = lazyNavigationRoute('/privacy', () =>
   import('@/pages/PagePrivacy').then(module => ({
     default: module.PagePrivacy,
   }))
 );
-const PageDesignSystem = lazy(() =>
+const PageDesignSystem = lazyNavigationRoute('/design-system', () =>
   import('@/pages/PageDesignSystem').then(module => ({
     default: module.PageDesignSystem,
   }))
 );
-const PageBuildInfo = lazy(() =>
+const PageBuildInfo = lazyNavigationRoute('/build-info', () =>
   import('@/pages/PageBuildInfo').then(module => ({
     default: module.PageBuildInfo,
   }))
 );
-const PageProducts = lazy(() =>
+const PageProducts = lazyNavigationRoute('/products', () =>
   import('@/pages/PageProducts').then(module => ({
     default: module.PageProducts,
   }))
 );
-const PageTeam = lazy(() =>
+const PageTeam = lazyNavigationRoute('/team', () =>
   import('@/pages/PageTeam').then(module => ({ default: module.PageTeam }))
 );
-const PageTools = lazy(() =>
+const PageTools = lazyNavigationRoute('/tools', () =>
   import('@/pages/PageTools').then(module => ({ default: module.PageTools }))
 );
-const PageMemberDetail = lazy(() =>
+const PageMemberDetail = lazyNavigationRoute('/member/detail', () =>
   import('@/pages/PageMemberDetail').then(module => ({
     default: module.PageMemberDetail,
   }))
 );
-const PageMemberScoreList = lazy(() =>
+const PageMemberScoreList = lazyNavigationRoute('/member/score-list', () =>
   import('@/pages/PageMemberScoreList').then(module => ({
     default: module.PageMemberScoreList,
   }))

@@ -7,7 +7,7 @@ import {
 import { getMemberList } from '@/api/orz2';
 import { useI18n } from '@/hooks/useI18n';
 import { OrzTooltip } from '@/pages/Products/ProductSilicon/components/OrzTooltip';
-import CacheManager from '@/utils/CacheManager';
+import CacheManager, { cacheKeys } from '@/utils/CacheManager';
 import md5 from 'blueimp-md5';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -22,7 +22,6 @@ import { Link } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const STORAGE_KEY_MEMBER_TOKEN = 'orz2_silicon_member_token';
 const PAGE_SIZE = 15;
 
 function SectionReveal({
@@ -81,7 +80,7 @@ export function MemberListPage() {
 
   useEffect(() => {
     const token =
-      CacheManager.getLocalStorage<string>(STORAGE_KEY_MEMBER_TOKEN) || '';
+      CacheManager.getLocalStorage<string>(cacheKeys.siliconMemberToken) || '';
     if (token) setMemberHash(md5(token));
   }, []);
 

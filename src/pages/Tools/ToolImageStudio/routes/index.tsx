@@ -1,7 +1,7 @@
-import { lazy } from 'react';
+import { lazyNavigationRoute } from '@/utils/loadingPriority';
 import { RouteObject } from 'react-router-dom';
 
-const ImageStudio = lazy(() =>
+const ImageStudio = lazyNavigationRoute('/tools/smart-image-compressor', () =>
   import('@/pages/Tools/ToolImageStudio/pages/Home').then(module => ({
     default: module.ImageStudio,
   }))

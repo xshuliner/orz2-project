@@ -1,7 +1,7 @@
-import { lazy } from 'react';
+import { lazyNavigationRoute } from '@/utils/loadingPriority';
 import type { RouteObject } from 'react-router-dom';
 
-const JsonFormatter = lazy(() =>
+const JsonFormatter = lazyNavigationRoute('/tools/json-formatter', () =>
   import('@/pages/Tools/ToolJsonFormatter/pages/Home').then(module => ({
     default: module.JsonFormatter,
   }))

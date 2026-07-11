@@ -8,6 +8,7 @@ import {
   type Locale,
 } from '@/i18n/locale';
 import { loadMessages, type Messages } from '@/i18n/messages';
+import CacheManager, { cacheKeys } from '@/utils/CacheManager';
 import { toSiteUrl } from '@/utils/siteUrl';
 import {
   createContext,
@@ -28,8 +29,6 @@ export interface I18nContextValue {
   routeUrl: (to: string) => string;
   switchLocale: (locale: Locale) => void;
 }
-
-const localeStorageKey = 'orz2:locale';
 
 export const I18nContext = createContext<I18nContextValue | null>(null);
 
@@ -57,7 +56,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.lang = localeHtmlLang[locale];
-    window.localStorage.setItem(localeStorageKey, locale);
+    CacheManager.setLocalStorage(cacheKeys.locale, locale);
   }, [locale]);
 
   const toLocalizedPath = useCallback(

@@ -1,9 +1,8 @@
 import {
-  reportPolisherStorageKey,
   type CachedReportPolishForm,
   type ReportType,
 } from '@/pages/Tools/ToolWorkReportPolisher/config';
-import CacheManager from '@/utils/CacheManager';
+import CacheManager, { cacheKeys } from '@/utils/CacheManager';
 
 export function normalizeReportType(value: unknown): ReportType {
   return value === 'weekly' ? 'weekly' : 'daily';
@@ -11,7 +10,7 @@ export function normalizeReportType(value: unknown): ReportType {
 
 export function getInitialReportPolishForm(): Required<CachedReportPolishForm> {
   const cached = CacheManager.getLocalStorage<CachedReportPolishForm>(
-    reportPolisherStorageKey
+    cacheKeys.workReportPolisherForm
   );
 
   return {
@@ -25,5 +24,5 @@ export function getInitialReportPolishForm(): Required<CachedReportPolishForm> {
 }
 
 export function persistReportPolishForm(form: CachedReportPolishForm) {
-  CacheManager.setLocalStorage(reportPolisherStorageKey, form);
+  CacheManager.setLocalStorage(cacheKeys.workReportPolisherForm, form);
 }

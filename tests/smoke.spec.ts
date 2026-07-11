@@ -37,6 +37,55 @@ test.describe('public route smoke tests', () => {
   }
 });
 
+test('navigation intent preloads a route and local RUM stays on-device', async ({
+  page,
+}) => {
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+  const pageToolsRequest = page.waitForResponse(response =>
+    response.url().includes('/src/pages/PageTools/index.tsx')
+  );
+  await page
+    .getByRole('link', { name: zhMessages.pageTitles.onlineTools })
+    .hover();
+  await pageToolsRequest;
+
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  const profile = await page.evaluate(() =>
+    window.localStorage.getItem('CACHE_orz2:local-rum')
+  );
+  expect(profile).not.toBeNull();
+  expect(JSON.parse(profile ?? '{}')).toMatchObject({ version: 1 });
+});
+
+test('constrained local RUM profile skips navigation prefetches', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem(
+      'CACHE_orz2:local-rum',
+      JSON.stringify({
+        deviceTier: 'constrained',
+        metrics: { lcp: 4500 },
+        updatedAt: Date.now(),
+        version: 1,
+      })
+    );
+  });
+  const requestedUrls: string[] = [];
+  page.on('request', request => requestedUrls.push(request.url()));
+
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page
+    .getByRole('link', { name: zhMessages.pageTitles.onlineTools })
+    .hover();
+  await page.waitForTimeout(300);
+
+  expect(
+    requestedUrls.some(url => url.includes('/src/pages/PageTools/index.tsx'))
+  ).toBe(false);
+});
+
 test('developer utility tools transform input in the browser', async ({
   page,
 }) => {
@@ -73,7 +122,10 @@ test('authenticated header profile popover distinguishes hover and click', async
   page,
 }) => {
   await page.addInitScript(() => {
-    window.localStorage.setItem('CACHE_token', JSON.stringify('test-token'));
+    window.localStorage.setItem(
+      'CACHE_orz2:auth-token',
+      JSON.stringify('test-token')
+    );
     window.localStorage.setItem(
       'CACHE_orz2:auth-user',
       JSON.stringify({
@@ -136,7 +188,10 @@ test('authenticated mobile header opens and dismisses the profile popover', asyn
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
-    window.localStorage.setItem('CACHE_token', JSON.stringify('test-token'));
+    window.localStorage.setItem(
+      'CACHE_orz2:auth-token',
+      JSON.stringify('test-token')
+    );
     window.localStorage.setItem(
       'CACHE_orz2:auth-user',
       JSON.stringify({
@@ -265,7 +320,11 @@ test('theme follows system dark mode and manual dark choice persists', async ({
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect
     .poll(() =>
-      page.evaluate(() => localStorage.getItem('orz2:theme-preference'))
+      page.evaluate(() =>
+        JSON.parse(
+          localStorage.getItem('CACHE_orz2:theme-preference') ?? 'null'
+        )
+      )
     )
     .toBe('dark');
 

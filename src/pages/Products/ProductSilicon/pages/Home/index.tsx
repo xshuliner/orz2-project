@@ -12,7 +12,7 @@ import StoryLogList, {
 import { useDescendLoadingText } from '@/pages/Products/ProductSilicon/hooks/useDescendLoadingText';
 import { useInfiniteList } from '@/pages/Products/ProductSilicon/hooks/useInfiniteList';
 import { generateRandomNickName } from '@/pages/Products/ProductSilicon/utils';
-import CacheManager from '@/utils/CacheManager';
+import CacheManager, { cacheKeys } from '@/utils/CacheManager';
 import md5 from 'blueimp-md5';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -28,8 +28,6 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 
 gsap.registerPlugin(ScrollTrigger);
-
-const STORAGE_KEY_MEMBER_TOKEN = 'orz2_silicon_member_token';
 
 function SectionReveal({
   children,
@@ -122,7 +120,7 @@ export function ProductSilicon() {
 
   useEffect(() => {
     const memberToken =
-      CacheManager.getLocalStorage<string>(STORAGE_KEY_MEMBER_TOKEN) || '';
+      CacheManager.getLocalStorage<string>(cacheKeys.siliconMemberToken) || '';
     if (memberToken) {
       setMemberHash(md5(memberToken));
     }
@@ -167,7 +165,8 @@ export function ProductSilicon() {
     setDescendError(null);
     try {
       const cachedMemberToken =
-        CacheManager.getLocalStorage<string>(STORAGE_KEY_MEMBER_TOKEN) || '';
+        CacheManager.getLocalStorage<string>(cacheKeys.siliconMemberToken) ||
+        '';
       if (cachedMemberToken) {
         navigate(memberDetailPath);
         return;
@@ -183,7 +182,7 @@ export function ProductSilicon() {
       const resLoginMemberInfo = await postLoginMemberInfo(trimmed);
       const memberToken = resLoginMemberInfo?.memberInfo?.identity_token;
       if (memberToken) {
-        CacheManager.setLocalStorage(STORAGE_KEY_MEMBER_TOKEN, memberToken);
+        CacheManager.setLocalStorage(cacheKeys.siliconMemberToken, memberToken);
         setMemberHash(md5(memberToken));
         navigate(memberDetailPath);
         return;

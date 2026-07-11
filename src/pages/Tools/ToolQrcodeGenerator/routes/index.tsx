@@ -1,7 +1,7 @@
-import { lazy } from 'react';
+import { lazyNavigationRoute } from '@/utils/loadingPriority';
 import type { RouteObject } from 'react-router-dom';
 
-const QrcodeGenerator = lazy(() =>
+const QrcodeGenerator = lazyNavigationRoute('/tools/qrcode-generator', () =>
   import('@/pages/Tools/ToolQrcodeGenerator/pages/Home').then(module => ({
     default: module.QrcodeGenerator,
   }))

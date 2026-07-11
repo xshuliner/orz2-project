@@ -52,7 +52,6 @@ export type PromptTemplateCopyMap = Record<
 
 export const officialPublisherToolId = 'tool-wechat-publisher';
 export const officialPublisherSeoKey = 'official-publisher';
-export const officialPublisherStorageKey = 'orz2:official-publisher-form';
 export const officialPublisherScheduleEmail = 'agjgj187076081@gmail.com';
 export const defaultPromptTemplateId: PromptTemplateId = 'general';
 export const defaultSimpleInlineImageCount = 3;

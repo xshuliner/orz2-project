@@ -1,7 +1,7 @@
-import { lazy } from 'react';
+import { lazyNavigationRoute } from '@/utils/loadingPriority';
 import type { RouteObject } from 'react-router-dom';
 
-const PaletteLab = lazy(() =>
+const PaletteLab = lazyNavigationRoute('/tools/palette-lab', () =>
   import('@/pages/Tools/ToolPaletteLab/pages/Home').then(module => ({
     default: module.PaletteLab,
   }))

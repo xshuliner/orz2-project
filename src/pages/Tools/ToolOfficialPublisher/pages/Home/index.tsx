@@ -29,7 +29,6 @@ import {
   officialPublisherProviders,
   officialPublisherScheduleEmail,
   officialPublisherSeoKey,
-  officialPublisherStorageKey,
   officialPublisherToolId,
   wechatConsoleUrl,
   type PromptTemplateId,
@@ -51,7 +50,7 @@ import {
 } from '@/pages/Tools/ToolOfficialPublisher/utils/form';
 
 import { createInitialPublishSteps } from '@/pages/Tools/ToolOfficialPublisher/utils/progress';
-import CacheManager from '@/utils/CacheManager';
+import CacheManager, { cacheKeys } from '@/utils/CacheManager';
 import type { LucideIcon } from 'lucide-react';
 import {
   BriefcaseBusiness,
@@ -185,7 +184,7 @@ export function PageOfficialPublisher() {
   const [form, setForm] = useState<OfficialPublisherForm>(() => {
     try {
       return normalizeForm(
-        CacheManager.getLocalStorage(officialPublisherStorageKey),
+        CacheManager.getLocalStorage(cacheKeys.officialPublisherForm),
         defaultRewriteRequirement
       );
     } catch {
@@ -231,7 +230,7 @@ export function PageOfficialPublisher() {
   const publisherAbortRef = useRef<AbortController | null>(null);
   const publishStartedAtRef = useRef<number | null>(null);
   useEffect(() => {
-    CacheManager.setLocalStorage(officialPublisherStorageKey, form);
+    CacheManager.setLocalStorage(cacheKeys.officialPublisherForm, form);
   }, [form]);
 
   useEffect(() => {

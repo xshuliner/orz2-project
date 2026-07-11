@@ -9,7 +9,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { LoadMoreSentinel } from '@/pages/Products/ProductSilicon/components/LoadMoreSentinel';
 import { OrzTooltip } from '@/pages/Products/ProductSilicon/components/OrzTooltip';
 import { getStoryTypeLabel } from '@/pages/Products/ProductSilicon/config';
-import CacheManager from '@/utils/CacheManager';
+import CacheManager, { cacheKeys } from '@/utils/CacheManager';
 import md5 from 'blueimp-md5';
 import dayjs from 'dayjs';
 import gsap from 'gsap';
@@ -28,7 +28,6 @@ import { Link, useSearchParams } from 'react-router-dom';
 gsap.registerPlugin(ScrollTrigger);
 
 const STORY_PAGE_SIZE = 15;
-const STORAGE_KEY_MEMBER_TOKEN = 'orz2_silicon_member_token';
 
 const SHICHEN = [
   '子时',
@@ -140,7 +139,7 @@ export function MemberDetailPage() {
 
     const persistTokenAndApply = (info: MemberInfo, token: string) => {
       if (cancelled) return;
-      CacheManager.setLocalStorage(STORAGE_KEY_MEMBER_TOKEN, token);
+      CacheManager.setLocalStorage(cacheKeys.siliconMemberToken, token);
       setMemberHash(md5(token));
       setMember(info);
       setError(null);
@@ -161,7 +160,8 @@ export function MemberDetailPage() {
         }
 
         const memberToken =
-          CacheManager.getLocalStorage<string>(STORAGE_KEY_MEMBER_TOKEN) || '';
+          CacheManager.getLocalStorage<string>(cacheKeys.siliconMemberToken) ||
+          '';
         if (memberToken) setMemberHash(md5(memberToken));
 
         if (id) {
@@ -183,7 +183,8 @@ export function MemberDetailPage() {
 
         try {
           const info = await getMemberInfo({ token: memberToken });
-          if (!info) CacheManager.removeLocalStorage(STORAGE_KEY_MEMBER_TOKEN);
+          if (!info)
+            CacheManager.removeLocalStorage(cacheKeys.siliconMemberToken);
           if (!cancelled) {
             setMember(info ?? null);
             setError(info ? null : '未找到侠客');

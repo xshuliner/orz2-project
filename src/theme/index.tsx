@@ -1,3 +1,4 @@
+import CacheManager, { cacheKeys } from '@/utils/CacheManager';
 import {
   createContext,
   useCallback,
@@ -18,7 +19,7 @@ interface ThemeContextValue {
   cycleTheme: () => void;
 }
 
-export const themeStorageKey = 'orz2:theme-preference';
+export const themeStorageKey = cacheKeys.themePreference;
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function isThemePreference(value: string | null): value is ThemePreference {
@@ -38,7 +39,7 @@ function resolveTheme(preference: ThemePreference): ResolvedTheme {
 
 function readInitialPreference(): ThemePreference {
   if (typeof window === 'undefined') return 'system';
-  const stored = window.localStorage.getItem(themeStorageKey);
+  const stored = CacheManager.getLocalStorage<ThemePreference>(themeStorageKey);
   return isThemePreference(stored) ? stored : 'system';
 }
 
@@ -84,7 +85,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const setPreference = useCallback((nextPreference: ThemePreference) => {
     setPreferenceState(nextPreference);
-    window.localStorage.setItem(themeStorageKey, nextPreference);
+    CacheManager.setLocalStorage(themeStorageKey, nextPreference);
   }, []);
 
   const cycleTheme = useCallback(() => {
@@ -95,7 +96,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           : current === 'light'
             ? 'dark'
             : 'system';
-      window.localStorage.setItem(themeStorageKey, next);
+      CacheManager.setLocalStorage(themeStorageKey, next);
       return next;
     });
   }, []);

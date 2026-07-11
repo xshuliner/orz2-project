@@ -1,25 +1,31 @@
-import { lazy } from 'react';
+import { lazyNavigationRoute, lazyWithPriority } from '@/utils/loadingPriority';
 import { RouteObject } from 'react-router-dom';
 
-const ProductSiliconFrame = lazy(() =>
+const ProductSiliconFrame = lazyWithPriority(() =>
   import('@/pages/Products/ProductSilicon/components/ProductSiliconFrame').then(
     module => ({ default: module.ProductSiliconFrame })
   )
 );
-const ProductSilicon = lazy(() =>
+const ProductSilicon = lazyNavigationRoute('/products/silicon', () =>
   import('@/pages/Products/ProductSilicon/pages/Home').then(module => ({
     default: module.ProductSilicon,
   }))
 );
-const MemberDetailPage = lazy(() =>
-  import('@/pages/Products/ProductSilicon/pages/MemberDetail').then(module => ({
-    default: module.MemberDetailPage,
-  }))
+const MemberDetailPage = lazyNavigationRoute(
+  '/products/silicon/member-detail',
+  () =>
+    import('@/pages/Products/ProductSilicon/pages/MemberDetail').then(
+      module => ({
+        default: module.MemberDetailPage,
+      })
+    )
 );
-const MemberListPage = lazy(() =>
-  import('@/pages/Products/ProductSilicon/pages/MemberList').then(module => ({
-    default: module.MemberListPage,
-  }))
+const MemberListPage = lazyNavigationRoute(
+  '/products/silicon/member-list',
+  () =>
+    import('@/pages/Products/ProductSilicon/pages/MemberList').then(module => ({
+      default: module.MemberListPage,
+    }))
 );
 
 export const routesProductSilicon: RouteObject[] = [

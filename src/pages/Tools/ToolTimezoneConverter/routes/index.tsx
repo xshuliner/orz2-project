@@ -1,7 +1,7 @@
-import { lazy } from 'react';
+import { lazyNavigationRoute } from '@/utils/loadingPriority';
 import { RouteObject } from 'react-router-dom';
 
-const TimezoneConverter = lazy(() =>
+const TimezoneConverter = lazyNavigationRoute('/tools/timezone-converter', () =>
   import('@/pages/Tools/ToolTimezoneConverter/pages/Home').then(module => ({
     default: module.TimezoneConverter,
   }))

@@ -4,13 +4,17 @@ import { SectionTools } from '@/components/SectionTools';
 import { Seo } from '@/components/Seo';
 import { getPageSeo } from '@/config/seo';
 import { useI18n } from '@/hooks/useI18n';
-import { lazy, Suspense, useEffect, useRef, useState } from 'react';
+import { createPriorityModule } from '@/utils/loadingPriority';
+import { Suspense, useEffect, useRef, useState } from 'react';
 
-const SectionTestimonial = lazy(() =>
-  import('@/components/SectionTestimonial').then(module => ({
-    default: module.SectionTestimonial,
-  }))
+const testimonialModule = createPriorityModule(
+  () =>
+    import('@/components/SectionTestimonial').then(module => ({
+      default: module.SectionTestimonial,
+    })),
+  'visible'
 );
+const SectionTestimonial = testimonialModule.Component;
 
 function LazySectionTestimonial() {
   const { messages } = useI18n();
@@ -25,6 +29,7 @@ function LazySectionTestimonial() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;
+        void testimonialModule.load();
         setIsVisible(true);
         observer.disconnect();
       },

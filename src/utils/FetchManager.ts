@@ -7,7 +7,7 @@ import axios, {
 } from 'axios';
 import md5 from 'blueimp-md5';
 import { v4 as uuidV4 } from 'uuid';
-import CacheManager from './CacheManager';
+import CacheManager, { cacheKeys } from './CacheManager';
 
 type WebEnvironment = 'local' | 'uat' | 'prod';
 type HttpMethod = NonNullable<AxiosRequestConfig['method']>;
@@ -19,8 +19,6 @@ const webEnvironment =
 const platform = 'ORZ2';
 const brand = 'zero';
 const secretKey = 'I@, ha*ve #187076081$ dream(s)!~';
-const tokenStorageKey = 'token';
-const refreshTokenStorageKey = 'refreshToken';
 const defaultTimeoutMs = 20000;
 
 const apiOrigins: Record<WebEnvironment, string> = {
@@ -228,7 +226,7 @@ class FetchManager {
     if (this.refreshPromise) return this.refreshPromise;
 
     const refreshToken = CacheManager.getLocalStorage<string>(
-      refreshTokenStorageKey
+      cacheKeys.authRefreshToken
     );
     if (!refreshToken) return false;
 
@@ -244,14 +242,14 @@ class FetchManager {
             ? getRefreshedTokens(response.data)
             : null;
         if (!tokens) {
-          CacheManager.removeLocalStorage(tokenStorageKey);
-          CacheManager.removeLocalStorage(refreshTokenStorageKey);
+          CacheManager.removeLocalStorage(cacheKeys.authToken);
+          CacheManager.removeLocalStorage(cacheKeys.authRefreshToken);
           return false;
         }
 
-        CacheManager.setLocalStorage(tokenStorageKey, tokens.token);
+        CacheManager.setLocalStorage(cacheKeys.authToken, tokens.token);
         CacheManager.setLocalStorage(
-          refreshTokenStorageKey,
+          cacheKeys.authRefreshToken,
           tokens.refreshToken
         );
         return true;
@@ -278,7 +276,8 @@ class FetchManager {
       timeout = defaultTimeoutMs,
       ...axiosOptions
     } = config;
-    const token = CacheManager.getLocalStorage<string>(tokenStorageKey) || '';
+    const token =
+      CacheManager.getLocalStorage<string>(cacheKeys.authToken) || '';
     const signature = await createRequestSignature({ path: url, query, body });
     const responseUrl = url.includes('://') ? url : `${this.baseUrl}${url}`;
     const axiosConfig: AxiosRequestConfig = {
@@ -356,7 +355,8 @@ class FetchManager {
       filePath,
       ...fileFields
     } = file;
-    const token = CacheManager.getLocalStorage<string>(tokenStorageKey) || '';
+    const token =
+      CacheManager.getLocalStorage<string>(cacheKeys.authToken) || '';
     const signature = await createRequestSignature({
       path: signPath || url,
       query,
@@ -442,7 +442,8 @@ class FetchManager {
       timeout = defaultTimeoutMs,
       ...axiosOptions
     } = config;
-    const token = CacheManager.getLocalStorage<string>(tokenStorageKey) || '';
+    const token =
+      CacheManager.getLocalStorage<string>(cacheKeys.authToken) || '';
     const signature = await createRequestSignature({ path: url, query, body });
     const urlWithQuery = buildUrlWithQuery(url, stringifyRequestValues(query));
     const responseUrl = urlWithQuery.includes('://')

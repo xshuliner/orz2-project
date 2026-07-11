@@ -4,14 +4,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#ffffff" />
-    <meta name="google-adsense-account" content="%VITE_GOOGLE_ADSENSE_CLIENT%" />
+    <meta
+      name="google-adsense-account"
+      content="%VITE_GOOGLE_ADSENSE_CLIENT%"
+    />
     <script>
       (function () {
         try {
-          var stored = window.localStorage.getItem('orz2:theme-preference');
-          var preference =
-            stored === 'light' || stored === 'dark' || stored === 'system'
-              ? stored
+          var stored = window.localStorage.getItem(
+            'CACHE_orz2:theme-preference'
+          );
+          var preference;
+          try {
+            preference = JSON.parse(stored || 'null');
+          } catch (_error) {
+            preference = 'system';
+          }
+          preference =
+            preference === 'light' ||
+            preference === 'dark' ||
+            preference === 'system'
+              ? preference
               : 'system';
           var theme =
             preference === 'system'
