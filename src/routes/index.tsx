@@ -35,6 +35,16 @@ const PageTeam = lazy(() =>
 const PageTools = lazy(() =>
   import('@/pages/PageTools').then(module => ({ default: module.PageTools }))
 );
+const PageMemberDetail = lazy(() =>
+  import('@/pages/PageMemberDetail').then(module => ({
+    default: module.PageMemberDetail,
+  }))
+);
+const PageMemberScoreList = lazy(() =>
+  import('@/pages/PageMemberScoreList').then(module => ({
+    default: module.PageMemberScoreList,
+  }))
+);
 
 function InvalidLocaleRedirect() {
   const params = useParams();
@@ -78,6 +88,14 @@ function createAppChildren(): RouteObject[] {
     {
       path: 'privacy',
       element: <PagePrivacy />,
+    },
+    {
+      path: 'member/detail',
+      element: <PageMemberDetail />,
+    },
+    {
+      path: 'member/score-list',
+      element: <PageMemberScoreList />,
     },
     {
       path: 'design-system',

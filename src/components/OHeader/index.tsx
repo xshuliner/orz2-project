@@ -4,7 +4,17 @@ import { ORadio, type ORadioOption } from '@/components/ORadio';
 import { useI18n } from '@/hooks/useI18n';
 import type { Locale } from '@/i18n';
 import { useTheme, type ThemePreference } from '@/theme';
-import { LogOut, Menu, Monitor, Moon, Sun, UserCircle, X } from 'lucide-react';
+import {
+  CircleUserRound,
+  Coins,
+  LogOut,
+  Menu,
+  Monitor,
+  Moon,
+  Sun,
+  UserCircle,
+  X,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import './index.css';
@@ -64,6 +74,8 @@ export function OHeader() {
         isAuthenticated={isAuthenticated}
         onLogin={openLogin}
         onLogout={logout}
+        avatarUrl={user?.avatarUrl}
+        score={user?.score}
         userName={user?.name}
         variant='desktop'
       />
@@ -102,11 +114,13 @@ export function OHeader() {
             variant='mobile'
           />
         </div>
-        <div className='mobile-nav-account'>
+        <div className='mobile-nav-member'>
           <UserInfoModule
             isAuthenticated={isAuthenticated}
             onLogin={openLogin}
             onLogout={logout}
+            avatarUrl={user?.avatarUrl}
+            score={user?.score}
             userName={user?.name}
             variant='mobile'
           />
@@ -227,12 +241,16 @@ function UserInfoModule({
   isAuthenticated,
   onLogin,
   onLogout,
+  avatarUrl,
+  score,
   userName,
   variant,
 }: {
   isAuthenticated: boolean;
   onLogin: () => void;
   onLogout: () => void;
+  avatarUrl?: string;
+  score?: number;
   userName?: string;
   variant: 'desktop' | 'mobile';
 }) {
@@ -255,22 +273,53 @@ function UserInfoModule({
   }
 
   return (
-    <div className={`${className} logged-in`}>
-      <span className='nav-user-avatar' aria-hidden='true'>
-        {userName?.slice(0, 1) || headerCopy.defaultAvatar}
-      </span>
-      <span className='nav-user-copy'>
+    <details className={`${className} logged-in`}>
+      <summary className='nav-user-trigger interactive'>
+        <span className='nav-user-avatar' aria-hidden='true'>
+          {avatarUrl ? (
+            <img alt='' src={avatarUrl} />
+          ) : (
+            userName?.slice(0, 1) || headerCopy.defaultAvatar
+          )}
+        </span>
         <strong>{userName || headerCopy.defaultUserName}</strong>
-        <small>{headerCopy.loggedIn}</small>
-      </span>
-      <button
-        className='nav-logout interactive'
-        type='button'
-        aria-label={headerCopy.logoutAriaLabel}
-        onClick={onLogout}
-      >
-        <LogOut size={16} aria-hidden='true' />
-      </button>
-    </div>
+      </summary>
+      <div className='nav-user-menu'>
+        <div className='nav-user-menu-heading'>
+          <span className='nav-user-avatar' aria-hidden='true'>
+            {avatarUrl ? (
+              <img alt='' src={avatarUrl} />
+            ) : (
+              userName?.slice(0, 1) || headerCopy.defaultAvatar
+            )}
+          </span>
+          <div>
+            <strong>{userName || headerCopy.defaultUserName}</strong>
+            <span>
+              {headerCopy.scoreLabel}: {score ?? 0}
+            </span>
+          </div>
+        </div>
+        <Link className='nav-user-menu-link interactive' to='/member/detail'>
+          <CircleUserRound size={16} aria-hidden='true' />
+          {headerCopy.profile}
+        </Link>
+        <Link
+          className='nav-user-menu-link interactive'
+          to='/member/score-list'
+        >
+          <Coins size={16} aria-hidden='true' />
+          {headerCopy.scores}
+        </Link>
+        <button
+          className='nav-user-menu-link nav-user-menu-logout interactive'
+          type='button'
+          onClick={onLogout}
+        >
+          <LogOut size={16} aria-hidden='true' />
+          {headerCopy.logout}
+        </button>
+      </div>
+    </details>
   );
 }

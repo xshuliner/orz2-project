@@ -68,6 +68,17 @@ export interface AuthMemberInfo {
   sys_thirdId?: string;
   user_avatarUrl?: string;
   user_nickName?: string;
+  user_gender?: number;
+  user_province?: string;
+  user_province_code?: string;
+  user_city?: string;
+  user_city_code?: string;
+  user_area?: string;
+  user_area_code?: string;
+  user_title?: string;
+  user_level?: number;
+  user_exp?: number;
+  user_score?: number;
 }
 
 interface MemberInfoBody {
@@ -118,6 +129,65 @@ export const getQueryMemberInfo = async (): Promise<
     url: '/smart/v1/member/getQueryMemberInfo',
   });
 };
+
+export interface UpdateMemberInfoParams {
+  avatarUrl: string;
+  nickName: string;
+  gender: number;
+  province: string;
+  provinceCode: string;
+  city: string;
+  cityCode: string;
+  area: string;
+  areaCode: string;
+  title: string;
+}
+
+export interface ScoreRecord {
+  _id: string;
+  sys_createTime: string;
+  type: string;
+  scoreOperation: number;
+  scoreBalance: number;
+}
+
+interface ScoreListBody {
+  pageNum: number;
+  pageSize: number;
+  totalCount: number;
+  list: ScoreRecord[];
+}
+
+export const postUpdateMemberInfo = async (params: UpdateMemberInfoParams) =>
+  FetchManager.request<LegacyApiPayload<MemberInfoBody>>({
+    method: 'POST',
+    url: '/smart/v1/member/postUpdateMemberInfo',
+    body: { ...params },
+  });
+
+export const postUploadMemberAvatar = async (params: {
+  file: Blob;
+  filename: string;
+}) =>
+  FetchManager.upload<LegacyApiPayload<string>>({
+    method: 'POST',
+    url: '/smart/v1/member/postUploadMemberAvatar',
+    file: {
+      blob: params.file,
+      fieldName: 'file',
+      filename: params.filename,
+    },
+  });
+
+export const getQueryScoreList = async (params: {
+  pageNum: number;
+  pageSize: number;
+}) =>
+  FetchManager.request<LegacyApiPayload<ScoreListBody>>({
+    method: 'GET',
+    url: '/smart/v1/score/getQueryScoreList',
+    query: params,
+  });
 
 /**
  * Password login.
@@ -259,7 +329,10 @@ export default {
   getQueryMiniCodeLogin,
   postCreateMiniCodeLogin,
   getQueryMemberInfo,
+  getQueryScoreList,
   postLoginMemberInfoForPassword,
+  postUpdateMemberInfo,
+  postUploadMemberAvatar,
   postPolishContent,
   postTinifyImage,
 };

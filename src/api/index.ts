@@ -5,12 +5,19 @@ export default {
 };
 
 export {
+  getQueryScoreList,
   postOfficialPublisher,
   postPolishContent,
   postTinifyImage,
+  postUpdateMemberInfo,
+  postUploadMemberAvatar,
   streamPostOfficialPublisher,
 } from './orz2';
-export type { AuthMemberInfo } from './orz2';
+export type {
+  AuthMemberInfo,
+  ScoreRecord,
+  UpdateMemberInfoParams,
+} from './orz2';
 export { getAvatarBorderColor, ossAvatarUrl } from './orz2.modal';
 export type {
   BackpackItem,

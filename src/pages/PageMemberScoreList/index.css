@@ -1,0 +1,76 @@
+.member-score-list {
+  display: grid;
+  gap: 16px;
+  width: min(100% - 40px, 900px);
+  margin: 0 auto 56px;
+}
+
+.member-score-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.member-score-summary span {
+  color: var(--color-muted);
+}
+
+.member-score-summary strong {
+  color: var(--color-green-deep);
+  font-size: 32px;
+}
+
+.member-score-table-wrap {
+  overflow-x: auto;
+}
+
+.member-score-table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.member-score-table th,
+.member-score-table td {
+  height: 52px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--color-line);
+  font-size: 14px;
+}
+
+.member-score-table th {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.member-score-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.member-score-type .iconfont {
+  color: var(--color-green-deep);
+  font-size: 18px;
+}
+
+.member-score-positive {
+  color: var(--color-green-deep);
+}
+
+.member-score-negative {
+  color: #c2410c;
+}
+
+@media (max-width: 640px) {
+  .member-score-list {
+    width: min(100% - 28px, 900px);
+  }
+
+  .member-score-table th,
+  .member-score-table td {
+    padding: 0 12px;
+  }
+}

@@ -17,11 +17,22 @@ import {
 } from 'react';
 import './index.css';
 
-interface AuthUser {
+export interface AuthUser {
   id: string;
   name: string;
   email: string;
   avatarUrl?: string;
+  gender: number;
+  province: string;
+  provinceCode: string;
+  city: string;
+  cityCode: string;
+  area: string;
+  areaCode: string;
+  title: string;
+  level: number;
+  experience: number;
+  score: number;
 }
 
 type GuardedAction<TArgs extends unknown[]> = (
@@ -37,6 +48,7 @@ interface AuthContextValue {
   openLogin: () => void;
   closeLogin: () => void;
   logout: () => void;
+  refreshUser: () => Promise<AuthUser | null>;
   withLoginRequired: LoginGate;
 }
 
@@ -68,6 +80,17 @@ function toAuthUser(
       memberInfo.user_nickName || memberInfo.identity_username || fallbackName,
     email: memberInfo.identity_email || '',
     avatarUrl: memberInfo.user_avatarUrl || undefined,
+    gender: memberInfo.user_gender ?? 0,
+    province: memberInfo.user_province || '',
+    provinceCode: memberInfo.user_province_code || '',
+    city: memberInfo.user_city || '',
+    cityCode: memberInfo.user_city_code || '',
+    area: memberInfo.user_area || '',
+    areaCode: memberInfo.user_area_code || '',
+    title: memberInfo.user_title || '',
+    level: memberInfo.user_level ?? 0,
+    experience: memberInfo.user_exp ?? 0,
+    score: memberInfo.user_score ?? 0,
   };
 }
 
@@ -88,7 +111,10 @@ function removeAuthStorage() {
 
 function readStoredUser() {
   const token = CacheManager.getLocalStorage<string>(tokenStorageKey);
-  if (!token) return null;
+  const refreshToken = CacheManager.getLocalStorage<string>(
+    refreshTokenStorageKey
+  );
+  if (!token && !refreshToken) return null;
   return CacheManager.getLocalStorage<AuthUser>(authStorageKey);
 }
 
@@ -112,28 +138,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     removeAuthStorage();
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    const response = await loadOrz2Api().then(api => api.getQueryMemberInfo());
+    const memberInfo = response?.data?.body?.memberInfo;
+    if (!memberInfo) return null;
+    const nextUser = toAuthUser(memberInfo, loginCopy.wechatUser);
+    CacheManager.setLocalStorage(authStorageKey, nextUser);
+    setUser(nextUser);
+    return nextUser;
+  }, [loginCopy.wechatUser]);
+
   useEffect(() => {
     const token = CacheManager.getLocalStorage<string>(tokenStorageKey);
-    if (!token) {
+    const refreshToken = CacheManager.getLocalStorage<string>(
+      refreshTokenStorageKey
+    );
+    if (!token && !refreshToken) {
       removeAuthStorage();
       setUser(null);
       return;
     }
 
     let isActive = true;
-    loadOrz2Api()
-      .then(api => api.getQueryMemberInfo())
-      .then(response => {
+    refreshUser()
+      .then(nextUser => {
         if (!isActive) return;
-        const memberInfo = response?.data?.body?.memberInfo;
-        if (!memberInfo) {
+        if (!nextUser) {
           removeAuthStorage();
           setUser(null);
           return;
         }
-        const nextUser = toAuthUser(memberInfo, loginCopy.wechatUser);
-        CacheManager.setLocalStorage(authStorageKey, nextUser);
-        setUser(nextUser);
       })
       .catch(() => {
         if (!isActive) return;
@@ -144,7 +178,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       isActive = false;
     };
-  }, [loginCopy.wechatUser]);
+  }, [refreshUser]);
 
   const withLoginRequired = useCallback<LoginGate>(
     action =>
@@ -166,9 +200,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       openLogin,
       closeLogin,
       logout,
+      refreshUser,
       withLoginRequired,
     }),
-    [closeLogin, logout, openLogin, user, withLoginRequired]
+    [closeLogin, logout, openLogin, refreshUser, user, withLoginRequired]
   );
 
   return (

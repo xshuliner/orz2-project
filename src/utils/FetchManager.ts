@@ -20,6 +20,7 @@ const platform = 'ORZ2';
 const brand = 'zero';
 const secretKey = 'I@, ha*ve #187076081$ dream(s)!~';
 const tokenStorageKey = 'token';
+const refreshTokenStorageKey = 'refreshToken';
 const defaultTimeoutMs = 20000;
 
 const apiOrigins: Record<WebEnvironment, string> = {
@@ -92,6 +93,28 @@ function getRequestErrorResponse(error: unknown): FetchResponse {
     error: error.message || 'Network error',
     headers: error.response?.headers || {},
   };
+}
+
+interface RefreshTokenResponse {
+  body?: {
+    refreshToken?: unknown;
+    token?: unknown;
+  };
+}
+
+function getRefreshedTokens(data: unknown): {
+  refreshToken: string;
+  token: string;
+} | null {
+  if (typeof data !== 'object' || data === null) return null;
+  const body = (data as RefreshTokenResponse).body;
+  if (
+    typeof body?.token !== 'string' ||
+    typeof body.refreshToken !== 'string'
+  ) {
+    return null;
+  }
+  return { token: body.token, refreshToken: body.refreshToken };
 }
 
 function showLoading(): void {
@@ -185,6 +208,7 @@ class FetchManager {
 
   private readonly baseUrl: string;
   private readonly axiosInstance: AxiosInstance;
+  private refreshPromise: Promise<boolean> | null = null;
 
   private constructor() {
     this.baseUrl = resolveBaseUrl();
@@ -200,6 +224,45 @@ class FetchManager {
     return this.instance;
   }
 
+  private async refreshAccessToken(): Promise<boolean> {
+    if (this.refreshPromise) return this.refreshPromise;
+
+    const refreshToken = CacheManager.getLocalStorage<string>(
+      refreshTokenStorageKey
+    );
+    if (!refreshToken) return false;
+
+    this.refreshPromise = this.request<RefreshTokenResponse>({
+      method: 'POST',
+      url: '/smart/v1/member/postRefreshToken',
+      body: { refreshToken },
+      isRepeatAuth: false,
+    })
+      .then(response => {
+        const tokens =
+          response.statusCode === 200
+            ? getRefreshedTokens(response.data)
+            : null;
+        if (!tokens) {
+          CacheManager.removeLocalStorage(tokenStorageKey);
+          CacheManager.removeLocalStorage(refreshTokenStorageKey);
+          return false;
+        }
+
+        CacheManager.setLocalStorage(tokenStorageKey, tokens.token);
+        CacheManager.setLocalStorage(
+          refreshTokenStorageKey,
+          tokens.refreshToken
+        );
+        return true;
+      })
+      .finally(() => {
+        this.refreshPromise = null;
+      });
+
+    return this.refreshPromise;
+  }
+
   async request<TData = unknown>(
     config: FetchRequestConfig
   ): Promise<FetchResponse<TData>> {
@@ -211,7 +274,7 @@ class FetchManager {
       body = {},
       isShowLoading = false,
       isShowToast = false,
-      isRepeatAuth: _isRepeatAuth = true,
+      isRepeatAuth = true,
       timeout = defaultTimeoutMs,
       ...axiosOptions
     } = config;
@@ -241,12 +304,24 @@ class FetchManager {
         data: response.data,
         headers: getResponseHeaders(response),
       };
+      if (isRepeatAuth && result.statusCode === 401) {
+        const hasRefreshed = await this.refreshAccessToken();
+        if (hasRefreshed) {
+          return this.request<TData>({ ...config, isRepeatAuth: false });
+        }
+      }
       if (isShowToast && result.statusCode !== 200) {
         showToast(getErrorMessage(result.data, 'Request failed'));
       }
       return result;
     } catch (error) {
       const result = getRequestErrorResponse(error) as FetchResponse<TData>;
+      if (isRepeatAuth && result.statusCode === 401) {
+        const hasRefreshed = await this.refreshAccessToken();
+        if (hasRefreshed) {
+          return this.request<TData>({ ...config, isRepeatAuth: false });
+        }
+      }
       if (isShowToast) {
         showToast(
           getErrorMessage(result.data, result.error || 'Network error')
@@ -270,7 +345,7 @@ class FetchManager {
       body = {},
       file = {},
       isShowLoading = false,
-      isRepeatAuth: _isRepeatAuth = true,
+      isRepeatAuth = true,
       timeout = defaultTimeoutMs,
       ...axiosOptions
     } = config;
@@ -326,13 +401,27 @@ class FetchManager {
     if (isShowLoading) showLoading();
     try {
       const response = await axios.request<TData>(axiosConfig);
-      return {
+      const result = {
         statusCode: response.status,
         data: response.data,
         headers: getResponseHeaders(response),
       };
+      if (isRepeatAuth && result.statusCode === 401) {
+        const hasRefreshed = await this.refreshAccessToken();
+        if (hasRefreshed) {
+          return this.upload<TData>({ ...config, isRepeatAuth: false });
+        }
+      }
+      return result;
     } catch (error) {
-      return getRequestErrorResponse(error) as FetchResponse<TData>;
+      const result = getRequestErrorResponse(error) as FetchResponse<TData>;
+      if (isRepeatAuth && result.statusCode === 401) {
+        const hasRefreshed = await this.refreshAccessToken();
+        if (hasRefreshed) {
+          return this.upload<TData>({ ...config, isRepeatAuth: false });
+        }
+      }
+      return result;
     } finally {
       if (isShowLoading) hideLoading();
     }
@@ -349,6 +438,7 @@ class FetchManager {
       body = {},
       isShowLoading = false,
       isShowToast = false,
+      isRepeatAuth = true,
       timeout = defaultTimeoutMs,
       ...axiosOptions
     } = config;
@@ -384,6 +474,12 @@ class FetchManager {
       };
     } catch (error) {
       const result = getRequestErrorResponse(error) as FetchResponse<TData>;
+      if (isRepeatAuth && result.statusCode === 401) {
+        const hasRefreshed = await this.refreshAccessToken();
+        if (hasRefreshed) {
+          return this.stream<TData>({ ...config, isRepeatAuth: false });
+        }
+      }
       if (isShowToast) {
         showToast(
           getErrorMessage(result.data, result.error || 'Network error')
