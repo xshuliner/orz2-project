@@ -236,35 +236,35 @@ export const messages = {
         'ORZ2 collects AI writing, image processing, developer, marketing, and office productivity tools, plus customizable commercial tool-site solutions.',
     },
     products: {
-      title: 'Products - ORZ2',
+      title: 'ORZ2 - Products',
       description:
         'Browse ORZ2 product work, including smart mini apps, browser and editor extensions, and interactive games.',
       itemListName: 'ORZ2 products',
     },
     tools: {
-      title: 'Online Tools - ORZ2',
+      title: 'ORZ2 - Online Tools',
       description:
         'Browse the ORZ2 online tool directory for WeChat publishing, time zone conversion, JSON formatting, palette, and image compression tools.',
       itemListName: 'ORZ2 online tools',
     },
     team: {
-      title: 'Team - ORZ2',
+      title: 'ORZ2 - Core Team',
       description:
         'Meet the ORZ2 team across project delivery, engineering, product, design, finance, and HR.',
       pageName: 'ORZ2 team',
     },
     privacy: {
-      title: 'Privacy Policy - ORZ2',
+      title: 'ORZ2 - Privacy Policy',
       description:
         'Learn how ORZ2 handles necessary information, cookies, third-party services, advertising compliance, and user privacy rights.',
     },
     designSystem: {
-      title: 'Design System - ORZ2',
+      title: 'ORZ2 - Design System',
       description:
         'Explore ORZ2 shared components, visual tokens, cards, buttons, badges, empty states, and modal examples.',
     },
     buildInfo: {
-      title: 'Build Info - ORZ2',
+      title: 'ORZ2 - Build Info',
       description:
         'View the version, Git, build, CI, and release information for the current ORZ2 deployment.',
     },
@@ -1609,7 +1609,7 @@ export const messages = {
         },
         entries: { web: 'Tool entry' },
         seo: {
-          title: 'WeChat Auto Publisher - ORZ2 Content Ops Tool',
+          title: 'ORZ2 - WeChat Auto Publisher',
           description:
             'Use ORZ2 WeChat Auto Publisher to choose a template and generate an article, cover, inline images, and digest in one click, with full prompt controls in Advanced mode.',
           keywords: [
@@ -1632,7 +1632,7 @@ export const messages = {
         },
         entries: { web: 'Tool entry' },
         seo: {
-          title: 'Batch Image Studio - ORZ2 Online Image Tool',
+          title: 'ORZ2 - Batch Image Studio',
           description:
             'ORZ2 Batch Image Studio supports multi-image upload previews, unified format conversion, resizing, TinyPNG compression, and ZIP downloads.',
           keywords: [
@@ -1656,7 +1656,7 @@ export const messages = {
         },
         entries: { web: 'Tool entry' },
         seo: {
-          title: 'Time Zone Converter - ORZ2 Online Productivity Tool',
+          title: 'ORZ2 - Time Zone Converter',
           description:
             'ORZ2 Time Zone Converter supports China, United States, Japan, United Kingdom, and other common country time conversions with IANA daylight saving rules.',
           keywords: [
@@ -1680,7 +1680,7 @@ export const messages = {
         },
         entries: { web: 'Tool entry' },
         seo: {
-          title: 'Daily / Weekly Report Polisher - ORZ2 Productivity Tool',
+          title: 'ORZ2 - Daily / Weekly Report Polisher',
           description:
             'ORZ2 Daily / Weekly Report Polisher turns work notes into natural, restrained reports that keep facts intact and avoid an AI-written tone.',
           keywords: [
@@ -1704,7 +1704,7 @@ export const messages = {
         },
         entries: { web: 'Tool entry' },
         seo: {
-          title: 'JSON Formatter - ORZ2 Developer Tool',
+          title: 'ORZ2 - JSON Formatter',
           description:
             'Use ORZ2 JSON Formatter to organize, validate, and inspect JSON data online.',
           keywords: ['JSON formatter', 'developer tool', 'JSON validation'],
@@ -1722,7 +1722,7 @@ export const messages = {
         },
         entries: { web: 'Tool entry' },
         seo: {
-          title: 'Palette Lab - ORZ2 Online Design Tool',
+          title: 'ORZ2 - Palette Lab',
           description:
             'ORZ2 Palette Lab helps designers and developers generate brand colors, check contrast, and export color values.',
           keywords: ['online palette', 'design tool', 'color contrast'],
@@ -1739,7 +1739,7 @@ export const messages = {
         },
         entries: { web: 'Tool entry' },
         seo: {
-          title: 'Base64 Converter - ORZ2 Developer Tool',
+          title: 'ORZ2 - Base64 Converter',
           description:
             'ORZ2 Base64 Converter supports Base64 encoding and decoding for text and files during development and debugging.',
           keywords: ['Base64 converter', 'encoding decoding', 'developer tool'],
@@ -1757,7 +1757,7 @@ export const messages = {
         },
         entries: { web: 'Tool entry' },
         seo: {
-          title: 'Markdown Editor - ORZ2 Developer Tool',
+          title: 'ORZ2 - Markdown Editor',
           description:
             'ORZ2 Markdown Editor provides live preview, HTML export, file import, and practical editing features.',
           keywords: ['Markdown editor', 'online editing', 'HTML export'],
@@ -1775,7 +1775,7 @@ export const messages = {
         },
         entries: { web: 'Tool entry' },
         seo: {
-          title: 'QR Code Generator - ORZ2 Online Tool',
+          title: 'ORZ2 - QR Code Generator',
           description:
             'ORZ2 QR Code Generator creates QR codes for URLs, text, and contact information with customizable size.',
           keywords: ['QR code generator', 'QR Code', 'online tool'],

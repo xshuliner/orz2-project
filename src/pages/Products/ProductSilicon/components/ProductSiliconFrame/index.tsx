@@ -1,3 +1,4 @@
+import { Seo } from '@/components/Seo';
 import { useI18n } from '@/hooks/useI18n';
 import { stripLocalePrefix } from '@/i18n';
 import { ProductSiliconWatermark } from '@/pages/Products/ProductSilicon/components/ProductSiliconWatermark';
@@ -8,9 +9,16 @@ import './index.css';
 
 export function ProductSiliconFrame({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
-  const { localizePath } = useI18n();
+  const { locale, localizePath, messages } = useI18n();
   const routePath = stripLocalePrefix(pathname);
   const isSiliconHome = routePath === '/products/silicon';
+  const isMemberPage = routePath.startsWith('/products/silicon/member-');
+  const seoTitle = isMemberPage
+    ? messages.silicon.memberList.title
+    : messages.silicon.title;
+  const seoDescription = isMemberPage
+    ? messages.silicon.memberList.description
+    : messages.silicon.description;
 
   useEffect(() => {
     document.body.classList.add('product-silicon-active');
@@ -34,6 +42,18 @@ export function ProductSiliconFrame({ children }: { children: ReactNode }) {
 
   return (
     <div className='product-silicon-theme'>
+      <Seo
+        config={{
+          title: seoTitle,
+          description: seoDescription,
+          canonicalPath: routePath,
+          locale,
+          robots:
+            routePath === '/products/silicon/member-detail'
+              ? 'noindex, follow'
+              : undefined,
+        }}
+      />
       <header className='silicon-nav'>
         <nav className='silicon-nav-inner' aria-label='硅基江湖导航'>
           <Link

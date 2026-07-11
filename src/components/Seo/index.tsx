@@ -15,6 +15,10 @@ function absoluteUrl(path = defaultImageOg) {
 
 export function Seo({ config }: SeoProps) {
   const locale = config.locale ?? defaultLocale;
+  const titlePrefix = `${siteName} - `;
+  const pageTitle = config.title.startsWith(titlePrefix)
+    ? config.title
+    : `${titlePrefix}${config.title}`;
   const canonical = routeUrl(config.canonicalPath, locale);
   const image = absoluteUrl(config.ogImage);
   const jsonLd = Array.isArray(config.jsonLd)
@@ -30,15 +34,15 @@ export function Seo({ config }: SeoProps) {
     };
 
     setMeta('meta[name="description"]', 'content', config.description);
-    setMeta('meta[property="og:title"]', 'content', config.title);
+    setMeta('meta[property="og:title"]', 'content', pageTitle);
     setMeta('meta[property="og:description"]', 'content', config.description);
     setMeta('meta[property="og:locale"]', 'content', localeOpenGraph[locale]);
     setMeta('meta[property="og:image"]', 'content', image);
-    setMeta('meta[name="twitter:title"]', 'content', config.title);
+    setMeta('meta[name="twitter:title"]', 'content', pageTitle);
     setMeta('meta[name="twitter:description"]', 'content', config.description);
     setMeta('meta[name="twitter:image"]', 'content', image);
     setMeta('meta[name="robots"]', 'content', config.robots ?? 'index, follow');
-  }, [config.description, config.robots, config.title, image, locale]);
+  }, [config.description, config.robots, image, locale, pageTitle]);
 
   const alternateLocales: Array<Locale | 'x-default'> = [
     ...locales,
@@ -47,7 +51,7 @@ export function Seo({ config }: SeoProps) {
 
   return (
     <Helmet>
-      <title>{config.title}</title>
+      <title>{pageTitle}</title>
       <meta name='description' content={config.description} />
       {config.keywords?.length ? (
         <meta name='keywords' content={config.keywords.join(', ')} />
@@ -78,12 +82,12 @@ export function Seo({ config }: SeoProps) {
           />
         ))}
       <meta property='og:type' content='website' />
-      <meta property='og:title' content={config.title} />
+      <meta property='og:title' content={pageTitle} />
       <meta property='og:description' content={config.description} />
       <meta property='og:url' content={canonical} />
       <meta property='og:image' content={image} />
       <meta name='twitter:card' content='summary_large_image' />
-      <meta name='twitter:title' content={config.title} />
+      <meta name='twitter:title' content={pageTitle} />
       <meta name='twitter:description' content={config.description} />
       <meta name='twitter:image' content={image} />
       {jsonLd.map((item, index) => (

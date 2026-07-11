@@ -257,7 +257,7 @@ test('localized SEO exposes canonical and alternate links', async ({
 }) => {
   await page.goto('/en/tools', { waitUntil: 'domcontentloaded' });
 
-  await expect(page).toHaveTitle('Online Tools - ORZ2');
+  await expect(page).toHaveTitle('ORZ2 - Online Tools');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
     'https://orz2.online/en/tools'
@@ -274,6 +274,12 @@ test('localized SEO exposes canonical and alternate links', async ({
   await expect(
     page.locator('link[rel="alternate"][hreflang="x-default"]')
   ).toHaveAttribute('href', 'https://orz2.online/tools');
+
+  await page.goto('/team', { waitUntil: 'domcontentloaded' });
+  await expect(page).toHaveTitle('ORZ2 - 核心团队');
+
+  await page.goto('/products/silicon', { waitUntil: 'domcontentloaded' });
+  await expect(page).toHaveTitle('ORZ2 - 硅基江湖');
 });
 
 test('timezone converter respects US daylight saving changes', async ({

@@ -238,35 +238,35 @@ export const messages = {
         'ORZ2 は AI ライティング、画像処理、開発、マーケティング、オフィス効率化ツールと、商用ツールサイトのカスタム方案を提供します。',
     },
     products: {
-      title: 'プロダクト - ORZ2',
+      title: 'ORZ2 - プロダクト',
       description:
         'ORZ2 のプロダクト実践を閲覧できます。スマートミニアプリ、ブラウザ・エディタ拡張、インタラクティブゲームを含みます。',
       itemListName: 'ORZ2 プロダクト',
     },
     tools: {
-      title: 'オンラインツール - ORZ2',
+      title: 'ORZ2 - オンラインツール',
       description:
         'ORZ2 のオンラインツール目录から、公众号自動投稿、タイムゾーン変換、JSON 整形、配色、画像圧縮ツールを探せます。',
       itemListName: 'ORZ2 オンラインツール',
     },
     team: {
-      title: 'チーム - ORZ2',
+      title: 'ORZ2 - コアチーム',
       description:
         'プロジェクト、開発、プロダクト、デザイン、財務、HR が連携する ORZ2 チームを紹介します。',
       pageName: 'ORZ2 チーム',
     },
     privacy: {
-      title: 'プライバシーポリシー - ORZ2',
+      title: 'ORZ2 - プライバシーポリシー',
       description:
         'ORZ2 が必要情報、Cookie、第三者サービス、広告合規、ユーザーのプライバシー権利をどう扱うかを説明します。',
     },
     designSystem: {
-      title: 'デザインシステム - ORZ2',
+      title: 'ORZ2 - デザインシステム',
       description:
         'ORZ2 の共通コンポーネント、視覚 token、カード、ボタン、タグ、空状態、モーダル例を確認できます。',
     },
     buildInfo: {
-      title: 'ビルド情報 - ORZ2',
+      title: 'ORZ2 - ビルド情報',
       description:
         '現在の ORZ2 デプロイのバージョン、Git、ビルド、CI、リリース情報を確認できます。',
     },
@@ -1599,7 +1599,7 @@ export const messages = {
         },
         entries: { web: 'ツール入口' },
         seo: {
-          title: '公众号 自動投稿ツール - ORZ2 コンテンツ運用ツール',
+          title: 'ORZ2 - 公众号 自動投稿ツール',
           description:
             'ORZ2 公众号自動投稿ツールでテンプレートを選び、記事、カバー、本文画像、摘要をワンクリック生成できます。高度設定では全プロンプトを編集できます。',
           keywords: [
@@ -1622,7 +1622,7 @@ export const messages = {
         },
         entries: { web: 'ツール入口' },
         seo: {
-          title: '一括画像処理スタジオ - ORZ2 オンライン画像ツール',
+          title: 'ORZ2 - 一括画像処理スタジオ',
           description:
             'ORZ2 一括画像処理スタジオは、複数画像アップロード、統一形式変換、リサイズ、TinyPNG 圧縮、ZIP ダウンロードに対応します。',
           keywords: [
@@ -1646,7 +1646,7 @@ export const messages = {
         },
         entries: { web: 'ツール入口' },
         seo: {
-          title: 'タイムゾーン変換 - ORZ2 オンライン効率化ツール',
+          title: 'ORZ2 - タイムゾーン変換',
           description:
             'ORZ2 タイムゾーン変換は、中国、米国、日本、英国など一般的な国の時刻を IANA の夏時間ルールに基づいて換算します。',
           keywords: [
@@ -1670,7 +1670,7 @@ export const messages = {
         },
         entries: { web: 'ツール入口' },
         seo: {
-          title: '日報 / 週報リライト - ORZ2 オンライン効率化ツール',
+          title: 'ORZ2 - 日報 / 週報リライト',
           description:
             'ORZ2 日報 / 週報リライトは、作業メモを自然で控えめな報告文に整え、AI らしさを抑えて日常の業務報告に使いやすくします。',
           keywords: [
@@ -1694,7 +1694,7 @@ export const messages = {
         },
         entries: { web: 'ツール入口' },
         seo: {
-          title: 'JSON フォーマッター - ORZ2 開発者ツール',
+          title: 'ORZ2 - JSON フォーマッター',
           description:
             'ORZ2 JSON フォーマッターで JSON データをオンラインで整形、検証、閲覧できます。',
           keywords: ['JSON 整形', '開発者ツール', 'JSON 検証'],
@@ -1711,7 +1711,7 @@ export const messages = {
         },
         entries: { web: 'ツール入口' },
         seo: {
-          title: '配色ラボ - ORZ2 オンラインデザインツール',
+          title: 'ORZ2 - 配色ラボ',
           description:
             'ORZ2 配色ラボはブランド色生成、コントラスト確認、色値エクスポートを支援します。',
           keywords: ['オンライン配色', 'デザインツール', '色コントラスト'],
@@ -1728,7 +1728,7 @@ export const messages = {
         },
         entries: { web: 'ツール入口' },
         seo: {
-          title: 'Base64 コンバーター - ORZ2 開発者ツール',
+          title: 'ORZ2 - Base64 コンバーター',
           description:
             'ORZ2 Base64 コンバーターは、開発とデバッグに便利なテキスト・ファイルの Base64 変換を提供します。',
           keywords: ['Base64 変換', 'エンコード デコード', '開発者ツール'],
@@ -1746,7 +1746,7 @@ export const messages = {
         },
         entries: { web: 'ツール入口' },
         seo: {
-          title: 'Markdown エディター - ORZ2 開発者ツール',
+          title: 'ORZ2 - Markdown エディター',
           description:
             'ORZ2 Markdown エディターはリアルタイムプレビュー、HTML エクスポート、ファイル読み込みを提供します。',
           keywords: [
@@ -1768,7 +1768,7 @@ export const messages = {
         },
         entries: { web: 'ツール入口' },
         seo: {
-          title: 'QR コード生成 - ORZ2 オンラインツール',
+          title: 'ORZ2 - QR コード生成',
           description:
             'ORZ2 QR コード生成は URL、テキスト、連絡先情報の QR コードを作成し、サイズ調整にも対応します。',
           keywords: ['QR コード生成', 'QR Code', 'オンラインツール'],

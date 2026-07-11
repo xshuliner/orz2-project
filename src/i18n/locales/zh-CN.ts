@@ -229,35 +229,35 @@ export const messages = {
         'ORZ2 汇集 AI 写作、图片处理、开发调试、营销和办公效率工具，并提供可定制的商业化工具站方案。',
     },
     products: {
-      title: '产品展示 - ORZ2',
+      title: 'ORZ2 - 产品展示',
       description:
         '浏览 ORZ2 已落地的产品实践，包括智能小程序、浏览器与编辑器扩展和互动游戏。',
       itemListName: 'ORZ2 产品展示',
     },
     tools: {
-      title: '在线工具 - ORZ2',
+      title: 'ORZ2 - 在线工具',
       description:
         '浏览 ORZ2 在线工具目录，查找公众号自动发布、时区转换、JSON 格式化、配色和图片压缩工具。',
       itemListName: 'ORZ2 在线工具目录',
     },
     team: {
-      title: '团队 - ORZ2',
+      title: 'ORZ2 - 核心团队',
       description:
         '认识 ORZ2 团队：项目、研发、产品、设计、财务和 HR 一起打造稳定、合规、可扩展的在线工具平台。',
       pageName: 'ORZ2 团队',
     },
     privacy: {
-      title: '隐私协议 - ORZ2',
+      title: 'ORZ2 - 隐私协议',
       description:
         '了解 ORZ2 如何处理必要信息、Cookie、第三方服务、广告合规和用户隐私权利。',
     },
     designSystem: {
-      title: '设计系统 - ORZ2',
+      title: 'ORZ2 - 设计系统',
       description:
         '浏览 ORZ2 公共组件、视觉 token、卡片、按钮、标签、空状态与弹窗实例。',
     },
     buildInfo: {
-      title: '编译信息 - ORZ2',
+      title: 'ORZ2 - 编译信息',
       description: '查看 ORZ2 当前部署的版本、Git、构建、CI 与发布信息。',
     },
   },
@@ -1558,7 +1558,7 @@ export const messages = {
         },
         entries: { web: '工具入口' },
         seo: {
-          title: '公众号自动发布工具 - ORZ2 内容运营工具',
+          title: 'ORZ2 - 公众号自动发布工具',
           description:
             '使用 ORZ2 公众号自动发布工具选择模板，一键生成文章、封面、正文配图和摘要，也可在高级模式定制完整提示词。',
           keywords: [
@@ -1581,7 +1581,7 @@ export const messages = {
         },
         entries: { web: '工具入口' },
         seo: {
-          title: '批量图片处理工具 - ORZ2 在线图片工具',
+          title: 'ORZ2 - 批量图片处理工具',
           description:
             'ORZ2 批量图片处理工具支持多图上传预览、统一格式转换、尺寸缩放、TinyPNG 压缩和 ZIP 打包下载。',
           keywords: [
@@ -1605,7 +1605,7 @@ export const messages = {
         },
         entries: { web: '工具入口' },
         seo: {
-          title: '时区转换器 - ORZ2 在线效率工具',
+          title: 'ORZ2 - 时区转换器',
           description:
             'ORZ2 时区转换器支持中国、美国、日本、英国等常见国家时间互转，并依据 IANA 时区规则处理夏令时与冬令时。',
           keywords: [
@@ -1629,7 +1629,7 @@ export const messages = {
         },
         entries: { web: '工具入口' },
         seo: {
-          title: '日/周报润色工具 - ORZ2 在线效率工具',
+          title: 'ORZ2 - 日/周报润色工具',
           description:
             'ORZ2 日/周报润色工具可将工作记录整理为自然克制的日报或周报，保留事实、减少 AI 味，适合日常工作汇报。',
           keywords: ['日报润色', '周报润色', '工作总结', '职场写作', 'AI润色'],
@@ -1646,7 +1646,7 @@ export const messages = {
         },
         entries: { web: '工具入口' },
         seo: {
-          title: 'JSON 格式化工具 - ORZ2 开发者工具',
+          title: 'ORZ2 - JSON 格式化工具',
           description:
             '使用 ORZ2 JSON 格式化工具在线整理、校验和查看 JSON 数据。',
           keywords: ['JSON格式化', '开发者工具', 'JSON校验'],
@@ -1663,7 +1663,7 @@ export const messages = {
         },
         entries: { web: '工具入口' },
         seo: {
-          title: '配色实验室 - ORZ2 在线设计工具',
+          title: 'ORZ2 - 配色实验室',
           description:
             'ORZ2 配色实验室帮助设计师和开发者生成品牌色、检查对比度并导出色值。',
           keywords: ['在线配色', '设计工具', '颜色对比度'],
@@ -1680,7 +1680,7 @@ export const messages = {
         },
         entries: { web: '工具入口' },
         seo: {
-          title: 'Base64 转换器 - ORZ2 开发者工具',
+          title: 'ORZ2 - Base64 转换器',
           description:
             'ORZ2 Base64 转换器支持文本与文件的 Base64 编码解码，方便开发与调试。',
           keywords: ['Base64转换', '编码解码', '开发者工具'],
@@ -1697,7 +1697,7 @@ export const messages = {
         },
         entries: { web: '工具入口' },
         seo: {
-          title: 'Markdown 编辑器 - ORZ2 开发者工具',
+          title: 'ORZ2 - Markdown 编辑器',
           description:
             'ORZ2 Markdown 编辑器提供实时预览、导出 HTML、文件导入等丰富的编辑能力。',
           keywords: ['Markdown编辑器', '在线编辑', 'HTML导出'],
@@ -1714,7 +1714,7 @@ export const messages = {
         },
         entries: { web: '工具入口' },
         seo: {
-          title: '二维码生成器 - ORZ2 在线工具',
+          title: 'ORZ2 - 二维码生成器',
           description:
             'ORZ2 二维码生成器可创建 URL、文本与联系信息的二维码，支持自定义尺寸。',
           keywords: ['二维码生成', 'QR Code', '在线工具'],
