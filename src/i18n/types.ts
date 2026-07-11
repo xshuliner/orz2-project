@@ -11,6 +11,7 @@ export interface CatalogItemTranslation {
   group?: string;
   summary: string;
   badges: readonly string[];
+  heroBadges?: Readonly<Record<string, string>>;
   entries?: Readonly<Record<string, string>>;
   mediaAlt?: string;
   seo?: {

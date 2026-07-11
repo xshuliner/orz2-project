@@ -58,6 +58,9 @@ function localizeCatalogItem(
   if (!translation.name || !translation.summary || !translation.badges) {
     throw new Error(`Incomplete catalog i18n mapping for "${item.id}".`);
   }
+  if (item.heroBadges && !translation.heroBadges) {
+    throw new Error(`Missing hero badge i18n mapping for "${item.id}".`);
+  }
   if (item.seo && !translation.seo) {
     throw new Error(`Missing catalog SEO i18n mapping for "${item.id}".`);
   }
@@ -76,6 +79,16 @@ function localizeCatalogItem(
         ? { ...item.media, alt: translation.mediaAlt ?? translation.name }
         : item.media,
     badges: [...translation.badges],
+    heroBadges: item.heroBadges?.map(badge => {
+      const label = translation.heroBadges?.[badge.id];
+      if (!label) {
+        throw new Error(
+          `Missing hero badge i18n mapping for "${item.id}.${badge.id}".`
+        );
+      }
+
+      return { ...badge, label };
+    }),
     entries: item.entries.map(entry => {
       const label = translation.entries?.[entry.id];
       if (!label) {

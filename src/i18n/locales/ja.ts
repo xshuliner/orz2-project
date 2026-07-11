@@ -330,12 +330,6 @@ export const messages = {
     title: '一括画像処理スタジオ',
     description:
       '複数画像をアップロードし、同じ変換、リサイズ、TinyPNG 圧縮設定を適用して ZIP でダウンロードできます。',
-    heroAriaLabel: '画像ツール機能',
-    heroHighlights: [
-      '複数画像の一括処理',
-      '統一変換とリサイズ',
-      'ZIP ダウンロード',
-    ],
     upload: {
       title: '一括画像ワークベンチ',
       subtitle:
@@ -477,8 +471,6 @@ export const messages = {
     title: '日報 / 週報リライト',
     description:
       '作業メモを、事実を保ったまま自然で控えめな報告文に整えます。AI っぽい大げさな表現は抑えます。',
-    heroAriaLabel: '日報 / 週報リライトの機能',
-    heroHighlights: ['自然な表現', '事実を保持', '日報・週報向け'],
     typeLabel: '報告タイプ',
     daily: '日報',
     weekly: '週報',
@@ -577,12 +569,6 @@ export const messages = {
     title: 'タイムゾーン変換',
     description:
       '一般的な国を選び、片側の現地時刻を入力すると、夏時間ルール込みでもう片側を自動換算します。',
-    heroAriaLabel: 'タイムゾーン変換の機能',
-    heroHighlights: [
-      '一般的な国をすぐ選択',
-      '双方向の時刻変換',
-      '夏時間に対応',
-    ],
     leftSide: '左側',
     rightSide: '右側',
     sourceBadge: '基準',
@@ -1606,6 +1592,11 @@ export const messages = {
         summary:
           'テンプレートから記事、カバー、本文画像、摘要を生成し、公众号草稿箱へ保存します。',
         badges: ['AI', '公众号', '自動投稿', 'LLM', 'コンテンツ運用'],
+        heroBadges: {
+          'ai-content': 'AI コンテンツ生成',
+          'wechat-drafts': '公众号下書き',
+          'one-click-publish': 'ワンクリック投稿',
+        },
         entries: { web: 'ツール入口' },
         seo: {
           title: '公众号 自動投稿ツール - ORZ2 コンテンツ運用ツール',
@@ -1624,6 +1615,11 @@ export const messages = {
         summary:
           '複数画像をアップロードし、同じ変換、リサイズ、TinyPNG 圧縮設定を適用して ZIP でダウンロードできます。',
         badges: ['画像', '一括', '変換', 'リサイズ', 'ZIP'],
+        heroBadges: {
+          'batch-process': '複数画像の一括処理',
+          'resize-convert': '統一変換とリサイズ',
+          'zip-download': 'ZIP ダウンロード',
+        },
         entries: { web: 'ツール入口' },
         seo: {
           title: '一括画像処理スタジオ - ORZ2 オンライン画像ツール',
@@ -1643,6 +1639,11 @@ export const messages = {
         summary:
           '一般的な国を選び、片側の現地時刻を入力すると、夏時間ルール込みでもう片側を自動換算します。',
         badges: ['タイムゾーン', '国', '夏時間', '効率化'],
+        heroBadges: {
+          'country-presets': '一般的な国をすぐ選択',
+          'two-way-convert': '双方向の時刻変換',
+          'dst-aware': '夏時間に対応',
+        },
         entries: { web: 'ツール入口' },
         seo: {
           title: 'タイムゾーン変換 - ORZ2 オンライン効率化ツール',
@@ -1662,6 +1663,11 @@ export const messages = {
         summary:
           '作業メモを、事実を保ったまま自然で控えめな日報・週報に整えます。',
         badges: ['AI', '日報', '週報', 'ビジネス文書'],
+        heroBadges: {
+          'natural-wording': '自然な表現',
+          'facts-intact': '事実を保持',
+          'daily-weekly': '日報・週報向け',
+        },
         entries: { web: 'ツール入口' },
         seo: {
           title: '日報 / 週報リライト - ORZ2 オンライン効率化ツール',
@@ -1681,6 +1687,11 @@ export const messages = {
         summary:
           'シンタックスハイライトとエラー検出に対応した JSON 整形・検証ツール。',
         badges: ['JSON', '開発', '検証'],
+        heroBadges: {
+          'json-input': 'JSON 入力',
+          'format-minify': '整形と圧縮',
+          'syntax-validate': '構文検証',
+        },
         entries: { web: 'ツール入口' },
         seo: {
           title: 'JSON フォーマッター - ORZ2 開発者ツール',
@@ -1693,6 +1704,11 @@ export const messages = {
         name: '配色ラボ',
         summary: '複数の色形式とパレットに対応したプロ向けカラー選択ツール。',
         badges: ['配色', 'デザイン', 'アクセシビリティ'],
+        heroBadges: {
+          'color-picker': 'カラー選択',
+          'contrast-check': 'コントラスト確認',
+          accessibility: 'アクセシビリティ確認',
+        },
         entries: { web: 'ツール入口' },
         seo: {
           title: '配色ラボ - ORZ2 オンラインデザインツール',
@@ -1705,6 +1721,11 @@ export const messages = {
         name: 'Base64 コンバーター',
         summary: 'テキストとファイルの Base64 エンコード・デコード変換ツール。',
         badges: ['Base64', 'エンコード', 'デコード'],
+        heroBadges: {
+          'text-convert': 'テキスト変換',
+          'unicode-compatible': 'Unicode 対応',
+          'instant-result': '即時変換',
+        },
         entries: { web: 'ツール入口' },
         seo: {
           title: 'Base64 コンバーター - ORZ2 開発者ツール',
@@ -1718,6 +1739,11 @@ export const messages = {
         summary:
           'リアルタイムプレビューとエクスポートに対応した多機能 Markdown エディター。',
         badges: ['Markdown', 'エディター', 'プレビュー'],
+        heroBadges: {
+          'live-editor': 'リアルタイム編集',
+          'instant-preview': '即時プレビュー',
+          'code-blocks': 'コードブロック対応',
+        },
         entries: { web: 'ツール入口' },
         seo: {
           title: 'Markdown エディター - ORZ2 開発者ツール',
@@ -1735,6 +1761,11 @@ export const messages = {
         summary:
           'URL、テキスト、連絡先情報の QR コードを作成・カスタマイズできます。',
         badges: ['QR コード', '生成', 'オンライン'],
+        heroBadges: {
+          'custom-content': '内容をカスタマイズ',
+          'size-control': 'サイズ調整',
+          'png-download': 'PNG ダウンロード',
+        },
         entries: { web: 'ツール入口' },
         seo: {
           title: 'QR コード生成 - ORZ2 オンラインツール',

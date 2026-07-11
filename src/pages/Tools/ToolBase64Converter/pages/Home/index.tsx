@@ -1,7 +1,7 @@
+import { LayoutToolPage } from '@/components/LayoutToolPage';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { useI18n } from '@/hooks/useI18n';
-import { UtilityToolPageLayout } from '@/pages/Tools/components/UtilityToolPageLayout';
 import {
   base64ConverterSeoKey,
   base64ConverterToolId,
@@ -42,7 +42,7 @@ export function Base64Converter() {
   }
 
   return (
-    <UtilityToolPageLayout
+    <LayoutToolPage
       icon={TextCursorInput}
       seoKey={base64ConverterSeoKey}
       toolId={base64ConverterToolId}
@@ -97,6 +97,6 @@ export function Base64Converter() {
           {feedback}
         </p>
       ) : null}
-    </UtilityToolPageLayout>
+    </LayoutToolPage>
   );
 }

@@ -328,12 +328,6 @@ export const messages = {
     title: 'Batch Image Studio',
     description:
       'Upload multiple images, apply one conversion, resize, and TinyPNG compression setup, then download the results as a ZIP.',
-    heroAriaLabel: 'Image tool capabilities',
-    heroHighlights: [
-      'Batch image processing',
-      'Unified resize and convert',
-      'ZIP download',
-    ],
     upload: {
       title: 'Batch image workbench',
       subtitle:
@@ -472,12 +466,6 @@ export const messages = {
     title: 'Daily / Weekly Report Polisher',
     description:
       'Turn rough work notes into a natural, restrained report that keeps the facts and avoids an over-polished AI tone.',
-    heroAriaLabel: 'Report polishing capabilities',
-    heroHighlights: [
-      'Natural wording',
-      'Facts stay intact',
-      'Daily and weekly reports',
-    ],
     typeLabel: 'Report type',
     daily: 'Daily',
     weekly: 'Weekly',
@@ -576,12 +564,6 @@ export const messages = {
     title: 'Time Zone Converter',
     description:
       'Pick common countries, edit either local time, and convert the other side with daylight saving rules applied.',
-    heroAriaLabel: 'Time zone converter capabilities',
-    heroHighlights: [
-      'Common country presets',
-      'Two-way time conversion',
-      'Daylight saving aware',
-    ],
     leftSide: 'Left side',
     rightSide: 'Right side',
     sourceBadge: 'Source',
@@ -1620,6 +1602,11 @@ export const messages = {
         summary:
           'Choose a template to generate the article, cover, inline images, and digest directly in the WeChat draft box.',
         badges: ['AI', 'WeChat', 'Auto publish', 'LLM', 'Content ops'],
+        heroBadges: {
+          'ai-content': 'AI content generation',
+          'wechat-drafts': 'WeChat drafts',
+          'one-click-publish': 'One-click publishing',
+        },
         entries: { web: 'Tool entry' },
         seo: {
           title: 'WeChat Auto Publisher - ORZ2 Content Ops Tool',
@@ -1638,6 +1625,11 @@ export const messages = {
         summary:
           'Upload multiple images, apply one conversion, resize, and TinyPNG compression setup, then download the results as a ZIP.',
         badges: ['Image', 'Batch', 'Convert', 'Resize', 'ZIP'],
+        heroBadges: {
+          'batch-process': 'Batch image processing',
+          'resize-convert': 'Unified resize and convert',
+          'zip-download': 'ZIP download',
+        },
         entries: { web: 'Tool entry' },
         seo: {
           title: 'Batch Image Studio - ORZ2 Online Image Tool',
@@ -1657,6 +1649,11 @@ export const messages = {
         summary:
           'Pick common countries, edit either local time, and convert the other side with daylight saving rules applied.',
         badges: ['Time zone', 'Countries', 'DST', 'Productivity'],
+        heroBadges: {
+          'country-presets': 'Common country presets',
+          'two-way-convert': 'Two-way time conversion',
+          'dst-aware': 'Daylight saving aware',
+        },
         entries: { web: 'Tool entry' },
         seo: {
           title: 'Time Zone Converter - ORZ2 Online Productivity Tool',
@@ -1676,6 +1673,11 @@ export const messages = {
         summary:
           'Turn rough work notes into a natural, restrained daily or weekly report while keeping the facts intact.',
         badges: ['AI', 'Daily report', 'Weekly report', 'Work writing'],
+        heroBadges: {
+          'natural-wording': 'Natural wording',
+          'facts-intact': 'Facts stay intact',
+          'daily-weekly': 'Daily and weekly reports',
+        },
         entries: { web: 'Tool entry' },
         seo: {
           title: 'Daily / Weekly Report Polisher - ORZ2 Productivity Tool',
@@ -1695,6 +1697,11 @@ export const messages = {
         summary:
           'Format, validate, and beautify JSON data with syntax highlighting and error detection.',
         badges: ['JSON', 'Dev', 'Validation'],
+        heroBadges: {
+          'json-input': 'JSON input',
+          'format-minify': 'Format and minify',
+          'syntax-validate': 'Syntax validation',
+        },
         entries: { web: 'Tool entry' },
         seo: {
           title: 'JSON Formatter - ORZ2 Developer Tool',
@@ -1708,6 +1715,11 @@ export const messages = {
         summary:
           'A professional color picker with multiple color formats and palette support.',
         badges: ['Palette', 'Design', 'Accessibility'],
+        heroBadges: {
+          'color-picker': 'Color picker',
+          'contrast-check': 'Contrast check',
+          accessibility: 'Accessibility check',
+        },
         entries: { web: 'Tool entry' },
         seo: {
           title: 'Palette Lab - ORZ2 Online Design Tool',
@@ -1720,6 +1732,11 @@ export const messages = {
         name: 'Base64 Converter',
         summary: 'Encode and decode text and files with Base64.',
         badges: ['Base64', 'Encode', 'Decode'],
+        heroBadges: {
+          'text-convert': 'Text encoding and decoding',
+          'unicode-compatible': 'Unicode compatible',
+          'instant-result': 'Instant conversion',
+        },
         entries: { web: 'Tool entry' },
         seo: {
           title: 'Base64 Converter - ORZ2 Developer Tool',
@@ -1733,6 +1750,11 @@ export const messages = {
         summary:
           'A rich Markdown editor with live preview and export features.',
         badges: ['Markdown', 'Editor', 'Preview'],
+        heroBadges: {
+          'live-editor': 'Live editor',
+          'instant-preview': 'Instant preview',
+          'code-blocks': 'Code block support',
+        },
         entries: { web: 'Tool entry' },
         seo: {
           title: 'Markdown Editor - ORZ2 Developer Tool',
@@ -1746,6 +1768,11 @@ export const messages = {
         summary:
           'Create and customize QR codes for URLs, text, and contact information.',
         badges: ['QR Code', 'Generator', 'Online'],
+        heroBadges: {
+          'custom-content': 'Custom content',
+          'size-control': 'Size control',
+          'png-download': 'PNG download',
+        },
         entries: { web: 'Tool entry' },
         seo: {
           title: 'QR Code Generator - ORZ2 Online Tool',

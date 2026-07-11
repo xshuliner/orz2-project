@@ -10,6 +10,24 @@ export type CatalogIconName =
   | 'Sparkles'
   | 'Workflow';
 
+export type ToolHeroBadgeIconName =
+  | 'Braces'
+  | 'CalendarClock'
+  | 'CheckCircle2'
+  | 'Clipboard'
+  | 'Download'
+  | 'Eye'
+  | 'FileText'
+  | 'Globe2'
+  | 'Images'
+  | 'Maximize2'
+  | 'Palette'
+  | 'QrCode'
+  | 'Send'
+  | 'Sparkles'
+  | 'Wand2'
+  | 'Workflow';
+
 export type CatalogPlatform = 'web' | 'h5' | 'weapp' | 'app' | 'extension';
 
 export type CatalogStage = 'LIVE' | 'BETA' | 'PLANNING';
@@ -82,6 +100,15 @@ export interface CatalogBaseSeo {
   schemaType?: 'SoftwareApplication';
 }
 
+export interface CatalogBaseToolHeroBadge {
+  id: string;
+  icon: ToolHeroBadgeIconName;
+}
+
+export interface CatalogToolHeroBadge extends CatalogBaseToolHeroBadge {
+  label: string;
+}
+
 export interface CatalogBaseItem {
   id: string;
   group: string;
@@ -89,6 +116,7 @@ export interface CatalogBaseItem {
   lifecycle: CatalogLifecycle;
   platform: CatalogPlatform[];
   entries: CatalogBaseEntry[];
+  heroBadges?: CatalogBaseToolHeroBadge[];
   compact?: boolean;
   seo?: CatalogBaseSeo;
 }
@@ -103,6 +131,7 @@ export interface CatalogItem {
   lifecycle: CatalogLifecycle;
   platform: CatalogPlatform[];
   entries: CatalogEntry[];
+  heroBadges?: CatalogToolHeroBadge[];
   compact?: boolean;
   seo?: CatalogSeo;
 }

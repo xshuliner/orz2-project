@@ -7,6 +7,7 @@ import {
   type OfficialPublisherProgressEvent,
 } from '@/api';
 import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
+import { LayoutToolPage } from '@/components/LayoutToolPage';
 import { OBadge } from '@/components/OBadge';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
@@ -16,10 +17,7 @@ import { OModalConfirm } from '@/components/OModalConfirm';
 import { ORadio } from '@/components/ORadio';
 import { OSelector } from '@/components/OSelector';
 import { OTooltip } from '@/components/OTooltip';
-import { Seo } from '@/components/Seo';
-import { getToolSeo } from '@/config/seo';
 import { useI18n } from '@/hooks/useI18n';
-import { getTools } from '@/i18n';
 import { DraftSuccessModal } from '@/pages/Tools/ToolOfficialPublisher/components/DraftSuccessModal';
 import { PublisherModuleCard } from '@/pages/Tools/ToolOfficialPublisher/components/PublisherModuleCard';
 import { PublisherProgressPanel } from '@/pages/Tools/ToolOfficialPublisher/components/PublisherProgressPanel';
@@ -56,7 +54,6 @@ import { createInitialPublishSteps } from '@/pages/Tools/ToolOfficialPublisher/u
 import CacheManager from '@/utils/CacheManager';
 import type { LucideIcon } from 'lucide-react';
 import {
-  ArrowLeft,
   BriefcaseBusiness,
   CalendarClock,
   CheckCircle2,
@@ -94,7 +91,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Link } from 'react-router-dom';
 import './index.css';
 
 type CommentOptionValue = 'closed' | 'open' | 'fansOnly';
@@ -121,7 +117,7 @@ const promptTemplateIcons: Record<PromptTemplateId, LucideIcon> = {
 };
 
 export function PageOfficialPublisher() {
-  const { locale, localizePath, messages } = useI18n();
+  const { messages } = useI18n();
   const publisherCopy = messages.publisher;
   const defaultRewriteRequirement = publisherCopy.defaultRewriteRequirement;
   const localizedDefaultForm = useMemo(
@@ -139,8 +135,6 @@ export function PageOfficialPublisher() {
     () => getPromptTemplates(publisherCopy.promptTemplates),
     [publisherCopy.promptTemplates]
   );
-  const localizedTools = useMemo(() => getTools(locale), [locale]);
-  const localizedToolSeo = useMemo(() => getToolSeo(locale), [locale]);
   const commentOptions = useMemo<
     Array<{ label: string; value: CommentOptionValue }>
   >(
@@ -269,13 +263,6 @@ export function PageOfficialPublisher() {
     [form, publisherCopy, selectedPromptTemplate]
   );
   const completedCount = completionItems.filter(item => item.done).length;
-  // Keep page title, description, breadcrumb, cards, and SEO on one catalog source.
-  const publisherTool = useMemo(
-    () =>
-      localizedTools.find(item => item.id === officialPublisherToolId) ??
-      localizedTools.find(item => item.seo?.slug === officialPublisherSeoKey),
-    [localizedTools]
-  );
 
   function updateField<K extends keyof OfficialPublisherForm>(
     key: K,
@@ -612,13 +599,11 @@ export function PageOfficialPublisher() {
 
   return (
     <>
-      <Seo config={localizedToolSeo[officialPublisherSeoKey]} />
-      <section className='tool-form-page'>
-        <div className='tool-form-topbar'>
-          <Link className='back-link interactive' to={localizePath('/tools')}>
-            <ArrowLeft size={16} aria-hidden='true' />
-            {publisherCopy.backLabel}
-          </Link>
+      <LayoutToolPage
+        icon={Send}
+        seoKey={officialPublisherSeoKey}
+        toolId={officialPublisherToolId}
+        topbarSlot={
           <div
             className='json-actions'
             aria-label={publisherCopy.jsonActionsAriaLabel}
@@ -643,14 +628,8 @@ export function PageOfficialPublisher() {
               onChange={handleImport}
             />
           </div>
-        </div>
-        <header className='tool-form-hero'>
-          <div className='tool-form-hero-copy'>
-            <h1>{publisherTool?.name ?? publisherCopy.fallbackName}</h1>
-            <p>{publisherTool?.summary ?? publisherCopy.fallbackSummary}</p>
-          </div>
-        </header>
-
+        }
+      >
         <OCard
           as='section'
           className='wechat-setup-card'
@@ -1184,7 +1163,7 @@ export function PageOfficialPublisher() {
             </OCard>
           ) : null}
         </form>
-      </section>
+      </LayoutToolPage>
 
       {isDraftResultOpen ? (
         <DraftSuccessModal

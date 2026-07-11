@@ -14,6 +14,11 @@ const tools = [
       updatedAt: '2026-06-03',
     },
     platform: ['web'],
+    heroBadges: [
+      { id: 'ai-content', icon: 'Sparkles' },
+      { id: 'wechat-drafts', icon: 'Send' },
+      { id: 'one-click-publish', icon: 'CheckCircle2' },
+    ],
     entries: [
       {
         id: 'web',
@@ -43,6 +48,11 @@ const tools = [
       updatedAt: '2026-06-08',
     },
     platform: ['web'],
+    heroBadges: [
+      { id: 'batch-process', icon: 'Images' },
+      { id: 'resize-convert', icon: 'Maximize2' },
+      { id: 'zip-download', icon: 'Download' },
+    ],
     entries: [
       {
         id: 'web',
@@ -72,6 +82,11 @@ const tools = [
       updatedAt: '2026-07-03',
     },
     platform: ['web'],
+    heroBadges: [
+      { id: 'country-presets', icon: 'Globe2' },
+      { id: 'two-way-convert', icon: 'CalendarClock' },
+      { id: 'dst-aware', icon: 'CheckCircle2' },
+    ],
     entries: [
       {
         id: 'web',
@@ -101,6 +116,11 @@ const tools = [
       updatedAt: '2026-07-04',
     },
     platform: ['web'],
+    heroBadges: [
+      { id: 'natural-wording', icon: 'Sparkles' },
+      { id: 'facts-intact', icon: 'CheckCircle2' },
+      { id: 'daily-weekly', icon: 'FileText' },
+    ],
     entries: [
       {
         id: 'web',
@@ -130,6 +150,11 @@ const tools = [
       updatedAt: '2026-07-11',
     },
     platform: ['web'],
+    heroBadges: [
+      { id: 'json-input', icon: 'Braces' },
+      { id: 'format-minify', icon: 'Wand2' },
+      { id: 'syntax-validate', icon: 'CheckCircle2' },
+    ],
     entries: [
       {
         id: 'web',
@@ -158,6 +183,11 @@ const tools = [
       updatedAt: '2026-07-11',
     },
     platform: ['web'],
+    heroBadges: [
+      { id: 'color-picker', icon: 'Palette' },
+      { id: 'contrast-check', icon: 'Eye' },
+      { id: 'accessibility', icon: 'CheckCircle2' },
+    ],
     entries: [
       {
         id: 'web',
@@ -186,6 +216,11 @@ const tools = [
       updatedAt: '2026-07-11',
     },
     platform: ['web'],
+    heroBadges: [
+      { id: 'text-convert', icon: 'Workflow' },
+      { id: 'unicode-compatible', icon: 'CheckCircle2' },
+      { id: 'instant-result', icon: 'Wand2' },
+    ],
     entries: [
       {
         id: 'web',
@@ -214,6 +249,11 @@ const tools = [
       updatedAt: '2026-07-11',
     },
     platform: ['web'],
+    heroBadges: [
+      { id: 'live-editor', icon: 'Clipboard' },
+      { id: 'instant-preview', icon: 'Eye' },
+      { id: 'code-blocks', icon: 'Braces' },
+    ],
     entries: [
       {
         id: 'web',
@@ -242,6 +282,11 @@ const tools = [
       updatedAt: '2026-07-11',
     },
     platform: ['web'],
+    heroBadges: [
+      { id: 'custom-content', icon: 'QrCode' },
+      { id: 'size-control', icon: 'Maximize2' },
+      { id: 'png-download', icon: 'Download' },
+    ],
     entries: [
       {
         id: 'web',

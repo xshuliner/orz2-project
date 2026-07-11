@@ -319,8 +319,6 @@ export const messages = {
     title: '批量图片处理',
     description:
       '一次上传多张图片，统一完成格式转换、尺寸缩放、TinyPNG 压缩，并打包下载结果。',
-    heroAriaLabel: '图片工具能力',
-    heroHighlights: ['多图批量处理', '统一转换与缩放', 'ZIP 打包下载'],
     upload: {
       title: '图片批量工作台',
       subtitle: '读取每张图片的尺寸、体积、格式，并可左右切换当前预览。',
@@ -452,8 +450,6 @@ export const messages = {
     title: '日/周报润色',
     description:
       '把零散的工作记录整理成自然、克制、像人写的汇报文案，保留事实，不把普通进展写得过满。',
-    heroAriaLabel: '日/周报润色工具能力',
-    heroHighlights: ['自然去 AI 味', '保留真实进展', '适合日报和周报'],
     typeLabel: '汇报类型',
     daily: '日报',
     weekly: '周报',
@@ -548,8 +544,6 @@ export const messages = {
     title: '时区转换器',
     description:
       '选择常见国家，输入任一侧本地时间，自动换算另一侧时间，并按当地夏令时规则处理。',
-    heroAriaLabel: '时区转换器能力',
-    heroHighlights: ['常见国家快速选择', '双向时间换算', '自动处理夏令时'],
     leftSide: '左侧',
     rightSide: '右侧',
     sourceBadge: '基准',
@@ -1557,6 +1551,11 @@ export const messages = {
         summary:
           '选择内容模板，一键生成文章、封面、正文配图和摘要并写入公众号草稿箱。',
         badges: ['AI', '公众号', '自动发布', 'LLM', '内容运营'],
+        heroBadges: {
+          'ai-content': 'AI 内容生成',
+          'wechat-drafts': '公众号草稿箱',
+          'one-click-publish': '一键发布',
+        },
         entries: { web: '工具入口' },
         seo: {
           title: '公众号自动发布工具 - ORZ2 内容运营工具',
@@ -1575,6 +1574,11 @@ export const messages = {
         summary:
           '一次上传多张图片，统一完成格式转换、尺寸缩放、TinyPNG 压缩，并打包下载结果。',
         badges: ['图片', '批量', '转换', '缩放', 'ZIP'],
+        heroBadges: {
+          'batch-process': '多图批量处理',
+          'resize-convert': '统一转换与缩放',
+          'zip-download': 'ZIP 打包下载',
+        },
         entries: { web: '工具入口' },
         seo: {
           title: '批量图片处理工具 - ORZ2 在线图片工具',
@@ -1594,6 +1598,11 @@ export const messages = {
         summary:
           '选择常见国家，输入任一侧本地时间，自动换算另一侧时间，并按当地夏令时规则处理。',
         badges: ['时区', '国家', '夏令时', '效率'],
+        heroBadges: {
+          'country-presets': '常见国家速选',
+          'two-way-convert': '双向时间换算',
+          'dst-aware': '自动处理夏令时',
+        },
         entries: { web: '工具入口' },
         seo: {
           title: '时区转换器 - ORZ2 在线效率工具',
@@ -1613,6 +1622,11 @@ export const messages = {
         summary:
           '把零散工作记录整理成自然、克制、像人写的日/周报，保留事实，不夸大表达。',
         badges: ['AI', '日报', '周报', '职场写作'],
+        heroBadges: {
+          'natural-wording': '自然去 AI 味',
+          'facts-intact': '保留真实进展',
+          'daily-weekly': '适合日报和周报',
+        },
         entries: { web: '工具入口' },
         seo: {
           title: '日/周报润色工具 - ORZ2 在线效率工具',
@@ -1625,6 +1639,11 @@ export const messages = {
         name: 'JSON 格式化',
         summary: '支持语法高亮和错误检测的 JSON 数据格式化、验证和美化工具',
         badges: ['JSON', '开发', '校验'],
+        heroBadges: {
+          'json-input': 'JSON 输入',
+          'format-minify': '格式化与压缩',
+          'syntax-validate': '语法校验',
+        },
         entries: { web: '工具入口' },
         seo: {
           title: 'JSON 格式化工具 - ORZ2 开发者工具',
@@ -1637,6 +1656,11 @@ export const messages = {
         name: '配色实验室',
         summary: '专业的颜色选择工具，支持多种颜色格式和调色板',
         badges: ['配色', '设计', '可访问性'],
+        heroBadges: {
+          'color-picker': '颜色选择',
+          'contrast-check': '对比度检测',
+          accessibility: '可访问性检查',
+        },
         entries: { web: '工具入口' },
         seo: {
           title: '配色实验室 - ORZ2 在线设计工具',
@@ -1649,6 +1673,11 @@ export const messages = {
         name: 'Base64 转换器',
         summary: '文本和文件的 Base64 编码解码转换工具',
         badges: ['Base64', '编码', '解码'],
+        heroBadges: {
+          'text-convert': '文本编码解码',
+          'unicode-compatible': 'Unicode 兼容',
+          'instant-result': '即时转换',
+        },
         entries: { web: '工具入口' },
         seo: {
           title: 'Base64 转换器 - ORZ2 开发者工具',
@@ -1661,6 +1690,11 @@ export const messages = {
         name: 'Markdown 编辑器',
         summary: '功能丰富的 Markdown 编辑器，支持实时预览和导出功能',
         badges: ['Markdown', '编辑器', '预览'],
+        heroBadges: {
+          'live-editor': '实时编辑',
+          'instant-preview': '即时预览',
+          'code-blocks': '代码块支持',
+        },
         entries: { web: '工具入口' },
         seo: {
           title: 'Markdown 编辑器 - ORZ2 开发者工具',
@@ -1673,6 +1707,11 @@ export const messages = {
         name: '二维码生成器',
         summary: '创建和自定义 URL、文本和联系信息的二维码',
         badges: ['二维码', 'QR Code', '生成'],
+        heroBadges: {
+          'custom-content': '自定义内容',
+          'size-control': '尺寸调节',
+          'png-download': 'PNG 下载',
+        },
         entries: { web: '工具入口' },
         seo: {
           title: '二维码生成器 - ORZ2 在线工具',

@@ -1,67 +1,3 @@
-.report-polish-page {
-  width: var(--page-content-width);
-  margin: 0 auto;
-  padding: var(--space-6) 0 var(--space-16);
-}
-
-.report-polish-back-link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-bottom: var(--space-4);
-  color: var(--color-text-link);
-  font-size: var(--text-body-sm);
-  font-weight: 760;
-}
-
-.report-polish-hero {
-  width: 100%;
-  margin-bottom: var(--space-5);
-  padding: var(--space-5) 0 var(--space-6);
-}
-
-.report-polish-hero.compact-hero {
-  grid-template-columns: minmax(0, 0.92fr) minmax(280px, 0.64fr);
-  align-items: center;
-}
-
-.report-polish-hero h1 {
-  font-size: clamp(38px, 4.4vw, 54px);
-  line-height: 1.02;
-  white-space: normal;
-}
-
-.report-polish-hero p {
-  margin-top: 0;
-  font-size: var(--text-lead);
-}
-
-.report-polish-hero-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  margin-top: var(--space-5);
-}
-
-.report-polish-hero-strip span {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: 34px;
-  padding: 0 var(--space-3);
-  border: 1px solid
-    color-mix(in srgb, var(--color-green) 16%, var(--color-line));
-  border-radius: var(--radius-control);
-  background: color-mix(
-    in srgb,
-    var(--color-panel) 82%,
-    var(--color-green-soft)
-  );
-  color: var(--color-text-accent);
-  font-size: var(--text-meta);
-  font-weight: 760;
-}
-
 .report-polish-workbench {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -319,17 +255,9 @@
   .report-polish-workbench {
     grid-template-columns: 1fr;
   }
-
-  .report-polish-hero.compact-hero {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 640px) {
-  .report-polish-page {
-    padding-top: var(--space-4);
-  }
-
   .report-polish-type-row,
   .report-polish-action-row,
   .report-polish-field-heading {

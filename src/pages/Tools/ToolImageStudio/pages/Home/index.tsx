@@ -1,12 +1,9 @@
+import { LayoutToolPage } from '@/components/LayoutToolPage';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { OIconButton } from '@/components/OIconButton';
-import { OPageHero } from '@/components/OPageHero';
 import { OSelector, type OSelectorOption } from '@/components/OSelector';
-import { Seo } from '@/components/Seo';
-import { getToolSeo } from '@/config/seo';
 import { useI18n } from '@/hooks/useI18n';
-import { getTools } from '@/i18n';
 import {
   Base64Transfer,
   MetricItem,
@@ -57,7 +54,6 @@ import {
 } from '@/pages/Tools/ToolImageStudio/utils/imageProcessing';
 import JSZip from 'jszip';
 import {
-  ArrowLeft,
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
@@ -85,11 +81,10 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Link } from 'react-router-dom';
 import './index.css';
 
 export function ImageStudio() {
-  const { locale, localizePath, messages } = useI18n();
+  const { messages } = useI18n();
   const copy = messages.imageTool;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const base64ParseIdRef = useRef(0);
@@ -97,9 +92,6 @@ export function ImageStudio() {
   const previewStripRef = useRef<HTMLDivElement>(null);
   const previewButtonRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const batchResultUrlsRef = useRef<Set<string>>(new Set());
-  const toolSeo = getToolSeo(locale);
-  const tools = useMemo(() => getTools(locale), [locale]);
-  const tool = tools.find(item => item.id === imageToolId);
   const batchImagesRef = useRef<ReadImageFileResult[]>([]);
   const [batchImages, setBatchImages] = useState<ReadImageFileResult[]>([]);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -897,619 +889,587 @@ export function ImageStudio() {
   }
 
   return (
-    <>
-      <Seo config={toolSeo[imageToolSeoKey]} />
-      <main className='image-tool-page'>
-        <Link
-          className='image-back-link interactive'
-          to={localizePath('/tools')}
+    <LayoutToolPage icon={Images} seoKey={imageToolSeoKey} toolId={imageToolId}>
+      <section className='image-tool-workbench'>
+        <OCard
+          as='section'
+          className='image-upload-panel reveal-on-scroll'
+          padding='lg'
         >
-          <ArrowLeft size={16} aria-hidden='true' />
-          {copy.backToTools}
-        </Link>
+          <div className='image-panel-heading'>
+            <div>
+              <h2>{copy.upload.title}</h2>
+              <p>{copy.upload.subtitle}</p>
+            </div>
+            {imageInfo ? (
+              <OIconButton
+                aria-label={copy.upload.clear}
+                className='image-clear-button'
+                variant='ghost'
+                onClick={resetAll}
+              >
+                <X size={17} aria-hidden='true' />
+              </OIconButton>
+            ) : null}
+          </div>
 
-        <OPageHero
-          className='image-tool-hero'
-          title={tool?.name ?? copy.title}
-          description={tool?.summary ?? copy.description}
-        >
-          <div className='image-hero-strip' aria-label={copy.heroAriaLabel}>
-            {copy.heroHighlights.map((highlight, index) => {
-              const Icon = [Images, Maximize2, Zap][index] ?? CheckCircle2;
-              return (
-                <span key={highlight}>
-                  <Icon size={15} aria-hidden='true' />
-                  {highlight}
+          <div
+            aria-label={copy.upload.dropzoneAriaLabel}
+            className={[
+              'image-dropzone',
+              isDragging ? 'is-dragging' : '',
+              imageInfo ? 'has-image' : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            role='button'
+            tabIndex={0}
+            onClick={() => fileInputRef.current?.click()}
+            onDragEnter={event => {
+              event.preventDefault();
+              setIsDragging(true);
+            }}
+            onDragLeave={event => {
+              event.preventDefault();
+              setIsDragging(false);
+            }}
+            onDragOver={event => event.preventDefault()}
+            onDrop={handleDrop}
+            onKeyDown={event => {
+              if (event.key !== 'Enter' && event.key !== ' ') return;
+              event.preventDefault();
+              fileInputRef.current?.click();
+            }}
+          >
+            <input
+              ref={fileInputRef}
+              accept={uploadAccept}
+              multiple
+              type='file'
+              onChange={handleInputChange}
+            />
+            {previewUrl && imageInfo ? (
+              <div className='image-preview-frame'>
+                <img src={previewUrl} alt={copy.upload.previewAlt} />
+                {isBatchMode ? (
+                  <>
+                    <OIconButton
+                      aria-label={copy.upload.previousPreview}
+                      className='image-preview-nav image-preview-nav--prev'
+                      hoverTranslate={false}
+                      size='sm'
+                      variant='ghost'
+                      onClick={event => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        showPreviousPreview();
+                      }}
+                    >
+                      <ChevronLeft size={16} aria-hidden='true' />
+                    </OIconButton>
+                    <OIconButton
+                      aria-label={copy.upload.nextPreview}
+                      className='image-preview-nav image-preview-nav--next'
+                      hoverTranslate={false}
+                      size='sm'
+                      variant='ghost'
+                      onClick={event => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        showNextPreview();
+                      }}
+                    >
+                      <ChevronRight size={16} aria-hidden='true' />
+                    </OIconButton>
+                    <span className='image-preview-counter'>
+                      {previewPosition}
+                    </span>
+                  </>
+                ) : null}
+              </div>
+            ) : (
+              <span className='image-empty-state'>
+                <UploadCloud size={34} strokeWidth={1.7} aria-hidden='true' />
+                <strong>{copy.upload.emptyTitle}</strong>
+                <small>{copy.upload.emptyDescription}</small>
+              </span>
+            )}
+          </div>
+
+          {batchImages.length ? (
+            <div
+              ref={previewStripRef}
+              className='image-preview-strip'
+              aria-label={copy.batch.title}
+            >
+              {batchImages.map((item, index) => (
+                <button
+                  ref={node => {
+                    previewButtonRefs.current[index] = node;
+                  }}
+                  key={`${item.info.name}-${item.info.lastModified}-${index}`}
+                  className={[
+                    'interactive',
+                    index === activeImageIndex ? 'is-active' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  type='button'
+                  onClick={() => showPreviewAt(index)}
+                >
+                  <img src={item.previewUrl} alt='' aria-hidden='true' />
+                  <span>
+                    <strong>{item.info.name}</strong>
+                    <small>
+                      {item.info.width} x {item.info.height} ·{' '}
+                      {formatBytes(item.info.size)}
+                    </small>
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          {batchFiles.length ? (
+            <div className='image-batch-summary' aria-label={copy.batch.title}>
+              <div className='image-batch-summary-head'>
+                <span aria-hidden='true'>
+                  <Images size={16} />
                 </span>
+                <div>
+                  <strong>
+                    {batchFiles.length}
+                    {copy.batch.countSuffix}
+                  </strong>
+                  <small>{copy.batch.unifiedNote}</small>
+                </div>
+              </div>
+              <div className='image-batch-stats'>
+                <span>
+                  {copy.batch.totalSize}: {formatBytes(totalInputSize)}
+                </span>
+                <span>
+                  {copy.batch.primary}: {previewPosition || copy.info.unknown}
+                </span>
+              </div>
+            </div>
+          ) : null}
+
+          <Base64Transfer
+            copied={copiedBase64}
+            copy={copy.base64}
+            error={base64Error}
+            value={base64Value}
+            onCopy={() => void copyImageBase64()}
+            onChange={value => {
+              setCopiedBase64(false);
+              setBase64Error('');
+              setBase64Value(value);
+            }}
+          />
+
+          <div className='image-info-grid' aria-label={copy.info.title}>
+            <MetricItem
+              label={copy.info.dimensions}
+              value={
+                imageInfo
+                  ? `${imageInfo.width} x ${imageInfo.height}`
+                  : copy.info.unknown
+              }
+            />
+            <MetricItem
+              label={copy.info.size}
+              value={
+                imageInfo ? formatBytes(imageInfo.size) : copy.info.unknown
+              }
+            />
+            <MetricItem
+              label={copy.info.mime}
+              value={imageInfo?.type || copy.info.unknown}
+            />
+            <MetricItem
+              label={copy.info.lastModified}
+              value={
+                imageInfo
+                  ? formatDate(imageInfo.lastModified)
+                  : copy.info.unknown
+              }
+            />
+          </div>
+        </OCard>
+
+        <OCard
+          as='aside'
+          className='image-settings-panel reveal-on-scroll'
+          padding='lg'
+        >
+          <div className='image-panel-heading'>
+            <div>
+              <h2>{copy.settings.title}</h2>
+              <p>{copy.settings.subtitle}</p>
+            </div>
+            <Wand2 size={20} strokeWidth={1.8} aria-hidden='true' />
+          </div>
+
+          <div className='image-setting-group'>
+            <ToggleRow
+              checked={convertEnabled}
+              label={copy.convert.enable}
+              onChange={setConvertEnabled}
+            >
+              {copy.convert.description}
+            </ToggleRow>
+            <OSelector
+              ariaLabel={copy.convert.formatLabel}
+              className='image-format-selector'
+              options={formatOptions}
+              value={convertEnabled ? outputFormat : 'original'}
+              onChange={value => setOutputFormat(value as OutputFormat)}
+            />
+          </div>
+
+          <div className='image-setting-group'>
+            <ToggleRow
+              checked={resizeEnabled}
+              label={copy.resize.enable}
+              onChange={setResizeEnabled}
+            >
+              {copy.resize.description}
+            </ToggleRow>
+            <div className='image-resize-panel'>
+              <div className='image-resize-heading'>
+                <span>
+                  <Maximize2 size={15} aria-hidden='true' />
+                  {copy.resize.dimensionTitle}
+                </span>
+                <span
+                  className={[
+                    'image-aspect-status',
+                    keepAspectRatio ? 'is-locked' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                >
+                  {keepAspectRatio
+                    ? copy.resize.aspectLocked
+                    : copy.resize.aspectUnlocked}
+                </span>
+              </div>
+              <div className='image-dimension-controls'>
+                <label>
+                  <span>{copy.resize.width}</span>
+                  <input
+                    disabled={!resizeEnabled || !imageInfo}
+                    inputMode='numeric'
+                    min='1'
+                    type='number'
+                    value={targetWidth}
+                    onChange={event =>
+                      handleDimensionChange('width', event.target.value)
+                    }
+                  />
+                </label>
+                <OIconButton
+                  aria-label={
+                    keepAspectRatio
+                      ? copy.resize.aspectLocked
+                      : copy.resize.aspectUnlocked
+                  }
+                  aria-pressed={keepAspectRatio}
+                  className={[
+                    'image-aspect-button',
+                    keepAspectRatio ? 'is-active' : '',
+                  ]
+                    .filter(Boolean)
+                    .join(' ')}
+                  disabled={!resizeEnabled || !imageInfo}
+                  hoverTranslate={false}
+                  size='md'
+                  title={copy.resize.aspectToggleLabel}
+                  variant='ghost'
+                  onClick={handleAspectRatioToggle}
+                >
+                  {keepAspectRatio ? (
+                    <Lock size={16} aria-hidden='true' />
+                  ) : (
+                    <Unlock size={16} aria-hidden='true' />
+                  )}
+                </OIconButton>
+                <label>
+                  <span>{copy.resize.height}</span>
+                  <input
+                    disabled={!resizeEnabled || !imageInfo}
+                    inputMode='numeric'
+                    min='1'
+                    type='number'
+                    value={targetHeight}
+                    onChange={event =>
+                      handleDimensionChange('height', event.target.value)
+                    }
+                  />
+                </label>
+              </div>
+              <label className='image-range-control'>
+                <span>
+                  {copy.resize.scaleLabel}
+                  <strong>{scale}%</strong>
+                </span>
+                <input
+                  disabled={!resizeEnabled || !imageInfo}
+                  max={maxScale}
+                  min={minScale}
+                  step='5'
+                  type='range'
+                  value={scale}
+                  onChange={event => handleScaleChange(event.target.value)}
+                />
+                <small>
+                  <span>{minScale}%</span>
+                  <span>{maxScale}%</span>
+                </small>
+              </label>
+              <p className='image-resize-help'>{copy.resize.batchHint}</p>
+            </div>
+          </div>
+
+          <div className='image-setting-group'>
+            <ToggleRow
+              checked={compressEnabled}
+              label={copy.compress.enable}
+              onChange={setCompressEnabled}
+            >
+              {copy.compress.description}
+            </ToggleRow>
+            <div className='image-provider-row'>
+              <ImageDown size={16} aria-hidden='true' />
+              <span>{copy.compress.provider}</span>
+            </div>
+          </div>
+
+          <div
+            className='image-estimate-panel'
+            aria-label={copy.output.estimateTitle}
+          >
+            <MetricItem
+              label={copy.output.estimatedDimensions}
+              value={
+                targetDimensions
+                  ? `${targetDimensions.width} x ${targetDimensions.height}`
+                  : copy.info.unknown
+              }
+            />
+            <MetricItem
+              label={copy.output.estimatedSize}
+              value={
+                estimatedSize
+                  ? `~${formatBytes(estimatedSize)}`
+                  : copy.info.unknown
+              }
+            />
+            <MetricItem
+              label={copy.output.outputType}
+              value={convertEnabled ? outputFormat : copy.convert.keep}
+            />
+          </div>
+
+          <div className='image-action-row'>
+            <OButton
+              disabled={!canProcess}
+              type='button'
+              onClick={() => void processImage()}
+            >
+              {processState.phase === 'processing' ||
+              processState.phase === 'compressing' ? (
+                <Loader2 className='spin' size={16} aria-hidden='true' />
+              ) : (
+                <Zap size={16} aria-hidden='true' />
+              )}
+              {processState.phase === 'compressing'
+                ? copy.output.compressing
+                : processState.phase === 'processing'
+                  ? copy.output.processing
+                  : isBatchMode
+                    ? copy.output.processBatch
+                    : copy.output.process}
+            </OButton>
+            <OButton type='button' variant='ghost' onClick={resetAll}>
+              <RotateCcw size={16} aria-hidden='true' />
+              {copy.output.reset}
+            </OButton>
+          </div>
+        </OCard>
+      </section>
+
+      <OCard
+        as='section'
+        className={[
+          'image-result-panel reveal-on-scroll',
+          result ? 'has-result' : '',
+          `is-${processState.phase}`,
+        ].join(' ')}
+        padding='lg'
+      >
+        <div className='image-result-status'>
+          <span>
+            {processState.phase === 'done' ? (
+              <CheckCircle2 size={18} aria-hidden='true' />
+            ) : processState.phase === 'compressing' ||
+              processState.phase === 'processing' ? (
+              <Loader2 className='spin' size={18} aria-hidden='true' />
+            ) : processState.phase === 'error' ? (
+              <Info size={18} aria-hidden='true' />
+            ) : (
+              <RefreshCcw size={18} aria-hidden='true' />
+            )}
+          </span>
+          <div>
+            <h2>{copy.output.title}</h2>
+            <p>{outputMessage}</p>
+          </div>
+        </div>
+
+        <div className='image-result-grid'>
+          <MetricItem
+            label={
+              hasBatchFeedback
+                ? copy.output.processedCount
+                : copy.output.processedDimensions
+            }
+            value={
+              hasBatchFeedback
+                ? `${completedBatchItemCount}/${batchProcessItems.length}`
+                : result
+                  ? `${result.width} x ${result.height}`
+                  : copy.info.unknown
+            }
+          />
+          <MetricItem
+            label={
+              hasBatchFeedback
+                ? copy.output.outputTotalSize
+                : copy.output.processedSize
+            }
+            value={
+              hasBatchFeedback
+                ? formatBytes(totalResultSize)
+                : result
+                  ? formatBytes(result.size)
+                  : copy.info.unknown
+            }
+          />
+          <MetricItem
+            label={copy.output.savings}
+            value={
+              hasBatchFeedback && batchSavingsRatio !== null
+                ? `${Math.max(0, batchSavingsRatio * 100).toFixed(1)}%`
+                : result
+                  ? `${Math.max(0, result.savingsRatio * 100).toFixed(1)}%`
+                  : copy.info.unknown
+            }
+          />
+          <MetricItem
+            label={
+              hasBatchFeedback ? copy.output.failedCount : copy.output.engine
+            }
+            value={
+              hasBatchFeedback
+                ? String(failedBatchItemCount)
+                : result?.source === 'tinypng'
+                  ? copy.compress.provider
+                  : copy.output.localEngine
+            }
+          />
+        </div>
+
+        <div className='image-result-actions'>
+          {isBatchMode && batchResults.length ? (
+            <OButton
+              disabled={isZipping}
+              type='button'
+              variant='secondary'
+              onClick={() => void downloadAllResults()}
+            >
+              {isZipping ? (
+                <Loader2 className='spin' size={16} aria-hidden='true' />
+              ) : (
+                <Download size={16} aria-hidden='true' />
+              )}
+              {isZipping
+                ? copy.output.zipping
+                : failedBatchItemCount
+                  ? copy.output.downloadSuccessfulZip
+                  : copy.output.downloadZip}
+            </OButton>
+          ) : result ? (
+            <OButton
+              download={result.name}
+              href={result.url}
+              variant='secondary'
+            >
+              <Download size={16} aria-hidden='true' />
+              {copy.output.download}
+            </OButton>
+          ) : null}
+        </div>
+
+        {hasBatchFeedback ? (
+          <div
+            className='image-result-items'
+            aria-label={copy.output.batchItemsTitle}
+          >
+            {batchProcessItems.map((item, index) => {
+              const icon =
+                item.phase === 'done' ? (
+                  <CheckCircle2 size={14} aria-hidden='true' />
+                ) : item.phase === 'processing' ||
+                  item.phase === 'compressing' ? (
+                  <Loader2 className='spin' size={14} aria-hidden='true' />
+                ) : item.phase === 'error' ? (
+                  <Info size={14} aria-hidden='true' />
+                ) : (
+                  <FileImage size={14} aria-hidden='true' />
+                );
+              const statusDetail = item.result
+                ? `${item.message} · ${formatBytes(item.result.size)}`
+                : item.message;
+              const className = [
+                'image-result-item',
+                `is-${item.phase}`,
+                item.result ? 'interactive' : '',
+              ]
+                .filter(Boolean)
+                .join(' ');
+              const content = (
+                <>
+                  {icon}
+                  <span>
+                    <strong>{item.result?.name || item.name}</strong>
+                    <small>{statusDetail}</small>
+                  </span>
+                  <small>
+                    {index + 1}/{batchProcessItems.length}
+                  </small>
+                </>
+              );
+
+              return item.result ? (
+                <a
+                  key={`${item.name}-${index}`}
+                  className={className}
+                  download={item.result.name}
+                  href={item.result.url}
+                >
+                  {content}
+                </a>
+              ) : (
+                <div key={`${item.name}-${index}`} className={className}>
+                  {content}
+                </div>
               );
             })}
           </div>
-        </OPageHero>
-
-        <section className='image-tool-workbench'>
-          <OCard
-            as='section'
-            className='image-upload-panel reveal-on-scroll'
-            padding='lg'
-          >
-            <div className='image-panel-heading'>
-              <div>
-                <h2>{copy.upload.title}</h2>
-                <p>{copy.upload.subtitle}</p>
-              </div>
-              {imageInfo ? (
-                <OIconButton
-                  aria-label={copy.upload.clear}
-                  className='image-clear-button'
-                  variant='ghost'
-                  onClick={resetAll}
-                >
-                  <X size={17} aria-hidden='true' />
-                </OIconButton>
-              ) : null}
-            </div>
-
-            <div
-              aria-label={copy.upload.dropzoneAriaLabel}
-              className={[
-                'image-dropzone',
-                isDragging ? 'is-dragging' : '',
-                imageInfo ? 'has-image' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              role='button'
-              tabIndex={0}
-              onClick={() => fileInputRef.current?.click()}
-              onDragEnter={event => {
-                event.preventDefault();
-                setIsDragging(true);
-              }}
-              onDragLeave={event => {
-                event.preventDefault();
-                setIsDragging(false);
-              }}
-              onDragOver={event => event.preventDefault()}
-              onDrop={handleDrop}
-              onKeyDown={event => {
-                if (event.key !== 'Enter' && event.key !== ' ') return;
-                event.preventDefault();
-                fileInputRef.current?.click();
-              }}
-            >
-              <input
-                ref={fileInputRef}
-                accept={uploadAccept}
-                multiple
-                type='file'
-                onChange={handleInputChange}
-              />
-              {previewUrl && imageInfo ? (
-                <div className='image-preview-frame'>
-                  <img src={previewUrl} alt={copy.upload.previewAlt} />
-                  {isBatchMode ? (
-                    <>
-                      <OIconButton
-                        aria-label={copy.upload.previousPreview}
-                        className='image-preview-nav image-preview-nav--prev'
-                        hoverTranslate={false}
-                        size='sm'
-                        variant='ghost'
-                        onClick={event => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          showPreviousPreview();
-                        }}
-                      >
-                        <ChevronLeft size={16} aria-hidden='true' />
-                      </OIconButton>
-                      <OIconButton
-                        aria-label={copy.upload.nextPreview}
-                        className='image-preview-nav image-preview-nav--next'
-                        hoverTranslate={false}
-                        size='sm'
-                        variant='ghost'
-                        onClick={event => {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          showNextPreview();
-                        }}
-                      >
-                        <ChevronRight size={16} aria-hidden='true' />
-                      </OIconButton>
-                      <span className='image-preview-counter'>
-                        {previewPosition}
-                      </span>
-                    </>
-                  ) : null}
-                </div>
-              ) : (
-                <span className='image-empty-state'>
-                  <UploadCloud size={34} strokeWidth={1.7} aria-hidden='true' />
-                  <strong>{copy.upload.emptyTitle}</strong>
-                  <small>{copy.upload.emptyDescription}</small>
-                </span>
-              )}
-            </div>
-
-            {batchImages.length ? (
-              <div
-                ref={previewStripRef}
-                className='image-preview-strip'
-                aria-label={copy.batch.title}
-              >
-                {batchImages.map((item, index) => (
-                  <button
-                    ref={node => {
-                      previewButtonRefs.current[index] = node;
-                    }}
-                    key={`${item.info.name}-${item.info.lastModified}-${index}`}
-                    className={[
-                      'interactive',
-                      index === activeImageIndex ? 'is-active' : '',
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
-                    type='button'
-                    onClick={() => showPreviewAt(index)}
-                  >
-                    <img src={item.previewUrl} alt='' aria-hidden='true' />
-                    <span>
-                      <strong>{item.info.name}</strong>
-                      <small>
-                        {item.info.width} x {item.info.height} ·{' '}
-                        {formatBytes(item.info.size)}
-                      </small>
-                    </span>
-                  </button>
-                ))}
-              </div>
-            ) : null}
-
-            {batchFiles.length ? (
-              <div
-                className='image-batch-summary'
-                aria-label={copy.batch.title}
-              >
-                <div className='image-batch-summary-head'>
-                  <span aria-hidden='true'>
-                    <Images size={16} />
-                  </span>
-                  <div>
-                    <strong>
-                      {batchFiles.length}
-                      {copy.batch.countSuffix}
-                    </strong>
-                    <small>{copy.batch.unifiedNote}</small>
-                  </div>
-                </div>
-                <div className='image-batch-stats'>
-                  <span>
-                    {copy.batch.totalSize}: {formatBytes(totalInputSize)}
-                  </span>
-                  <span>
-                    {copy.batch.primary}: {previewPosition || copy.info.unknown}
-                  </span>
-                </div>
-              </div>
-            ) : null}
-
-            <Base64Transfer
-              copied={copiedBase64}
-              copy={copy.base64}
-              error={base64Error}
-              value={base64Value}
-              onCopy={() => void copyImageBase64()}
-              onChange={value => {
-                setCopiedBase64(false);
-                setBase64Error('');
-                setBase64Value(value);
-              }}
-            />
-
-            <div className='image-info-grid' aria-label={copy.info.title}>
-              <MetricItem
-                label={copy.info.dimensions}
-                value={
-                  imageInfo
-                    ? `${imageInfo.width} x ${imageInfo.height}`
-                    : copy.info.unknown
-                }
-              />
-              <MetricItem
-                label={copy.info.size}
-                value={
-                  imageInfo ? formatBytes(imageInfo.size) : copy.info.unknown
-                }
-              />
-              <MetricItem
-                label={copy.info.mime}
-                value={imageInfo?.type || copy.info.unknown}
-              />
-              <MetricItem
-                label={copy.info.lastModified}
-                value={
-                  imageInfo
-                    ? formatDate(imageInfo.lastModified)
-                    : copy.info.unknown
-                }
-              />
-            </div>
-          </OCard>
-
-          <OCard
-            as='aside'
-            className='image-settings-panel reveal-on-scroll'
-            padding='lg'
-          >
-            <div className='image-panel-heading'>
-              <div>
-                <h2>{copy.settings.title}</h2>
-                <p>{copy.settings.subtitle}</p>
-              </div>
-              <Wand2 size={20} strokeWidth={1.8} aria-hidden='true' />
-            </div>
-
-            <div className='image-setting-group'>
-              <ToggleRow
-                checked={convertEnabled}
-                label={copy.convert.enable}
-                onChange={setConvertEnabled}
-              >
-                {copy.convert.description}
-              </ToggleRow>
-              <OSelector
-                ariaLabel={copy.convert.formatLabel}
-                className='image-format-selector'
-                options={formatOptions}
-                value={convertEnabled ? outputFormat : 'original'}
-                onChange={value => setOutputFormat(value as OutputFormat)}
-              />
-            </div>
-
-            <div className='image-setting-group'>
-              <ToggleRow
-                checked={resizeEnabled}
-                label={copy.resize.enable}
-                onChange={setResizeEnabled}
-              >
-                {copy.resize.description}
-              </ToggleRow>
-              <div className='image-resize-panel'>
-                <div className='image-resize-heading'>
-                  <span>
-                    <Maximize2 size={15} aria-hidden='true' />
-                    {copy.resize.dimensionTitle}
-                  </span>
-                  <span
-                    className={[
-                      'image-aspect-status',
-                      keepAspectRatio ? 'is-locked' : '',
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
-                  >
-                    {keepAspectRatio
-                      ? copy.resize.aspectLocked
-                      : copy.resize.aspectUnlocked}
-                  </span>
-                </div>
-                <div className='image-dimension-controls'>
-                  <label>
-                    <span>{copy.resize.width}</span>
-                    <input
-                      disabled={!resizeEnabled || !imageInfo}
-                      inputMode='numeric'
-                      min='1'
-                      type='number'
-                      value={targetWidth}
-                      onChange={event =>
-                        handleDimensionChange('width', event.target.value)
-                      }
-                    />
-                  </label>
-                  <OIconButton
-                    aria-label={
-                      keepAspectRatio
-                        ? copy.resize.aspectLocked
-                        : copy.resize.aspectUnlocked
-                    }
-                    aria-pressed={keepAspectRatio}
-                    className={[
-                      'image-aspect-button',
-                      keepAspectRatio ? 'is-active' : '',
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
-                    disabled={!resizeEnabled || !imageInfo}
-                    hoverTranslate={false}
-                    size='md'
-                    title={copy.resize.aspectToggleLabel}
-                    variant='ghost'
-                    onClick={handleAspectRatioToggle}
-                  >
-                    {keepAspectRatio ? (
-                      <Lock size={16} aria-hidden='true' />
-                    ) : (
-                      <Unlock size={16} aria-hidden='true' />
-                    )}
-                  </OIconButton>
-                  <label>
-                    <span>{copy.resize.height}</span>
-                    <input
-                      disabled={!resizeEnabled || !imageInfo}
-                      inputMode='numeric'
-                      min='1'
-                      type='number'
-                      value={targetHeight}
-                      onChange={event =>
-                        handleDimensionChange('height', event.target.value)
-                      }
-                    />
-                  </label>
-                </div>
-                <label className='image-range-control'>
-                  <span>
-                    {copy.resize.scaleLabel}
-                    <strong>{scale}%</strong>
-                  </span>
-                  <input
-                    disabled={!resizeEnabled || !imageInfo}
-                    max={maxScale}
-                    min={minScale}
-                    step='5'
-                    type='range'
-                    value={scale}
-                    onChange={event => handleScaleChange(event.target.value)}
-                  />
-                  <small>
-                    <span>{minScale}%</span>
-                    <span>{maxScale}%</span>
-                  </small>
-                </label>
-                <p className='image-resize-help'>{copy.resize.batchHint}</p>
-              </div>
-            </div>
-
-            <div className='image-setting-group'>
-              <ToggleRow
-                checked={compressEnabled}
-                label={copy.compress.enable}
-                onChange={setCompressEnabled}
-              >
-                {copy.compress.description}
-              </ToggleRow>
-              <div className='image-provider-row'>
-                <ImageDown size={16} aria-hidden='true' />
-                <span>{copy.compress.provider}</span>
-              </div>
-            </div>
-
-            <div
-              className='image-estimate-panel'
-              aria-label={copy.output.estimateTitle}
-            >
-              <MetricItem
-                label={copy.output.estimatedDimensions}
-                value={
-                  targetDimensions
-                    ? `${targetDimensions.width} x ${targetDimensions.height}`
-                    : copy.info.unknown
-                }
-              />
-              <MetricItem
-                label={copy.output.estimatedSize}
-                value={
-                  estimatedSize
-                    ? `~${formatBytes(estimatedSize)}`
-                    : copy.info.unknown
-                }
-              />
-              <MetricItem
-                label={copy.output.outputType}
-                value={convertEnabled ? outputFormat : copy.convert.keep}
-              />
-            </div>
-
-            <div className='image-action-row'>
-              <OButton
-                disabled={!canProcess}
-                type='button'
-                onClick={() => void processImage()}
-              >
-                {processState.phase === 'processing' ||
-                processState.phase === 'compressing' ? (
-                  <Loader2 className='spin' size={16} aria-hidden='true' />
-                ) : (
-                  <Zap size={16} aria-hidden='true' />
-                )}
-                {processState.phase === 'compressing'
-                  ? copy.output.compressing
-                  : processState.phase === 'processing'
-                    ? copy.output.processing
-                    : isBatchMode
-                      ? copy.output.processBatch
-                      : copy.output.process}
-              </OButton>
-              <OButton type='button' variant='ghost' onClick={resetAll}>
-                <RotateCcw size={16} aria-hidden='true' />
-                {copy.output.reset}
-              </OButton>
-            </div>
-          </OCard>
-        </section>
-
-        <OCard
-          as='section'
-          className={[
-            'image-result-panel reveal-on-scroll',
-            result ? 'has-result' : '',
-            `is-${processState.phase}`,
-          ].join(' ')}
-          padding='lg'
-        >
-          <div className='image-result-status'>
-            <span>
-              {processState.phase === 'done' ? (
-                <CheckCircle2 size={18} aria-hidden='true' />
-              ) : processState.phase === 'compressing' ||
-                processState.phase === 'processing' ? (
-                <Loader2 className='spin' size={18} aria-hidden='true' />
-              ) : processState.phase === 'error' ? (
-                <Info size={18} aria-hidden='true' />
-              ) : (
-                <RefreshCcw size={18} aria-hidden='true' />
-              )}
-            </span>
-            <div>
-              <h2>{copy.output.title}</h2>
-              <p>{outputMessage}</p>
-            </div>
-          </div>
-
-          <div className='image-result-grid'>
-            <MetricItem
-              label={
-                hasBatchFeedback
-                  ? copy.output.processedCount
-                  : copy.output.processedDimensions
-              }
-              value={
-                hasBatchFeedback
-                  ? `${completedBatchItemCount}/${batchProcessItems.length}`
-                  : result
-                    ? `${result.width} x ${result.height}`
-                    : copy.info.unknown
-              }
-            />
-            <MetricItem
-              label={
-                hasBatchFeedback
-                  ? copy.output.outputTotalSize
-                  : copy.output.processedSize
-              }
-              value={
-                hasBatchFeedback
-                  ? formatBytes(totalResultSize)
-                  : result
-                    ? formatBytes(result.size)
-                    : copy.info.unknown
-              }
-            />
-            <MetricItem
-              label={copy.output.savings}
-              value={
-                hasBatchFeedback && batchSavingsRatio !== null
-                  ? `${Math.max(0, batchSavingsRatio * 100).toFixed(1)}%`
-                  : result
-                    ? `${Math.max(0, result.savingsRatio * 100).toFixed(1)}%`
-                    : copy.info.unknown
-              }
-            />
-            <MetricItem
-              label={
-                hasBatchFeedback ? copy.output.failedCount : copy.output.engine
-              }
-              value={
-                hasBatchFeedback
-                  ? String(failedBatchItemCount)
-                  : result?.source === 'tinypng'
-                    ? copy.compress.provider
-                    : copy.output.localEngine
-              }
-            />
-          </div>
-
-          <div className='image-result-actions'>
-            {isBatchMode && batchResults.length ? (
-              <OButton
-                disabled={isZipping}
-                type='button'
-                variant='secondary'
-                onClick={() => void downloadAllResults()}
-              >
-                {isZipping ? (
-                  <Loader2 className='spin' size={16} aria-hidden='true' />
-                ) : (
-                  <Download size={16} aria-hidden='true' />
-                )}
-                {isZipping
-                  ? copy.output.zipping
-                  : failedBatchItemCount
-                    ? copy.output.downloadSuccessfulZip
-                    : copy.output.downloadZip}
-              </OButton>
-            ) : result ? (
-              <OButton
-                download={result.name}
-                href={result.url}
-                variant='secondary'
-              >
-                <Download size={16} aria-hidden='true' />
-                {copy.output.download}
-              </OButton>
-            ) : null}
-          </div>
-
-          {hasBatchFeedback ? (
-            <div
-              className='image-result-items'
-              aria-label={copy.output.batchItemsTitle}
-            >
-              {batchProcessItems.map((item, index) => {
-                const icon =
-                  item.phase === 'done' ? (
-                    <CheckCircle2 size={14} aria-hidden='true' />
-                  ) : item.phase === 'processing' ||
-                    item.phase === 'compressing' ? (
-                    <Loader2 className='spin' size={14} aria-hidden='true' />
-                  ) : item.phase === 'error' ? (
-                    <Info size={14} aria-hidden='true' />
-                  ) : (
-                    <FileImage size={14} aria-hidden='true' />
-                  );
-                const statusDetail = item.result
-                  ? `${item.message} · ${formatBytes(item.result.size)}`
-                  : item.message;
-                const className = [
-                  'image-result-item',
-                  `is-${item.phase}`,
-                  item.result ? 'interactive' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ');
-                const content = (
-                  <>
-                    {icon}
-                    <span>
-                      <strong>{item.result?.name || item.name}</strong>
-                      <small>{statusDetail}</small>
-                    </span>
-                    <small>
-                      {index + 1}/{batchProcessItems.length}
-                    </small>
-                  </>
-                );
-
-                return item.result ? (
-                  <a
-                    key={`${item.name}-${index}`}
-                    className={className}
-                    download={item.result.name}
-                    href={item.result.url}
-                  >
-                    {content}
-                  </a>
-                ) : (
-                  <div key={`${item.name}-${index}`} className={className}>
-                    {content}
-                  </div>
-                );
-              })}
-            </div>
-          ) : null}
-        </OCard>
-      </main>
-    </>
+        ) : null}
+      </OCard>
+    </LayoutToolPage>
   );
 }

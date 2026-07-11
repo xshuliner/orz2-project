@@ -1,10 +1,7 @@
+import { LayoutToolPage } from '@/components/LayoutToolPage';
 import { OCard } from '@/components/OCard';
 import { OIconButton } from '@/components/OIconButton';
-import { OPageHero } from '@/components/OPageHero';
-import { Seo } from '@/components/Seo';
-import { getToolSeo } from '@/config/seo';
 import { useI18n } from '@/hooks/useI18n';
-import { getTools } from '@/i18n';
 import { TimezoneSideCard } from '@/pages/Tools/ToolTimezoneConverter/components/TimezoneSideCard';
 import {
   getOptionById,
@@ -24,30 +21,18 @@ import {
   parseDateTimeLocal,
   zonedTimeToUtc,
 } from '@/pages/Tools/ToolTimezoneConverter/utils/dateTime';
-import {
-  ArrowLeft,
-  ArrowRightLeft,
-  CalendarClock,
-  CheckCircle2,
-  Globe2,
-} from 'lucide-react';
+import { ArrowRightLeft, Globe2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import './index.css';
 
 export function TimezoneConverter() {
-  const { locale, localizePath, messages } = useI18n();
+  const { locale, messages } = useI18n();
   const copy = messages.timezoneTool;
   const [leftZoneId, setLeftZoneId] = useState<TimeZoneId>('china');
   const [rightZoneId, setRightZoneId] = useState<TimeZoneId>('us-pacific');
   const [sourceSide, setSourceSide] = useState<ConverterSide>('left');
   const [instantMs, setInstantMs] = useState(() => Date.now());
 
-  const tool = useMemo(
-    () => getTools(locale).find(item => item.id === timezoneToolId),
-    [locale]
-  );
-  const localizedToolSeo = useMemo(() => getToolSeo(locale), [locale]);
   const instant = useMemo(() => new Date(instantMs), [instantMs]);
   const leftOption = getOptionById(leftZoneId);
   const rightOption = getOptionById(rightZoneId);
@@ -87,97 +72,71 @@ export function TimezoneConverter() {
   }
 
   return (
-    <>
-      <Seo config={localizedToolSeo[timezoneSeoKey]} />
-      <section className='timezone-tool-page'>
-        <Link
-          className='timezone-back-link interactive'
-          to={localizePath('/tools')}
-        >
-          <ArrowLeft size={16} aria-hidden='true' />
-          {copy.backToTools}
-        </Link>
-
-        <OPageHero
-          className='timezone-tool-hero'
-          title={tool?.name ?? copy.title}
-          description={tool?.summary ?? copy.description}
-        >
-          <div className='timezone-hero-strip' aria-label={copy.heroAriaLabel}>
-            {copy.heroHighlights.map((highlight, index) => {
-              const Icon =
-                [Globe2, CalendarClock, CheckCircle2][index] ?? CheckCircle2;
-              return (
-                <span key={highlight}>
-                  <Icon size={15} aria-hidden='true' />
-                  {highlight}
-                </span>
-              );
-            })}
-          </div>
-        </OPageHero>
-
-        <section className='timezone-workbench'>
-          <TimezoneSideCard
-            copy={copy}
-            details={leftDetails}
-            inputValue={leftInputValue}
-            instant={instant}
-            isSource={sourceSide === 'left'}
-            locale={locale}
-            option={leftOption}
-            sideTitle={copy.leftSide}
-            zoneId={leftZoneId}
-            onTimeChange={value => updateFromInput(value, leftOption, 'left')}
-            onZoneChange={setLeftZoneId}
-          />
-
-          <OCard
-            as='section'
-            className='timezone-relation-card reveal-on-scroll'
-            aria-label={copy.swapSides}
-            padding='sm'
-            tone='brand'
-          >
-            <OIconButton
-              aria-label={copy.swapSides}
-              className='timezone-swap-button'
-              hoverTranslate={false}
-              size='lg'
-              onClick={swapSides}
-            >
-              <ArrowRightLeft size={22} strokeWidth={1.9} aria-hidden='true' />
-            </OIconButton>
-          </OCard>
-
-          <TimezoneSideCard
-            copy={copy}
-            details={rightDetails}
-            inputValue={rightInputValue}
-            instant={instant}
-            isSource={sourceSide === 'right'}
-            locale={locale}
-            option={rightOption}
-            sideTitle={copy.rightSide}
-            zoneId={rightZoneId}
-            onTimeChange={value => updateFromInput(value, rightOption, 'right')}
-            onZoneChange={setRightZoneId}
-          />
-        </section>
+    <LayoutToolPage
+      icon={Globe2}
+      seoKey={timezoneSeoKey}
+      toolId={timezoneToolId}
+    >
+      <section className='timezone-workbench'>
+        <TimezoneSideCard
+          copy={copy}
+          details={leftDetails}
+          inputValue={leftInputValue}
+          instant={instant}
+          isSource={sourceSide === 'left'}
+          locale={locale}
+          option={leftOption}
+          sideTitle={copy.leftSide}
+          zoneId={leftZoneId}
+          onTimeChange={value => updateFromInput(value, leftOption, 'left')}
+          onZoneChange={setLeftZoneId}
+        />
 
         <OCard
-          as='aside'
-          className='timezone-note-card reveal-on-scroll'
-          padding='md'
-          tone='soft'
+          as='section'
+          className='timezone-relation-card reveal-on-scroll'
+          aria-label={copy.swapSides}
+          padding='sm'
+          tone='brand'
         >
-          <Globe2 size={18} strokeWidth={1.8} aria-hidden='true' />
-          <div>
-            <strong>{copy.noteTitle}</strong>
-            <p>{copy.noteDescription}</p>
-          </div>
+          <OIconButton
+            aria-label={copy.swapSides}
+            className='timezone-swap-button'
+            hoverTranslate={false}
+            size='lg'
+            onClick={swapSides}
+          >
+            <ArrowRightLeft size={22} strokeWidth={1.9} aria-hidden='true' />
+          </OIconButton>
         </OCard>
+
+        <TimezoneSideCard
+          copy={copy}
+          details={rightDetails}
+          inputValue={rightInputValue}
+          instant={instant}
+          isSource={sourceSide === 'right'}
+          locale={locale}
+          option={rightOption}
+          sideTitle={copy.rightSide}
+          zoneId={rightZoneId}
+          onTimeChange={value => updateFromInput(value, rightOption, 'right')}
+          onZoneChange={setRightZoneId}
+        />
       </section>
-    </>
+
+      <OCard
+        as='aside'
+        className='timezone-note-card reveal-on-scroll'
+        padding='md'
+        tone='soft'
+      >
+        <Globe2 size={18} strokeWidth={1.8} aria-hidden='true' />
+        <div>
+          <strong>{copy.noteTitle}</strong>
+          <p>{copy.noteDescription}</p>
+        </div>
+      </OCard>
+    </LayoutToolPage>
   );
 }

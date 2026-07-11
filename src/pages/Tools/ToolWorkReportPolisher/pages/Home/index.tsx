@@ -1,11 +1,8 @@
 import { postPolishContent } from '@/api';
+import { LayoutToolPage } from '@/components/LayoutToolPage';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
-import { OPageHero } from '@/components/OPageHero';
-import { Seo } from '@/components/Seo';
-import { getToolSeo } from '@/config/seo';
 import { useI18n } from '@/hooks/useI18n';
-import { getTools } from '@/i18n';
 import {
   reportPolisherPolishMode,
   reportPolisherSeoKey,
@@ -19,8 +16,6 @@ import {
 } from '@/pages/Tools/ToolWorkReportPolisher/utils/form';
 import { buildPolishContent } from '@/pages/Tools/ToolWorkReportPolisher/utils/prompt';
 import {
-  ArrowLeft,
-  CheckCircle2,
   ClipboardCopy,
   ClipboardPenLine,
   FileText,
@@ -28,7 +23,6 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
 import './index.css';
 
 function cx(...values: Array<string | false | null | undefined>) {
@@ -36,7 +30,7 @@ function cx(...values: Array<string | false | null | undefined>) {
 }
 
 export function WorkReportPolisher() {
-  const { locale, localizePath, messages } = useI18n();
+  const { messages } = useI18n();
   const copy = messages.reportPolishTool;
   const initialForm = useMemo(() => getInitialReportPolishForm(), []);
   const [reportType, setReportType] = useState<ReportType>(
@@ -51,11 +45,6 @@ export function WorkReportPolisher() {
   const [isPolishing, setIsPolishing] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
 
-  const tool = useMemo(
-    () => getTools(locale).find(item => item.id === reportPolisherToolId),
-    [locale]
-  );
-  const localizedToolSeo = useMemo(() => getToolSeo(locale), [locale]);
   const reportTypeOptions: Array<{ label: string; value: ReportType }> = [
     { label: copy.daily, value: 'daily' },
     { label: copy.weekly, value: 'weekly' },
@@ -144,211 +133,182 @@ export function WorkReportPolisher() {
   }
 
   return (
-    <>
-      <Seo config={localizedToolSeo[reportPolisherSeoKey]} />
-      <section className='report-polish-page'>
-        <Link
-          className='report-polish-back-link interactive'
-          to={localizePath('/tools')}
+    <LayoutToolPage
+      icon={Sparkles}
+      seoKey={reportPolisherSeoKey}
+      toolId={reportPolisherToolId}
+    >
+      <section className='report-polish-workbench'>
+        <OCard
+          as='section'
+          className='report-polish-card reveal-on-scroll'
+          padding='lg'
         >
-          <ArrowLeft size={16} aria-hidden='true' />
-          {copy.backToTools}
-        </Link>
-
-        <OPageHero
-          className='report-polish-hero'
-          title={tool?.name ?? copy.title}
-          description={tool?.summary ?? copy.description}
-        >
-          <div
-            className='report-polish-hero-strip'
-            aria-label={copy.heroAriaLabel}
-          >
-            {copy.heroHighlights.map((highlight, index) => {
-              const Icon =
-                [Sparkles, CheckCircle2, FileText][index] ?? CheckCircle2;
-              return (
-                <span key={highlight}>
-                  <Icon size={15} aria-hidden='true' />
-                  {highlight}
-                </span>
-              );
-            })}
+          <div className='report-polish-card-heading'>
+            <span className='report-polish-card-icon' aria-hidden='true'>
+              <ClipboardPenLine size={19} strokeWidth={1.9} />
+            </span>
+            <div>
+              <h2>{copy.inputTitle}</h2>
+              <p>{copy.inputDescription}</p>
+            </div>
           </div>
-        </OPageHero>
 
-        <section className='report-polish-workbench'>
-          <OCard
-            as='section'
-            className='report-polish-card reveal-on-scroll'
-            padding='lg'
-          >
-            <div className='report-polish-card-heading'>
-              <span className='report-polish-card-icon' aria-hidden='true'>
-                <ClipboardPenLine size={19} strokeWidth={1.9} />
-              </span>
-              <div>
-                <h2>{copy.inputTitle}</h2>
-                <p>{copy.inputDescription}</p>
-              </div>
-            </div>
-
-            <div className='report-polish-type-row'>
-              <span>{copy.typeLabel}</span>
-              <div className='report-polish-type-switch'>
-                {reportTypeOptions.map(option => (
-                  <button
-                    aria-pressed={reportType === option.value}
-                    className={cx(
-                      'interactive',
-                      reportType === option.value && 'is-active'
-                    )}
-                    key={option.value}
-                    onClick={() => handleReportTypeChange(option.value)}
-                    type='button'
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className='report-polish-textarea-field'>
-              <span className='report-polish-field-heading'>
-                <span>
-                  <strong>{copy.inputTitle}</strong>
-                  <small>{copy.inputDescription}</small>
-                </span>
-                <OButton
-                  disabled={isPolishing}
-                  onClick={fillSourceSample}
-                  size='sm'
-                  type='button'
-                  variant='ghost'
-                >
-                  {copy.useSample}
-                </OButton>
-              </span>
-              <textarea
-                aria-label={copy.inputTitle}
-                disabled={isPolishing}
-                onChange={event => {
-                  setSource(event.target.value);
-                  setStatus('');
-                }}
-                placeholder={copy.inputPlaceholder}
-                value={source}
-              />
-            </div>
-
-            <div className='report-polish-textarea-field report-polish-textarea-field--reference'>
-              <span className='report-polish-field-heading'>
-                <span>
-                  <strong>{copy.referenceTitle}</strong>
-                  <small>{copy.referenceDescription}</small>
-                </span>
-                <OButton
-                  disabled={isPolishing}
-                  onClick={fillReferenceSample}
-                  size='sm'
-                  type='button'
-                  variant='ghost'
-                >
-                  {copy.useReferenceSample}
-                </OButton>
-              </span>
-              <textarea
-                aria-label={copy.referenceTitle}
-                disabled={isPolishing}
-                onChange={event => {
-                  setReferenceContent(event.target.value);
-                  setStatus('');
-                }}
-                placeholder={copy.referencePlaceholder}
-                value={referenceContent}
-              />
-            </div>
-
-            <div className='report-polish-action-row report-polish-action-row--end'>
-              <div className='report-polish-actions'>
-                <OButton
-                  disabled={!canPolish}
-                  onClick={handlePolish}
-                  size='sm'
-                  type='button'
-                >
-                  {isPolishing ? (
-                    <Loader2
-                      className='report-polish-loading-icon'
-                      size={15}
-                      aria-hidden='true'
-                    />
-                  ) : (
-                    <Sparkles size={15} aria-hidden='true' />
+          <div className='report-polish-type-row'>
+            <span>{copy.typeLabel}</span>
+            <div className='report-polish-type-switch'>
+              {reportTypeOptions.map(option => (
+                <button
+                  aria-pressed={reportType === option.value}
+                  className={cx(
+                    'interactive',
+                    reportType === option.value && 'is-active'
                   )}
-                  {isPolishing ? copy.polishing : copy.polish}
-                </OButton>
-              </div>
+                  key={option.value}
+                  onClick={() => handleReportTypeChange(option.value)}
+                  type='button'
+                >
+                  {option.label}
+                </button>
+              ))}
             </div>
-          </OCard>
+          </div>
 
-          <OCard
-            as='section'
-            className='report-polish-card report-polish-output-card reveal-on-scroll'
-            padding='lg'
-          >
-            <div className='report-polish-card-heading'>
-              <span className='report-polish-card-icon' aria-hidden='true'>
-                <FileText size={19} strokeWidth={1.9} />
-              </span>
-              <div>
-                <h2>{copy.outputTitle}</h2>
-                <p>{copy.outputDescription}</p>
-              </div>
-            </div>
-
-            <div
-              className={cx(
-                'report-polish-output',
-                result ? 'has-result' : 'is-empty'
-              )}
-              aria-live='polite'
-            >
-              {result ? <pre>{result}</pre> : <p>{copy.outputEmpty}</p>}
-            </div>
-
-            <div className='report-polish-action-row report-polish-output-actions'>
-              <span className='report-polish-status' role='status'>
-                {status}
+          <div className='report-polish-textarea-field'>
+            <span className='report-polish-field-heading'>
+              <span>
+                <strong>{copy.inputTitle}</strong>
+                <small>{copy.inputDescription}</small>
               </span>
               <OButton
-                disabled={!result.trim()}
-                onClick={copyResult}
+                disabled={isPolishing}
+                onClick={fillSourceSample}
                 size='sm'
                 type='button'
-                variant='secondary'
+                variant='ghost'
               >
-                <ClipboardCopy size={15} aria-hidden='true' />
-                {isCopied ? copy.copied : copy.copy}
+                {copy.useSample}
+              </OButton>
+            </span>
+            <textarea
+              aria-label={copy.inputTitle}
+              disabled={isPolishing}
+              onChange={event => {
+                setSource(event.target.value);
+                setStatus('');
+              }}
+              placeholder={copy.inputPlaceholder}
+              value={source}
+            />
+          </div>
+
+          <div className='report-polish-textarea-field report-polish-textarea-field--reference'>
+            <span className='report-polish-field-heading'>
+              <span>
+                <strong>{copy.referenceTitle}</strong>
+                <small>{copy.referenceDescription}</small>
+              </span>
+              <OButton
+                disabled={isPolishing}
+                onClick={fillReferenceSample}
+                size='sm'
+                type='button'
+                variant='ghost'
+              >
+                {copy.useReferenceSample}
+              </OButton>
+            </span>
+            <textarea
+              aria-label={copy.referenceTitle}
+              disabled={isPolishing}
+              onChange={event => {
+                setReferenceContent(event.target.value);
+                setStatus('');
+              }}
+              placeholder={copy.referencePlaceholder}
+              value={referenceContent}
+            />
+          </div>
+
+          <div className='report-polish-action-row report-polish-action-row--end'>
+            <div className='report-polish-actions'>
+              <OButton
+                disabled={!canPolish}
+                onClick={handlePolish}
+                size='sm'
+                type='button'
+              >
+                {isPolishing ? (
+                  <Loader2
+                    className='report-polish-loading-icon'
+                    size={15}
+                    aria-hidden='true'
+                  />
+                ) : (
+                  <Sparkles size={15} aria-hidden='true' />
+                )}
+                {isPolishing ? copy.polishing : copy.polish}
               </OButton>
             </div>
-          </OCard>
-        </section>
+          </div>
+        </OCard>
 
         <OCard
-          as='aside'
-          className='report-polish-tips reveal-on-scroll'
-          padding='md'
-          tone='soft'
+          as='section'
+          className='report-polish-card report-polish-output-card reveal-on-scroll'
+          padding='lg'
         >
-          <strong>{copy.tipsTitle}</strong>
-          <ul>
-            {copy.tips.map(tip => (
-              <li key={tip}>{tip}</li>
-            ))}
-          </ul>
+          <div className='report-polish-card-heading'>
+            <span className='report-polish-card-icon' aria-hidden='true'>
+              <FileText size={19} strokeWidth={1.9} />
+            </span>
+            <div>
+              <h2>{copy.outputTitle}</h2>
+              <p>{copy.outputDescription}</p>
+            </div>
+          </div>
+
+          <div
+            className={cx(
+              'report-polish-output',
+              result ? 'has-result' : 'is-empty'
+            )}
+            aria-live='polite'
+          >
+            {result ? <pre>{result}</pre> : <p>{copy.outputEmpty}</p>}
+          </div>
+
+          <div className='report-polish-action-row report-polish-output-actions'>
+            <span className='report-polish-status' role='status'>
+              {status}
+            </span>
+            <OButton
+              disabled={!result.trim()}
+              onClick={copyResult}
+              size='sm'
+              type='button'
+              variant='secondary'
+            >
+              <ClipboardCopy size={15} aria-hidden='true' />
+              {isCopied ? copy.copied : copy.copy}
+            </OButton>
+          </div>
         </OCard>
       </section>
-    </>
+
+      <OCard
+        as='aside'
+        className='report-polish-tips reveal-on-scroll'
+        padding='md'
+        tone='soft'
+      >
+        <strong>{copy.tipsTitle}</strong>
+        <ul>
+          {copy.tips.map(tip => (
+            <li key={tip}>{tip}</li>
+          ))}
+        </ul>
+      </OCard>
+    </LayoutToolPage>
   );
 }
