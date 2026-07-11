@@ -244,6 +244,3 @@ export function getToolSeo(locale: Locale) {
       ])
   );
 }
-
-export const pageSeo = getPageSeo(defaultLocale);
-export const toolSeo = getToolSeo(defaultLocale);

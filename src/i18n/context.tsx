@@ -7,13 +7,14 @@ import {
   switchLocaleInPath,
   type Locale,
 } from '@/i18n/locale';
-import { getMessages, type Messages } from '@/i18n/messages';
+import { loadMessages, type Messages } from '@/i18n/messages';
 import { toSiteUrl } from '@/utils/siteUrl';
 import {
   createContext,
   useCallback,
   useEffect,
   useMemo,
+  useState,
   type ReactNode,
 } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -37,6 +38,22 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const parsed = parseLocalizedPath(location.pathname);
   const locale = parsed.locale;
+  const [loadedLocale, setLoadedLocale] = useState<Locale | null>(null);
+  const [messages, setMessages] = useState<Messages | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void loadMessages(locale).then(localeMessages => {
+      if (cancelled) return;
+      setMessages(localeMessages);
+      setLoadedLocale(locale);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [locale]);
 
   useEffect(() => {
     document.documentElement.lang = localeHtmlLang[locale];
@@ -51,8 +68,6 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     (to: string) => toSiteUrl(localizePath(to, locale)),
     [locale]
   );
-  const messages = getMessages(locale);
-
   const switchLocale = useCallback(
     (nextLocale: Locale) => {
       if (nextLocale === locale) return;
@@ -68,20 +83,28 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     [locale, location.hash, location.pathname, location.search, navigate]
   );
 
-  const value = useMemo<I18nContextValue>(
-    () => ({
+  const value = useMemo<I18nContextValue | null>(() => {
+    if (loadedLocale !== locale || !messages) return null;
+
+    return {
       locale,
-      localeName:
-        messages.locale.names[locale] ??
-        getMessages(defaultLocale).locale.names[defaultLocale],
+      localeName: messages.locale.names[locale] ?? defaultLocale,
       locales,
       messages,
       localizePath: toLocalizedPath,
       routeUrl: toRouteUrl,
       switchLocale,
-    }),
-    [locale, messages, switchLocale, toLocalizedPath, toRouteUrl]
-  );
+    };
+  }, [
+    loadedLocale,
+    locale,
+    messages,
+    switchLocale,
+    toLocalizedPath,
+    toRouteUrl,
+  ]);
+
+  if (!value) return null;
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }

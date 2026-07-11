@@ -17,4 +17,25 @@ export default defineConfig(({ mode }) => ({
       '@': resolve(rootDir, 'src'),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+
+          if (
+            /node_modules\/(react|react-dom|scheduler|react-router|@remix-run|react-helmet-async)\//.test(
+              id
+            )
+          ) {
+            return 'vendor-react';
+          }
+
+          if (id.includes('/node_modules/lucide-react/')) {
+            return 'vendor-icons';
+          }
+        },
+      },
+    },
+  },
 }));
