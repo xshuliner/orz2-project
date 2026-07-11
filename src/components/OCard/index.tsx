@@ -1,3 +1,4 @@
+import { cn } from '@/utils/classNames';
 import {
   createElement,
   forwardRef,
@@ -37,16 +38,14 @@ export const OCard = forwardRef<HTMLElement, OCardProps>(function OCard(
     {
       ...props,
       ref,
-      className: [
+      className: cn(
         'o-card',
         `o-card--${tone}`,
         `o-card--padding-${padding}`,
         interactive ? 'o-card--interactive interactive' : '',
         accentBar ? 'o-card--accent' : '',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' '),
+        className
+      ),
       'data-o-card-interactive': interactive ? 'true' : undefined,
     },
     children

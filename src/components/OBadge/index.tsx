@@ -1,3 +1,4 @@
+import { cn } from '@/utils/classNames';
 import type { HTMLAttributes, ReactNode } from 'react';
 
 export type OBadgeTone = 'neutral' | 'brand' | 'warning' | 'danger';
@@ -18,7 +19,7 @@ export function OBadge({
   return (
     <span
       {...props}
-      className={[
+      className={cn(
         'o-badge inline-flex min-h-[var(--badge-height)] items-center rounded-[var(--radius-control)] border px-[9px] text-xs font-[720]',
         pill ? 'rounded-full' : '',
         {
@@ -31,10 +32,8 @@ export function OBadge({
           danger:
             'border-[color:color-mix(in_srgb,var(--color-danger)_24%,transparent)] bg-[var(--color-panel-danger)] text-[var(--color-danger)]',
         }[tone],
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+        className
+      )}
     >
       {children}
     </span>

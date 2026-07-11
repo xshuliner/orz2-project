@@ -1,3 +1,4 @@
+import { cn } from '@/utils/classNames';
 import type { HTMLAttributes, ReactNode } from 'react';
 
 interface OEmptyStateProps extends HTMLAttributes<HTMLDivElement> {
@@ -12,13 +13,11 @@ export function OEmptyState({
   return (
     <div
       {...props}
-      className={[
+      className={cn(
         'empty-state',
         'rounded-[var(--radius-card)] bg-[var(--surface-soft)]',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+        className
+      )}
     >
       {children}
     </div>

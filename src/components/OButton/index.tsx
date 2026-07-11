@@ -1,4 +1,5 @@
 import { useI18n } from '@/hooks/useI18n';
+import { cn } from '@/utils/classNames';
 import {
   forwardRef,
   type AnchorHTMLAttributes,
@@ -48,7 +49,7 @@ function buttonClassName(
   hoverTranslate: boolean,
   className: string | undefined
 ) {
-  return [
+  return cn(
     'rounded-[var(--radius-control)]',
     {
       sm: 'min-h-[var(--control-height-sm)] px-[var(--control-padding-sm)]',
@@ -60,10 +61,8 @@ function buttonClassName(
     'button',
     variant,
     'interactive',
-    className,
-  ]
-    .filter(Boolean)
-    .join(' ');
+    className
+  );
 }
 
 export const OButton = forwardRef<

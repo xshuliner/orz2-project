@@ -1,3 +1,4 @@
+import { cn } from '@/utils/classNames';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 export type OIconButtonVariant = 'default' | 'ghost';
@@ -26,7 +27,7 @@ export function OIconButton({
   return (
     <button
       {...props}
-      className={[
+      className={cn(
         'rounded-[var(--radius-control)]',
         'icon-button',
         'interactive',
@@ -38,10 +39,8 @@ export function OIconButton({
         }[size],
         !hoverTranslate &&
           'o-icon-button--no-hover-translate hover:!transform-none',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+        className
+      )}
       type={type}
     >
       {children}
