@@ -16,8 +16,8 @@ type ResponseHeaders = AxiosResponseHeaders | RawAxiosResponseHeaders;
 
 const webEnvironment =
   (import.meta.env.VITE_APP_ENV as WebEnvironment | undefined) || 'prod';
-const platform = 'EXTENSION';
-const brand = 'gatling';
+const platform = 'ORZ2';
+const brand = 'zero';
 const secretKey = 'I@, ha*ve #187076081$ dream(s)!~';
 const tokenStorageKey = 'token';
 const defaultTimeoutMs = 20000;
