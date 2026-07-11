@@ -6,8 +6,8 @@ import type {
   PostOfficialPublisherBody,
 } from '@/api';
 import {
-  defaultForm,
   defaultPromptTemplateId,
+  defaultPublisherForm,
   defaultSimpleInlineImageCount,
   officialPublisherModes,
   officialPublisherProviders,
@@ -17,9 +17,9 @@ import {
 } from '@/pages/Tools/ToolOfficialPublisher/config';
 import type {
   CompletionItem,
+  OfficialPublisherForm,
   PublisherCopy,
   PublisherModeSetting,
-  WechatPublisherForm,
 } from '@/pages/Tools/ToolOfficialPublisher/types';
 
 function asRecord(value: unknown): Record<string, unknown> {
@@ -66,7 +66,7 @@ function normalizePromptTemplateId(value: unknown): PromptTemplateId {
 export function normalizeForm(
   input: unknown,
   defaultRewriteRequirement: string
-): WechatPublisherForm {
+): OfficialPublisherForm {
   const source = asRecord(input);
   const rawAi = asRecord(source.ai);
   const rawModeSettings = asRecord(source.modeSettings);
@@ -113,7 +113,7 @@ export function normalizeForm(
     | 'open'
     | 'fansOnly'
     | undefined;
-  let comment: OfficialCommentConfig = { ...defaultForm.comment };
+  let comment: OfficialCommentConfig = { ...defaultPublisherForm.comment };
   if (rawComment && typeof rawComment === 'object') {
     comment = {
       open: rawComment.open === 1 ? 1 : 0,
@@ -182,7 +182,7 @@ export function isWechatArticleUrl(value: string) {
   }
 }
 
-export function getActiveModeSetting(form: WechatPublisherForm) {
+export function getActiveModeSetting(form: OfficialPublisherForm) {
   return form.modeSettings[form.publishMode];
 }
 
@@ -190,7 +190,7 @@ export function getTemplateContent(
   template: PromptTemplate,
   inlineImageCount = defaultSimpleInlineImageCount
 ): Pick<
-  WechatPublisherForm,
+  OfficialPublisherForm,
   'promptSystem' | 'promptContent' | 'imageCover' | 'imagesInlineList'
 > {
   return {
@@ -204,7 +204,7 @@ export function getTemplateContent(
 }
 
 export function hasTemplateCustomizations(
-  form: WechatPublisherForm,
+  form: OfficialPublisherForm,
   template?: PromptTemplate
 ) {
   if (!template) return false;
@@ -230,7 +230,7 @@ export function hasTemplateCustomizations(
 }
 
 export function getCompletionItems(
-  form: WechatPublisherForm,
+  form: OfficialPublisherForm,
   copy: PublisherCopy,
   selectedTemplate?: PromptTemplate
 ): CompletionItem[] {
@@ -289,7 +289,7 @@ export function getCompletionItems(
 }
 
 export function getValidationErrors(
-  form: WechatPublisherForm,
+  form: OfficialPublisherForm,
   copy: PublisherCopy,
   selectedTemplate?: PromptTemplate
 ) {
@@ -342,7 +342,7 @@ export function getValidationErrors(
 }
 
 export function buildPublisherRequestBody(
-  form: WechatPublisherForm,
+  form: OfficialPublisherForm,
   selectedTemplate: PromptTemplate,
   defaultRewriteRequirement: string
 ): PostOfficialPublisherBody {

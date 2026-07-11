@@ -25,7 +25,7 @@ import { PublisherModuleCard } from '@/pages/Tools/ToolOfficialPublisher/compone
 import { PublisherProgressPanel } from '@/pages/Tools/ToolOfficialPublisher/components/PublisherProgressPanel';
 import {
   apiWhitelistIp,
-  defaultForm,
+  defaultPublisherForm,
   getPromptTemplates,
   officialPublisherModes,
   officialPublisherProviders,
@@ -37,9 +37,9 @@ import {
   type PromptTemplateId,
 } from '@/pages/Tools/ToolOfficialPublisher/config';
 import type {
+  OfficialPublisherForm,
   PublishPhase,
   PublishStepStatus,
-  WechatPublisherForm,
 } from '@/pages/Tools/ToolOfficialPublisher/types';
 import {
   buildPublisherRequestBody,
@@ -120,16 +120,16 @@ const promptTemplateIcons: Record<PromptTemplateId, LucideIcon> = {
   fitness: Dumbbell,
 };
 
-export function OfficialPublisher() {
+export function PageOfficialPublisher() {
   const { locale, localizePath, messages } = useI18n();
   const publisherCopy = messages.publisher;
   const defaultRewriteRequirement = publisherCopy.defaultRewriteRequirement;
   const localizedDefaultForm = useMemo(
     () => ({
-      ...defaultForm,
+      ...defaultPublisherForm,
       modeSettings: {
-        create: { ...defaultForm.modeSettings.create },
-        rewrite: { ...defaultForm.modeSettings.rewrite },
+        create: { ...defaultPublisherForm.modeSettings.create },
+        rewrite: { ...defaultPublisherForm.modeSettings.rewrite },
       },
       rewriteRequirement: defaultRewriteRequirement,
     }),
@@ -188,7 +188,7 @@ export function OfficialPublisher() {
       })),
     [promptTemplates]
   );
-  const [form, setForm] = useState<WechatPublisherForm>(() => {
+  const [form, setForm] = useState<OfficialPublisherForm>(() => {
     try {
       return normalizeForm(
         CacheManager.getLocalStorage(officialPublisherStorageKey),
@@ -198,8 +198,8 @@ export function OfficialPublisher() {
       return localizedDefaultForm;
     }
   });
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [statusText, setStatusText] = useState<string>(
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishStatusText, setPublishStatusText] = useState<string>(
     publisherCopy.status.autosave
   );
   const [publishPhase, setPublishPhase] = useState<PublishPhase>('idle');
@@ -207,7 +207,7 @@ export function OfficialPublisher() {
     createInitialPublishSteps(publisherCopy.stepNames)
   );
   const [publishElapsedMs, setPublishElapsedMs] = useState(0);
-  const [errors, setErrors] = useState<string[]>([]);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [draftResult, setDraftResult] = useState<OfficialDraftResult | null>(
     null
   );
@@ -215,7 +215,7 @@ export function OfficialPublisher() {
   const [copiedIp, setCopiedIp] = useState(false);
   const [pendingTemplateId, setPendingTemplateId] =
     useState<PromptTemplateId | null>(null);
-  const [isGenerateConfirmOpen, setGenerateConfirmOpen] = useState(false);
+  const [isPublishConfirmOpen, setPublishConfirmOpen] = useState(false);
   const [isResetConfirmOpen, setResetConfirmOpen] = useState(false);
   const selectedCommentOption: CommentOptionValue =
     form.comment.open === 0
@@ -241,14 +241,14 @@ export function OfficialPublisher() {
   }, [form]);
 
   useEffect(() => {
-    if (!isGenerating) return;
+    if (!isPublishing) return;
     const timer = window.setInterval(() => {
       if (publishStartedAtRef.current) {
         setPublishElapsedMs(Date.now() - publishStartedAtRef.current);
       }
     }, 1000);
     return () => window.clearInterval(timer);
-  }, [isGenerating]);
+  }, [isPublishing]);
 
   useEffect(
     () => () => {
@@ -277,15 +277,15 @@ export function OfficialPublisher() {
     [localizedTools]
   );
 
-  function updateField<K extends keyof WechatPublisherForm>(
+  function updateField<K extends keyof OfficialPublisherForm>(
     key: K,
-    value: WechatPublisherForm[K]
+    value: OfficialPublisherForm[K]
   ) {
     setForm(current => ({ ...current, [key]: value }));
   }
 
   function updatePublishMode(publishMode: OfficialPublisherMode) {
-    setErrors([]);
+    setValidationErrors([]);
     setForm(current => ({
       ...current,
       publishMode,
@@ -296,10 +296,10 @@ export function OfficialPublisher() {
   }
 
   function updateCustomizationOpen(isOpen: boolean) {
-    setErrors([]);
+    setValidationErrors([]);
     setForm(current => {
       const currentSetting = getActiveModeSetting(current);
-      const next: WechatPublisherForm = {
+      const next: OfficialPublisherForm = {
         ...current,
         modeSettings: {
           ...current.modeSettings,
@@ -325,7 +325,7 @@ export function OfficialPublisher() {
   }
 
   function applyTemplate(templateId: PromptTemplateId) {
-    setErrors([]);
+    setValidationErrors([]);
     const template = promptTemplates.find(item => item.id === templateId);
     if (!template) return;
     setForm(current => {
@@ -343,7 +343,7 @@ export function OfficialPublisher() {
 
       return { ...next, ...getTemplateContent(template) };
     });
-    setStatusText(
+    setPublishStatusText(
       `${publisherCopy.simpleMode.selectedPrefix}「${template.label}」${publisherCopy.simpleMode.selectedSuffix}`
     );
   }
@@ -363,24 +363,13 @@ export function OfficialPublisher() {
     setPendingTemplateId(null);
   }
 
-  function updateCoverImageValue(value: string) {
-    setForm(current => ({
-      ...current,
-      imageCover: { ...current.imageCover, value },
-    }));
-  }
-
-  function updateComment(comment: OfficialCommentConfig) {
-    setForm(current => ({ ...current, comment }));
-  }
-
-  function validate() {
+  function validatePublisherForm() {
     const nextErrors = getValidationErrors(
       form,
       publisherCopy,
       selectedPromptTemplate
     );
-    setErrors(nextErrors);
+    setValidationErrors(nextErrors);
     return nextErrors.length === 0;
   }
 
@@ -479,16 +468,16 @@ export function OfficialPublisher() {
 
     if (event.status === 'running') {
       setPublishPhase('publishing');
-      setStatusText(
+      setPublishStatusText(
         `${publisherCopy.status.runningPrefix}${
           event.name || publisherCopy.status.runningFallback
         }。`
       );
     } else if (event.status === 'warning') {
-      setStatusText(event.message || publisherCopy.status.skipped);
+      setPublishStatusText(event.message || publisherCopy.status.skipped);
     } else if (event.status === 'failed') {
       setPublishPhase('failed');
-      setStatusText(
+      setPublishStatusText(
         `${publisherCopy.status.failedPrefix}${
           event.message || publisherCopy.status.failedFallback
         }`
@@ -496,24 +485,24 @@ export function OfficialPublisher() {
     }
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handlePublishRequest(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!validate()) {
-      setStatusText(publisherCopy.status.validationFailed);
+    if (!validatePublisherForm()) {
+      setPublishStatusText(publisherCopy.status.validationFailed);
       return;
     }
-    setGenerateConfirmOpen(true);
+    setPublishConfirmOpen(true);
   }
 
-  async function runGenerate() {
-    setGenerateConfirmOpen(false);
-    setIsGenerating(true);
+  async function handlePublishConfirm() {
+    setPublishConfirmOpen(false);
+    setIsPublishing(true);
     setDraftResult(null);
     setDraftResultOpen(false);
     setPublishPhase('connecting');
     setPublishSteps(createInitialPublishSteps(publisherCopy.stepNames));
     setPublishElapsedMs(0);
-    setStatusText(publisherCopy.status.connecting);
+    setPublishStatusText(publisherCopy.status.connecting);
 
     const body = buildPublisherRequestBody(
       form,
@@ -530,14 +519,14 @@ export function OfficialPublisher() {
         signal: controller.signal,
         onConnected: event => {
           setPublishPhase('publishing');
-          setStatusText(event.message || publisherCopy.status.connected);
+          setPublishStatusText(event.message || publisherCopy.status.connected);
         },
         onProgress: updatePublishProgress,
       });
       setDraftResult(result);
       setDraftResultOpen(true);
       setPublishPhase('completed');
-      setStatusText(
+      setPublishStatusText(
         result?.title
           ? `${publisherCopy.status.draftCreatedPrefix}「${result.title}」${publisherCopy.status.draftCreatedSuffix}`
           : publisherCopy.status.draftCreated
@@ -555,27 +544,27 @@ export function OfficialPublisher() {
             : step
         )
       );
-      setStatusText(`${publisherCopy.status.failedPrefix}${message}`);
+      setPublishStatusText(`${publisherCopy.status.failedPrefix}${message}`);
     } finally {
       if (publishStartedAtRef.current) {
         setPublishElapsedMs(Date.now() - publishStartedAtRef.current);
       }
       publishStartedAtRef.current = null;
       publisherAbortRef.current = null;
-      setIsGenerating(false);
+      setIsPublishing(false);
     }
   }
 
-  function confirmReset() {
+  function handleResetConfirm() {
     setResetConfirmOpen(false);
     setForm(localizedDefaultForm);
-    setErrors([]);
+    setValidationErrors([]);
     setDraftResult(null);
     setDraftResultOpen(false);
     setPublishPhase('idle');
     setPublishSteps(createInitialPublishSteps(publisherCopy.stepNames));
     setPublishElapsedMs(0);
-    setStatusText(publisherCopy.status.resetDone);
+    setPublishStatusText(publisherCopy.status.resetDone);
   }
 
   function handleExport() {
@@ -588,7 +577,7 @@ export function OfficialPublisher() {
     link.download = 'orz2-wechat-publisher-config.json';
     link.click();
     URL.revokeObjectURL(url);
-    setStatusText(publisherCopy.status.exportDone);
+    setPublishStatusText(publisherCopy.status.exportDone);
   }
 
   async function handleImport(event: ChangeEvent<HTMLInputElement>) {
@@ -600,10 +589,10 @@ export function OfficialPublisher() {
         defaultRewriteRequirement
       );
       setForm(imported);
-      setErrors([]);
-      setStatusText(publisherCopy.status.importDone);
+      setValidationErrors([]);
+      setPublishStatusText(publisherCopy.status.importDone);
     } catch {
-      setStatusText(publisherCopy.status.importFailed);
+      setPublishStatusText(publisherCopy.status.importFailed);
     } finally {
       event.target.value = '';
     }
@@ -615,7 +604,7 @@ export function OfficialPublisher() {
       setCopiedIp(true);
       window.setTimeout(() => setCopiedIp(false), 1800);
     } catch {
-      setStatusText(
+      setPublishStatusText(
         `${publisherCopy.status.copyFailedPrefix} ${apiWhitelistIp} ${publisherCopy.status.copyFailedSuffix}`
       );
     }
@@ -732,7 +721,7 @@ export function OfficialPublisher() {
 
         <form
           className='publisher-form box-border pb-4'
-          onSubmit={handleSubmit}
+          onSubmit={handlePublishRequest}
         >
           <div className='publisher-workspace'>
             <div className='publisher-main'>
@@ -930,7 +919,12 @@ export function OfficialPublisher() {
                         <span>{publisherCopy.sections.images.coverLabel}</span>
                         <OInputAI
                           value={form.imageCover.value}
-                          onValueChange={updateCoverImageValue}
+                          onValueChange={value =>
+                            setForm(current => ({
+                              ...current,
+                              imageCover: { ...current.imageCover, value },
+                            }))
+                          }
                           polishMode='official_image_prompt'
                           disabledPolish={form.imageCover.type !== 'ai'}
                           placeholder={
@@ -1039,7 +1033,10 @@ export function OfficialPublisher() {
                             options={commentOptions}
                             value={selectedCommentOption}
                             onChange={value =>
-                              updateComment(commentConfigByValue[value])
+                              setForm(current => ({
+                                ...current,
+                                comment: commentConfigByValue[value],
+                              }))
                             }
                           />
                         </label>
@@ -1114,12 +1111,12 @@ export function OfficialPublisher() {
                 </div>
 
                 <div className='publisher-status-line' aria-live='polite'>
-                  {isGenerating ? (
+                  {isPublishing ? (
                     <Loader2 className='spin' size={18} aria-hidden='true' />
                   ) : publishPhase === 'completed' ? (
                     <CheckCircle2 size={18} aria-hidden='true' />
                   ) : null}
-                  <span>{statusText}</span>
+                  <span>{publishStatusText}</span>
                 </div>
                 {publishPhase === 'completed' ? (
                   <button
@@ -1137,7 +1134,7 @@ export function OfficialPublisher() {
                     type='button'
                     variant='ghost'
                     onClick={() => setResetConfirmOpen(true)}
-                    disabled={isGenerating}
+                    disabled={isPublishing}
                   >
                     <RotateCcw size={17} aria-hidden='true' />
                     {publisherCopy.aside.reset}
@@ -1145,16 +1142,16 @@ export function OfficialPublisher() {
                   <OButton
                     className='publisher-submit'
                     type='submit'
-                    disabled={isGenerating}
+                    disabled={isPublishing}
                   >
-                    {isGenerating ? (
+                    {isPublishing ? (
                       <Loader2 className='spin' size={17} aria-hidden='true' />
                     ) : form.publishMode === 'rewrite' ? (
                       <FileDiff size={17} aria-hidden='true' />
                     ) : (
                       <Send size={17} aria-hidden='true' />
                     )}
-                    {isGenerating
+                    {isPublishing
                       ? publisherCopy.aside.generating
                       : form.publishMode === 'rewrite'
                         ? publisherCopy.aside.generateRewrite
@@ -1174,14 +1171,14 @@ export function OfficialPublisher() {
             </aside>
           </div>
 
-          {errors.length ? (
+          {validationErrors.length ? (
             <OCard
               className='form-errors'
               padding='sm'
               role='alert'
               tone='danger'
             >
-              {errors.map(error => (
+              {validationErrors.map(error => (
                 <p key={error}>{error}</p>
               ))}
             </OCard>
@@ -1216,7 +1213,7 @@ export function OfficialPublisher() {
 
       <OModalConfirm
         ariaLabel={publisherCopy.status.confirmTitle}
-        isOpen={isGenerateConfirmOpen}
+        isOpen={isPublishConfirmOpen}
         title={publisherCopy.status.confirmTitle}
         description={
           form.publishMode === 'rewrite'
@@ -1236,8 +1233,8 @@ export function OfficialPublisher() {
             <Send size={17} aria-hidden='true' />
           )
         }
-        onCancel={() => setGenerateConfirmOpen(false)}
-        onConfirm={runGenerate}
+        onCancel={() => setPublishConfirmOpen(false)}
+        onConfirm={handlePublishConfirm}
       />
 
       <OModalConfirm
@@ -1249,7 +1246,7 @@ export function OfficialPublisher() {
         confirmLabel={publisherCopy.aside.reset}
         confirmIcon={<RotateCcw size={17} aria-hidden='true' />}
         onCancel={() => setResetConfirmOpen(false)}
-        onConfirm={confirmReset}
+        onConfirm={handleResetConfirm}
       />
     </>
   );

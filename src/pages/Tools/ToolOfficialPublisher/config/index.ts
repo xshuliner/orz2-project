@@ -1,5 +1,5 @@
 import type { OfficialPublisherMode, OfficialPublisherProvider } from '@/api';
-import type { WechatPublisherForm } from '@/pages/Tools/ToolOfficialPublisher/types';
+import type { OfficialPublisherForm } from '@/pages/Tools/ToolOfficialPublisher/types';
 
 export type PromptTemplateId =
   | 'general'
@@ -77,7 +77,7 @@ export const officialPublisherModes: OfficialPublisherMode[] = [
   'create',
   'rewrite',
 ];
-export const defaultForm: WechatPublisherForm = {
+export const defaultPublisherForm: OfficialPublisherForm = {
   publishMode: 'create',
   modeSettings: {
     create: { isCustomizationOpen: false, templateId: defaultPromptTemplateId },

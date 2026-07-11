@@ -12,7 +12,7 @@ export interface PublisherModeSetting {
   templateId: PromptTemplateId;
 }
 
-export interface WechatPublisherForm {
+export interface OfficialPublisherForm {
   publishMode: OfficialPublisherMode;
   modeSettings: Record<OfficialPublisherMode, PublisherModeSetting>;
   appId: string;
