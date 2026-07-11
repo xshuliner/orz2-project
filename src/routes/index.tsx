@@ -2,10 +2,14 @@ import { LayoutApp } from '@/components/LayoutApp';
 import { defaultLocale, localePrefixes, type Locale } from '@/i18n';
 import { PageHome } from '@/pages/PageHome';
 import { routesProductSilicon } from '@/pages/Products/ProductSilicon/routes';
+import { routesToolBase64Converter } from '@/pages/Tools/ToolBase64Converter/routes';
 import { routesToolImageStudio } from '@/pages/Tools/ToolImageStudio/routes';
+import { routesToolJsonFormatter } from '@/pages/Tools/ToolJsonFormatter/routes';
+import { routesToolMarkdownEditor } from '@/pages/Tools/ToolMarkdownEditor/routes';
 import { routesToolOfficialPublisher } from '@/pages/Tools/ToolOfficialPublisher/routes';
+import { routesToolPaletteLab } from '@/pages/Tools/ToolPaletteLab/routes';
+import { routesToolQrcodeGenerator } from '@/pages/Tools/ToolQrcodeGenerator/routes';
 import { routesToolTimezoneConverter } from '@/pages/Tools/ToolTimezoneConverter/routes';
-import { routesToolUtility } from '@/pages/Tools/ToolUtility/routes';
 import { routesToolWorkReportPolisher } from '@/pages/Tools/ToolWorkReportPolisher/routes';
 import { lazy } from 'react';
 import { Navigate, RouteObject, useParams } from 'react-router-dom';
@@ -80,7 +84,11 @@ function createAppChildren(): RouteObject[] {
         ...routesToolOfficialPublisher,
         ...routesToolTimezoneConverter,
         ...routesToolWorkReportPolisher,
-        ...routesToolUtility,
+        ...routesToolJsonFormatter,
+        ...routesToolPaletteLab,
+        ...routesToolBase64Converter,
+        ...routesToolMarkdownEditor,
+        ...routesToolQrcodeGenerator,
       ],
     },
     {
