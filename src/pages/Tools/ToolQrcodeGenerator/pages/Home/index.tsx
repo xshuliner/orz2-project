@@ -1,4 +1,4 @@
-import { LayoutToolPage } from '@/components/LayoutToolPage';
+import { LayoutPage } from '@/components/LayoutPage';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { useI18n } from '@/hooks/useI18n';
@@ -40,7 +40,7 @@ export function QrcodeGenerator() {
   }
 
   return (
-    <LayoutToolPage
+    <LayoutPage
       icon={QrCode}
       seoKey={qrcodeGeneratorSeoKey}
       toolId={qrcodeGeneratorToolId}
@@ -83,6 +83,6 @@ export function QrcodeGenerator() {
           </OButton>
         </OCard>
       </section>
-    </LayoutToolPage>
+    </LayoutPage>
   );
 }

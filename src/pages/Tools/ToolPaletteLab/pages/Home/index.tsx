@@ -1,4 +1,4 @@
-import { LayoutToolPage } from '@/components/LayoutToolPage';
+import { LayoutPage } from '@/components/LayoutPage';
 import { OCard } from '@/components/OCard';
 import { useI18n } from '@/hooks/useI18n';
 import {
@@ -38,7 +38,7 @@ export function PaletteLab() {
   const ratio = contrastRatio(color, background);
 
   return (
-    <LayoutToolPage
+    <LayoutPage
       icon={Palette}
       seoKey={paletteLabSeoKey}
       toolId={paletteLabToolId}
@@ -78,6 +78,6 @@ export function PaletteLab() {
           </strong>
         </OCard>
       </section>
-    </LayoutToolPage>
+    </LayoutPage>
   );
 }

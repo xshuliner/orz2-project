@@ -1,10 +1,9 @@
 import { postUpdateMemberInfo, postUploadMemberAvatar } from '@/api';
 import { useAuth } from '@/components/ContextAuth';
+import { LayoutPage } from '@/components/LayoutPage';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { OModal } from '@/components/OModal';
-import { OPageHero } from '@/components/OPageHero';
-import { Seo } from '@/components/Seo';
 import { useI18n } from '@/hooks/useI18n';
 import { X, ZoomIn } from 'lucide-react';
 import { ChangeEvent, useRef, useState } from 'react';
@@ -122,20 +121,18 @@ export function PageMemberDetail() {
     }
   };
   return (
-    <>
-      <Seo
-        config={{
-          title: copy.profileTitle,
-          description: copy.profileDescription,
-          canonicalPath: '/member/detail',
-          locale,
-          robots: 'noindex, follow',
-        }}
-      />
-      <OPageHero
-        title={copy.profileTitle}
-        description={copy.profileDescription}
-      />
+    <LayoutPage
+      backLink={false}
+      description={copy.profileDescription}
+      seoConfig={{
+        title: copy.profileTitle,
+        description: copy.profileDescription,
+        canonicalPath: '/member/detail',
+        locale,
+        robots: 'noindex, follow',
+      }}
+      title={copy.profileTitle}
+    >
       <section className='member-detail-layout' aria-label={copy.profileTitle}>
         <OCard className='profile-avatar-card' padding='lg'>
           <img
@@ -308,6 +305,6 @@ export function PageMemberDetail() {
           </footer>
         </div>
       </OModal>
-    </>
+    </LayoutPage>
   );
 }

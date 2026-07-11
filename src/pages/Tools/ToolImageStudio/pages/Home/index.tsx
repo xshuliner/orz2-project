@@ -1,4 +1,4 @@
-import { LayoutToolPage } from '@/components/LayoutToolPage';
+import { LayoutPage } from '@/components/LayoutPage';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { OIconButton } from '@/components/OIconButton';
@@ -889,7 +889,7 @@ export function ImageStudio() {
   }
 
   return (
-    <LayoutToolPage icon={Images} seoKey={imageToolSeoKey} toolId={imageToolId}>
+    <LayoutPage icon={Images} seoKey={imageToolSeoKey} toolId={imageToolId}>
       <section className='image-tool-workbench'>
         <OCard
           as='section'
@@ -1470,6 +1470,6 @@ export function ImageStudio() {
           </div>
         ) : null}
       </OCard>
-    </LayoutToolPage>
+    </LayoutPage>
   );
 }

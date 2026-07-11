@@ -1,6 +1,5 @@
-import { OPageHero } from '@/components/OPageHero';
+import { LayoutPage } from '@/components/LayoutPage';
 import { SectionTools } from '@/components/SectionTools';
-import { Seo } from '@/components/Seo';
 import { getPageSeo } from '@/config/seo';
 import { useI18n } from '@/hooks/useI18n';
 
@@ -10,13 +9,13 @@ export function PageTools() {
   const homeSections = messages.homeSections;
   const pageTitles = messages.pageTitles;
   return (
-    <>
-      <Seo config={pageSeo.tools} />
-      <OPageHero
-        title={pageTitles.onlineTools}
-        description={homeSections.tools.subtitle}
-      />
+    <LayoutPage
+      backLink={false}
+      description={homeSections.tools.subtitle}
+      seoConfig={pageSeo.tools}
+      title={pageTitles.onlineTools}
+    >
       <SectionTools />
-    </>
+    </LayoutPage>
   );
 }

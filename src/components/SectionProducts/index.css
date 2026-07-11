@@ -1,7 +1,7 @@
 .product-directory {
   width: var(--page-content-width);
   margin: 0 auto;
-  padding: var(--space-16) 0 var(--space-20);
+  padding: 0 0 var(--space-20);
 }
 
 .product-directory.compact {

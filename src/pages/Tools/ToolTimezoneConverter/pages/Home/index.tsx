@@ -1,4 +1,4 @@
-import { LayoutToolPage } from '@/components/LayoutToolPage';
+import { LayoutPage } from '@/components/LayoutPage';
 import { OCard } from '@/components/OCard';
 import { OIconButton } from '@/components/OIconButton';
 import { useI18n } from '@/hooks/useI18n';
@@ -72,11 +72,7 @@ export function TimezoneConverter() {
   }
 
   return (
-    <LayoutToolPage
-      icon={Globe2}
-      seoKey={timezoneSeoKey}
-      toolId={timezoneToolId}
-    >
+    <LayoutPage icon={Globe2} seoKey={timezoneSeoKey} toolId={timezoneToolId}>
       <section className='timezone-workbench'>
         <TimezoneSideCard
           copy={copy}
@@ -137,6 +133,6 @@ export function TimezoneConverter() {
           <p>{copy.noteDescription}</p>
         </div>
       </OCard>
-    </LayoutToolPage>
+    </LayoutPage>
   );
 }

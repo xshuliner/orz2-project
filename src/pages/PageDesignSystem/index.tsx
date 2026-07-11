@@ -1,3 +1,4 @@
+import { LayoutPage } from '@/components/LayoutPage';
 import { OBadge } from '@/components/OBadge';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
@@ -5,9 +6,7 @@ import { OCardCatalog } from '@/components/OCardCatalog';
 import { OEmptyState } from '@/components/OEmptyState';
 import { OIconButton } from '@/components/OIconButton';
 import { OModal } from '@/components/OModal';
-import { OPageHero } from '@/components/OPageHero';
 import { OSectionHeading } from '@/components/OSectionHeading';
-import { Seo } from '@/components/Seo';
 import { getPageSeo } from '@/config/seo';
 import { useI18n } from '@/hooks/useI18n';
 import { getProducts, getTools } from '@/i18n';
@@ -63,9 +62,12 @@ export function PageDesignSystem() {
   const [isModalOpen, setModalOpen] = useState(false);
 
   return (
-    <>
-      <Seo config={pageSeo.designSystem} />
-      <OPageHero title={copy.heroTitle} description={copy.heroDescription} />
+    <LayoutPage
+      backLink={false}
+      description={copy.heroDescription}
+      seoConfig={pageSeo.designSystem}
+      title={copy.heroTitle}
+    >
       <div className='design-system-page'>
         <section className='design-system-section'>
           <OSectionHeading
@@ -265,6 +267,6 @@ export function PageDesignSystem() {
           </OButton>
         </div>
       </OModal>
-    </>
+    </LayoutPage>
   );
 }

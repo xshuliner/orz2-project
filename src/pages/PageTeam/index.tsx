@@ -1,6 +1,5 @@
+import { LayoutPage } from '@/components/LayoutPage';
 import { OCard } from '@/components/OCard';
-import { OPageHero } from '@/components/OPageHero';
-import { Seo } from '@/components/Seo';
 import { getPageSeo } from '@/config/seo';
 import { useI18n } from '@/hooks/useI18n';
 import { getTeamMembers } from '@/i18n';
@@ -13,9 +12,12 @@ export function PageTeam() {
   const teamMembers = getTeamMembers(locale);
   const copy = messages.teamPage;
   return (
-    <>
-      <Seo config={pageSeo.team} />
-      <OPageHero title={copy.heroTitle} description={copy.heroDescription} />
+    <LayoutPage
+      backLink={false}
+      description={copy.heroDescription}
+      seoConfig={pageSeo.team}
+      title={copy.heroTitle}
+    >
       <section className='team-grid' aria-label={copy.gridAriaLabel}>
         {teamMembers.map(member => (
           <OCard
@@ -45,6 +47,6 @@ export function PageTeam() {
           </OCard>
         ))}
       </section>
-    </>
+    </LayoutPage>
   );
 }

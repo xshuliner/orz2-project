@@ -4,6 +4,7 @@ import { getToolSeo } from '@/config/seo';
 import { useI18n } from '@/hooks/useI18n';
 import { getTools } from '@/i18n';
 import type { ToolHeroBadgeIconName } from '@/types/catalog';
+import type { SeoConfig } from '@/types/seo';
 import {
   ArrowLeft,
   Braces,
@@ -47,61 +48,76 @@ const heroBadgeIconMap: Record<ToolHeroBadgeIconName, LucideIcon> = {
   Workflow,
 };
 
-interface LayoutToolPageProps {
+interface LayoutPageProps {
+  backLink?: false | { label: ReactNode; to: string };
   children: ReactNode;
   className?: string;
   contentClassName?: string;
+  description?: ReactNode;
   heroSlot?: ReactNode;
-  icon: LucideIcon;
-  seoKey: keyof ReturnType<typeof getToolSeo>;
-  toolId: string;
+  icon?: LucideIcon;
+  seoConfig?: SeoConfig;
+  seoKey?: keyof ReturnType<typeof getToolSeo>;
+  title?: ReactNode;
   topbarSlot?: ReactNode;
+  toolId?: string;
 }
 
-export function LayoutToolPage({
+export function LayoutPage({
+  backLink,
   children,
   className,
   contentClassName,
+  description,
   heroSlot,
-  icon: Icon,
+  icon: Icon = Sparkles,
+  seoConfig,
   seoKey,
+  title,
   toolId,
   topbarSlot,
-}: LayoutToolPageProps) {
+}: LayoutPageProps) {
   const { locale, localizePath, messages } = useI18n();
   const tool = useMemo(
     () => getTools(locale).find(item => item.id === toolId),
     [locale, toolId]
   );
   const seo = useMemo(() => getToolSeo(locale), [locale]);
+  const resolvedSeo = seoConfig ?? (seoKey ? seo[seoKey] : undefined);
+  const resolvedBackLink =
+    backLink === undefined && toolId
+      ? { label: messages.utilityTool.backToTools, to: localizePath('/tools') }
+      : backLink;
 
   return (
     <>
-      <Seo config={seo[seoKey]} />
-      <section
-        className={['layout-tool-page', className].filter(Boolean).join(' ')}
-      >
-        <div className='layout-tool-page__topbar'>
-          <Link
-            className='layout-tool-page__back-link interactive'
-            to={localizePath('/tools')}
-          >
-            <ArrowLeft size={16} aria-hidden='true' />
-            {messages.utilityTool.backToTools}
-          </Link>
-          {topbarSlot}
-        </div>
+      {resolvedSeo ? <Seo config={resolvedSeo} /> : null}
+      <section className={['layout-page', className].filter(Boolean).join(' ')}>
+        {resolvedBackLink || topbarSlot ? (
+          <div className='layout-page__topbar'>
+            {resolvedBackLink ? (
+              <Link
+                className='layout-page__back-link interactive'
+                to={resolvedBackLink.to}
+              >
+                <ArrowLeft size={16} aria-hidden='true' />
+                {resolvedBackLink.label}
+              </Link>
+            ) : null}
+            {topbarSlot}
+          </div>
+        ) : null}
         <OPageHero
-          className='layout-tool-page__hero'
-          description={tool?.summary}
-          title={tool?.name ?? String(seoKey)}
+          className='layout-page__hero'
+          description={description ?? tool?.summary}
+          title={title ?? tool?.name ?? String(seoKey ?? '')}
         >
           {tool?.heroBadges?.length ? (
-            <div className='layout-tool-page__badges'>
+            <div className='layout-page__badges'>
               {tool.heroBadges.map(badge => {
                 const BadgeIcon = heroBadgeIconMap[badge.icon] ?? Icon;
                 return (
-                  <span className='layout-tool-page__badge' key={badge.id}>
+                  <span className='layout-page__badge' key={badge.id}>
                     <BadgeIcon size={16} aria-hidden='true' />
                     {badge.label}
                   </span>
@@ -112,7 +128,7 @@ export function LayoutToolPage({
           {heroSlot}
         </OPageHero>
         <div
-          className={['layout-tool-page__content', contentClassName]
+          className={['layout-page__content', contentClassName]
             .filter(Boolean)
             .join(' ')}
         >

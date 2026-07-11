@@ -1,6 +1,5 @@
+import { LayoutPage } from '@/components/LayoutPage';
 import { OCard } from '@/components/OCard';
-import { OPageHero } from '@/components/OPageHero';
-import { Seo } from '@/components/Seo';
 import { getPageSeo } from '@/config/seo';
 import { siteConfig } from '@/config/site';
 import { useI18n } from '@/hooks/useI18n';
@@ -38,9 +37,12 @@ export function PagePrivacy() {
   const pageSeo = getPageSeo(locale);
   const copy = messages.privacy;
   return (
-    <>
-      <Seo config={pageSeo.privacy} />
-      <OPageHero title={copy.heroTitle} description={copy.heroDescription} />
+    <LayoutPage
+      backLink={false}
+      description={copy.heroDescription}
+      seoConfig={pageSeo.privacy}
+      title={copy.heroTitle}
+    >
       <section className='privacy-layout'>
         <OCard
           as='aside'
@@ -83,6 +85,6 @@ export function PagePrivacy() {
           ))}
         </article>
       </section>
-    </>
+    </LayoutPage>
   );
 }

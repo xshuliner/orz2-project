@@ -1,7 +1,6 @@
+import { LayoutPage } from '@/components/LayoutPage';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
-import { OPageHero } from '@/components/OPageHero';
-import { Seo } from '@/components/Seo';
 import { getPageSeo } from '@/config/seo';
 import { useBuildInfo } from '@/hooks/useBuildInfo';
 import { useI18n } from '@/hooks/useI18n';
@@ -159,9 +158,12 @@ export function PageBuildInfo() {
   const copy = messages.buildInfo;
 
   return (
-    <>
-      <Seo config={pageSeo.buildInfo} />
-      <OPageHero title={copy.heroTitle} description={copy.heroDescription}>
+    <LayoutPage
+      backLink={false}
+      description={copy.heroDescription}
+      seoConfig={pageSeo.buildInfo}
+      title={copy.heroTitle}
+      heroSlot={
         <div className='build-info-actions'>
           <OButton
             hoverTranslate={false}
@@ -186,8 +188,8 @@ export function PageBuildInfo() {
             {copy.rawJson}
           </OButton>
         </div>
-      </OPageHero>
-
+      }
+    >
       <section className='build-info-layout'>
         {info ? (
           <>
@@ -252,6 +254,6 @@ export function PageBuildInfo() {
           </OCard>
         )}
       </section>
-    </>
+    </LayoutPage>
   );
 }

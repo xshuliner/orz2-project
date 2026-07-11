@@ -1,5 +1,5 @@
 import { postPolishContent } from '@/api';
-import { LayoutToolPage } from '@/components/LayoutToolPage';
+import { LayoutPage } from '@/components/LayoutPage';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { useI18n } from '@/hooks/useI18n';
@@ -133,7 +133,7 @@ export function WorkReportPolisher() {
   }
 
   return (
-    <LayoutToolPage
+    <LayoutPage
       icon={Sparkles}
       seoKey={reportPolisherSeoKey}
       toolId={reportPolisherToolId}
@@ -309,6 +309,6 @@ export function WorkReportPolisher() {
           ))}
         </ul>
       </OCard>
-    </LayoutToolPage>
+    </LayoutPage>
   );
 }

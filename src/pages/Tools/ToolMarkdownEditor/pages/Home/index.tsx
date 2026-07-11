@@ -1,4 +1,4 @@
-import { LayoutToolPage } from '@/components/LayoutToolPage';
+import { LayoutPage } from '@/components/LayoutPage';
 import { OCard } from '@/components/OCard';
 import { useI18n } from '@/hooks/useI18n';
 import {
@@ -46,7 +46,7 @@ export function MarkdownEditor() {
   const [input, setInput] = useState<string>(copy.markdownPlaceholder);
 
   return (
-    <LayoutToolPage
+    <LayoutPage
       icon={Clipboard}
       seoKey={markdownEditorSeoKey}
       toolId={markdownEditorToolId}
@@ -70,6 +70,6 @@ export function MarkdownEditor() {
           </div>
         </OCard>
       </section>
-    </LayoutToolPage>
+    </LayoutPage>
   );
 }

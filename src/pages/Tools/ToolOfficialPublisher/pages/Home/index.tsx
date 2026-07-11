@@ -7,7 +7,7 @@ import {
   type OfficialPublisherProgressEvent,
 } from '@/api';
 import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
-import { LayoutToolPage } from '@/components/LayoutToolPage';
+import { LayoutPage } from '@/components/LayoutPage';
 import { OBadge } from '@/components/OBadge';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
@@ -599,7 +599,7 @@ export function PageOfficialPublisher() {
 
   return (
     <>
-      <LayoutToolPage
+      <LayoutPage
         icon={Send}
         seoKey={officialPublisherSeoKey}
         toolId={officialPublisherToolId}
@@ -1163,7 +1163,7 @@ export function PageOfficialPublisher() {
             </OCard>
           ) : null}
         </form>
-      </LayoutToolPage>
+      </LayoutPage>
 
       {isDraftResultOpen ? (
         <DraftSuccessModal

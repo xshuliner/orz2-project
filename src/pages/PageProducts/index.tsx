@@ -1,6 +1,5 @@
-import { OPageHero } from '@/components/OPageHero';
+import { LayoutPage } from '@/components/LayoutPage';
 import { SectionProducts } from '@/components/SectionProducts';
-import { Seo } from '@/components/Seo';
 import { getPageSeo } from '@/config/seo';
 import { useI18n } from '@/hooks/useI18n';
 
@@ -10,13 +9,13 @@ export function PageProducts() {
   const homeSections = messages.homeSections;
   const pageTitles = messages.pageTitles;
   return (
-    <>
-      <Seo config={pageSeo.products} />
-      <OPageHero
-        title={pageTitles.products}
-        description={homeSections.products.subtitle}
-      />
+    <LayoutPage
+      backLink={false}
+      description={homeSections.products.subtitle}
+      seoConfig={pageSeo.products}
+      title={pageTitles.products}
+    >
       <SectionProducts />
-    </>
+    </LayoutPage>
   );
 }

@@ -1,10 +1,9 @@
 import { getQueryScoreList, type ScoreRecord } from '@/api';
 import { useAuth } from '@/components/ContextAuth';
+import { LayoutPage } from '@/components/LayoutPage';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { OEmptyState } from '@/components/OEmptyState';
-import { OPageHero } from '@/components/OPageHero';
-import { Seo } from '@/components/Seo';
 import { useI18n } from '@/hooks/useI18n';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
@@ -63,17 +62,18 @@ export function PageMemberScoreList() {
   if (!user) return <Navigate replace to='/' />;
 
   return (
-    <>
-      <Seo
-        config={{
-          title: copy.scoreTitle,
-          description: copy.scoreDescription,
-          canonicalPath: '/member/score-list',
-          locale,
-          robots: 'noindex, follow',
-        }}
-      />
-      <OPageHero title={copy.scoreTitle} description={copy.scoreDescription} />
+    <LayoutPage
+      backLink={false}
+      description={copy.scoreDescription}
+      seoConfig={{
+        title: copy.scoreTitle,
+        description: copy.scoreDescription,
+        canonicalPath: '/member/score-list',
+        locale,
+        robots: 'noindex, follow',
+      }}
+      title={copy.scoreTitle}
+    >
       <section className='member-score-list' aria-label={copy.scoreTitle}>
         <OCard className='member-score-summary' padding='md'>
           <span>{copy.balance}</span>
@@ -146,6 +146,6 @@ export function PageMemberScoreList() {
           </OButton>
         )}
       </section>
-    </>
+    </LayoutPage>
   );
 }

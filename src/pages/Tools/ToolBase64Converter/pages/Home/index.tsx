@@ -1,4 +1,4 @@
-import { LayoutToolPage } from '@/components/LayoutToolPage';
+import { LayoutPage } from '@/components/LayoutPage';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { useI18n } from '@/hooks/useI18n';
@@ -42,7 +42,7 @@ export function Base64Converter() {
   }
 
   return (
-    <LayoutToolPage
+    <LayoutPage
       icon={TextCursorInput}
       seoKey={base64ConverterSeoKey}
       toolId={base64ConverterToolId}
@@ -97,6 +97,6 @@ export function Base64Converter() {
           {feedback}
         </p>
       ) : null}
-    </LayoutToolPage>
+    </LayoutPage>
   );
 }

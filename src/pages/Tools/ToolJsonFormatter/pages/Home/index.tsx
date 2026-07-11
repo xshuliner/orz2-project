@@ -1,4 +1,4 @@
-import { LayoutToolPage } from '@/components/LayoutToolPage';
+import { LayoutPage } from '@/components/LayoutPage';
 import { OButton } from '@/components/OButton';
 import { OCard } from '@/components/OCard';
 import { useI18n } from '@/hooks/useI18n';
@@ -41,7 +41,7 @@ export function JsonFormatter() {
   }
 
   return (
-    <LayoutToolPage
+    <LayoutPage
       icon={Braces}
       seoKey={jsonFormatterSeoKey}
       toolId={jsonFormatterToolId}
@@ -96,6 +96,6 @@ export function JsonFormatter() {
           {feedback}
         </p>
       ) : null}
-    </LayoutToolPage>
+    </LayoutPage>
   );
 }
