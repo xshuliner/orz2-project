@@ -1,3 +1,21 @@
+/**
+ * Business keys for all browser-persisted ORZ2 state.
+ *
+ * CacheManager adds its storage namespace when values are persisted, so callers
+ * must use these logical keys instead of constructing localStorage keys.
+ */
+export const cacheKeys = {
+  authToken: 'orz2:auth-token',
+  authRefreshToken: 'orz2:auth-refresh-token',
+  authUser: 'orz2:auth-user',
+  locale: 'orz2:locale',
+  localRum: 'orz2:local-rum',
+  officialPublisherForm: 'orz2:official-publisher-form',
+  siliconMemberToken: 'orz2:silicon-member-token',
+  themePreference: 'orz2:theme-preference',
+  workReportPolisherForm: 'orz2:work-report-polisher-form',
+} as const;
+
 // Persistent storage manager.
 class CacheManager {
   private static instance: CacheManager | null = null;
