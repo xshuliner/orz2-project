@@ -243,4 +243,139 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://orz2.online/tools/json-formatter</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/json-formatter" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/json-formatter" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/json-formatter" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/json-formatter" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/en/tools/json-formatter</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/json-formatter" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/json-formatter" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/json-formatter" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/json-formatter" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/ja/tools/json-formatter</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/json-formatter" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/json-formatter" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/json-formatter" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/json-formatter" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/tools/palette-lab</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/palette-lab" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/palette-lab" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/palette-lab" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/palette-lab" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/en/tools/palette-lab</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/palette-lab" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/palette-lab" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/palette-lab" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/palette-lab" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/ja/tools/palette-lab</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/palette-lab" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/palette-lab" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/palette-lab" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/palette-lab" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/tools/base64-converter</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/base64-converter" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/base64-converter" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/base64-converter" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/base64-converter" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/en/tools/base64-converter</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/base64-converter" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/base64-converter" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/base64-converter" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/base64-converter" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/ja/tools/base64-converter</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/base64-converter" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/base64-converter" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/base64-converter" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/base64-converter" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/tools/markdown-editor</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/markdown-editor" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/markdown-editor" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/markdown-editor" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/markdown-editor" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/en/tools/markdown-editor</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/markdown-editor" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/markdown-editor" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/markdown-editor" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/markdown-editor" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/ja/tools/markdown-editor</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/markdown-editor" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/markdown-editor" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/markdown-editor" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/markdown-editor" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/tools/qrcode-generator</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/qrcode-generator" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/qrcode-generator" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/qrcode-generator" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/qrcode-generator" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/en/tools/qrcode-generator</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/qrcode-generator" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/qrcode-generator" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/qrcode-generator" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/qrcode-generator" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://orz2.online/ja/tools/qrcode-generator</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/qrcode-generator" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/qrcode-generator" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/qrcode-generator" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/qrcode-generator" />
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

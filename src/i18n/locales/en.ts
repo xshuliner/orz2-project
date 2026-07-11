@@ -543,6 +543,34 @@ export const messages = {
     sampleReferenceWeekly:
       'This week:\n1. Completed the main development for module one, including status and impact scope.\n2. Completed integration or issue fixes for module two, including key results.\n3. Added tests, documentation, or release preparation, including covered scope.\n\nNext week:\n1. Continue the next stage of feature development.\n2. Improve test coverage and edge-case validation.\n3. Make small adjustments based on review or acceptance feedback.\n\nDifficulties and support needed:\n1. Product rules or API fields that need confirmation.\n2. Items requiring support from backend, QA, or design.\n3. Current risks that may affect progress.',
   },
+  utilityTool: {
+    backToTools: 'Online tools',
+    input: 'Input',
+    output: 'Output',
+    format: 'Format',
+    minify: 'Minify',
+    encode: 'Encode',
+    decode: 'Decode',
+    copy: 'Copy result',
+    copied: 'Copied',
+    clear: 'Clear',
+    invalidJson: 'Invalid JSON. Check the content and try again.',
+    invalidBase64: 'Invalid Base64 content. Check the content and try again.',
+    color: 'Color',
+    contrast: 'Contrast',
+    accessible: 'Readable',
+    needsContrast: 'Low contrast',
+    qrcodeContent: 'QR code content',
+    qrcodeSize: 'Size',
+    download: 'Download PNG',
+    preview: 'Preview',
+    markdownHint:
+      'Supports headings, lists, quotes, code blocks, and paragraphs.',
+    jsonPlaceholder: '{\n  "hello": "ORZ2"\n}',
+    base64Placeholder: 'Enter text to encode or decode',
+    markdownPlaceholder: '# Title\n\nStart writing Markdown…',
+    qrcodePlaceholder: 'https://orz2.online',
+  },
   timezoneTool: {
     backToTools: 'Online tools',
     title: 'Time Zone Converter',
@@ -1667,6 +1695,7 @@ export const messages = {
         summary:
           'Format, validate, and beautify JSON data with syntax highlighting and error detection.',
         badges: ['JSON', 'Dev', 'Validation'],
+        entries: { web: 'Tool entry' },
         seo: {
           title: 'JSON Formatter - ORZ2 Developer Tool',
           description:
@@ -1679,6 +1708,7 @@ export const messages = {
         summary:
           'A professional color picker with multiple color formats and palette support.',
         badges: ['Palette', 'Design', 'Accessibility'],
+        entries: { web: 'Tool entry' },
         seo: {
           title: 'Palette Lab - ORZ2 Online Design Tool',
           description:
@@ -1690,6 +1720,7 @@ export const messages = {
         name: 'Base64 Converter',
         summary: 'Encode and decode text and files with Base64.',
         badges: ['Base64', 'Encode', 'Decode'],
+        entries: { web: 'Tool entry' },
         seo: {
           title: 'Base64 Converter - ORZ2 Developer Tool',
           description:
@@ -1702,6 +1733,7 @@ export const messages = {
         summary:
           'A rich Markdown editor with live preview and export features.',
         badges: ['Markdown', 'Editor', 'Preview'],
+        entries: { web: 'Tool entry' },
         seo: {
           title: 'Markdown Editor - ORZ2 Developer Tool',
           description:
@@ -1714,6 +1746,7 @@ export const messages = {
         summary:
           'Create and customize QR codes for URLs, text, and contact information.',
         badges: ['QR Code', 'Generator', 'Online'],
+        entries: { web: 'Tool entry' },
         seo: {
           title: 'QR Code Generator - ORZ2 Online Tool',
           description:

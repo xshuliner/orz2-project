@@ -16,6 +16,11 @@ const publicRoutes = [
   '/tools/official-publisher',
   '/tools/timezone-converter',
   '/tools/work-report-polisher',
+  '/tools/json-formatter',
+  '/tools/palette-lab',
+  '/tools/base64-converter',
+  '/tools/markdown-editor',
+  '/tools/qrcode-generator',
   '/en/tools/official-publisher',
   '/design-system',
 ];
@@ -30,6 +35,22 @@ test.describe('public route smoke tests', () => {
       await expect(page.locator('vite-error-overlay')).toHaveCount(0);
     });
   }
+});
+
+test('developer utility tools transform input in the browser', async ({
+  page,
+}) => {
+  await page.goto('/tools/json-formatter', { waitUntil: 'domcontentloaded' });
+  await page.getByLabel(zhMessages.utilityTool.input).fill('{"orz2":true}');
+  await page
+    .getByRole('button', { name: zhMessages.utilityTool.format })
+    .click();
+  await expect(page.getByLabel(zhMessages.utilityTool.output)).toHaveValue(
+    '{\n  "orz2": true\n}'
+  );
+
+  await page.goto('/tools/qrcode-generator', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('.utility-qr-card svg')).toBeVisible();
 });
 
 test('login modal opens and closes through the shared modal shell', async ({

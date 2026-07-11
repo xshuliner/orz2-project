@@ -125,12 +125,20 @@ const tools = [
       name: 'Braces',
     },
     lifecycle: {
-      stage: 'PLANNING',
-      version: '0.1.0',
-      updatedAt: '2026-06-03',
+      stage: 'LIVE',
+      version: '1.0.0',
+      updatedAt: '2026-07-11',
     },
     platform: ['web'],
-    entries: [],
+    entries: [
+      {
+        id: 'web',
+        kind: 'link',
+        href: '/tools/json-formatter',
+        qrValue: 'https://orz2.online/tools/json-formatter',
+        primary: true,
+      },
+    ],
     seo: {
       slug: 'json-formatter',
       ogImage: 'https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp',
@@ -145,12 +153,20 @@ const tools = [
       name: 'Palette',
     },
     lifecycle: {
-      stage: 'PLANNING',
-      version: '0.1.0',
-      updatedAt: '2026-06-03',
+      stage: 'LIVE',
+      version: '1.0.0',
+      updatedAt: '2026-07-11',
     },
     platform: ['web'],
-    entries: [],
+    entries: [
+      {
+        id: 'web',
+        kind: 'link',
+        href: '/tools/palette-lab',
+        qrValue: 'https://orz2.online/tools/palette-lab',
+        primary: true,
+      },
+    ],
     seo: {
       slug: 'palette-lab',
       ogImage: 'https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp',
@@ -165,12 +181,20 @@ const tools = [
       name: 'Workflow',
     },
     lifecycle: {
-      stage: 'PLANNING',
-      version: '0.1.0',
-      updatedAt: '2026-06-04',
+      stage: 'LIVE',
+      version: '1.0.0',
+      updatedAt: '2026-07-11',
     },
     platform: ['web'],
-    entries: [],
+    entries: [
+      {
+        id: 'web',
+        kind: 'link',
+        href: '/tools/base64-converter',
+        qrValue: 'https://orz2.online/tools/base64-converter',
+        primary: true,
+      },
+    ],
     seo: {
       slug: 'base64-converter',
       ogImage: 'https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp',
@@ -185,12 +209,20 @@ const tools = [
       name: 'Workflow',
     },
     lifecycle: {
-      stage: 'PLANNING',
-      version: '0.1.0',
-      updatedAt: '2026-06-04',
+      stage: 'LIVE',
+      version: '1.0.0',
+      updatedAt: '2026-07-11',
     },
     platform: ['web'],
-    entries: [],
+    entries: [
+      {
+        id: 'web',
+        kind: 'link',
+        href: '/tools/markdown-editor',
+        qrValue: 'https://orz2.online/tools/markdown-editor',
+        primary: true,
+      },
+    ],
     seo: {
       slug: 'markdown-editor',
       ogImage: 'https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp',
@@ -205,12 +237,20 @@ const tools = [
       name: 'Workflow',
     },
     lifecycle: {
-      stage: 'PLANNING',
-      version: '0.1.0',
-      updatedAt: '2026-06-04',
+      stage: 'LIVE',
+      version: '1.0.0',
+      updatedAt: '2026-07-11',
     },
     platform: ['web'],
-    entries: [],
+    entries: [
+      {
+        id: 'web',
+        kind: 'link',
+        href: '/tools/qrcode-generator',
+        qrValue: 'https://orz2.online/tools/qrcode-generator',
+        primary: true,
+      },
+    ],
     seo: {
       slug: 'qrcode-generator',
       ogImage: 'https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp',

@@ -516,6 +516,33 @@ export const messages = {
     sampleReferenceWeekly:
       '本周工作：\n1. 完成模块一的主要开发，说明当前完成度和影响范围。\n2. 完成模块二的联调或问题修复，说明关键处理结果。\n3. 补充测试、文档或上线准备，说明已覆盖的范围。\n\n下周计划：\n1. 继续推进下一阶段功能开发。\n2. 完善测试用例和异常场景验证。\n3. 根据评审或验收反馈做小范围优化。\n\n难点及需要支持：\n1. 需要确认的产品规则或接口字段。\n2. 需要后端、测试或设计配合的事项。\n3. 当前可能影响进度的风险点。',
   },
+  utilityTool: {
+    backToTools: '在线工具',
+    input: '输入内容',
+    output: '结果',
+    format: '格式化',
+    minify: '压缩',
+    encode: '编码',
+    decode: '解码',
+    copy: '复制结果',
+    copied: '已复制',
+    clear: '清空',
+    invalidJson: 'JSON 格式有误，请检查后重试。',
+    invalidBase64: 'Base64 内容无效，请检查后重试。',
+    color: '颜色',
+    contrast: '对比度',
+    accessible: '可读',
+    needsContrast: '对比度不足',
+    qrcodeContent: '二维码内容',
+    qrcodeSize: '尺寸',
+    download: '下载 PNG',
+    preview: '预览',
+    markdownHint: '支持标题、列表、引用、代码块与普通段落。',
+    jsonPlaceholder: '{\n  "hello": "ORZ2"\n}',
+    base64Placeholder: '输入需要编码或解码的文本',
+    markdownPlaceholder: '# 标题\n\n从这里开始写 Markdown…',
+    qrcodePlaceholder: 'https://orz2.online',
+  },
   timezoneTool: {
     backToTools: '在线工具',
     title: '时区转换器',
@@ -1598,7 +1625,7 @@ export const messages = {
         name: 'JSON 格式化',
         summary: '支持语法高亮和错误检测的 JSON 数据格式化、验证和美化工具',
         badges: ['JSON', '开发', '校验'],
-        entries: {},
+        entries: { web: '工具入口' },
         seo: {
           title: 'JSON 格式化工具 - ORZ2 开发者工具',
           description:
@@ -1610,7 +1637,7 @@ export const messages = {
         name: '配色实验室',
         summary: '专业的颜色选择工具，支持多种颜色格式和调色板',
         badges: ['配色', '设计', '可访问性'],
-        entries: {},
+        entries: { web: '工具入口' },
         seo: {
           title: '配色实验室 - ORZ2 在线设计工具',
           description:
@@ -1622,7 +1649,7 @@ export const messages = {
         name: 'Base64 转换器',
         summary: '文本和文件的 Base64 编码解码转换工具',
         badges: ['Base64', '编码', '解码'],
-        entries: {},
+        entries: { web: '工具入口' },
         seo: {
           title: 'Base64 转换器 - ORZ2 开发者工具',
           description:
@@ -1634,7 +1661,7 @@ export const messages = {
         name: 'Markdown 编辑器',
         summary: '功能丰富的 Markdown 编辑器，支持实时预览和导出功能',
         badges: ['Markdown', '编辑器', '预览'],
-        entries: {},
+        entries: { web: '工具入口' },
         seo: {
           title: 'Markdown 编辑器 - ORZ2 开发者工具',
           description:
@@ -1646,7 +1673,7 @@ export const messages = {
         name: '二维码生成器',
         summary: '创建和自定义 URL、文本和联系信息的二维码',
         badges: ['二维码', 'QR Code', '生成'],
-        entries: {},
+        entries: { web: '工具入口' },
         seo: {
           title: '二维码生成器 - ORZ2 在线工具',
           description:

@@ -544,6 +544,34 @@ export const messages = {
     sampleReferenceWeekly:
       '今週の作業：\n1. モジュール一の主要開発を完了し、現在の完成度と影響範囲を記載します。\n2. モジュール二の連携または不具合修正を完了し、主な対応結果を記載します。\n3. テスト、ドキュメント、リリース準備を補足し、確認済みの範囲を記載します。\n\n来週の予定：\n1. 次の段階の機能開発を進めます。\n2. テストケースと異常系の検証を補います。\n3. レビューまたは受け入れ結果に基づいて小さく改善します。\n\n難点と必要な支援：\n1. 確認が必要なプロダクトルールまたは API フィールド。\n2. バックエンド、QA、デザインの協力が必要な事項。\n3. 進捗に影響する可能性があるリスク。',
   },
+  utilityTool: {
+    backToTools: 'オンラインツール',
+    input: '入力',
+    output: '結果',
+    format: '整形',
+    minify: '圧縮',
+    encode: 'エンコード',
+    decode: 'デコード',
+    copy: '結果をコピー',
+    copied: 'コピー済み',
+    clear: 'クリア',
+    invalidJson: 'JSON の形式が正しくありません。内容を確認してください。',
+    invalidBase64: 'Base64 の内容が無効です。内容を確認してください。',
+    color: 'カラー',
+    contrast: 'コントラスト',
+    accessible: '読みやすい',
+    needsContrast: 'コントラスト不足',
+    qrcodeContent: 'QR コード内容',
+    qrcodeSize: 'サイズ',
+    download: 'PNG をダウンロード',
+    preview: 'プレビュー',
+    markdownHint:
+      '見出し、リスト、引用、コードブロック、段落に対応しています。',
+    jsonPlaceholder: '{\n  "hello": "ORZ2"\n}',
+    base64Placeholder: 'エンコードまたはデコードするテキストを入力',
+    markdownPlaceholder: '# タイトル\n\nMarkdown を書き始めましょう…',
+    qrcodePlaceholder: 'https://orz2.online',
+  },
   timezoneTool: {
     backToTools: 'オンラインツール',
     title: 'タイムゾーン変換',
@@ -1653,6 +1681,7 @@ export const messages = {
         summary:
           'シンタックスハイライトとエラー検出に対応した JSON 整形・検証ツール。',
         badges: ['JSON', '開発', '検証'],
+        entries: { web: 'ツール入口' },
         seo: {
           title: 'JSON フォーマッター - ORZ2 開発者ツール',
           description:
@@ -1664,6 +1693,7 @@ export const messages = {
         name: '配色ラボ',
         summary: '複数の色形式とパレットに対応したプロ向けカラー選択ツール。',
         badges: ['配色', 'デザイン', 'アクセシビリティ'],
+        entries: { web: 'ツール入口' },
         seo: {
           title: '配色ラボ - ORZ2 オンラインデザインツール',
           description:
@@ -1675,6 +1705,7 @@ export const messages = {
         name: 'Base64 コンバーター',
         summary: 'テキストとファイルの Base64 エンコード・デコード変換ツール。',
         badges: ['Base64', 'エンコード', 'デコード'],
+        entries: { web: 'ツール入口' },
         seo: {
           title: 'Base64 コンバーター - ORZ2 開発者ツール',
           description:
@@ -1687,6 +1718,7 @@ export const messages = {
         summary:
           'リアルタイムプレビューとエクスポートに対応した多機能 Markdown エディター。',
         badges: ['Markdown', 'エディター', 'プレビュー'],
+        entries: { web: 'ツール入口' },
         seo: {
           title: 'Markdown エディター - ORZ2 開発者ツール',
           description:
@@ -1703,6 +1735,7 @@ export const messages = {
         summary:
           'URL、テキスト、連絡先情報の QR コードを作成・カスタマイズできます。',
         badges: ['QR コード', '生成', 'オンライン'],
+        entries: { web: 'ツール入口' },
         seo: {
           title: 'QR コード生成 - ORZ2 オンラインツール',
           description:
