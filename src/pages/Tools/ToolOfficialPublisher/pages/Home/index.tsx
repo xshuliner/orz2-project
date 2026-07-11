@@ -50,7 +50,7 @@ import {
 } from '@/pages/Tools/ToolOfficialPublisher/utils/form';
 
 import { createInitialPublishSteps } from '@/pages/Tools/ToolOfficialPublisher/utils/progress';
-import CacheManager, { cacheKeys } from '@/utils/CacheManager';
+import managerCache, { cacheKeys } from '@/utils/managerCache';
 import type { LucideIcon } from 'lucide-react';
 import {
   BriefcaseBusiness,
@@ -184,7 +184,7 @@ export function PageOfficialPublisher() {
   const [form, setForm] = useState<OfficialPublisherForm>(() => {
     try {
       return normalizeForm(
-        CacheManager.getLocalStorage(cacheKeys.officialPublisherForm),
+        managerCache.getLocalStorage(cacheKeys.officialPublisherForm),
         defaultRewriteRequirement
       );
     } catch {
@@ -230,7 +230,7 @@ export function PageOfficialPublisher() {
   const publisherAbortRef = useRef<AbortController | null>(null);
   const publishStartedAtRef = useRef<number | null>(null);
   useEffect(() => {
-    CacheManager.setLocalStorage(cacheKeys.officialPublisherForm, form);
+    managerCache.setLocalStorage(cacheKeys.officialPublisherForm, form);
   }, [form]);
 
   useEffect(() => {

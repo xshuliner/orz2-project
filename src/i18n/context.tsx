@@ -8,7 +8,7 @@ import {
   type Locale,
 } from '@/i18n/locale';
 import { loadMessages, type Messages } from '@/i18n/messages';
-import CacheManager, { cacheKeys } from '@/utils/CacheManager';
+import managerCache, { cacheKeys } from '@/utils/managerCache';
 import { toSiteUrl } from '@/utils/siteUrl';
 import {
   createContext,
@@ -56,7 +56,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.lang = localeHtmlLang[locale];
-    CacheManager.setLocalStorage(cacheKeys.locale, locale);
+    managerCache.setLocalStorage(cacheKeys.locale, locale);
   }, [locale]);
 
   const toLocalizedPath = useCallback(

@@ -12,7 +12,7 @@ import StoryLogList, {
 import { useDescendLoadingText } from '@/pages/Products/ProductSilicon/hooks/useDescendLoadingText';
 import { useInfiniteList } from '@/pages/Products/ProductSilicon/hooks/useInfiniteList';
 import { generateRandomNickName } from '@/pages/Products/ProductSilicon/utils';
-import CacheManager, { cacheKeys } from '@/utils/CacheManager';
+import managerCache, { cacheKeys } from '@/utils/managerCache';
 import md5 from 'blueimp-md5';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -120,7 +120,7 @@ export function ProductSilicon() {
 
   useEffect(() => {
     const memberToken =
-      CacheManager.getLocalStorage<string>(cacheKeys.siliconMemberToken) || '';
+      managerCache.getLocalStorage<string>(cacheKeys.siliconMemberToken) || '';
     if (memberToken) {
       setMemberHash(md5(memberToken));
     }
@@ -165,7 +165,7 @@ export function ProductSilicon() {
     setDescendError(null);
     try {
       const cachedMemberToken =
-        CacheManager.getLocalStorage<string>(cacheKeys.siliconMemberToken) ||
+        managerCache.getLocalStorage<string>(cacheKeys.siliconMemberToken) ||
         '';
       if (cachedMemberToken) {
         navigate(memberDetailPath);
@@ -182,7 +182,7 @@ export function ProductSilicon() {
       const resLoginMemberInfo = await postLoginMemberInfo(trimmed);
       const memberToken = resLoginMemberInfo?.memberInfo?.identity_token;
       if (memberToken) {
-        CacheManager.setLocalStorage(cacheKeys.siliconMemberToken, memberToken);
+        managerCache.setLocalStorage(cacheKeys.siliconMemberToken, memberToken);
         setMemberHash(md5(memberToken));
         navigate(memberDetailPath);
         return;

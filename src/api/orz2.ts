@@ -1,4 +1,4 @@
-import FetchManager, { type FetchResponse } from '@/utils/FetchManager';
+import managerFetch, { type FetchResponse } from '@/utils/managerFetch';
 import axios from 'axios';
 import md5 from 'blueimp-md5';
 import type {
@@ -92,7 +92,7 @@ export const getQueryMiniCodeLogin = async (params: {
     uuid: params.uuid,
   };
 
-  return await FetchManager.request({
+  return await managerFetch.request({
     method: 'GET',
     url: '/smart/v1/minicode/getQueryMiniCodeLogin',
     query,
@@ -106,7 +106,7 @@ export const getQueryMiniCodeLogin = async (params: {
 export const postCreateMiniCodeLogin = async (): Promise<
   FetchResponse<LegacyApiPayload<MiniCodeLoginQrCodeBody>>
 > => {
-  return FetchManager.request({
+  return managerFetch.request({
     method: 'POST',
     url: '/smart/v1/minicode/postCreateMiniCodeLogin',
     body: {
@@ -124,7 +124,7 @@ export const postCreateMiniCodeLogin = async (): Promise<
 export const getQueryMemberInfo = async (): Promise<
   FetchResponse<LegacyApiPayload<MemberInfoBody>>
 > => {
-  return FetchManager.request({
+  return managerFetch.request({
     method: 'GET',
     url: '/smart/v1/member/getQueryMemberInfo',
   });
@@ -159,7 +159,7 @@ interface ScoreListBody {
 }
 
 export const postUpdateMemberInfo = async (params: UpdateMemberInfoParams) =>
-  FetchManager.request<LegacyApiPayload<MemberInfoBody>>({
+  managerFetch.request<LegacyApiPayload<MemberInfoBody>>({
     method: 'POST',
     url: '/smart/v1/member/postUpdateMemberInfo',
     body: { ...params },
@@ -169,7 +169,7 @@ export const postUploadMemberAvatar = async (params: {
   file: Blob;
   filename: string;
 }) =>
-  FetchManager.upload<LegacyApiPayload<string>>({
+  managerFetch.upload<LegacyApiPayload<string>>({
     method: 'POST',
     url: '/smart/v1/member/postUploadMemberAvatar',
     file: {
@@ -183,7 +183,7 @@ export const getQueryScoreList = async (params: {
   pageNum: number;
   pageSize: number;
 }) =>
-  FetchManager.request<LegacyApiPayload<ScoreListBody>>({
+  managerFetch.request<LegacyApiPayload<ScoreListBody>>({
     method: 'GET',
     url: '/smart/v1/score/getQueryScoreList',
     query: params,
@@ -204,7 +204,7 @@ export const postLoginMemberInfoForPassword = async (params: {
     password: md5(params.password),
   };
 
-  return FetchManager.request({
+  return managerFetch.request({
     method: 'POST',
     url: '/smart/v1/member/postLoginMemberInfoForPassword',
     body,
@@ -359,7 +359,7 @@ export async function postTinifyImage(params: {
           lastModified: Date.now(),
           type: params.image.type || 'application/octet-stream',
         });
-  const response = await FetchManager.upload<{
+  const response = await managerFetch.upload<{
     code?: number;
     body?: TinifyImageResult | null;
     content?: string;

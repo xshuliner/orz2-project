@@ -3,7 +3,7 @@ import { OButton } from '@/components/OButton';
 import { OIconButton } from '@/components/OIconButton';
 import { OModal } from '@/components/OModal';
 import { useI18n } from '@/hooks/useI18n';
-import CacheManager, { cacheKeys } from '@/utils/CacheManager';
+import managerCache, { cacheKeys } from '@/utils/managerCache';
 import { Loader2, MessageCircle, RefreshCw, X } from 'lucide-react';
 import {
   ReactNode,
@@ -92,27 +92,27 @@ function toAuthUser(
 }
 
 function persistTokens(token: string, refreshToken?: string) {
-  CacheManager.setLocalStorage(cacheKeys.authToken, token);
+  managerCache.setLocalStorage(cacheKeys.authToken, token);
   if (refreshToken) {
-    CacheManager.setLocalStorage(cacheKeys.authRefreshToken, refreshToken);
+    managerCache.setLocalStorage(cacheKeys.authRefreshToken, refreshToken);
   } else {
-    CacheManager.removeLocalStorage(cacheKeys.authRefreshToken);
+    managerCache.removeLocalStorage(cacheKeys.authRefreshToken);
   }
 }
 
 function removeAuthStorage() {
-  CacheManager.removeLocalStorage(cacheKeys.authUser);
-  CacheManager.removeLocalStorage(cacheKeys.authToken);
-  CacheManager.removeLocalStorage(cacheKeys.authRefreshToken);
+  managerCache.removeLocalStorage(cacheKeys.authUser);
+  managerCache.removeLocalStorage(cacheKeys.authToken);
+  managerCache.removeLocalStorage(cacheKeys.authRefreshToken);
 }
 
 function readStoredUser() {
-  const token = CacheManager.getLocalStorage<string>(cacheKeys.authToken);
-  const refreshToken = CacheManager.getLocalStorage<string>(
+  const token = managerCache.getLocalStorage<string>(cacheKeys.authToken);
+  const refreshToken = managerCache.getLocalStorage<string>(
     cacheKeys.authRefreshToken
   );
   if (!token && !refreshToken) return null;
-  return CacheManager.getLocalStorage<AuthUser>(cacheKeys.authUser);
+  return managerCache.getLocalStorage<AuthUser>(cacheKeys.authUser);
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -126,7 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const completeLogin = useCallback((nextUser: AuthUser) => {
     setUser(nextUser);
-    CacheManager.setLocalStorage(cacheKeys.authUser, nextUser);
+    managerCache.setLocalStorage(cacheKeys.authUser, nextUser);
     setIsLoginOpen(false);
   }, []);
 
@@ -140,14 +140,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const memberInfo = response?.data?.body?.memberInfo;
     if (!memberInfo) return null;
     const nextUser = toAuthUser(memberInfo, loginCopy.wechatUser);
-    CacheManager.setLocalStorage(cacheKeys.authUser, nextUser);
+    managerCache.setLocalStorage(cacheKeys.authUser, nextUser);
     setUser(nextUser);
     return nextUser;
   }, [loginCopy.wechatUser]);
 
   useEffect(() => {
-    const token = CacheManager.getLocalStorage<string>(cacheKeys.authToken);
-    const refreshToken = CacheManager.getLocalStorage<string>(
+    const token = managerCache.getLocalStorage<string>(cacheKeys.authToken);
+    const refreshToken = managerCache.getLocalStorage<string>(
       cacheKeys.authRefreshToken
     );
     if (!token && !refreshToken) {

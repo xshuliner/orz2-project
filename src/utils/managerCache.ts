@@ -1,7 +1,7 @@
 /**
  * Business keys for all browser-persisted ORZ2 state.
  *
- * CacheManager adds its storage namespace when values are persisted, so callers
+ * managerCache adds its storage namespace when values are persisted, so callers
  * must use these logical keys instead of constructing localStorage keys.
  */
 export const cacheKeys = {
@@ -17,14 +17,14 @@ export const cacheKeys = {
 } as const;
 
 // Persistent storage manager.
-class CacheManager {
-  private static instance: CacheManager | null = null;
+class managerCache {
+  private static instance: managerCache | null = null;
 
   private readonly header = 'CACHE_';
   private readonly tailer = '_EXPIRE';
 
-  static getInstance(): CacheManager {
-    this.instance ??= new CacheManager();
+  static getInstance(): managerCache {
+    this.instance ??= new managerCache();
     return this.instance;
   }
 
@@ -107,7 +107,7 @@ class CacheManager {
     try {
       return JSON.parse(raw) as T;
     } catch (e) {
-      console.debug('CacheManager#getStorageCore parse error', raw, e);
+      console.debug('managerCache#getStorageCore parse error', raw, e);
       return defaultValue;
     }
   }
@@ -218,4 +218,4 @@ class CacheManager {
   }
 }
 
-export default CacheManager.getInstance();
+export default managerCache.getInstance();

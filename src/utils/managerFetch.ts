@@ -7,7 +7,7 @@ import axios, {
 } from 'axios';
 import md5 from 'blueimp-md5';
 import { v4 as uuidV4 } from 'uuid';
-import CacheManager, { cacheKeys } from './CacheManager';
+import managerCache, { cacheKeys } from './managerCache';
 
 type WebEnvironment = 'local' | 'uat' | 'prod';
 type HttpMethod = NonNullable<AxiosRequestConfig['method']>;
@@ -116,15 +116,15 @@ function getRefreshedTokens(data: unknown): {
 }
 
 function showLoading(): void {
-  console.debug('FetchManager: showLoading');
+  console.debug('managerFetch: showLoading');
 }
 
 function hideLoading(): void {
-  console.debug('FetchManager: hideLoading');
+  console.debug('managerFetch: hideLoading');
 }
 
 function showToast(message: string): void {
-  console.debug('FetchManager: showToast', message);
+  console.debug('managerFetch: showToast', message);
 }
 
 export interface FetchRequestConfig extends Omit<
@@ -201,8 +201,8 @@ function createRequestHeaders(
   };
 }
 
-class FetchManager {
-  static instance: FetchManager | null = null;
+class managerFetch {
+  static instance: managerFetch | null = null;
 
   private readonly baseUrl: string;
   private readonly axiosInstance: AxiosInstance;
@@ -217,15 +217,15 @@ class FetchManager {
     });
   }
 
-  static getInstance(): FetchManager {
-    this.instance ??= new FetchManager();
+  static getInstance(): managerFetch {
+    this.instance ??= new managerFetch();
     return this.instance;
   }
 
   private async refreshAccessToken(): Promise<boolean> {
     if (this.refreshPromise) return this.refreshPromise;
 
-    const refreshToken = CacheManager.getLocalStorage<string>(
+    const refreshToken = managerCache.getLocalStorage<string>(
       cacheKeys.authRefreshToken
     );
     if (!refreshToken) return false;
@@ -242,13 +242,13 @@ class FetchManager {
             ? getRefreshedTokens(response.data)
             : null;
         if (!tokens) {
-          CacheManager.removeLocalStorage(cacheKeys.authToken);
-          CacheManager.removeLocalStorage(cacheKeys.authRefreshToken);
+          managerCache.removeLocalStorage(cacheKeys.authToken);
+          managerCache.removeLocalStorage(cacheKeys.authRefreshToken);
           return false;
         }
 
-        CacheManager.setLocalStorage(cacheKeys.authToken, tokens.token);
-        CacheManager.setLocalStorage(
+        managerCache.setLocalStorage(cacheKeys.authToken, tokens.token);
+        managerCache.setLocalStorage(
           cacheKeys.authRefreshToken,
           tokens.refreshToken
         );
@@ -277,7 +277,7 @@ class FetchManager {
       ...axiosOptions
     } = config;
     const token =
-      CacheManager.getLocalStorage<string>(cacheKeys.authToken) || '';
+      managerCache.getLocalStorage<string>(cacheKeys.authToken) || '';
     const signature = await createRequestSignature({ path: url, query, body });
     const responseUrl = url.includes('://') ? url : `${this.baseUrl}${url}`;
     const axiosConfig: AxiosRequestConfig = {
@@ -356,7 +356,7 @@ class FetchManager {
       ...fileFields
     } = file;
     const token =
-      CacheManager.getLocalStorage<string>(cacheKeys.authToken) || '';
+      managerCache.getLocalStorage<string>(cacheKeys.authToken) || '';
     const signature = await createRequestSignature({
       path: signPath || url,
       query,
@@ -443,7 +443,7 @@ class FetchManager {
       ...axiosOptions
     } = config;
     const token =
-      CacheManager.getLocalStorage<string>(cacheKeys.authToken) || '';
+      managerCache.getLocalStorage<string>(cacheKeys.authToken) || '';
     const signature = await createRequestSignature({ path: url, query, body });
     const urlWithQuery = buildUrlWithQuery(url, stringifyRequestValues(query));
     const responseUrl = urlWithQuery.includes('://')
@@ -493,4 +493,4 @@ class FetchManager {
   }
 }
 
-export default FetchManager.getInstance();
+export default managerFetch.getInstance();

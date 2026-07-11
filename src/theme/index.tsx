@@ -1,4 +1,4 @@
-import CacheManager, { cacheKeys } from '@/utils/CacheManager';
+import managerCache, { cacheKeys } from '@/utils/managerCache';
 import {
   createContext,
   useCallback,
@@ -39,7 +39,7 @@ function resolveTheme(preference: ThemePreference): ResolvedTheme {
 
 function readInitialPreference(): ThemePreference {
   if (typeof window === 'undefined') return 'system';
-  const stored = CacheManager.getLocalStorage<ThemePreference>(themeStorageKey);
+  const stored = managerCache.getLocalStorage<ThemePreference>(themeStorageKey);
   return isThemePreference(stored) ? stored : 'system';
 }
 
@@ -85,7 +85,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const setPreference = useCallback((nextPreference: ThemePreference) => {
     setPreferenceState(nextPreference);
-    CacheManager.setLocalStorage(themeStorageKey, nextPreference);
+    managerCache.setLocalStorage(themeStorageKey, nextPreference);
   }, []);
 
   const cycleTheme = useCallback(() => {
@@ -96,7 +96,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
           : current === 'light'
             ? 'dark'
             : 'system';
-      CacheManager.setLocalStorage(themeStorageKey, next);
+      managerCache.setLocalStorage(themeStorageKey, next);
       return next;
     });
   }, []);

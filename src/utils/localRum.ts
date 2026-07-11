@@ -1,4 +1,4 @@
-import CacheManager, { cacheKeys } from '@/utils/CacheManager';
+import managerCache, { cacheKeys } from '@/utils/managerCache';
 
 export type DevicePerformanceTier = 'constrained' | 'standard' | 'capable';
 
@@ -107,7 +107,7 @@ export function getLocalRumProfile(): LocalRumProfile | undefined {
   if (!isBrowser()) return undefined;
 
   try {
-    const parsed = CacheManager.getLocalStorage<unknown>(cacheKeys.localRum);
+    const parsed = managerCache.getLocalStorage<unknown>(cacheKeys.localRum);
     if (!parsed || typeof parsed !== 'object') return undefined;
     const source = parsed as Record<string, unknown>;
     const metrics = readMetrics(source.metrics);
@@ -156,7 +156,7 @@ function persistProfile(metrics: LocalRumMetrics) {
   };
 
   try {
-    CacheManager.setLocalStorage(cacheKeys.localRum, profile);
+    managerCache.setLocalStorage(cacheKeys.localRum, profile);
   } catch {
     // Private browsing and storage quotas must not affect page loading.
   }
