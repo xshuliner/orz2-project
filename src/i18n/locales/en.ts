@@ -167,6 +167,23 @@ export const messages = {
       qrReadFailed: 'Could not read QR image data',
     },
   },
+  apiError: {
+    closeAriaLabel: 'Close message dialog',
+    generic: {
+      title: 'Action not completed',
+      description:
+        'The service could not complete this action. Please try again shortly.',
+    },
+    scoreLow: {
+      title: 'Not enough points',
+      description:
+        'This action requires points, but your current balance is too low.',
+      codeAlt: 'Mini program code for earning points',
+      codePending:
+        'The mini program code for earning points is being prepared. Please try again shortly.',
+      hint: 'Scan the mini program code in WeChat, then complete tasks in the mini program to earn points.',
+    },
+  },
   homeSections: {
     tools: {
       subtitle:

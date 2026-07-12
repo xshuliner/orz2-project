@@ -1,3 +1,4 @@
+import { notifyApiError } from '@/api/errors';
 import axios, {
   type AxiosInstance,
   type AxiosRequestConfig,
@@ -356,6 +357,7 @@ class managerFetch {
       if (isShowToast && result.statusCode !== 200) {
         showToast(getErrorMessage(result.data, 'Request failed'));
       }
+      notifyApiError(result.data);
       return result;
     } catch (error) {
       const result = getRequestErrorResponse(error) as FetchResponse<TData>;
@@ -369,6 +371,7 @@ class managerFetch {
           getErrorMessage(result.data, result.error || 'Network error')
         );
       }
+      notifyApiError(result.data);
       return result;
     } finally {
       if (isShowLoading) hideLoading();
@@ -402,6 +405,14 @@ class managerFetch {
 
     if (await this.shouldRetryAuthentication(response.status, isRepeatAuth)) {
       return this.requestStream({ ...config, isRepeatAuth: false });
+    }
+
+    if (!response.ok) {
+      const payload = await response
+        .clone()
+        .json()
+        .catch(() => undefined);
+      notifyApiError(payload);
     }
 
     return response;
@@ -482,6 +493,7 @@ class managerFetch {
       ) {
         return this.upload<TData>({ ...config, isRepeatAuth: false });
       }
+      notifyApiError(result.data);
       return result;
     } catch (error) {
       const result = getRequestErrorResponse(error) as FetchResponse<TData>;
@@ -490,6 +502,7 @@ class managerFetch {
       ) {
         return this.upload<TData>({ ...config, isRepeatAuth: false });
       }
+      notifyApiError(result.data);
       return result;
     } finally {
       if (isShowLoading) hideLoading();

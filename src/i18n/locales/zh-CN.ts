@@ -163,6 +163,20 @@ export const messages = {
       qrReadFailed: '二维码图片读取失败',
     },
   },
+  apiError: {
+    closeAriaLabel: '关闭提示窗口',
+    generic: {
+      title: '操作未完成',
+      description: '服务暂时无法完成本次操作，请稍后再试。',
+    },
+    scoreLow: {
+      title: '积分不足',
+      description: '本次操作需要消耗积分，你当前的积分余额不足。',
+      codeAlt: '获取积分的小程序太阳码',
+      codePending: '获取积分的小程序太阳码正在准备中，请稍后再试。',
+      hint: '请使用微信扫描太阳码进入小程序，完成任务即可获取积分。',
+    },
+  },
   homeSections: {
     tools: {
       subtitle:

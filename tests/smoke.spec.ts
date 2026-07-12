@@ -118,6 +118,75 @@ test('login modal opens and closes through the shared modal shell', async ({
   ).toHaveCount(0);
 });
 
+test('a low-points API error opens the global score-reward dialog', async ({
+  page,
+}) => {
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+
+  await page.evaluate(() => {
+    window.dispatchEvent(
+      new CustomEvent('orz2:api-error', {
+        detail: {
+          code: 400,
+          content: 'Member score is running low',
+          message: 'MEMBER_SCORE_LOW',
+        },
+      })
+    );
+  });
+
+  await expect(
+    page.getByRole('dialog', { name: zhMessages.apiError.scoreLow.title })
+  ).toBeVisible();
+  await expect(
+    page.getByAltText(zhMessages.apiError.scoreLow.codeAlt)
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      page
+        .getByAltText(zhMessages.apiError.scoreLow.codeAlt)
+        .evaluate(image => (image as HTMLImageElement).naturalWidth)
+    )
+    .toBeGreaterThan(0);
+  await expect(page.getByText(zhMessages.apiError.scoreLow.hint)).toBeVisible();
+
+  await page.keyboard.press('Escape');
+  await expect(
+    page.getByRole('dialog', { name: zhMessages.apiError.scoreLow.title })
+  ).toHaveCount(0);
+});
+
+test('a low-points response from the API client opens the global dialog', async ({
+  page,
+}) => {
+  await page.route('**/smart/v1/llm/postPolishContent**', route =>
+    route.fulfill({
+      contentType: 'application/json',
+      status: 400,
+      body: JSON.stringify({
+        body: {},
+        code: 400,
+        content: 'Member score is running low',
+        message: 'MEMBER_SCORE_LOW',
+      }),
+    })
+  );
+  await page.goto('/tools/work-report-polisher', {
+    waitUntil: 'domcontentloaded',
+  });
+
+  await page
+    .getByLabel(zhMessages.reportPolishTool.inputTitle)
+    .fill('完成项目排期与接口联调');
+  await page
+    .getByRole('button', { name: zhMessages.reportPolishTool.polish })
+    .click();
+
+  await expect(
+    page.getByRole('dialog', { name: zhMessages.apiError.scoreLow.title })
+  ).toBeVisible();
+});
+
 test('official publisher resumes the validated publish flow after login', async ({
   page,
 }) => {
@@ -722,9 +791,7 @@ test('official publisher confirmation dialog is centered in the viewport', async
   await page.goto('/tools/official-publisher', {
     waitUntil: 'domcontentloaded',
   });
-  await page
-    .getByRole('button', { name: publisher.aside.reset })
-    .click();
+  await page.getByRole('button', { name: publisher.aside.reset }).click();
 
   const dialog = page.getByRole('dialog', {
     name: publisher.status.resetTitle,

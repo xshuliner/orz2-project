@@ -168,6 +168,23 @@ export const messages = {
       qrReadFailed: 'QR 画像を読み取れませんでした',
     },
   },
+  apiError: {
+    closeAriaLabel: 'メッセージ画面を閉じる',
+    generic: {
+      title: '操作を完了できませんでした',
+      description:
+        'サービスでこの操作を完了できませんでした。しばらくしてからもう一度お試しください。',
+    },
+    scoreLow: {
+      title: 'ポイントが不足しています',
+      description:
+        'この操作にはポイントが必要ですが、現在の残高では不足しています。',
+      codeAlt: 'ポイント獲得用ミニプログラムコード',
+      codePending:
+        'ポイント獲得用ミニプログラムコードを準備中です。しばらくしてからもう一度お試しください。',
+      hint: 'WeChat でミニプログラムコードをスキャンし、タスクを完了するとポイントを獲得できます。',
+    },
+  },
   homeSections: {
     tools: {
       subtitle:

@@ -1,3 +1,4 @@
+import { ApiErrorHandler } from '@/components/ApiErrorHandler';
 import { EffectsMotion } from '@/components/EffectsMotion';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { LocalPerformanceMonitor } from '@/components/LocalPerformanceMonitor';
@@ -49,6 +50,7 @@ export function App() {
 
   return (
     <>
+      <ApiErrorHandler />
       <EffectsMotion />
       <GoogleAnalytics />
       <LocalPerformanceMonitor />
