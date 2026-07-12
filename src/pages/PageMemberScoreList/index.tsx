@@ -15,7 +15,6 @@ const ScoreTypeMap = {
   REWARDED_CREATE: { label: 'REWARDED_CREATE', icon: 'iconemoji' },
   REWARDED_AD: { label: 'REWARDED_AD', icon: 'iconlive' },
   USE_CHAT: { label: 'USE_CHAT', icon: 'iconinteractive' },
-  USE_OFFICE: { label: 'USE_OFFICE', icon: 'icongongzhonghao' },
   USE_OFFICIAL: { label: 'USE_OFFICIAL', icon: 'icongongzhonghao' },
   MANUAL: { label: 'MANUAL', icon: 'iconsetup' },
   DEFAULT: { label: 'DEFAULT', icon: 'iconsetup' },

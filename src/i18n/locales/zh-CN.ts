@@ -111,7 +111,6 @@ export const messages = {
       REWARDED_CREATE: '建号奖励',
       REWARDED_AD: '广告奖励',
       USE_CHAT: 'AI聊天消耗',
-      USE_OFFICE: '生成公众号文章消耗',
       USE_OFFICIAL: '使用公众号工具消耗',
       MANUAL: '系统操作',
       DEFAULT: '未知',

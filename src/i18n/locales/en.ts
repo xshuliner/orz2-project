@@ -112,7 +112,6 @@ export const messages = {
       REWARDED_CREATE: 'Account creation reward',
       REWARDED_AD: 'Ad reward',
       USE_CHAT: 'AI chat usage',
-      USE_OFFICE: 'Official article generation',
       USE_OFFICIAL: 'Official account tool usage',
       MANUAL: 'System operation',
       DEFAULT: 'Unknown',
