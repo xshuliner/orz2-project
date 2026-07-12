@@ -50,13 +50,13 @@ pnpm run start:prod
 
 ## Architecture
 
-**ORZ2** is a commercial online-tools and product-showcase frontend built with
-**React 18 + Vite 6 + TypeScript**. The repository ships a static frontend;
-there is no in-repo backend. Runtime features such as login, Silicon member
-data, content polishing, WeChat publishing, and TinyPNG compression call remote
-ORZ2 APIs from `src/api/orz2.ts`. Production monetization/measurement is wired
-through Google AdSense in `index.html` and Google Analytics in
-`src/components/GoogleAnalytics/`.
+**ORZ2** is a commercial online-tools, member-center, and product-showcase
+frontend built with **React 18 + Vite 6 + TypeScript**. The repository ships a
+static frontend; there is no in-repo backend. Runtime features such as login,
+Silicon member data, content polishing, WeChat publishing, and TinyPNG
+compression call remote ORZ2 APIs from `src/api/orz2.ts`. Production
+monetization/measurement is wired through Google AdSense in `index.html` and
+Google Analytics in `src/components/GoogleAnalytics/`.
 
 ### Agent Workflow
 
@@ -142,9 +142,11 @@ Placement rules:
 - **Tailwind CSS v4** via `@tailwindcss/vite`; tokens live in
   `src/styles/theme.css`, not in `tailwind.config.js`
 - **GSAP 3** + `ScrollTrigger` for reveal, header, tilt, and Silicon page motion
+- **Radix UI** primitives for dialogs, popovers, selectors, tabs, and radio
+  controls
 - **react-helmet-async** for SEO, canonical/alternate links, and JSON-LD
 - **lucide-react 0.468** for icons
-- **axios 1.16**, `FetchManager`, **blueimp-md5**, **uuid 14**, **dayjs**,
+- **axios 1.16**, `managerFetch`, **blueimp-md5**, **uuid 14**, **dayjs**,
   **qrcode.react**, and **jszip** for APIs, signed requests, QR codes, date
   display, and image ZIP export
 - **Google AdSense** (`VITE_GOOGLE_ADSENSE_CLIENT`) and **Google Analytics 4**
@@ -167,8 +169,10 @@ theme script that reads `orz2:theme-preference`, applies `data-theme`, updates
 `color-scheme`, and loads `%BASE_URL%__xshuliner__/build-info.js` before React
 boots.
 
-`src/App.tsx` mounts `EffectsMotion` and `GoogleAnalytics` once, then renders
-`useRoutes(routes)` in a `Suspense` boundary.
+`src/App.tsx` mounts `EffectsMotion`, `GoogleAnalytics`, and
+`LocalPerformanceMonitor` once, then renders `useRoutes(routes)` in a `Suspense`
+boundary. It also preloads registered internal navigation modules on link
+hover/focus when the browser is not in a constrained performance tier.
 
 ### Routing
 
@@ -198,8 +202,15 @@ Current app routes:
 - `/tools/smart-image-compressor` -> batch image studio / compressor
 - `/tools/timezone-converter` -> time zone converter
 - `/tools/work-report-polisher` -> daily / weekly report polisher
+- `/tools/json-formatter` -> JSON formatter and validator
+- `/tools/palette-lab` -> color picker and contrast checker
+- `/tools/base64-converter` -> Base64 text converter
+- `/tools/markdown-editor` -> Markdown editor and preview
+- `/tools/qrcode-generator` -> QR code generator
 - `/team` -> `PageTeam`
 - `/privacy` -> `PagePrivacy`
+- `/member/detail` -> authenticated member profile
+- `/member/score-list` -> authenticated score history
 - `/design-system` -> internal component gallery, `robots: noindex, follow`
 - `/build-info` -> deployment build metadata viewer, `robots: noindex, follow`
 
@@ -323,13 +334,17 @@ first:
 - `OEmptyState` -> empty lists
 - `OInputAI` -> input/textarea with AI polish/restore action via
   `postPolishContent`
-- `OModal` -> portal dialog with Escape/backdrop close and focus restoration
+- `OModal` / `OModalConfirm` -> Radix-based dialogs with Escape/backdrop close
+  and focus restoration
+- `OPopover` -> shared Radix-based hover/click popover
 - `OPageHero` -> page-level title/description/action layout
 - `ORadio` -> segmented radio controls
 - `OSectionHeading` -> section title + subtitle
 - `OSelector` -> segmented selector
 - `OTab` -> tab controls
 - `OTooltip` -> accessible hover/click tooltip
+- `LayoutPage` -> shared SEO, back-link, hero, tool badges, and content layout
+  for regular pages/tools
 
 `OHeader` and `OFooter` are also `O*` components. The older `Header`/`Footer`
 names are not current.
@@ -356,8 +371,9 @@ names are not current.
 `src/components/ContextAuth/` provides React auth context and the shared login
 modal. It is localStorage-backed, but not purely mock:
 
-- Auth user cache: `orz2:auth-user`
-- Token keys: `token`, `refreshToken`
+- All browser persistence uses `managerCache` plus logical `cacheKeys`; physical
+  localStorage keys are prefixed `CACHE_`.
+- Auth keys: `orz2:auth-user`, `orz2:auth-token`, `orz2:auth-refresh-token`
 - Login opens a QR-code modal, calls `postCreateMiniCodeLogin()`, polls
   `getQueryMiniCodeLogin({ uuid })`, then fetches `getQueryMemberInfo()`.
 - `useAuth()` exposes `user`, `isAuthenticated`, `openLogin`, `closeLogin`,
@@ -365,8 +381,10 @@ modal. It is localStorage-backed, but not purely mock:
 - `useLoginGate()` returns `withLoginRequired` and is used by protected actions
   such as official-publisher generation.
 
-`CacheManager` prefixes stored business keys with `CACHE_`; remember that
-browser storage keys may not match the raw key string exactly.
+`managerCache` prefixes stored business keys with `CACHE_`; never construct
+physical storage keys in feature code. Relevant additional keys include local
+RUM (`orz2:local-rum`), publisher/report forms, theme/locale, and the Silicon
+member token.
 
 ### API Surface
 
@@ -375,16 +393,16 @@ and shared types from `orz2.modal.ts`.
 
 `src/api/orz2.ts` contains:
 
-- Mini-code login and member info APIs through `FetchManager`
+- Mini-code login and member info APIs through `managerFetch`
 - Silicon APIs: summary, member list/detail, story list, member login
 - Tool APIs: `postTinifyImage`
 - LLM polish API: `postPolishContent`
 - Official publisher APIs: `postOfficialPublisher` and
   `streamPostOfficialPublisher`
 
-`FetchManager` signs requests with `requestid`, `t`, and `k`, reads `token` from
-`CacheManager`, and resolves its base URL from `VITE_API_BASE_URL` or fallback
-env mappings.
+`managerFetch` signs requests with `requestid`, `t`, and `k`, reads the auth
+token through `managerCache`, and resolves its base URL from `VITE_API_BASE_URL`
+or fallback env mappings.
 
 Current env files:
 
@@ -408,6 +426,17 @@ hostname). Localhost, loopback, and `.local` hosts are blocked.
 Privacy copy and AdSense launch notes live in locale dictionaries and
 `docs/ADSENSE_CHECKLIST.md`. Keep those in sync when measurement or ad behavior
 changes.
+
+### Local Performance and Route Loading
+
+`LocalPerformanceMonitor` starts `localRum` once in the browser. It observes
+navigation timing, LCP, CLS, INP, and long tasks and persists a 14-day local
+profile through `managerCache`; it does not send telemetry to a server.
+`loadingPriority.ts` owns priority-aware lazy modules and route-module
+registration. `lazyNavigationRoute()` is the default for lazy pages. Navigation
+prefetch is skipped for `saveData`, slow/constrained devices, and historically
+poor local performance. Keep new route paths registered through this helper so
+they participate in the same behavior.
 
 ### Product: Silicon
 
@@ -484,6 +513,14 @@ Key behaviors:
 - Keep prompt construction and form normalization local unless another tool
   needs the same behavior
 
+### Developer Utility Tools
+
+`src/pages/Tools/ToolJsonFormatter/`, `ToolPaletteLab/`, `ToolBase64Converter/`,
+`ToolMarkdownEditor/`, and `ToolQrcodeGenerator/` are small browser-only
+utilities. Each follows the feature layout with a local `config/`, lazy
+`routes/`, and `pages/Home/`; use `LayoutPage` and the localized `utilityTool`
+messages rather than duplicating a tool shell or hard-coding copy.
+
 ### Build Info
 
 Build scripts run `xbi generate` before TypeScript/Vite builds. Generated files
@@ -556,6 +593,11 @@ Playwright tests live in `tests/smoke.spec.ts`. Current coverage checks:
 - Canonical and alternate SEO links
 - Design-system modal close behavior
 - Silicon page independent theme/header behavior
+- navigation prefetch and constrained-device local RUM behavior
+- developer utility transforms, member popover behavior, and confirmation
+  dialogs
+- timezone DST conversion, report-form persistence, and publisher template
+  workflows
 
 Run `pnpm run test:e2e` after changes that affect routes, layout, SEO, theme,
 auth modal behavior, or public page rendering.
@@ -604,7 +646,7 @@ addition:
   `PLANNING`; render them through helpers, never inline.
 - Keep component-local CSS next to the component and reuse global tokens instead
   of inventing one-off colors or spacing.
-- `CacheManager` stores namespaced keys and optional expiry metadata; remember
+- `managerCache` stores namespaced keys and optional expiry metadata; remember
   browser storage keys may not match the raw key string.
 - Do not edit generated `dist/`, `*.tsbuildinfo`, `test-results/`, or build-info
   artifacts unless the task explicitly calls for generated output.
