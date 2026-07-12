@@ -4,7 +4,6 @@ public/__xshuliner__/
 *.tsbuildinfo
 .DS_Store
 test-results/
-.env.*.local
 
 # Agents
 settings.local.json

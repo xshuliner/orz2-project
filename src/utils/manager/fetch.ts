@@ -22,9 +22,9 @@ const secretKey = 'I@, ha*ve #187076081$ dream(s)!~';
 const defaultTimeoutMs = 20000;
 
 const apiOrigins: Record<WebEnvironment, string> = {
-  prod: 'https://orz2.online/api',
-  uat: 'https://orz2.online/apiuat',
-  local: 'http://localhost:9002/apilocal',
+  prod: 'https://orz2.online/api/smart',
+  uat: 'https://orz2.online/apiuat/smart',
+  local: 'http://localhost:9002/apilocal/smart',
 };
 
 function getFallbackBaseUrl(): string {
@@ -36,12 +36,15 @@ function resolveBaseUrl(): string {
   if (!apiBaseUrl) return getFallbackBaseUrl();
 
   try {
-    const parsedUrl = new URL(apiBaseUrl);
-    parsedUrl.pathname = parsedUrl.pathname.replace(/\/smart\/v1\/?$/, '');
-    return parsedUrl.toString().replace(/\/$/, '');
+    return new URL(apiBaseUrl).toString().replace(/\/$/, '');
   } catch {
     return getFallbackBaseUrl();
   }
+}
+
+function resolveRequestUrl(baseUrl: string, url: string): string {
+  if (url.includes('://')) return url;
+  return `${baseUrl}${url.replace(/^\/smart(?=\/)/, '')}`;
 }
 
 function stringifyRequestValues(values: RequestValues): Record<string, string> {
@@ -253,7 +256,7 @@ class managerFetch {
       managerCache.getLocalStorage<string>(cacheKeys.authToken) || '';
     const signature = await createRequestSignature({ path, query, body });
     return {
-      url: url.includes('://') ? url : `${this.baseUrl}${url}`,
+      url: resolveRequestUrl(this.baseUrl, url),
       headers: createRequestHeaders(signature, token, header, contentType),
     };
   }
