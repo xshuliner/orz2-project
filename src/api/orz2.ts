@@ -1,5 +1,4 @@
-import managerFetch, { type FetchResponse } from '@/utils/managerFetch';
-import axios from 'axios';
+import managerFetch, { type FetchResponse } from '@/utils/manager/fetch';
 import md5 from 'blueimp-md5';
 import type {
   MemberInfo,
@@ -14,25 +13,8 @@ import type {
   TinifyImageResult,
 } from './orz2.modal';
 
-// ===== API roots and URL constants =====
-
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'https://orz2.online/api/smart/v1';
-
-const MEMBER_PREFIX = `${API_BASE_URL}/member`;
-const STORY_PREFIX = `${API_BASE_URL}/story`;
-const OFFICIAL_PREFIX = `${API_BASE_URL}/official`;
-const LLM_PREFIX = `${API_BASE_URL}/llm`;
 const TINIFY_IMAGE_API_PATH = '/smart/v1/tool/postTinifyImage';
-const TINIFY_IMAGE_SIGN_PATH = `${new URL(API_BASE_URL).pathname}/tool/postTinifyImage`;
-
-export const MEMBER_SUMMARY_API_URL = `${MEMBER_PREFIX}/getQueryMemberSummaryForSilicon`;
-export const MEMBER_LIST_API_URL = `${MEMBER_PREFIX}/getQueryMemberListForSilicon`;
-export const MEMBER_INFO_API_URL = `${MEMBER_PREFIX}/getQueryMemberInfoForSilicon`;
-export const MEMBER_LOGIN_API_URL = `${MEMBER_PREFIX}/postLoginMemberInfoForSilicon`;
-export const STORY_LIST_API_URL = `${STORY_PREFIX}/getQueryStoryListForSilicon`;
-export const OFFICIAL_PUBLISHER_API_URL = `${OFFICIAL_PREFIX}/postOfficialPublisher`;
-export const POLISH_CONTENT_API_URL = `${LLM_PREFIX}/postPolishContent`;
+const TINIFY_IMAGE_SIGN_PATH = TINIFY_IMAGE_API_PATH;
 
 /**
  * Query QR-code login status.
@@ -215,10 +197,13 @@ export const postLoginMemberInfoForPassword = async (params: {
 
 /** Query member summary. */
 export async function getMemberSummary(): Promise<MemberSummaryBody | null> {
-  const { data } = await axios.get<{
-    code: number;
-    body?: MemberSummaryBody | null;
-  }>(MEMBER_SUMMARY_API_URL);
+  const response = await managerFetch.request<
+    LegacyApiPayload<MemberSummaryBody | null>
+  >({
+    method: 'GET',
+    url: '/smart/v1/member/getQueryMemberSummaryForSilicon',
+  });
+  const data = response.data;
   if (data?.code === 200 && data?.body) {
     return data.body;
   }
@@ -230,14 +215,14 @@ export async function getMemberList(params: {
   pageNum: number;
   pageSize: number;
 }): Promise<MemberListPageBody> {
-  const searchParams = new URLSearchParams({
-    pageNum: String(params.pageNum),
-    pageSize: String(params.pageSize),
+  const response = await managerFetch.request<
+    LegacyApiPayload<MemberListPageBody>
+  >({
+    method: 'GET',
+    url: '/smart/v1/member/getQueryMemberListForSilicon',
+    query: params,
   });
-  const { data } = await axios.get<{
-    code: number;
-    body: MemberListPageBody;
-  }>(`${MEMBER_LIST_API_URL}?${searchParams.toString()}`);
+  const data = response.data;
   if (data?.code === 200 && data?.body) {
     return data.body;
   }
@@ -252,15 +237,19 @@ export async function getMemberInfo(params: {
   const { id, token } = params;
   const query =
     id != null && id !== ''
-      ? `id=${encodeURIComponent(id)}`
+      ? { id }
       : token != null && token !== ''
-        ? `token=${encodeURIComponent(token)}`
+        ? { token }
         : null;
   if (!query) return null;
-  const { data } = await axios.get<{
-    code: number;
-    body?: { memberInfo?: MemberInfo | null } | null;
-  }>(`${MEMBER_INFO_API_URL}?${query}`);
+  const response = await managerFetch.request<
+    LegacyApiPayload<{ memberInfo?: MemberInfo | null } | null>
+  >({
+    method: 'GET',
+    url: '/smart/v1/member/getQueryMemberInfoForSilicon',
+    query,
+  });
+  const data = response.data;
   if (data?.code === 200 && data?.body?.memberInfo) {
     return data.body.memberInfo;
   }
@@ -274,20 +263,19 @@ export async function getStoryList(options: {
   memberId?: string;
 }): Promise<StoryListResult> {
   const { pageNum = 0, pageSize = 15, memberId } = options;
-  const params = new URLSearchParams({
-    pageNum: String(pageNum),
-    pageSize: String(pageSize),
-  });
-  if (memberId) params.set('memberId', memberId);
-  const { data } = await axios.get<{
-    code: number;
-    body: {
+  const response = await managerFetch.request<
+    LegacyApiPayload<{
       pageNum: number;
       pageSize: number;
       totalCount: number;
       list: import('./orz2.modal').StoryItem[];
-    };
-  }>(`${STORY_LIST_API_URL}?${params.toString()}`);
+    }>
+  >({
+    method: 'GET',
+    url: '/smart/v1/story/getQueryStoryListForSilicon',
+    query: { pageNum, pageSize, ...(memberId ? { memberId } : {}) },
+  });
+  const data = response.data;
   if (data?.code === 200 && data?.body) {
     return {
       list: data.body.list ?? [],
@@ -304,21 +292,18 @@ export async function postLoginMemberInfo(nickName: string): Promise<{
   storyInfo?: import('./orz2.modal').StoryItem;
   memberInfo?: MemberInfo;
 } | null> {
-  const { data } = await axios.post<{
-    code: number;
-    body?: {
+  const response = await managerFetch.request<
+    LegacyApiPayload<{
       storyInfo?: import('./orz2.modal').StoryItem;
       memberInfo?: MemberInfo;
-    } | null;
-  }>(
-    MEMBER_LOGIN_API_URL,
-    { nickName },
-    {
-      headers: {
-        mode: 'human',
-      },
-    }
-  );
+    } | null>
+  >({
+    method: 'POST',
+    url: '/smart/v1/member/postLoginMemberInfoForSilicon',
+    body: { nickName },
+    header: { mode: 'human' },
+  });
+  const data = response.data;
   if (data?.code === 200 && data?.body) {
     return data.body;
   }
@@ -408,24 +393,25 @@ export async function postTinifyImage(params: {
 export async function postPolishContent(
   body: PostPolishContentBody
 ): Promise<PostPolishContentResult> {
-  const { data } = await axios.post<{
-    code?: number;
-    body?: PostPolishContentResult | null;
-    message?: string;
-    content?: string;
-  }>(POLISH_CONTENT_API_URL, body, {
-    headers: {
-      brand: 'orz2',
-      platform: 'WEB',
-    },
+  const response = await managerFetch.request<
+    LegacyApiPayload<PostPolishContentResult | null>
+  >({
+    method: 'POST',
+    url: '/smart/v1/llm/postPolishContent',
+    body,
     timeout: 120000,
   });
+  const data = response.data;
 
   if (data?.code === 200 && data?.body?.content) {
     return data.body;
   }
 
-  const message = data?.message || data?.content || 'Content polishing failed';
+  const message =
+    data?.message ||
+    data?.content ||
+    response.error ||
+    'Content polishing failed';
   throw new Error(message);
 }
 
@@ -434,29 +420,27 @@ export async function postPolishContent(
 /**
  * Call the backend endpoint that generates and creates a WeChat draft.
  * Backend route: POST /smart/v1/official/postOfficialPublisher
- * Backend headers accept brand=zero|weather|carbon and platform=WEAPP|WEB|OTHER.
- * This caller overrides them with brand='orz2' and platform='WEB'.
  */
 export async function postOfficialPublisher(
   body: PostOfficialPublisherBody
 ): Promise<OfficialDraftResult | null> {
-  const { data } = await axios.post<{
-    code?: number;
-    body?: OfficialDraftResult | null;
-    message?: string;
-    content?: string;
-  }>(OFFICIAL_PUBLISHER_API_URL, body, {
-    headers: {
-      brand: 'orz2',
-      platform: 'WEB',
-    },
+  const response = await managerFetch.request<
+    LegacyApiPayload<OfficialDraftResult | null>
+  >({
+    method: 'POST',
+    url: '/smart/v1/official/postOfficialPublisher',
+    body,
     timeout: 600000,
   });
+  const data = response.data;
   if (data?.code === 200 && data?.body) {
     return data.body;
   }
   const message =
-    data?.message || data?.content || 'Publishing task submission failed';
+    data?.message ||
+    data?.content ||
+    response.error ||
+    'Publishing task submission failed';
   throw new Error(message);
 }
 
@@ -497,15 +481,12 @@ export async function streamPostOfficialPublisher(
   body: PostOfficialPublisherBody,
   options: PostOfficialPublisherStreamOptions = {}
 ): Promise<OfficialDraftResult | null> {
-  const response = await fetch(`${OFFICIAL_PUBLISHER_API_URL}?stream=true`, {
+  const response = await managerFetch.requestStream({
     method: 'POST',
-    headers: {
-      Accept: 'text/event-stream',
-      'Content-Type': 'application/json',
-      brand: 'orz2',
-      platform: 'WEB',
-    },
-    body: JSON.stringify(body),
+    url: '/smart/v1/official/postOfficialPublisher',
+    query: { stream: true },
+    body,
+    header: { Accept: 'text/event-stream' },
     signal: options.signal,
   });
 
