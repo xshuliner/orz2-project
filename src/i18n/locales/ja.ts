@@ -113,6 +113,7 @@ export const messages = {
       REWARDED_AD: '広告ボーナス',
       USE_CHAT: 'AI チャット利用',
       USE_OFFICE: '公式アカウント記事の生成',
+      USE_OFFICIAL: '公式アカウントツールの利用',
       MANUAL: 'システム操作',
       DEFAULT: '不明',
     },

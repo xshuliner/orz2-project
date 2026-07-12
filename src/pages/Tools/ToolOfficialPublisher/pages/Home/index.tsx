@@ -7,6 +7,7 @@ import {
   type OfficialPublisherProgressEvent,
 } from '@/api';
 import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
+import { useAuthLogin } from '@/components/ContextAuth';
 import { LayoutPage } from '@/components/LayoutPage';
 import { OBadge } from '@/components/OBadge';
 import { OButton } from '@/components/OButton';
@@ -50,7 +51,7 @@ import {
 } from '@/pages/Tools/ToolOfficialPublisher/utils/form';
 
 import { createInitialPublishSteps } from '@/pages/Tools/ToolOfficialPublisher/utils/progress';
-import managerCache, { cacheKeys } from '@/utils/managerCache';
+import managerCache, { cacheKeys } from '@/utils/manager/cache';
 import type { LucideIcon } from 'lucide-react';
 import {
   BriefcaseBusiness,
@@ -117,6 +118,7 @@ const promptTemplateIcons: Record<PromptTemplateId, LucideIcon> = {
 
 export function PageOfficialPublisher() {
   const { messages } = useI18n();
+  const withLoginRequired = useAuthLogin();
   const publisherCopy = messages.publisher;
   const defaultRewriteRequirement = publisherCopy.defaultRewriteRequirement;
   const localizedDefaultForm = useMemo(
@@ -477,10 +479,14 @@ export function PageOfficialPublisher() {
       setPublishStatusText(publisherCopy.status.validationFailed);
       return;
     }
-    setPublishConfirmOpen(true);
+    return withLoginRequired(() => setPublishConfirmOpen(true))();
   }
 
-  async function handlePublishConfirm() {
+  function handlePublishConfirm() {
+    return withLoginRequired(startPublish)();
+  }
+
+  async function startPublish() {
     setPublishConfirmOpen(false);
     setIsPublishing(true);
     setDraftResult(null);

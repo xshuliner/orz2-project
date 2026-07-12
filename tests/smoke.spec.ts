@@ -118,6 +118,84 @@ test('login modal opens and closes through the shared modal shell', async ({
   ).toHaveCount(0);
 });
 
+test('official publisher resumes the validated publish flow after login', async ({
+  page,
+}) => {
+  const publisher = zhMessages.publisher;
+
+  await page.route('**/smart/v1/minicode/postCreateMiniCodeLogin**', route =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        body: { data: { data: [255, 216, 255, 217] }, uuid: 'login-uuid' },
+      }),
+    })
+  );
+  await page.route('**/smart/v1/minicode/getQueryMiniCodeLogin**', route =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({ body: { timer: 1, token: 'test-token' } }),
+    })
+  );
+  await page.route('**/smart/v1/member/getQueryMemberInfo**', route =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        body: { memberInfo: { _id: 'test-user', user_nickName: 'Test User' } },
+      }),
+    })
+  );
+
+  await page.goto('/tools/official-publisher', {
+    waitUntil: 'domcontentloaded',
+  });
+  await page
+    .getByPlaceholder(publisher.sections.account.appIdPlaceholder)
+    .fill('test-app-id');
+  await page
+    .getByPlaceholder(publisher.sections.account.appSecretPlaceholder)
+    .fill('test-app-secret');
+  await page.getByRole('button', { name: publisher.aside.generate }).click();
+
+  await expect(
+    page.getByRole('dialog', { name: publisher.status.confirmTitle })
+  ).toBeVisible();
+});
+
+test('closing publisher login cancels the pending publish flow', async ({
+  page,
+}) => {
+  const publisher = zhMessages.publisher;
+
+  await page.route('**/smart/v1/minicode/postCreateMiniCodeLogin**', route =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        body: { data: { data: [255, 216, 255, 217] }, uuid: 'login-uuid' },
+      }),
+    })
+  );
+
+  await page.goto('/tools/official-publisher', {
+    waitUntil: 'domcontentloaded',
+  });
+  await page
+    .getByPlaceholder(publisher.sections.account.appIdPlaceholder)
+    .fill('test-app-id');
+  await page
+    .getByPlaceholder(publisher.sections.account.appSecretPlaceholder)
+    .fill('test-app-secret');
+  await page.getByRole('button', { name: publisher.aside.generate }).click();
+
+  await expect(
+    page.getByRole('dialog', { name: zhMessages.login.title })
+  ).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(
+    page.getByRole('dialog', { name: publisher.status.confirmTitle })
+  ).toHaveCount(0);
+});
+
 test('authenticated header profile popover distinguishes hover and click', async ({
   page,
 }) => {
