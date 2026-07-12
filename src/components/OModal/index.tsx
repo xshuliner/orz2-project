@@ -38,18 +38,20 @@ export function OModal({
             .filter(Boolean)
             .join(' ')}
         />
-        <DialogPrimitive.Content
-          {...props}
-          ref={panelRef}
-          className={['o-modal-panel', className].filter(Boolean).join(' ')}
-          aria-label={ariaLabel}
-          aria-labelledby={titleId}
-          onInteractOutside={event => {
-            if (!closeOnBackdrop) event.preventDefault();
-          }}
-        >
-          {children}
-        </DialogPrimitive.Content>
+        <div className='o-modal-positioner'>
+          <DialogPrimitive.Content
+            {...props}
+            ref={panelRef}
+            className={['o-modal-panel', className].filter(Boolean).join(' ')}
+            aria-label={ariaLabel}
+            aria-labelledby={titleId}
+            onInteractOutside={event => {
+              if (!closeOnBackdrop) event.preventDefault();
+            }}
+          >
+            {children}
+          </DialogPrimitive.Content>
+        </div>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
   );

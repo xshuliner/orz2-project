@@ -636,6 +636,29 @@ test('design system modal supports button, backdrop and escape closing', async (
   await expect(dialog).toHaveCount(0);
 });
 
+test('official publisher confirmation dialog is centered in the viewport', async ({
+  page,
+}) => {
+  const publisher = zhMessages.publisher;
+
+  await page.goto('/tools/official-publisher', {
+    waitUntil: 'domcontentloaded',
+  });
+  await page
+    .getByRole('button', { name: publisher.aside.reset })
+    .click();
+
+  const dialog = page.getByRole('dialog', {
+    name: publisher.status.resetTitle,
+  });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toBeInViewport();
+  await dialog
+    .getByRole('button', { name: publisher.customization.cancel })
+    .click();
+  await expect(dialog).toHaveCount(0);
+});
+
 test('silicon product keeps its independent theme', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('/products/silicon', { waitUntil: 'domcontentloaded' });

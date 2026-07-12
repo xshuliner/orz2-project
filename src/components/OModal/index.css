@@ -15,9 +15,21 @@
   backdrop-filter: blur(10px) saturate(1.05);
 }
 
+.o-modal-positioner {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-modal-critical) + 1);
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  pointer-events: none;
+}
+
 .o-modal-panel {
   position: relative;
   width: min(100%, 520px);
+  max-height: calc(100dvh - (var(--space-6) * 2));
+  overflow-y: auto;
   border: 1px solid
     color-mix(in srgb, var(--color-green) 18%, var(--color-line));
   border-radius: var(--radius-modal);
@@ -29,4 +41,5 @@
     ),
     var(--surface-panel);
   box-shadow: var(--shadow-modal);
+  pointer-events: auto;
 }
