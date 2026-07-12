@@ -7,7 +7,7 @@ import axios, {
 } from 'axios';
 import md5 from 'blueimp-md5';
 import { v4 as uuidV4 } from 'uuid';
-import managerCache, { cacheKeys } from './managerCache';
+import managerCache, { cacheKeys } from './cache';
 
 type WebEnvironment = 'local' | 'uat' | 'prod';
 type HttpMethod = NonNullable<AxiosRequestConfig['method']>;
@@ -135,7 +135,7 @@ export interface FetchRequestConfig extends Omit<
   url: string;
   header?: Record<string, string>;
   query?: RequestValues;
-  body?: RequestValues;
+  body?: object;
   isShowLoading?: boolean;
   isShowToast?: boolean;
   isRepeatAuth?: boolean;
@@ -151,6 +151,18 @@ export interface FetchUploadConfig extends FetchRequestConfig {
     filePath?: string;
     [key: string]: unknown;
   };
+}
+
+export interface FetchStreamConfig extends Omit<
+  RequestInit,
+  'body' | 'headers' | 'method'
+> {
+  method?: HttpMethod;
+  url: string;
+  header?: Record<string, string>;
+  query?: RequestValues;
+  body?: object;
+  isRepeatAuth?: boolean;
 }
 
 export interface FetchResponse<TData = unknown> {
@@ -169,7 +181,7 @@ interface RequestSignature {
 async function createRequestSignature(params: {
   path: string;
   query: RequestValues;
-  body: RequestValues;
+  body: unknown;
 }): Promise<RequestSignature> {
   const queryForSignature = stringifyRequestValues(params.query);
   const requestid = uuidV4();
@@ -222,6 +234,30 @@ class managerFetch {
     return this.instance;
   }
 
+  private async createSignedRequest({
+    path,
+    url,
+    query,
+    body,
+    header,
+    contentType,
+  }: {
+    path: string;
+    url: string;
+    query: RequestValues;
+    body: unknown;
+    header: Record<string, string>;
+    contentType?: string;
+  }): Promise<{ headers: Record<string, string>; url: string }> {
+    const token =
+      managerCache.getLocalStorage<string>(cacheKeys.authToken) || '';
+    const signature = await createRequestSignature({ path, query, body });
+    return {
+      url: url.includes('://') ? url : `${this.baseUrl}${url}`,
+      headers: createRequestHeaders(signature, token, header, contentType),
+    };
+  }
+
   private async refreshAccessToken(): Promise<boolean> {
     if (this.refreshPromise) return this.refreshPromise;
 
@@ -261,6 +297,13 @@ class managerFetch {
     return this.refreshPromise;
   }
 
+  private async shouldRetryAuthentication(
+    statusCode: number | undefined,
+    isRepeatAuth: boolean
+  ): Promise<boolean> {
+    return statusCode === 401 && isRepeatAuth && this.refreshAccessToken();
+  }
+
   async request<TData = unknown>(
     config: FetchRequestConfig
   ): Promise<FetchResponse<TData>> {
@@ -276,20 +319,19 @@ class managerFetch {
       timeout = defaultTimeoutMs,
       ...axiosOptions
     } = config;
-    const token =
-      managerCache.getLocalStorage<string>(cacheKeys.authToken) || '';
-    const signature = await createRequestSignature({ path: url, query, body });
-    const responseUrl = url.includes('://') ? url : `${this.baseUrl}${url}`;
+    const signedRequest = await this.createSignedRequest({
+      path: url,
+      url,
+      query,
+      body,
+      header,
+      contentType: 'application/json',
+    });
     const axiosConfig: AxiosRequestConfig = {
       ...axiosOptions,
       method,
-      url: responseUrl,
-      headers: createRequestHeaders(
-        signature,
-        token,
-        header,
-        'application/json'
-      ),
+      url: signedRequest.url,
+      headers: signedRequest.headers,
       params: isBodyMethod(method) ? undefined : query,
       data: isBodyMethod(method) ? body : undefined,
       timeout,
@@ -303,11 +345,10 @@ class managerFetch {
         data: response.data,
         headers: getResponseHeaders(response),
       };
-      if (isRepeatAuth && result.statusCode === 401) {
-        const hasRefreshed = await this.refreshAccessToken();
-        if (hasRefreshed) {
-          return this.request<TData>({ ...config, isRepeatAuth: false });
-        }
+      if (
+        await this.shouldRetryAuthentication(result.statusCode, isRepeatAuth)
+      ) {
+        return this.request<TData>({ ...config, isRepeatAuth: false });
       }
       if (isShowToast && result.statusCode !== 200) {
         showToast(getErrorMessage(result.data, 'Request failed'));
@@ -315,11 +356,10 @@ class managerFetch {
       return result;
     } catch (error) {
       const result = getRequestErrorResponse(error) as FetchResponse<TData>;
-      if (isRepeatAuth && result.statusCode === 401) {
-        const hasRefreshed = await this.refreshAccessToken();
-        if (hasRefreshed) {
-          return this.request<TData>({ ...config, isRepeatAuth: false });
-        }
+      if (
+        await this.shouldRetryAuthentication(result.statusCode, isRepeatAuth)
+      ) {
+        return this.request<TData>({ ...config, isRepeatAuth: false });
       }
       if (isShowToast) {
         showToast(
@@ -330,6 +370,38 @@ class managerFetch {
     } finally {
       if (isShowLoading) hideLoading();
     }
+  }
+
+  async requestStream(config: FetchStreamConfig): Promise<Response> {
+    const {
+      method = 'GET',
+      url,
+      header = {},
+      query = {},
+      body = {},
+      isRepeatAuth = true,
+      ...fetchOptions
+    } = config;
+    const signedRequest = await this.createSignedRequest({
+      path: url,
+      url,
+      query,
+      body,
+      header,
+      contentType: 'application/json',
+    });
+    const response = await fetch(buildUrlWithQuery(signedRequest.url, query), {
+      ...fetchOptions,
+      method,
+      headers: signedRequest.headers,
+      body: isBodyMethod(method) ? JSON.stringify(body) : undefined,
+    });
+
+    if (await this.shouldRetryAuthentication(response.status, isRepeatAuth)) {
+      return this.requestStream({ ...config, isRepeatAuth: false });
+    }
+
+    return response;
   }
 
   async upload<TData = unknown>(
@@ -355,17 +427,13 @@ class managerFetch {
       filePath,
       ...fileFields
     } = file;
-    const token =
-      managerCache.getLocalStorage<string>(cacheKeys.authToken) || '';
-    const signature = await createRequestSignature({
+    const signedRequest = await this.createSignedRequest({
       path: signPath || url,
+      url,
       query,
       body: {},
+      header,
     });
-    const uploadUrl = buildUrlWithQuery(url, query);
-    const responseUrl = uploadUrl.includes('://')
-      ? uploadUrl
-      : `${this.baseUrl}${uploadUrl}`;
     const formData = new FormData();
 
     if (blob) {
@@ -391,8 +459,8 @@ class managerFetch {
     const axiosConfig: AxiosRequestConfig = {
       ...axiosOptions,
       method,
-      url: responseUrl,
-      headers: createRequestHeaders(signature, token, header),
+      url: signedRequest.url,
+      headers: signedRequest.headers,
       data: formData,
       params: query,
       timeout,
@@ -406,85 +474,18 @@ class managerFetch {
         data: response.data,
         headers: getResponseHeaders(response),
       };
-      if (isRepeatAuth && result.statusCode === 401) {
-        const hasRefreshed = await this.refreshAccessToken();
-        if (hasRefreshed) {
-          return this.upload<TData>({ ...config, isRepeatAuth: false });
-        }
+      if (
+        await this.shouldRetryAuthentication(result.statusCode, isRepeatAuth)
+      ) {
+        return this.upload<TData>({ ...config, isRepeatAuth: false });
       }
       return result;
     } catch (error) {
       const result = getRequestErrorResponse(error) as FetchResponse<TData>;
-      if (isRepeatAuth && result.statusCode === 401) {
-        const hasRefreshed = await this.refreshAccessToken();
-        if (hasRefreshed) {
-          return this.upload<TData>({ ...config, isRepeatAuth: false });
-        }
-      }
-      return result;
-    } finally {
-      if (isShowLoading) hideLoading();
-    }
-  }
-
-  async stream<TData = ReadableStream<Uint8Array>>(
-    config: FetchRequestConfig
-  ): Promise<FetchResponse<TData>> {
-    const {
-      method = 'GET',
-      url,
-      header = {},
-      query = {},
-      body = {},
-      isShowLoading = false,
-      isShowToast = false,
-      isRepeatAuth = true,
-      timeout = defaultTimeoutMs,
-      ...axiosOptions
-    } = config;
-    const token =
-      managerCache.getLocalStorage<string>(cacheKeys.authToken) || '';
-    const signature = await createRequestSignature({ path: url, query, body });
-    const urlWithQuery = buildUrlWithQuery(url, stringifyRequestValues(query));
-    const responseUrl = urlWithQuery.includes('://')
-      ? urlWithQuery
-      : `${this.baseUrl}${urlWithQuery}`;
-    const axiosConfig: AxiosRequestConfig = {
-      ...axiosOptions,
-      method,
-      url: responseUrl,
-      headers: createRequestHeaders(
-        signature,
-        token,
-        header,
-        'application/json'
-      ),
-      params: isBodyMethod(method) ? undefined : query,
-      data: isBodyMethod(method) ? body : undefined,
-      timeout,
-      responseType: 'blob',
-    };
-
-    if (isShowLoading) showLoading();
-    try {
-      const response = await this.axiosInstance.request<Blob>(axiosConfig);
-      return {
-        statusCode: response.status,
-        data: response.data.stream() as TData,
-        headers: getResponseHeaders(response),
-      };
-    } catch (error) {
-      const result = getRequestErrorResponse(error) as FetchResponse<TData>;
-      if (isRepeatAuth && result.statusCode === 401) {
-        const hasRefreshed = await this.refreshAccessToken();
-        if (hasRefreshed) {
-          return this.stream<TData>({ ...config, isRepeatAuth: false });
-        }
-      }
-      if (isShowToast) {
-        showToast(
-          getErrorMessage(result.data, result.error || 'Network error')
-        );
+      if (
+        await this.shouldRetryAuthentication(result.statusCode, isRepeatAuth)
+      ) {
+        return this.upload<TData>({ ...config, isRepeatAuth: false });
       }
       return result;
     } finally {

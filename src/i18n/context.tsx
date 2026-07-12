@@ -8,7 +8,7 @@ import {
   type Locale,
 } from '@/i18n/locale';
 import { loadMessages, type Messages } from '@/i18n/messages';
-import managerCache, { cacheKeys } from '@/utils/managerCache';
+import managerCache, { cacheKeys } from '@/utils/manager/cache';
 import { toSiteUrl } from '@/utils/siteUrl';
 import {
   createContext,

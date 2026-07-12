@@ -7,7 +7,7 @@ import {
 import { getMemberList } from '@/api/orz2';
 import { useI18n } from '@/hooks/useI18n';
 import { OrzTooltip } from '@/pages/Products/ProductSilicon/components/OrzTooltip';
-import managerCache, { cacheKeys } from '@/utils/managerCache';
+import managerCache, { cacheKeys } from '@/utils/manager/cache';
 import md5 from 'blueimp-md5';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';

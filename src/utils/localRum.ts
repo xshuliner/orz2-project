@@ -1,4 +1,4 @@
-import managerCache, { cacheKeys } from '@/utils/managerCache';
+import managerCache, { cacheKeys } from '@/utils/manager/cache';
 
 export type DevicePerformanceTier = 'constrained' | 'standard' | 'capable';
 

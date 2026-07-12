@@ -9,7 +9,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { LoadMoreSentinel } from '@/pages/Products/ProductSilicon/components/LoadMoreSentinel';
 import { OrzTooltip } from '@/pages/Products/ProductSilicon/components/OrzTooltip';
 import { getStoryTypeLabel } from '@/pages/Products/ProductSilicon/config';
-import managerCache, { cacheKeys } from '@/utils/managerCache';
+import managerCache, { cacheKeys } from '@/utils/manager/cache';
 import md5 from 'blueimp-md5';
 import dayjs from 'dayjs';
 import gsap from 'gsap';

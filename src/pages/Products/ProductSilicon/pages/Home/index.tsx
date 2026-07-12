@@ -12,7 +12,7 @@ import StoryLogList, {
 import { useDescendLoadingText } from '@/pages/Products/ProductSilicon/hooks/useDescendLoadingText';
 import { useInfiniteList } from '@/pages/Products/ProductSilicon/hooks/useInfiniteList';
 import { generateRandomNickName } from '@/pages/Products/ProductSilicon/utils';
-import managerCache, { cacheKeys } from '@/utils/managerCache';
+import managerCache, { cacheKeys } from '@/utils/manager/cache';
 import md5 from 'blueimp-md5';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
