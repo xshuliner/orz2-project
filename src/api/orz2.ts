@@ -29,8 +29,9 @@ interface LegacyApiPayload<TBody> {
 }
 
 interface MiniCodeLoginStatus {
+  _id?: string;
   refreshToken?: string;
-  timer?: number;
+  status?: 'confirmed' | 'pending';
   token?: string;
 }
 
@@ -94,7 +95,6 @@ export const postCreateMiniCodeLogin = async (): Promise<
     body: {
       page: 'LG',
       third: 'O2',
-      brand: 'zero',
     },
   });
 };
@@ -103,12 +103,13 @@ export const postCreateMiniCodeLogin = async (): Promise<
  * Query user profile.
  * @returns Promise
  */
-export const getQueryMemberInfo = async (): Promise<
-  FetchResponse<LegacyApiPayload<MemberInfoBody>>
-> => {
+export const getQueryMemberInfo = async (
+  token?: string
+): Promise<FetchResponse<LegacyApiPayload<MemberInfoBody>>> => {
   return managerFetch.request({
     method: 'GET',
     url: '/smart/v1/member/getQueryMemberInfo',
+    header: token ? { authorization: `Bearer ${token}` } : undefined,
   });
 };
 

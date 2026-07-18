@@ -35,6 +35,10 @@ interface OModalLoginProps {
 const pollingDelay = 2000;
 const loadOrz2Api = () => import('@/api').then(module => module.default.Orz2);
 
+function isRetryableLoginStatus(statusCode?: number) {
+  return !statusCode || statusCode === 409 || statusCode >= 500;
+}
+
 export function toAuthUser(
   memberInfo: AuthMemberInfo,
   fallbackName = 'WeChat user'
@@ -114,49 +118,69 @@ export function OModalLogin({ isOpen, onClose, onLogin }: OModalLoginProps) {
   const queryLoginStatus = useCallback(
     async (uuid: string, session: number) => {
       if (session !== sessionRef.current) return;
+      const scheduleNextPoll = () => {
+        if (session !== sessionRef.current) return;
+        pollingTimerRef.current = setTimeout(
+          () => queryLoginStatus(uuid, session),
+          pollingDelay
+        );
+      };
+
       try {
         const api = await loadOrz2Api();
         const response = await api.getQueryMiniCodeLogin({ uuid });
         if (session !== sessionRef.current) return;
-        const { timer, token, refreshToken } = response?.data?.body || {};
-
-        if (!timer) {
-          setIsExpired(true);
-          stopPolling();
+        if (response.statusCode !== 200) {
+          if (isRetryableLoginStatus(response.statusCode)) {
+            scheduleNextPoll();
+          } else {
+            setError(loginCopy.errors.loginFailed);
+            stopPolling();
+          }
           return;
         }
 
+        const { status, token, refreshToken } = response.data?.body || {};
+
         if (token) {
-          persistTokens(token, refreshToken);
-          const memberResponse = await api.getQueryMemberInfo();
+          const memberResponse = await api.getQueryMemberInfo(token);
           if (session !== sessionRef.current) return;
-          const memberInfo = memberResponse?.data?.body?.memberInfo;
+          if (memberResponse.statusCode !== 200) {
+            if (isRetryableLoginStatus(memberResponse.statusCode)) {
+              scheduleNextPoll();
+            } else {
+              setError(loginCopy.errors.loginFailed);
+              stopPolling();
+            }
+            return;
+          }
+
+          const memberInfo = memberResponse.data?.body?.memberInfo;
           if (!memberInfo) {
             clearAuthStorage();
             setError(loginCopy.errors.loginFailed);
             stopPolling();
             return;
           }
+          persistTokens(token, refreshToken);
           stopPolling();
           onLogin(toAuthUser(memberInfo, loginCopy.wechatUser));
           return;
         }
 
-        pollingTimerRef.current = setTimeout(
-          () => queryLoginStatus(uuid, session),
-          pollingDelay
-        );
+        if (status === 'pending') {
+          scheduleNextPoll();
+          return;
+        }
+
+        setIsExpired(true);
+        stopPolling();
       } catch (queryError) {
         console.error('OModalLogin query login status error', queryError);
-        if (session === sessionRef.current) {
-          pollingTimerRef.current = setTimeout(
-            () => queryLoginStatus(uuid, session),
-            pollingDelay
-          );
-        }
+        scheduleNextPoll();
       }
     },
-    [loginCopy.wechatUser, onLogin, stopPolling]
+    [loginCopy.errors.loginFailed, loginCopy.wechatUser, onLogin, stopPolling]
   );
 
   const initQrCode = useCallback(async () => {

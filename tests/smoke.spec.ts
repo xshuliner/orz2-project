@@ -200,20 +200,30 @@ test('official publisher resumes the validated publish flow after login', async 
       }),
     })
   );
+  let loginStatusAttempts = 0;
   await page.route('**/smart/v1/minicode/getQueryMiniCodeLogin**', route =>
-    route.fulfill({
-      contentType: 'application/json',
-      body: JSON.stringify({ body: { timer: 1, token: 'test-token' } }),
-    })
+    ++loginStatusAttempts === 1
+      ? route.abort('connectionreset')
+      : route.fulfill({
+          contentType: 'application/json',
+          body: JSON.stringify({
+            body: {
+              status: 'confirmed',
+              token: 'test-token',
+              refreshToken: 'test-refresh-token',
+            },
+          }),
+        })
   );
-  await page.route('**/smart/v1/member/getQueryMemberInfo**', route =>
-    route.fulfill({
+  await page.route('**/smart/v1/member/getQueryMemberInfo**', route => {
+    expect(route.request().headers().authorization).toBe('Bearer test-token');
+    return route.fulfill({
       contentType: 'application/json',
       body: JSON.stringify({
         body: { memberInfo: { _id: 'test-user', user_nickName: 'Test User' } },
       }),
-    })
-  );
+    });
+  });
 
   await page.goto('/tools/official-publisher', {
     waitUntil: 'domcontentloaded',
@@ -229,6 +239,7 @@ test('official publisher resumes the validated publish flow after login', async 
   await expect(
     page.getByRole('dialog', { name: publisher.status.confirmTitle })
   ).toBeVisible();
+  expect(loginStatusAttempts).toBeGreaterThanOrEqual(2);
 });
 
 test('closing publisher login cancels the pending publish flow', async ({
