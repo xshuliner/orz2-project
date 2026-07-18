@@ -154,7 +154,7 @@ const products = [
       {
         id: 'chrome-web-store',
         kind: 'link',
-        href: 'https://chromewebstore.google.com/detail/leafy-note/fmbpdddpifomehoedpbafjmnbaiflfod',
+        href: 'https://leafy-note.xshuliner.online',
         primary: true,
       },
     ],
