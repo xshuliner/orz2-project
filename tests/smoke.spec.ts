@@ -122,6 +122,7 @@ test('a low-points API error opens the global score-reward dialog', async ({
   page,
 }) => {
   await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('main h1')).toBeVisible();
 
   await page.evaluate(() => {
     window.dispatchEvent(
@@ -628,7 +629,7 @@ test('official publisher progressively reveals template customization per workfl
   ).toHaveCount(0);
 
   await page
-    .getByRole('button', { name: publisher.simpleMode.selectorAriaLabel })
+    .getByRole('combobox', { name: publisher.simpleMode.selectorAriaLabel })
     .click();
   await page
     .getByRole('option', {
@@ -717,7 +718,7 @@ test('official publisher confirms before replacing edited template settings', as
     waitUntil: 'domcontentloaded',
   });
   await page
-    .getByRole('button', { name: publisher.simpleMode.selectorAriaLabel })
+    .getByRole('combobox', { name: publisher.simpleMode.selectorAriaLabel })
     .click();
   await page
     .getByRole('option', {
@@ -732,7 +733,7 @@ test('official publisher confirms before replacing edited template settings', as
     .fill('保留这段自定义提示词');
 
   await page
-    .getByRole('button', { name: publisher.simpleMode.selectorAriaLabel })
+    .getByRole('combobox', { name: publisher.simpleMode.selectorAriaLabel })
     .click();
   await page
     .getByRole('option', {
@@ -753,7 +754,7 @@ test('official publisher confirms before replacing edited template settings', as
   );
 
   await page
-    .getByRole('button', { name: publisher.simpleMode.selectorAriaLabel })
+    .getByRole('combobox', { name: publisher.simpleMode.selectorAriaLabel })
     .click();
   await page
     .getByRole('option', {
@@ -816,6 +817,26 @@ test('official publisher confirmation dialog is centered in the viewport', async
 });
 
 test('silicon product keeps its independent theme', async ({ page }) => {
+  await page.route(
+    '**/smart/v1/member/getQueryMemberSummaryForSilicon**',
+    route =>
+      route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          code: 200,
+          body: { totalCount: 0, topRankList: [] },
+        }),
+      })
+  );
+  await page.route('**/smart/v1/story/getQueryStoryListForSilicon**', route =>
+    route.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        code: 200,
+        body: { list: [], pageNum: 0, pageSize: 15, totalCount: 0 },
+      }),
+    })
+  );
   await page.emulateMedia({ colorScheme: 'dark' });
   await page.goto('/products/silicon', { waitUntil: 'domcontentloaded' });
 
