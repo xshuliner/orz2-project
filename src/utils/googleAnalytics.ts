@@ -5,7 +5,7 @@ type GtagParameters =
       string,
       {
         send_page_view?: boolean;
-      },
+      }?,
     ]
   | [
       'event',
@@ -85,10 +85,12 @@ export function initGoogleAnalytics() {
     script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(
       googleAnalyticsId
     )}`;
-    document.head.appendChild(script);
 
     window.gtag('js', new Date());
-    window.gtag('config', googleAnalyticsId, { send_page_view: false });
+    // Let GA4 send the initial page view through its standard config flow.
+    // SPA navigation is tracked separately after the first route render.
+    window.gtag('config', googleAnalyticsId);
+    document.head.appendChild(script);
   }
 }
 
