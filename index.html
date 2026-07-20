@@ -65,8 +65,7 @@
         var appEnv = '%VITE_APP_ENV%';
         var siteUrl = '%VITE_SITE_URL%';
 
-        if (!/^G-[A-Z0-9]+$/.test(measurementId) || appEnv !== 'prod')
-          return;
+        if (!/^G-[A-Z0-9]+$/.test(measurementId) || appEnv !== 'prod') return;
 
         try {
           var hostname = new URL(siteUrl).hostname;
@@ -86,7 +85,10 @@
             window.dataLayer.push(arguments);
           };
         window.gtag('js', new Date());
-        window.gtag('config', measurementId);
+        // React owns page-view timing so that SPA titles and sanitized URLs are
+        // ready before a hit is queued. GA4 history tracking must stay disabled
+        // for this stream; see the repository README.
+        window.gtag('config', measurementId, { send_page_view: false });
 
         var script = document.createElement('script');
         script.id = 'google-analytics-gtag';

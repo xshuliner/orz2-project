@@ -1,6 +1,6 @@
 type GoogleAnalyticsEventParameters = {
   page_location?: string;
-  page_path?: string;
+  page_referrer?: string;
   page_title?: string;
 };
 
@@ -57,12 +57,59 @@ export function canUseGoogleAnalytics() {
   return !isLocalHostname(window.location.hostname);
 }
 
-export function trackGoogleAnalyticsPageView(path: string) {
+const campaignParameterNames = new Set([
+  'dclid',
+  'gbraid',
+  'gclid',
+  'utm_campaign',
+  'utm_content',
+  'utm_id',
+  'utm_medium',
+  'utm_source',
+  'utm_term',
+  'wbraid',
+]);
+
+function sanitizeGoogleAnalyticsUrl(value: string, keepCampaign = false) {
+  if (!value) return '';
+
+  try {
+    const url = new URL(value, window.location.origin);
+    const campaignParameters = new URLSearchParams();
+
+    if (keepCampaign) {
+      url.searchParams.forEach((parameterValue, parameterName) => {
+        if (campaignParameterNames.has(parameterName.toLowerCase())) {
+          campaignParameters.append(parameterName, parameterValue);
+        }
+      });
+    }
+
+    url.search = campaignParameters.toString();
+    url.hash = '';
+    return url.href;
+  } catch {
+    return '';
+  }
+}
+
+export function getGoogleAnalyticsPageLocation() {
+  return sanitizeGoogleAnalyticsUrl(window.location.href, true);
+}
+
+export function getGoogleAnalyticsInitialReferrer() {
+  return sanitizeGoogleAnalyticsUrl(document.referrer);
+}
+
+export function trackGoogleAnalyticsPageView(
+  pageLocation: string,
+  pageReferrer: string
+) {
   if (!canUseGoogleAnalytics()) return;
 
   window.gtag?.('event', 'page_view', {
-    page_location: window.location.href,
-    page_path: path,
+    page_location: pageLocation,
+    page_referrer: pageReferrer,
     page_title: document.title,
   });
 }
