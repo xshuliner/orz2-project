@@ -1,17 +1,10 @@
-import {
-  initGoogleAnalytics,
-  trackGoogleAnalyticsPageView,
-} from '@/utils/googleAnalytics';
+import { trackGoogleAnalyticsPageView } from '@/utils/googleAnalytics';
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 export function GoogleAnalytics() {
   const location = useLocation();
   const isInitialPageView = useRef(true);
-
-  useEffect(() => {
-    initGoogleAnalytics();
-  }, []);
 
   useEffect(() => {
     if (isInitialPageView.current) {

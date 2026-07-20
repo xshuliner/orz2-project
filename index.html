@@ -59,6 +59,44 @@
         document.head.appendChild(script);
       })();
     </script>
+    <script>
+      (function () {
+        var measurementId = '%VITE_GOOGLE_ANALYTICS_ID%';
+        var appEnv = '%VITE_APP_ENV%';
+        var siteUrl = '%VITE_SITE_URL%';
+
+        if (!/^G-[A-Z0-9]+$/.test(measurementId) || appEnv !== 'prod')
+          return;
+
+        try {
+          var hostname = new URL(siteUrl).hostname;
+          if (
+            window.location.hostname !== hostname &&
+            window.location.hostname !== 'www.' + hostname
+          )
+            return;
+        } catch (_error) {
+          return;
+        }
+
+        window.dataLayer = window.dataLayer || [];
+        window.gtag =
+          window.gtag ||
+          function () {
+            window.dataLayer.push(arguments);
+          };
+        window.gtag('js', new Date());
+        window.gtag('config', measurementId);
+
+        var script = document.createElement('script');
+        script.id = 'google-analytics-gtag';
+        script.async = true;
+        script.src =
+          'https://www.googletagmanager.com/gtag/js?id=' +
+          encodeURIComponent(measurementId);
+        document.head.appendChild(script);
+      })();
+    </script>
     <meta name="robots" content="index, follow" />
     <meta
       name="description"
