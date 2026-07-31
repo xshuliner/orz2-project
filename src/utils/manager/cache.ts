@@ -10,7 +10,7 @@ export const cacheKeys = {
   authUser: 'orz2:auth-user',
   locale: 'orz2:locale',
   localRum: 'orz2:local-rum',
-  officialPublisherForm: 'orz2:official-publisher-form',
+  articlePublisherForm: 'orz2:article-publisher-form',
   siliconMemberToken: 'orz2:silicon-member-token',
   themePreference: 'orz2:theme-preference',
   workReportPolisherForm: 'orz2:work-report-polisher-form',

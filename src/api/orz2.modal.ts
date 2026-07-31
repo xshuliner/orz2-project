@@ -144,11 +144,11 @@ export type StoryListResult = {
   totalCount: number;
 };
 
-// ===== Official publisher =====
+// ===== Article publisher =====
 
 export type OfficialArticleType = 'news' | 'newspic';
-export type OfficialPublisherMode = 'create' | 'rewrite';
-export type OfficialPublisherProvider = 'AGNES' | 'MINIMAX';
+export type ArticlePublisherMode = 'create' | 'rewrite';
+export type ArticlePublisherProvider = 'AGNES' | 'MINIMAX';
 export type OfficialImageSourceType = 'ai' | 'url' | 'base64';
 export type PostPolishContentMode =
   | 'official_system_prompt'
@@ -185,18 +185,22 @@ export interface OfficialCommentConfig {
   fansOnly: 0 | 1;
 }
 
-export interface PostOfficialPublisherBody {
-  appId: string;
-  appSecret: string;
-  publishMode?: OfficialPublisherMode;
-  articleType: OfficialArticleType;
-  provider?: OfficialPublisherProvider;
+export type ArticleImageGenerationMode = 'async' | 'sync';
+
+export interface PostCreateArticleForLLMBody {
+  appId?: string;
+  appSecret?: string;
+  finalReportEmails?: string[];
+  publishMode?: ArticlePublisherMode;
+  articleType?: OfficialArticleType;
+  provider?: ArticlePublisherProvider;
   promptSystem?: string;
   promptContent?: string | string[];
   promptReferences?: string[];
   sourceArticleUrl?: string;
   rewriteRequirement?: string;
   inlineImageCount?: number;
+  imageGenerationMode?: ArticleImageGenerationMode;
   imageCover?: OfficialImageConfig;
   imagesInlineList?: OfficialImageConfig[];
   author?: string;
@@ -206,8 +210,9 @@ export interface PostOfficialPublisherBody {
 }
 
 export interface OfficialDraftResult {
+  resultType?: 'official';
   time?: string;
-  publishMode?: OfficialPublisherMode;
+  publishMode?: ArticlePublisherMode;
   articleType?: OfficialArticleType;
   sourceArticleUrl?: string;
   sourceArticleTitle?: string;
@@ -227,18 +232,24 @@ export interface OfficialDraftResult {
   imagePath?: string;
   inlineImagePaths?: string[];
   mediaId?: string;
+  articleInfo?: {
+    _id?: string;
+    generationId?: string;
+    title?: string;
+  } | null;
 }
 
-export type OfficialPublisherProgressStatus =
+export type ArticlePublisherProgressStatus =
   | 'connected'
   | 'running'
   | 'completed'
   | 'failed'
   | 'info'
-  | 'warning';
+  | 'warning'
+  | 'retrying';
 
-export interface OfficialPublisherProgressEvent {
-  status: OfficialPublisherProgressStatus;
+export interface ArticlePublisherProgressEvent {
+  status: ArticlePublisherProgressStatus;
   step?: number;
   totalSteps?: number;
   key?: string;
@@ -251,6 +262,30 @@ export interface OfficialPublisherProgressEvent {
   imageIndex?: number;
   mediaId?: string;
   skippedInlineImageCount?: number;
+  completedImageCount?: number;
+  totalImageCount?: number;
+  successfulImageCount?: number;
+  resultType?: 'official' | 'article';
+  attempt?: number;
+  nextAttempt?: number;
+  maxAttempts?: number;
+}
+
+export interface CreateArticleForLLMResult {
+  article: {
+    resultType: 'article';
+    generationId?: string;
+    articleInfo?: OfficialDraftResult['articleInfo'];
+  };
+  officialDraft: {
+    status: 'success' | 'failed' | 'skipped';
+    result?: OfficialDraftResult;
+    message?: string;
+  };
+  finalReportEmail: {
+    status: 'success' | 'failed' | 'skipped';
+    message?: string;
+  };
 }
 
 // ===== Tool APIs =====

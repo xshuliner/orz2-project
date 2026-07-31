@@ -251,7 +251,7 @@ export const messages = {
     tools: {
       title: 'ORZ2 - 在线工具',
       description:
-        '浏览 ORZ2 在线工具目录，查找公众号自动发布、时区转换、JSON 格式化、配色和图片压缩工具。',
+        '浏览 ORZ2 在线工具目录，查找文章发布、时区转换、JSON 格式化、配色和图片压缩工具。',
       itemListName: 'ORZ2 在线工具目录',
     },
     team: {
@@ -852,7 +852,7 @@ export const messages = {
     },
   },
   publisher: {
-    fallbackName: '公众号发布',
+    fallbackName: '文章发布',
     fallbackSummary:
       '选择内容模板，一键生成文章、封面、正文配图和摘要，也可进入高级模式逐项定制。',
     defaultRewriteRequirement:
@@ -970,13 +970,54 @@ export const messages = {
     sections: {
       account: {
         title: '公众号配置',
-        description: '连接发布账号并选择草稿类型。',
+        description: '可选：填入完整凭证后，文章会同步创建到公众号草稿箱。',
+        appId: '公众号 appId（可选）',
+        appSecret: '公众号 appSecret（可选）',
         appIdPlaceholder: '请输入公众号 appId',
         appSecretPlaceholder: '请输入公众号 appSecret',
         draftType: '草稿类型 *',
         newsType: 'news 图文消息',
         provider: 'AI 模型 *',
         modelSelectorAriaLabel: '选择 AI 提供商（模型）',
+      },
+      delivery: {
+        title: '传达途径',
+        description: '至少选择一种交付方式；两条链路可同时执行。',
+        selectionAriaLabel: '选择文章传达途径',
+        required: '至少选择一项',
+        wechat: {
+          title: '写入公众号草稿箱',
+          description: '完成开发配置后，将文章写入指定公众号的草稿箱。',
+          selected: '已启用草稿箱链路',
+          unselected: '启用草稿箱链路',
+          expand: '配置草稿箱链路',
+          collapse: '收起草稿箱配置',
+          setupTitle: '公众号开发配置',
+          setupDescription: '首次使用时，按图示在微信公众平台完成开发设置。',
+          credentialsTitle: '填写开发者凭据',
+          endpoint: '文章将写入公众号草稿箱',
+        },
+        email: {
+          title: '发送到邮箱',
+          description: '将生成完成的文章发送给一个或多个收件人。',
+          selected: '已启用邮箱链路',
+          unselected: '启用邮箱链路',
+          expand: '配置邮箱链路',
+          collapse: '收起邮箱配置',
+          endpoint: '文章将发送至已填写的邮箱',
+        },
+        summaryNone: '请选择至少一种传达途径。',
+        summaryPrefix: '本次将通过',
+        summarySuffix: '条链路交付：',
+        summaryWechat: '公众号草稿箱',
+        summaryEmail: '邮箱通知',
+        modelLabel: 'AI 模型（可切换）',
+        modelHint: '仅影响文章生成，不影响交付链路。',
+        finalReportEmails: '接收邮箱（一个或多个）',
+        finalReportEmailsPlaceholder:
+          'name@example.com，多个邮箱可用逗号、分号或换行分隔',
+        finalReportEmailsHint:
+          '邮箱模式无需配置公众号；多个邮箱可用逗号、分号或换行分隔。',
       },
       prompt: {
         title: '文章生成提示词',
@@ -1039,7 +1080,7 @@ export const messages = {
       fansOnly: '仅粉丝评论',
     },
     completion: {
-      account: '公众号配置',
+      delivery: '交付方式',
       template: '内容模板',
       prompt: '文章生成提示词',
       images: '封面与内嵌图片',
@@ -1068,9 +1109,9 @@ export const messages = {
       '生成文章内容',
       '准备并上传封面图',
       '准备并上传正文配图',
+      '保存生成文章记录',
       '组装微信公众号草稿',
       '提交草稿到微信',
-      '保存草稿发布记录',
     ],
     status: {
       autosave: '表单会自动保存到本机浏览器。',
@@ -1089,6 +1130,8 @@ export const messages = {
       draftCreatedPrefix: '已生成草稿',
       draftCreatedSuffix: '，请在公众号后台查看。',
       draftCreated: '草稿已生成，请在公众号后台查看。',
+      articleCreated: '文章已生成并保存。',
+      articleCreatedWithEmail: '文章已生成、保存，并已发送到指定邮箱。',
       submitFailed: '发布任务提交失败',
       resetTitle: '重置表单？',
       resetConfirm: '重置会清空当前表单并覆盖本机自动保存内容，确认继续？',
@@ -1102,6 +1145,8 @@ export const messages = {
     validation: {
       appId: '请填写公众号 appId。',
       appSecret: '请填写公众号 appSecret。',
+      delivery: '请至少填写完整的公众号 appId 与 appSecret，或一个接收邮箱。',
+      finalReportEmails: '请填写有效的接收邮箱地址。',
       articleType: '请选择草稿类型。',
       provider: '请选择 AI 提供商。',
       template: '请选择内容模板。',
@@ -1150,6 +1195,8 @@ export const messages = {
       noInline: '无内嵌图',
       details: '查看素材处理详情',
       inlineDetail: '内嵌图',
+      mediaId: '微信草稿 media_id',
+      articleRecordId: '已保存的文章记录',
       stay: '留在当前页面',
       goDraftBox: '前往公众号草稿箱',
       footnote: '草稿箱页面将在新窗口打开，当前任务配置会继续保留。',
@@ -1560,11 +1607,11 @@ export const messages = {
       'personal-blog': '个人博客',
     },
     tools: {
-      'tool-wechat-publisher': {
-        name: '公众号自动发布',
+      'tool-article-publisher': {
+        name: '文章发布',
         summary:
           '选择内容模板，一键生成文章、封面、正文配图和摘要并写入公众号草稿箱。',
-        badges: ['AI', '公众号', '自动发布', 'LLM', '内容运营'],
+        badges: ['AI', '文章', '自动发布', 'LLM', '内容运营'],
         heroBadges: {
           'ai-content': 'AI 内容生成',
           'wechat-drafts': '公众号草稿箱',
@@ -1572,12 +1619,12 @@ export const messages = {
         },
         entries: { web: '工具入口' },
         seo: {
-          title: 'ORZ2 - 公众号自动发布工具',
+          title: 'ORZ2 - 文章发布工具',
           description:
-            '使用 ORZ2 公众号自动发布工具选择模板，一键生成文章、封面、正文配图和摘要，也可在高级模式定制完整提示词。',
+            '使用 ORZ2 文章发布工具选择模板，一键生成文章、封面、正文配图和摘要，也可在高级模式定制完整提示词，并可按需交付至邮箱或公众号草稿箱。',
           keywords: [
-            '公众号自动发布',
-            '微信公众号工具',
+            '文章发布',
+            'AI文章发布工具',
             'AI文章生成',
             '内容运营工具',
           ],

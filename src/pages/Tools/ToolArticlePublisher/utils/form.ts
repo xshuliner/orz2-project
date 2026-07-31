@@ -1,26 +1,26 @@
 import type {
+  ArticlePublisherMode,
+  ArticlePublisherProvider,
   OfficialCommentConfig,
   OfficialImageSourceType,
-  OfficialPublisherMode,
-  OfficialPublisherProvider,
-  PostOfficialPublisherBody,
+  PostCreateArticleForLLMBody,
 } from '@/api';
 import {
+  articlePublisherModes,
+  articlePublisherProviders,
   defaultPromptTemplateId,
   defaultPublisherForm,
   defaultSimpleInlineImageCount,
-  officialPublisherModes,
-  officialPublisherProviders,
   promptTemplateConfigs,
   type PromptTemplate,
   type PromptTemplateId,
-} from '@/pages/Tools/ToolOfficialPublisher/config';
+} from '@/pages/Tools/ToolArticlePublisher/config';
 import type {
+  ArticlePublisherForm,
   CompletionItem,
-  OfficialPublisherForm,
   PublisherCopy,
   PublisherModeSetting,
-} from '@/pages/Tools/ToolOfficialPublisher/types';
+} from '@/pages/Tools/ToolArticlePublisher/types';
 
 function asRecord(value: unknown): Record<string, unknown> {
   return typeof value === 'object' && value
@@ -32,23 +32,31 @@ function readString(value: unknown, fallback = '') {
   return typeof value === 'string' ? value : fallback;
 }
 
-function normalizeOfficialPublisherProvider(
+function readEmailInput(value: unknown) {
+  return Array.isArray(value)
+    ? value
+        .filter((email): email is string => typeof email === 'string')
+        .join('\n')
+    : readString(value);
+}
+
+function normalizeArticlePublisherProvider(
   value: unknown
-): OfficialPublisherProvider {
+): ArticlePublisherProvider {
   const normalized =
     typeof value === 'string' ? value.trim().toUpperCase() : '';
-  return officialPublisherProviders.includes(
-    normalized as OfficialPublisherProvider
+  return articlePublisherProviders.includes(
+    normalized as ArticlePublisherProvider
   )
-    ? (normalized as OfficialPublisherProvider)
+    ? (normalized as ArticlePublisherProvider)
     : 'MINIMAX';
 }
 
-function normalizeOfficialPublisherMode(value: unknown): OfficialPublisherMode {
+function normalizeArticlePublisherMode(value: unknown): ArticlePublisherMode {
   const normalized =
     typeof value === 'string' ? value.trim().toLowerCase() : '';
-  return officialPublisherModes.includes(normalized as OfficialPublisherMode)
-    ? (normalized as OfficialPublisherMode)
+  return articlePublisherModes.includes(normalized as ArticlePublisherMode)
+    ? (normalized as ArticlePublisherMode)
     : 'create';
 }
 
@@ -66,7 +74,7 @@ function normalizePromptTemplateId(value: unknown): PromptTemplateId {
 export function normalizeForm(
   input: unknown,
   defaultRewriteRequirement: string
-): OfficialPublisherForm {
+): ArticlePublisherForm {
   const source = asRecord(input);
   const rawAi = asRecord(source.ai);
   const rawModeSettings = asRecord(source.modeSettings);
@@ -75,7 +83,7 @@ export function normalizeForm(
     ? source.imagesInlineList
     : [];
 
-  function normalizeModeSetting(mode: OfficialPublisherMode) {
+  function normalizeModeSetting(mode: ArticlePublisherMode) {
     const rawSetting = asRecord(rawModeSettings[mode]);
     return {
       isCustomizationOpen: normalizeCustomizationOpen(
@@ -128,7 +136,7 @@ export function normalizeForm(
   const rewriteRequirement = readString(source.rewriteRequirement);
 
   return {
-    publishMode: normalizeOfficialPublisherMode(
+    publishMode: normalizeArticlePublisherMode(
       source.publishMode ?? source.mode ?? source.scene
     ),
     modeSettings: {
@@ -137,7 +145,21 @@ export function normalizeForm(
     },
     appId: readString(source.appId),
     appSecret: readString(source.appSecret),
-    provider: normalizeOfficialPublisherProvider(
+    finalReportEmails: readEmailInput(source.finalReportEmails),
+    deliveryChannels: {
+      // Older saved forms did not store explicit channel choices. Infer them
+      // from the values they already contain so restoring a form stays safe.
+      wechat:
+        typeof asRecord(source.deliveryChannels).wechat === 'boolean'
+          ? Boolean(asRecord(source.deliveryChannels).wechat)
+          : hasText(readString(source.appId)) ||
+            hasText(readString(source.appSecret)),
+      email:
+        typeof asRecord(source.deliveryChannels).email === 'boolean'
+          ? Boolean(asRecord(source.deliveryChannels).email)
+          : Boolean(readEmailInput(source.finalReportEmails).trim()),
+    },
+    provider: normalizeArticlePublisherProvider(
       source.provider ?? source.aiProvider ?? rawAi.provider
     ),
     promptSystem: readString(source.promptSystem),
@@ -169,6 +191,21 @@ export function hasText(value: string) {
   return Boolean(value.trim());
 }
 
+export function getFinalReportEmails(value: string) {
+  return Array.from(
+    new Set(
+      value
+        .split(/[\n,;，；]+/)
+        .map(email => email.trim())
+        .filter(Boolean)
+    )
+  );
+}
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
 export function isWechatArticleUrl(value: string) {
   try {
     const url = new URL(value.trim());
@@ -182,7 +219,7 @@ export function isWechatArticleUrl(value: string) {
   }
 }
 
-export function getActiveModeSetting(form: OfficialPublisherForm) {
+export function getActiveModeSetting(form: ArticlePublisherForm) {
   return form.modeSettings[form.publishMode];
 }
 
@@ -190,7 +227,7 @@ export function getTemplateContent(
   template: PromptTemplate,
   inlineImageCount = defaultSimpleInlineImageCount
 ): Pick<
-  OfficialPublisherForm,
+  ArticlePublisherForm,
   'promptSystem' | 'promptContent' | 'imageCover' | 'imagesInlineList'
 > {
   return {
@@ -204,7 +241,7 @@ export function getTemplateContent(
 }
 
 export function hasTemplateCustomizations(
-  form: OfficialPublisherForm,
+  form: ArticlePublisherForm,
   template?: PromptTemplate
 ) {
   if (!template) return false;
@@ -230,18 +267,21 @@ export function hasTemplateCustomizations(
 }
 
 export function getCompletionItems(
-  form: OfficialPublisherForm,
+  form: ArticlePublisherForm,
   copy: PublisherCopy,
   selectedTemplate?: PromptTemplate
 ): CompletionItem[] {
   const hasCustomizations = hasTemplateCustomizations(form, selectedTemplate);
+  const hasAppId = hasText(form.appId);
+  const hasAppSecret = hasText(form.appSecret);
   const items: CompletionItem[] = [
     {
-      label: copy.completion.account,
+      label: copy.completion.delivery,
       done:
-        hasText(form.appId) &&
-        hasText(form.appSecret) &&
-        Boolean(form.provider),
+        (form.deliveryChannels.wechat || form.deliveryChannels.email) &&
+        (!form.deliveryChannels.wechat || (hasAppId && hasAppSecret)) &&
+        (!form.deliveryChannels.email ||
+          getFinalReportEmails(form.finalReportEmails).length > 0),
     },
   ];
 
@@ -289,15 +329,36 @@ export function getCompletionItems(
 }
 
 export function getValidationErrors(
-  form: OfficialPublisherForm,
+  form: ArticlePublisherForm,
   copy: PublisherCopy,
   selectedTemplate?: PromptTemplate
 ) {
   const nextErrors: string[] = [];
   const hasCustomizations = hasTemplateCustomizations(form, selectedTemplate);
 
-  if (!hasText(form.appId)) nextErrors.push(copy.validation.appId);
-  if (!hasText(form.appSecret)) nextErrors.push(copy.validation.appSecret);
+  const hasAppId = hasText(form.appId);
+  const hasAppSecret = hasText(form.appSecret);
+  const finalReportEmails = getFinalReportEmails(form.finalReportEmails);
+  if (!form.deliveryChannels.wechat && !form.deliveryChannels.email) {
+    nextErrors.push(copy.validation.delivery);
+  }
+  if (form.deliveryChannels.wechat && hasAppId !== hasAppSecret) {
+    nextErrors.push(
+      hasAppId ? copy.validation.appSecret : copy.validation.appId
+    );
+  }
+  if (form.deliveryChannels.wechat && !hasAppId && !hasAppSecret) {
+    nextErrors.push(copy.validation.appId, copy.validation.appSecret);
+  }
+  if (form.deliveryChannels.email && !finalReportEmails.length) {
+    nextErrors.push(copy.validation.finalReportEmails);
+  }
+  if (
+    form.deliveryChannels.email &&
+    finalReportEmails.some(email => !isValidEmail(email))
+  ) {
+    nextErrors.push(copy.validation.finalReportEmails);
+  }
   if (!form.provider) nextErrors.push(copy.validation.provider);
   if (form.publishMode === 'rewrite') {
     if (!hasText(form.sourceArticleUrl)) {
@@ -342,20 +403,18 @@ export function getValidationErrors(
 }
 
 export function buildPublisherRequestBody(
-  form: OfficialPublisherForm,
+  form: ArticlePublisherForm,
   selectedTemplate: PromptTemplate,
   defaultRewriteRequirement: string
-): PostOfficialPublisherBody {
+): PostCreateArticleForLLMBody {
   const hasCustomizations = hasTemplateCustomizations(form, selectedTemplate);
   const content = hasCustomizations
     ? form
     : getTemplateContent(selectedTemplate);
-  const body: PostOfficialPublisherBody = {
-    appId: form.appId.trim(),
-    appSecret: form.appSecret.trim(),
+  const body: PostCreateArticleForLLMBody = {
     publishMode: form.publishMode,
-    articleType: 'news',
     provider: form.provider,
+    imageGenerationMode: 'async',
     comment: {
       open: form.comment.open === 1 ? 1 : 0,
       fansOnly: form.comment.fansOnly === 1 ? 1 : 0,
@@ -371,6 +430,19 @@ export function buildPublisherRequestBody(
       value: item.value.trim(),
     })),
   };
+
+  const appId = form.appId.trim();
+  const appSecret = form.appSecret.trim();
+  if (form.deliveryChannels.wechat && appId && appSecret) {
+    body.appId = appId;
+    body.appSecret = appSecret;
+    body.articleType = 'news';
+  }
+
+  const finalReportEmails = getFinalReportEmails(form.finalReportEmails);
+  if (form.deliveryChannels.email && finalReportEmails.length) {
+    body.finalReportEmails = finalReportEmails;
+  }
 
   const author = form.author.trim();
   if (author) body.author = author;

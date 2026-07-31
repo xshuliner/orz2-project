@@ -136,29 +136,29 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://orz2.online/tools/official-publisher</loc>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/official-publisher" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/official-publisher" />
-    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/official-publisher" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/official-publisher" />
+    <loc>https://orz2.online/tools/article-publisher</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/article-publisher" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/article-publisher" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/article-publisher" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/article-publisher" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orz2.online/en/tools/official-publisher</loc>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/official-publisher" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/official-publisher" />
-    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/official-publisher" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/official-publisher" />
+    <loc>https://orz2.online/en/tools/article-publisher</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/article-publisher" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/article-publisher" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/article-publisher" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/article-publisher" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://orz2.online/ja/tools/official-publisher</loc>
-    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/official-publisher" />
-    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/official-publisher" />
-    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/official-publisher" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/official-publisher" />
+    <loc>https://orz2.online/ja/tools/article-publisher</loc>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://orz2.online/tools/article-publisher" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://orz2.online/en/tools/article-publisher" />
+    <xhtml:link rel="alternate" hreflang="ja" href="https://orz2.online/ja/tools/article-publisher" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://orz2.online/tools/article-publisher" />
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>

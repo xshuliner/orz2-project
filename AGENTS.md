@@ -109,7 +109,7 @@ Placement rules:
   compatibility.
 - Static data belongs in `src/config/` when shared globally. Feature-only static
   data belongs in that feature's local `config/` folder, for example
-  `src/pages/Tools/ToolOfficialPublisher/config/`.
+  `src/pages/Tools/ToolArticlePublisher/config/`.
 - Keep all user-visible copy, prompt templates, fallback messages, catalog
   labels, SEO text, and test selectors in `src/i18n/locales/{zh-CN,en,ja}.ts`.
   Shared components and pages should read copy through `messages`; do not
@@ -198,7 +198,7 @@ Current app routes:
 - `/products/silicon/member-list` -> Silicon member list
 - `/products/silicon/member-detail` -> Silicon member detail
 - `/tools` -> `PageTools`
-- `/tools/official-publisher` -> WeChat official-account publisher
+- `/tools/article-publisher` -> article publisher
 - `/tools/smart-image-compressor` -> batch image studio / compressor
 - `/tools/timezone-converter` -> time zone converter
 - `/tools/work-report-polisher` -> daily / weekly report polisher
@@ -379,7 +379,7 @@ modal. It is localStorage-backed, but not purely mock:
 - `useAuth()` exposes `user`, `isAuthenticated`, `openLogin`, `closeLogin`,
   `logout`, and `withLoginRequired`.
 - `useLoginGate()` returns `withLoginRequired` and is used by protected actions
-  such as official-publisher generation.
+  such as article-publisher generation.
 
 `managerCache` prefixes stored business keys with `CACHE_`; never construct
 physical storage keys in feature code. Relevant additional keys include local
@@ -397,8 +397,8 @@ and shared types from `orz2.modal.ts`.
 - Silicon APIs: summary, member list/detail, story list, member login
 - Tool APIs: `postTinifyImage`
 - LLM polish API: `postPolishContent`
-- Official publisher APIs: `postOfficialPublisher` and
-  `streamPostOfficialPublisher`
+- Article publisher APIs: `postCreateArticleForLLM` and
+  `streamPostCreateArticleForLLM`
 
 `managerFetch` signs requests with `requestid`, `t`, and `k`, reads the auth
 token through `managerCache`, and resolves its base URL from `VITE_API_BASE_URL`
@@ -454,13 +454,13 @@ Key pieces:
 - Local member token key: `orz2_silicon_member_token`
 - Public skill package: `public/skills/orz2-skill/`
 
-### Tool: Official Publisher
+### Tool: Article Publisher
 
-`src/pages/Tools/ToolOfficialPublisher/` powers `/tools/official-publisher`.
+`src/pages/Tools/ToolArticlePublisher/` powers `/tools/article-publisher`.
 
 Key behaviors:
 
-- Form state persists to `orz2:official-publisher-form`
+- Form state persists to `orz2:article-publisher-form`
 - Supports create and rewrite modes
 - Prompt template autofill lives in `config/index.ts`
 - `OInputAI` can polish prompts and image descriptions through
@@ -470,7 +470,7 @@ Key behaviors:
   shapes
 - Completion progress is computed from required sections
 - Generation is login-gated and streams progress through
-  `streamPostOfficialPublisher()`
+  `streamPostCreateArticleForLLM()`
 
 ### Tool: Image Studio
 
@@ -608,9 +608,9 @@ Components and pages use noun-first PascalCase and folder-based modules:
 
 - Pages: `PageHome`, `PageProducts`, `PageTools`, `PageTeam`, `PagePrivacy`,
   `PageDesignSystem`, `PageBuildInfo`
-- Product/tool modules: `Products/ProductSilicon`,
-  `Tools/ToolOfficialPublisher`, `Tools/ToolImageStudio`,
-  `Tools/ToolTimezoneConverter`, `Tools/ToolWorkReportPolisher`
+- Product/tool modules: `Products/ProductSilicon`, `Tools/ToolArticlePublisher`,
+  `Tools/ToolImageStudio`, `Tools/ToolTimezoneConverter`,
+  `Tools/ToolWorkReportPolisher`
 - Shared components: `LayoutApp`, `ContextAuth`, `Seo`, `EffectsMotion`,
   `GoogleAnalytics`, `SectionHero`, `SectionTools`, `SectionProducts`,
   `SectionTestimonial`, `SectionContact`

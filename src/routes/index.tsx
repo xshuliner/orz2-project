@@ -2,11 +2,11 @@ import { LayoutApp } from '@/components/LayoutApp';
 import { defaultLocale, localePrefixes, type Locale } from '@/i18n';
 import { PageHome } from '@/pages/PageHome';
 import { routesProductSilicon } from '@/pages/Products/ProductSilicon/routes';
+import { routesToolArticlePublisher } from '@/pages/Tools/ToolArticlePublisher/routes';
 import { routesToolBase64Converter } from '@/pages/Tools/ToolBase64Converter/routes';
 import { routesToolImageStudio } from '@/pages/Tools/ToolImageStudio/routes';
 import { routesToolJsonFormatter } from '@/pages/Tools/ToolJsonFormatter/routes';
 import { routesToolMarkdownEditor } from '@/pages/Tools/ToolMarkdownEditor/routes';
-import { routesToolOfficialPublisher } from '@/pages/Tools/ToolOfficialPublisher/routes';
 import { routesToolPaletteLab } from '@/pages/Tools/ToolPaletteLab/routes';
 import { routesToolQrcodeGenerator } from '@/pages/Tools/ToolQrcodeGenerator/routes';
 import { routesToolTimezoneConverter } from '@/pages/Tools/ToolTimezoneConverter/routes';
@@ -81,7 +81,7 @@ function createAppChildren(): RouteObject[] {
           element: <PageTools />,
         },
         ...routesToolImageStudio,
-        ...routesToolOfficialPublisher,
+        ...routesToolArticlePublisher,
         ...routesToolTimezoneConverter,
         ...routesToolWorkReportPolisher,
         ...routesToolJsonFormatter,

@@ -1,23 +1,29 @@
 import type {
+  ArticlePublisherMode,
+  ArticlePublisherProvider,
   OfficialCommentConfig,
   OfficialImageConfig,
-  OfficialPublisherMode,
-  OfficialPublisherProvider,
 } from '@/api';
 import type { I18nContextValue } from '@/i18n/context';
-import type { PromptTemplateId } from '@/pages/Tools/ToolOfficialPublisher/config';
+import type { PromptTemplateId } from '@/pages/Tools/ToolArticlePublisher/config';
 
 export interface PublisherModeSetting {
   isCustomizationOpen: boolean;
   templateId: PromptTemplateId;
 }
 
-export interface OfficialPublisherForm {
-  publishMode: OfficialPublisherMode;
-  modeSettings: Record<OfficialPublisherMode, PublisherModeSetting>;
+export type DeliveryChannel = 'wechat' | 'email';
+
+export type DeliveryChannelSettings = Record<DeliveryChannel, boolean>;
+
+export interface ArticlePublisherForm {
+  publishMode: ArticlePublisherMode;
+  modeSettings: Record<ArticlePublisherMode, PublisherModeSetting>;
   appId: string;
   appSecret: string;
-  provider: OfficialPublisherProvider;
+  finalReportEmails: string;
+  deliveryChannels: DeliveryChannelSettings;
+  provider: ArticlePublisherProvider;
   promptSystem: string;
   promptContent: string;
   sourceArticleUrl: string;

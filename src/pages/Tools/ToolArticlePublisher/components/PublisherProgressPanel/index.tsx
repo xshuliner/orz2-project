@@ -3,8 +3,8 @@ import type {
   PublisherCopy,
   PublishPhase,
   PublishStep,
-} from '@/pages/Tools/ToolOfficialPublisher/types';
-import { formatDuration } from '@/pages/Tools/ToolOfficialPublisher/utils/progress';
+} from '@/pages/Tools/ToolArticlePublisher/types';
+import { formatDuration } from '@/pages/Tools/ToolArticlePublisher/utils/progress';
 import {
   CheckCircle2,
   Circle,

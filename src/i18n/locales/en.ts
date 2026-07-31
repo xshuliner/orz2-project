@@ -885,7 +885,7 @@ export const messages = {
     },
   },
   publisher: {
-    fallbackName: 'WeChat Publisher',
+    fallbackName: 'Article Publisher',
     fallbackSummary:
       'Choose a template to generate the article, cover, inline images, and digest in one click, or customize every detail in Advanced mode.',
     defaultRewriteRequirement:
@@ -1010,13 +1010,56 @@ export const messages = {
       account: {
         title: 'Official Account',
         description:
-          'Connect the publishing account and choose the draft type.',
+          'Optional: add both credentials to also create a draft in the WeChat draft box.',
+        appId: 'Official account appId (optional)',
+        appSecret: 'Official account appSecret (optional)',
         appIdPlaceholder: 'Enter official account appId',
         appSecretPlaceholder: 'Enter official account appSecret',
         draftType: 'Draft type *',
         newsType: 'news article message',
         provider: 'AI model *',
         modelSelectorAriaLabel: 'Choose AI provider (model)',
+      },
+      delivery: {
+        title: 'Delivery routes',
+        description: 'Choose at least one route. Both routes can run together.',
+        selectionAriaLabel: 'Choose article delivery routes',
+        required: 'Choose at least one',
+        wechat: {
+          title: 'Save to WeChat drafts',
+          description:
+            'Complete developer setup, then save the article to the selected account draft box.',
+          selected: 'WeChat draft route enabled',
+          unselected: 'Enable WeChat draft route',
+          expand: 'Configure WeChat draft route',
+          collapse: 'Collapse WeChat draft settings',
+          setupTitle: 'WeChat developer setup',
+          setupDescription:
+            'For first use, complete developer setup in the WeChat console using this guide.',
+          credentialsTitle: 'Developer credentials',
+          endpoint: 'The article will be saved to the WeChat draft box',
+        },
+        email: {
+          title: 'Send by email',
+          description: 'Send the completed article to one or more recipients.',
+          selected: 'Email route enabled',
+          unselected: 'Enable email route',
+          expand: 'Configure email route',
+          collapse: 'Collapse email settings',
+          endpoint: 'The article will be sent to the listed recipients',
+        },
+        summaryNone: 'Choose at least one delivery route.',
+        summaryPrefix: 'This run will use',
+        summarySuffix: 'route(s):',
+        summaryWechat: 'WeChat drafts',
+        summaryEmail: 'Email',
+        modelLabel: 'AI model (switchable)',
+        modelHint: 'This affects article generation only, not delivery.',
+        finalReportEmails: 'Recipient emails (one or more)',
+        finalReportEmailsPlaceholder:
+          'name@example.com; separate multiple addresses with commas, semicolons, or new lines',
+        finalReportEmailsHint:
+          'Email delivery does not need WeChat setup. Separate multiple addresses with commas, semicolons, or new lines.',
       },
       prompt: {
         title: 'Article Generation Prompts',
@@ -1083,7 +1126,7 @@ export const messages = {
       fansOnly: 'Fans only',
     },
     completion: {
-      account: 'Official account',
+      delivery: 'Delivery method',
       template: 'Content template',
       prompt: 'Article prompts',
       images: 'Cover and inline images',
@@ -1112,9 +1155,9 @@ export const messages = {
       'Generate article content',
       'Prepare and upload cover',
       'Prepare and upload inline images',
+      'Save generated article record',
       'Assemble WeChat draft',
       'Submit draft to WeChat',
-      'Save draft record',
     ],
     status: {
       autosave: 'The form is saved automatically in this browser.',
@@ -1137,6 +1180,9 @@ export const messages = {
       draftCreatedPrefix: 'Generated draft',
       draftCreatedSuffix: '. Check it in the WeChat console.',
       draftCreated: 'Draft generated. Check it in the WeChat console.',
+      articleCreated: 'Article generated and saved.',
+      articleCreatedWithEmail:
+        'Article generated, saved, and sent to the recipient emails.',
       submitFailed: 'Publishing task submission failed',
       resetTitle: 'Reset the form?',
       resetConfirm:
@@ -1151,6 +1197,9 @@ export const messages = {
     validation: {
       appId: 'Enter the official account appId.',
       appSecret: 'Enter the official account appSecret.',
+      delivery:
+        'Enter both official-account credentials or at least one recipient email.',
+      finalReportEmails: 'Enter valid recipient email addresses.',
       articleType: 'Choose a draft type.',
       provider: 'Choose an AI provider.',
       template: 'Choose a content template.',
@@ -1199,6 +1248,8 @@ export const messages = {
       noInline: 'No inline images',
       details: 'View asset details',
       inlineDetail: 'Inline images',
+      mediaId: 'WeChat draft media_id',
+      articleRecordId: 'Saved article record',
       stay: 'Stay here',
       goDraftBox: 'Open WeChat draft box',
       footnote:
@@ -1614,11 +1665,11 @@ export const messages = {
       'personal-blog': 'Personal Blog',
     },
     tools: {
-      'tool-wechat-publisher': {
-        name: 'WeChat Auto Publisher',
+      'tool-article-publisher': {
+        name: 'Article Publisher',
         summary:
-          'Choose a template to generate the article, cover, inline images, and digest directly in the WeChat draft box.',
-        badges: ['AI', 'WeChat', 'Auto publish', 'LLM', 'Content ops'],
+          'Choose a template to generate an article, cover, inline images, and digest, then deliver it by email or to a WeChat draft box.',
+        badges: ['AI', 'Article', 'Auto publish', 'LLM', 'Content ops'],
         heroBadges: {
           'ai-content': 'AI content generation',
           'wechat-drafts': 'WeChat drafts',
@@ -1626,12 +1677,12 @@ export const messages = {
         },
         entries: { web: 'Tool entry' },
         seo: {
-          title: 'ORZ2 - WeChat Auto Publisher',
+          title: 'ORZ2 - Article Publisher',
           description:
-            'Use ORZ2 WeChat Auto Publisher to choose a template and generate an article, cover, inline images, and digest in one click, with full prompt controls in Advanced mode.',
+            'Use ORZ2 Article Publisher to choose a template and generate an article, cover, inline images, and digest in one click, with full prompt controls in Advanced mode and delivery by email or WeChat draft box.',
           keywords: [
-            'WeChat publisher',
-            'WeChat official account tool',
+            'article publisher',
+            'AI article publishing tool',
             'AI article generation',
             'content operations tool',
           ],

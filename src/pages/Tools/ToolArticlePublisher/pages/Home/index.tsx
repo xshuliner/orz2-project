@@ -1,10 +1,10 @@
 import {
-  streamPostOfficialPublisher,
+  streamPostCreateArticleForLLM,
+  type ArticlePublisherMode,
+  type ArticlePublisherProgressEvent,
   type OfficialCommentConfig,
   type OfficialDraftResult,
   type OfficialImageConfig,
-  type OfficialPublisherMode,
-  type OfficialPublisherProgressEvent,
 } from '@/api';
 import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
 import { useAuthLogin } from '@/components/ContextAuth';
@@ -19,26 +19,27 @@ import { ORadio } from '@/components/ORadio';
 import { OSelector } from '@/components/OSelector';
 import { OTooltip } from '@/components/OTooltip';
 import { useI18n } from '@/hooks/useI18n';
-import { DraftSuccessModal } from '@/pages/Tools/ToolOfficialPublisher/components/DraftSuccessModal';
-import { PublisherModuleCard } from '@/pages/Tools/ToolOfficialPublisher/components/PublisherModuleCard';
-import { PublisherProgressPanel } from '@/pages/Tools/ToolOfficialPublisher/components/PublisherProgressPanel';
+import { DraftSuccessModal } from '@/pages/Tools/ToolArticlePublisher/components/DraftSuccessModal';
+import { PublisherModuleCard } from '@/pages/Tools/ToolArticlePublisher/components/PublisherModuleCard';
+import { PublisherProgressPanel } from '@/pages/Tools/ToolArticlePublisher/components/PublisherProgressPanel';
 import {
   apiWhitelistIp,
+  articlePublisherModes,
+  articlePublisherProviders,
+  articlePublisherScheduleEmail,
+  articlePublisherSeoKey,
+  articlePublisherToolId,
   defaultPublisherForm,
   getPromptTemplates,
-  officialPublisherModes,
-  officialPublisherProviders,
-  officialPublisherScheduleEmail,
-  officialPublisherSeoKey,
-  officialPublisherToolId,
   wechatConsoleUrl,
   type PromptTemplateId,
-} from '@/pages/Tools/ToolOfficialPublisher/config';
+} from '@/pages/Tools/ToolArticlePublisher/config';
 import type {
-  OfficialPublisherForm,
+  ArticlePublisherForm,
+  DeliveryChannel,
   PublishPhase,
   PublishStepStatus,
-} from '@/pages/Tools/ToolOfficialPublisher/types';
+} from '@/pages/Tools/ToolArticlePublisher/types';
 import {
   buildPublisherRequestBody,
   getActiveModeSetting,
@@ -48,9 +49,9 @@ import {
   hasTemplateCustomizations,
   hasText,
   normalizeForm,
-} from '@/pages/Tools/ToolOfficialPublisher/utils/form';
+} from '@/pages/Tools/ToolArticlePublisher/utils/form';
 
-import { createInitialPublishSteps } from '@/pages/Tools/ToolOfficialPublisher/utils/progress';
+import { createInitialPublishSteps } from '@/pages/Tools/ToolArticlePublisher/utils/progress';
 import managerCache, { cacheKeys } from '@/utils/manager/cache';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -116,7 +117,7 @@ const promptTemplateIcons: Record<PromptTemplateId, LucideIcon> = {
   fitness: Dumbbell,
 };
 
-export function PageOfficialPublisher() {
+export function PageArticlePublisher() {
   const { messages } = useI18n();
   const withLoginRequired = useAuthLogin();
   const publisherCopy = messages.publisher;
@@ -155,7 +156,7 @@ export function PageOfficialPublisher() {
   );
   const providerOptions = useMemo(
     () =>
-      officialPublisherProviders.map(provider => ({
+      articlePublisherProviders.map(provider => ({
         value: provider,
         label: publisherCopy.providers[provider],
       })),
@@ -163,10 +164,10 @@ export function PageOfficialPublisher() {
   );
   const modeOptions = useMemo(() => {
     const modeCopy = publisherCopy.modes as Record<
-      OfficialPublisherMode,
+      ArticlePublisherMode,
       { label: string; description: string }
     >;
-    return officialPublisherModes.map(mode => ({
+    return articlePublisherModes.map(mode => ({
       value: mode,
       label: modeCopy[mode].label,
       description: modeCopy[mode].description,
@@ -183,10 +184,10 @@ export function PageOfficialPublisher() {
       })),
     [promptTemplates]
   );
-  const [form, setForm] = useState<OfficialPublisherForm>(() => {
+  const [form, setForm] = useState<ArticlePublisherForm>(() => {
     try {
       return normalizeForm(
-        managerCache.getLocalStorage(cacheKeys.officialPublisherForm),
+        managerCache.getLocalStorage(cacheKeys.articlePublisherForm),
         defaultRewriteRequirement
       );
     } catch {
@@ -212,6 +213,9 @@ export function PageOfficialPublisher() {
     useState<PromptTemplateId | null>(null);
   const [isPublishConfirmOpen, setPublishConfirmOpen] = useState(false);
   const [isResetConfirmOpen, setResetConfirmOpen] = useState(false);
+  const [expandedDeliveryChannels, setExpandedDeliveryChannels] = useState<
+    DeliveryChannel[]
+  >([]);
   const selectedCommentOption: CommentOptionValue =
     form.comment.open === 0
       ? 'closed'
@@ -232,7 +236,7 @@ export function PageOfficialPublisher() {
   const publisherAbortRef = useRef<AbortController | null>(null);
   const publishStartedAtRef = useRef<number | null>(null);
   useEffect(() => {
-    managerCache.setLocalStorage(cacheKeys.officialPublisherForm, form);
+    managerCache.setLocalStorage(cacheKeys.articlePublisherForm, form);
   }, [form]);
 
   useEffect(() => {
@@ -264,15 +268,42 @@ export function PageOfficialPublisher() {
     [form, publisherCopy, selectedPromptTemplate]
   );
   const completedCount = completionItems.filter(item => item.done).length;
+  const selectedDeliveryChannels = (['wechat', 'email'] as const).filter(
+    channel => form.deliveryChannels[channel]
+  );
 
-  function updateField<K extends keyof OfficialPublisherForm>(
+  function updateField<K extends keyof ArticlePublisherForm>(
     key: K,
-    value: OfficialPublisherForm[K]
+    value: ArticlePublisherForm[K]
   ) {
     setForm(current => ({ ...current, [key]: value }));
   }
 
-  function updatePublishMode(publishMode: OfficialPublisherMode) {
+  function updateDeliveryChannel(channel: DeliveryChannel) {
+    setValidationErrors([]);
+    setForm(current => ({
+      ...current,
+      deliveryChannels: {
+        ...current.deliveryChannels,
+        [channel]: !current.deliveryChannels[channel],
+      },
+    }));
+    setExpandedDeliveryChannels(current =>
+      form.deliveryChannels[channel]
+        ? current.filter(item => item !== channel)
+        : [...current, channel]
+    );
+  }
+
+  function toggleDeliveryDetails(channel: DeliveryChannel) {
+    setExpandedDeliveryChannels(current =>
+      current.includes(channel)
+        ? current.filter(item => item !== channel)
+        : [...current, channel]
+    );
+  }
+
+  function updatePublishMode(publishMode: ArticlePublisherMode) {
     setValidationErrors([]);
     setForm(current => ({
       ...current,
@@ -287,7 +318,7 @@ export function PageOfficialPublisher() {
     setValidationErrors([]);
     setForm(current => {
       const currentSetting = getActiveModeSetting(current);
-      const next: OfficialPublisherForm = {
+      const next: ArticlePublisherForm = {
         ...current,
         modeSettings: {
           ...current.modeSettings,
@@ -395,7 +426,7 @@ export function PageOfficialPublisher() {
     }));
   }
 
-  function updatePublishProgress(event: OfficialPublisherProgressEvent) {
+  function updatePublishProgress(event: ArticlePublisherProgressEvent) {
     if (event.key === 'workflow') {
       if (event.status === 'completed') setPublishPhase('completed');
       if (event.status === 'failed') setPublishPhase('failed');
@@ -403,9 +434,21 @@ export function PageOfficialPublisher() {
     }
     if (!event.step) return;
 
+    // The new API emits the article-generation and WeChat-draft workflows
+    // separately. Keep them in one timeline without letting the latter reset
+    // the first three steps.
+    const stepIndex =
+      event.resultType === 'official'
+        ? event.key === 'assemble_draft'
+          ? 5
+          : event.key === 'submit_draft'
+            ? 6
+            : 4
+        : event.step;
+
     setPublishSteps(current =>
       current.map(step => {
-        if (step.index !== event.step) return step;
+        if (step.index !== stepIndex) return step;
         const status: PublishStepStatus =
           event.status === 'info'
             ? step.status === 'pending'
@@ -413,27 +456,31 @@ export function PageOfficialPublisher() {
               : step.status
             : event.status === 'warning'
               ? 'warning'
-              : event.status === 'completed' ||
-                  event.status === 'failed' ||
-                  event.status === 'running'
-                ? event.status
-                : step.status;
+              : event.status === 'retrying'
+                ? 'running'
+                : event.status === 'completed' ||
+                    event.status === 'failed' ||
+                    event.status === 'running'
+                  ? event.status
+                  : step.status;
         const requestedCount = event.requestedCount ?? step.requestedCount;
+        const totalImageCount = event.totalImageCount ?? event.requestedCount;
+        const completedImageCount = event.completedImageCount;
         const currentInlineImageIndex =
           event.key === 'prepare_inline_images' &&
-          requestedCount &&
+          totalImageCount &&
           (event.status === 'running' || event.status === 'info')
-            ? event.status === 'info' && event.imageIndex !== undefined
-              ? Math.min(event.imageIndex + 1, requestedCount)
-              : 1
+            ? completedImageCount !== undefined
+              ? Math.min(completedImageCount, totalImageCount)
+              : event.status === 'info' && event.imageIndex !== undefined
+                ? Math.min(event.imageIndex + 1, totalImageCount)
+                : 1
             : undefined;
         const message =
-          currentInlineImageIndex && requestedCount
-            ? event.status === 'info' &&
-              event.imageIndex !== undefined &&
-              event.imageIndex >= requestedCount
-              ? `${publisherCopy.progress.inlineUploaded}（${requestedCount}/${requestedCount}）`
-              : `${publisherCopy.progress.inlineGenerating}（${currentInlineImageIndex}/${requestedCount}）`
+          currentInlineImageIndex !== undefined && totalImageCount
+            ? currentInlineImageIndex >= totalImageCount
+              ? `${publisherCopy.progress.inlineUploaded}（${totalImageCount}/${totalImageCount}）`
+              : `${publisherCopy.progress.inlineGenerating}（${currentInlineImageIndex}/${totalImageCount}）`
             : event.message ||
               (event.status === 'info' && event.imageIndex
                 ? `${publisherCopy.progress.inlineUploadedSingle} ${event.imageIndex}`
@@ -449,12 +496,12 @@ export function PageOfficialPublisher() {
           status,
           message: message ?? step.message,
           durationMs,
-          requestedCount,
+          requestedCount: totalImageCount ?? requestedCount,
         };
       })
     );
 
-    if (event.status === 'running') {
+    if (event.status === 'running' || event.status === 'retrying') {
       setPublishPhase('publishing');
       setPublishStatusText(
         `${publisherCopy.status.runningPrefix}${
@@ -507,7 +554,7 @@ export function PageOfficialPublisher() {
       const controller = new AbortController();
       publisherAbortRef.current = controller;
       publishStartedAtRef.current = Date.now();
-      const result = await streamPostOfficialPublisher(body, {
+      const result = await streamPostCreateArticleForLLM(body, {
         signal: controller.signal,
         onConnected: event => {
           setPublishPhase('publishing');
@@ -515,13 +562,19 @@ export function PageOfficialPublisher() {
         },
         onProgress: updatePublishProgress,
       });
-      setDraftResult(result);
-      setDraftResultOpen(true);
+      const officialDraft =
+        result?.officialDraft.status === 'success'
+          ? (result.officialDraft.result ?? null)
+          : null;
+      setDraftResult(officialDraft);
+      setDraftResultOpen(Boolean(officialDraft));
       setPublishPhase('completed');
       setPublishStatusText(
-        result?.title
-          ? `${publisherCopy.status.draftCreatedPrefix}「${result.title}」${publisherCopy.status.draftCreatedSuffix}`
-          : publisherCopy.status.draftCreated
+        officialDraft?.title
+          ? `${publisherCopy.status.draftCreatedPrefix}「${officialDraft.title}」${publisherCopy.status.draftCreatedSuffix}`
+          : result?.finalReportEmail.status === 'success'
+            ? publisherCopy.status.articleCreatedWithEmail
+            : publisherCopy.status.articleCreated
       );
     } catch (error) {
       const message =
@@ -566,7 +619,7 @@ export function PageOfficialPublisher() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'orz2-wechat-publisher-config.json';
+    link.download = 'orz2-article-publisher-config.json';
     link.click();
     URL.revokeObjectURL(url);
     setPublishStatusText(publisherCopy.status.exportDone);
@@ -606,8 +659,8 @@ export function PageOfficialPublisher() {
     <>
       <LayoutPage
         icon={Send}
-        seoKey={officialPublisherSeoKey}
-        toolId={officialPublisherToolId}
+        seoKey={articlePublisherSeoKey}
+        toolId={articlePublisherToolId}
         topbarSlot={
           <div
             className='json-actions'
@@ -635,50 +688,6 @@ export function PageOfficialPublisher() {
           </div>
         }
       >
-        <OCard
-          as='section'
-          className='wechat-setup-card'
-          aria-labelledby='wechat-setup-title'
-          padding='sm'
-          tone='warm'
-        >
-          <OTooltip
-            className='wechat-setup-visual interactive'
-            ariaLabel={publisherCopy.setupAriaLabel}
-            content={
-              <div className='wechat-setup-preview'>
-                <img src={WechatConsoleGuide} alt='' />
-              </div>
-            }
-            contentClassName='wechat-setup-tooltip'
-            maxWidth={680}
-            placement='bottom-start'
-            offset={12}
-          >
-            <img src={WechatConsoleGuide} alt={publisherCopy.setupImageAlt} />
-          </OTooltip>
-          <div className='wechat-setup-content'>
-            <h2 id='wechat-setup-title'>{publisherCopy.setupTitle}</h2>
-            <ol className='setup-steps'>
-              <li>{publisherCopy.setupSteps[0]}</li>
-              <li>{publisherCopy.setupSteps[1]}</li>
-              <li>
-                {publisherCopy.setupSteps[2]} <code>{apiWhitelistIp}</code>.
-              </li>
-            </ol>
-            <div className='setup-actions'>
-              <OButton href={wechatConsoleUrl} target='_blank' rel='noreferrer'>
-                <ExternalLink size={17} aria-hidden='true' />
-                {publisherCopy.openWechatConsole}
-              </OButton>
-              <OButton type='button' variant='secondary' onClick={handleCopyIp}>
-                <Clipboard size={17} aria-hidden='true' />
-                {copiedIp ? publisherCopy.copiedIp : publisherCopy.copyIp}
-              </OButton>
-            </div>
-          </div>
-        </OCard>
-
         <PublisherModuleCard
           className='publisher-automation-card'
           description={publisherCopy.automation.description}
@@ -692,7 +701,7 @@ export function PageOfficialPublisher() {
           titleId='publisher-automation-title'
           action={
             <OButton
-              href={`mailto:${officialPublisherScheduleEmail}?subject=${encodeURIComponent(
+              href={`mailto:${articlePublisherScheduleEmail}?subject=${encodeURIComponent(
                 publisherCopy.automation.emailSubject
               )}`}
               variant='secondary'
@@ -710,51 +719,277 @@ export function PageOfficialPublisher() {
           <div className='publisher-workspace'>
             <div className='publisher-main'>
               <PublisherModuleCard
-                description={publisherCopy.sections.account.description}
-                icon={KeyRound}
-                title={publisherCopy.sections.account.title}
+                className='delivery-paths-card'
+                description={publisherCopy.sections.delivery.description}
+                icon={Send}
+                title={publisherCopy.sections.delivery.title}
               >
-                <div className='form-grid account-config-grid'>
-                  <label className='field'>
-                    <span>appId *</span>
-                    <input
-                      value={form.appId}
-                      onChange={event =>
-                        updateField('appId', event.target.value)
-                      }
-                      placeholder={
-                        publisherCopy.sections.account.appIdPlaceholder
-                      }
-                      required
-                    />
-                  </label>
-                  <label className='field'>
-                    <span>appSecret *</span>
-                    <input
-                      value={form.appSecret}
-                      onChange={event =>
-                        updateField('appSecret', event.target.value)
-                      }
-                      placeholder={
-                        publisherCopy.sections.account.appSecretPlaceholder
-                      }
-                      type='password'
-                      required
-                    />
-                  </label>
-                  <label className='field'>
-                    <span>{publisherCopy.sections.account.provider}</span>
-                    <OSelector
-                      ariaLabel={
-                        publisherCopy.sections.account.modelSelectorAriaLabel
-                      }
-                      className='account-model-selector'
-                      options={providerOptions}
-                      value={form.provider}
-                      onChange={provider => updateField('provider', provider)}
-                    />
-                  </label>
+                <div
+                  className='delivery-path-selection'
+                  role='group'
+                  aria-label={
+                    publisherCopy.sections.delivery.selectionAriaLabel
+                  }
+                >
+                  {(['wechat', 'email'] as const).map(channel => {
+                    const copy = publisherCopy.sections.delivery[channel];
+                    const Icon = channel === 'wechat' ? KeyRound : Mail;
+                    const isSelected = form.deliveryChannels[channel];
+                    const isExpanded =
+                      expandedDeliveryChannels.includes(channel);
+
+                    return (
+                      <section
+                        key={channel}
+                        className={`delivery-path ${isSelected ? 'is-selected' : ''} ${
+                          isExpanded ? 'is-expanded' : ''
+                        }`.trim()}
+                        aria-label={copy.title}
+                      >
+                        <div className='delivery-path-head'>
+                          <button
+                            type='button'
+                            className='delivery-path-choice interactive'
+                            role='checkbox'
+                            aria-checked={isSelected}
+                            onClick={() => updateDeliveryChannel(channel)}
+                          >
+                            <span
+                              className='delivery-path-check'
+                              aria-hidden='true'
+                            >
+                              <CheckCircle2 size={18} />
+                            </span>
+                            <span
+                              className='delivery-path-icon'
+                              aria-hidden='true'
+                            >
+                              <Icon size={22} />
+                            </span>
+                            <span className='delivery-path-copy'>
+                              <strong>{copy.title}</strong>
+                              <small>{copy.description}</small>
+                            </span>
+                          </button>
+                          {isSelected ? (
+                            <button
+                              type='button'
+                              className='delivery-path-details-toggle interactive'
+                              aria-expanded={isExpanded}
+                              onClick={() => toggleDeliveryDetails(channel)}
+                            >
+                              {isExpanded ? copy.collapse : copy.expand}
+                              {isExpanded ? (
+                                <ChevronsUp size={16} aria-hidden='true' />
+                              ) : (
+                                <ChevronsDown size={16} aria-hidden='true' />
+                              )}
+                            </button>
+                          ) : null}
+                        </div>
+
+                        {isSelected && isExpanded ? (
+                          <div className='delivery-path-details'>
+                            {channel === 'wechat' ? (
+                              <>
+                                <section className='wechat-chain-setup'>
+                                  <div className='wechat-chain-guide'>
+                                    <OTooltip
+                                      className='wechat-chain-visual interactive'
+                                      ariaLabel={publisherCopy.setupAriaLabel}
+                                      content={
+                                        <div className='wechat-setup-preview'>
+                                          <img
+                                            src={WechatConsoleGuide}
+                                            alt=''
+                                          />
+                                        </div>
+                                      }
+                                      contentClassName='wechat-setup-tooltip'
+                                      maxWidth={680}
+                                      placement='bottom-start'
+                                      offset={12}
+                                    >
+                                      <img
+                                        src={WechatConsoleGuide}
+                                        alt={publisherCopy.setupImageAlt}
+                                      />
+                                    </OTooltip>
+                                    <div>
+                                      <h3>
+                                        {
+                                          publisherCopy.sections.delivery.wechat
+                                            .setupTitle
+                                        }
+                                      </h3>
+                                      <p>
+                                        {
+                                          publisherCopy.sections.delivery.wechat
+                                            .setupDescription
+                                        }
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <ol className='setup-steps'>
+                                    <li>{publisherCopy.setupSteps[0]}</li>
+                                    <li>{publisherCopy.setupSteps[1]}</li>
+                                    <li>
+                                      {publisherCopy.setupSteps[2]}{' '}
+                                      <code>{apiWhitelistIp}</code>.
+                                    </li>
+                                  </ol>
+                                  <div className='setup-actions'>
+                                    <OButton
+                                      href={wechatConsoleUrl}
+                                      target='_blank'
+                                      rel='noreferrer'
+                                    >
+                                      <ExternalLink
+                                        size={17}
+                                        aria-hidden='true'
+                                      />
+                                      {publisherCopy.openWechatConsole}
+                                    </OButton>
+                                    <OButton
+                                      type='button'
+                                      variant='secondary'
+                                      onClick={handleCopyIp}
+                                    >
+                                      <Clipboard size={17} aria-hidden='true' />
+                                      {copiedIp
+                                        ? publisherCopy.copiedIp
+                                        : publisherCopy.copyIp}
+                                    </OButton>
+                                  </div>
+                                </section>
+                                <div className='delivery-path-inputs form-grid two'>
+                                  <label className='field'>
+                                    <span>
+                                      {publisherCopy.sections.account.appId}
+                                    </span>
+                                    <input
+                                      value={form.appId}
+                                      onChange={event =>
+                                        updateField('appId', event.target.value)
+                                      }
+                                      placeholder={
+                                        publisherCopy.sections.account
+                                          .appIdPlaceholder
+                                      }
+                                      required
+                                    />
+                                  </label>
+                                  <label className='field'>
+                                    <span>
+                                      {publisherCopy.sections.account.appSecret}
+                                    </span>
+                                    <input
+                                      value={form.appSecret}
+                                      onChange={event =>
+                                        updateField(
+                                          'appSecret',
+                                          event.target.value
+                                        )
+                                      }
+                                      placeholder={
+                                        publisherCopy.sections.account
+                                          .appSecretPlaceholder
+                                      }
+                                      type='password'
+                                      required
+                                    />
+                                  </label>
+                                </div>
+                                <p className='delivery-path-endpoint'>
+                                  <CheckCircle2 size={16} aria-hidden='true' />
+                                  {
+                                    publisherCopy.sections.delivery.wechat
+                                      .endpoint
+                                  }
+                                </p>
+                              </>
+                            ) : (
+                              <>
+                                <label className='field'>
+                                  <span>
+                                    {
+                                      publisherCopy.sections.delivery
+                                        .finalReportEmails
+                                    }
+                                  </span>
+                                  <textarea
+                                    aria-describedby='final-report-emails-hint'
+                                    inputMode='email'
+                                    value={form.finalReportEmails}
+                                    onChange={event =>
+                                      updateField(
+                                        'finalReportEmails',
+                                        event.target.value
+                                      )
+                                    }
+                                    placeholder={
+                                      publisherCopy.sections.delivery
+                                        .finalReportEmailsPlaceholder
+                                    }
+                                    rows={2}
+                                    required
+                                  />
+                                  <small id='final-report-emails-hint'>
+                                    {
+                                      publisherCopy.sections.delivery
+                                        .finalReportEmailsHint
+                                    }
+                                  </small>
+                                </label>
+                                <p className='delivery-path-endpoint'>
+                                  <CheckCircle2 size={16} aria-hidden='true' />
+                                  {
+                                    publisherCopy.sections.delivery.email
+                                      .endpoint
+                                  }
+                                </p>
+                              </>
+                            )}
+                          </div>
+                        ) : null}
+                      </section>
+                    );
+                  })}
                 </div>
+                <div className='delivery-path-summary' aria-live='polite'>
+                  <CheckCircle2 size={17} aria-hidden='true' />
+                  {selectedDeliveryChannels.length ? (
+                    <span>
+                      {publisherCopy.sections.delivery.summaryPrefix}{' '}
+                      {selectedDeliveryChannels.length}{' '}
+                      {publisherCopy.sections.delivery.summarySuffix}{' '}
+                      {selectedDeliveryChannels
+                        .map(
+                          channel =>
+                            publisherCopy.sections.delivery[
+                              `summary${channel === 'wechat' ? 'Wechat' : 'Email'}`
+                            ]
+                        )
+                        .join('、')}
+                    </span>
+                  ) : (
+                    <span>{publisherCopy.sections.delivery.summaryNone}</span>
+                  )}
+                </div>
+                <label className='delivery-model-selector'>
+                  <span>
+                    {publisherCopy.sections.delivery.modelLabel}
+                    <small>{publisherCopy.sections.delivery.modelHint}</small>
+                  </span>
+                  <OSelector
+                    ariaLabel={
+                      publisherCopy.sections.account.modelSelectorAriaLabel
+                    }
+                    options={providerOptions}
+                    value={form.provider}
+                    onChange={provider => updateField('provider', provider)}
+                  />
+                </label>
               </PublisherModuleCard>
 
               <PublisherModuleCard

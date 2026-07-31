@@ -2,8 +2,8 @@ import type { OfficialDraftResult } from '@/api';
 import { OButton } from '@/components/OButton';
 import { OIconButton } from '@/components/OIconButton';
 import { OModal } from '@/components/OModal';
-import { wechatDraftBoxUrl } from '@/pages/Tools/ToolOfficialPublisher/config';
-import type { PublisherCopy } from '@/pages/Tools/ToolOfficialPublisher/types';
+import { wechatDraftBoxUrl } from '@/pages/Tools/ToolArticlePublisher/config';
+import type { PublisherCopy } from '@/pages/Tools/ToolArticlePublisher/types';
 import { CheckCheck, ExternalLink, FileText, X } from 'lucide-react';
 
 export function DraftSuccessModal({
@@ -92,8 +92,15 @@ export function DraftSuccessModal({
 
           {draftResult?.mediaId ? (
             <div className='draft-success-media'>
-              <span>media_id</span>
+              <span>{copy.success.mediaId}</span>
               <code>{draftResult.mediaId}</code>
+            </div>
+          ) : null}
+
+          {draftResult?.articleInfo?._id ? (
+            <div className='draft-success-media'>
+              <span>{copy.success.articleRecordId}</span>
+              <code>{draftResult.articleInfo._id}</code>
             </div>
           ) : null}
 

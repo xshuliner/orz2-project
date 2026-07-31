@@ -1,12 +1,12 @@
 import managerFetch, { type FetchResponse } from '@/utils/manager/fetch';
 import md5 from 'blueimp-md5';
 import type {
+  ArticlePublisherProgressEvent,
+  CreateArticleForLLMResult,
   MemberInfo,
   MemberListPageBody,
   MemberSummaryBody,
-  OfficialDraftResult,
-  OfficialPublisherProgressEvent,
-  PostOfficialPublisherBody,
+  PostCreateArticleForLLMBody,
   PostPolishContentBody,
   PostPolishContentResult,
   StoryListResult,
@@ -416,20 +416,20 @@ export async function postPolishContent(
   throw new Error(message);
 }
 
-// ===== Official publisher APIs =====
+// ===== Article publisher APIs =====
 
 /**
- * Call the backend endpoint that generates and creates a WeChat draft.
- * Backend route: POST /smart/v1/official/postOfficialPublisher
+ * Generate and persist an article, then create a WeChat draft for the
+ * `official` target. Backend route: POST /smart/v1/article/postCreateArticleForLLM
  */
-export async function postOfficialPublisher(
-  body: PostOfficialPublisherBody
-): Promise<OfficialDraftResult | null> {
+export async function postCreateArticleForLLM(
+  body: PostCreateArticleForLLMBody
+): Promise<CreateArticleForLLMResult | null> {
   const response = await managerFetch.request<
-    LegacyApiPayload<OfficialDraftResult | null>
+    LegacyApiPayload<CreateArticleForLLMResult | null>
   >({
     method: 'POST',
-    url: '/smart/v1/official/postOfficialPublisher',
+    url: '/smart/v1/article/postCreateArticleForLLM',
     body,
     timeout: 600000,
   });
@@ -445,20 +445,20 @@ export async function postOfficialPublisher(
   throw new Error(message);
 }
 
-interface PostOfficialPublisherStreamOptions {
+interface PostCreateArticleForLLMStreamOptions {
   signal?: AbortSignal;
-  onConnected?: (event: OfficialPublisherProgressEvent) => void;
-  onProgress?: (event: OfficialPublisherProgressEvent) => void;
+  onConnected?: (event: ArticlePublisherProgressEvent) => void;
+  onProgress?: (event: ArticlePublisherProgressEvent) => void;
 }
 
-interface OfficialPublisherStreamPayload {
+interface ArticlePublisherStreamPayload {
   code?: number;
-  body?: OfficialDraftResult | null;
+  body?: CreateArticleForLLMResult | null;
   message?: string;
   content?: string;
 }
 
-function getPublisherError(payload: OfficialPublisherStreamPayload) {
+function getPublisherError(payload: ArticlePublisherStreamPayload) {
   return (
     payload.message || payload.content || 'Publishing task submission failed'
   );
@@ -466,9 +466,9 @@ function getPublisherError(payload: OfficialPublisherStreamPayload) {
 
 function parsePublisherStreamPayload(
   rawData: string
-): OfficialPublisherStreamPayload {
+): ArticlePublisherStreamPayload {
   try {
-    return JSON.parse(rawData) as OfficialPublisherStreamPayload;
+    return JSON.parse(rawData) as ArticlePublisherStreamPayload;
   } catch {
     throw new Error('Publishing progress payload parse failed');
   }
@@ -478,13 +478,13 @@ function parsePublisherStreamPayload(
  * Generate a WeChat draft over SSE.
  * EventSource cannot send a POST body, so fetch reads text/event-stream.
  */
-export async function streamPostOfficialPublisher(
-  body: PostOfficialPublisherBody,
-  options: PostOfficialPublisherStreamOptions = {}
-): Promise<OfficialDraftResult | null> {
+export async function streamPostCreateArticleForLLM(
+  body: PostCreateArticleForLLMBody,
+  options: PostCreateArticleForLLMStreamOptions = {}
+): Promise<CreateArticleForLLMResult | null> {
   const response = await managerFetch.requestStream({
     method: 'POST',
-    url: '/smart/v1/official/postOfficialPublisher',
+    url: '/smart/v1/article/postCreateArticleForLLM',
     query: { stream: true },
     body,
     header: { Accept: 'text/event-stream' },
@@ -507,7 +507,7 @@ export async function streamPostOfficialPublisher(
   const decoder = new TextDecoder();
   let buffer = '';
   let isCompleted = false;
-  let result: OfficialDraftResult | null = null;
+  let result: CreateArticleForLLMResult | null = null;
 
   function processFrame(frame: string) {
     const lines = frame.split('\n');
@@ -527,9 +527,9 @@ export async function streamPostOfficialPublisher(
     const payload = parsePublisherStreamPayload(dataLines.join('\n'));
 
     if (eventName === 'connected') {
-      options.onConnected?.(payload as OfficialPublisherProgressEvent);
+      options.onConnected?.(payload as ArticlePublisherProgressEvent);
     } else if (eventName === 'progress') {
-      options.onProgress?.(payload as OfficialPublisherProgressEvent);
+      options.onProgress?.(payload as ArticlePublisherProgressEvent);
     } else if (eventName === 'complete') {
       if (payload.code !== 200) throw new Error(getPublisherError(payload));
       isCompleted = true;

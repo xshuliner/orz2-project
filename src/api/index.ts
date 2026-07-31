@@ -6,12 +6,12 @@ export default {
 
 export {
   getQueryScoreList,
-  postOfficialPublisher,
+  postCreateArticleForLLM,
   postPolishContent,
   postTinifyImage,
   postUpdateMemberInfo,
   postUploadMemberAvatar,
-  streamPostOfficialPublisher,
+  streamPostCreateArticleForLLM,
 } from './orz2';
 export type {
   AuthMemberInfo,
@@ -20,8 +20,14 @@ export type {
 } from './orz2';
 export { getAvatarBorderColor, ossAvatarUrl } from './orz2.modal';
 export type {
+  ArticleImageGenerationMode,
+  ArticlePublisherMode,
+  ArticlePublisherProgressEvent,
+  ArticlePublisherProgressStatus,
+  ArticlePublisherProvider,
   BackpackItem,
   BackpackItemDetail,
+  CreateArticleForLLMResult,
   FriendItem,
   MemberInfo,
   MemberListItem,
@@ -32,12 +38,8 @@ export type {
   OfficialDraftResult,
   OfficialImageConfig,
   OfficialImageSourceType,
-  OfficialPublisherMode,
-  OfficialPublisherProgressEvent,
-  OfficialPublisherProgressStatus,
-  OfficialPublisherProvider,
   OperatorMemberInfo,
-  PostOfficialPublisherBody,
+  PostCreateArticleForLLMBody,
   PostPolishContentBody,
   PostPolishContentMode,
   PostPolishContentResult,

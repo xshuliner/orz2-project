@@ -2,7 +2,7 @@ import type { CatalogBaseItem } from '@/types/catalog';
 
 const tools = [
   {
-    id: 'tool-wechat-publisher',
+    id: 'tool-article-publisher',
     group: 'ops-productivity',
     media: {
       kind: 'icon',
@@ -23,13 +23,13 @@ const tools = [
       {
         id: 'web',
         kind: 'link',
-        href: '/tools/official-publisher',
-        qrValue: 'https://orz2.online/tools/official-publisher',
+        href: '/tools/article-publisher',
+        qrValue: 'https://orz2.online/tools/article-publisher',
         primary: true,
       },
     ],
     seo: {
-      slug: 'official-publisher',
+      slug: 'article-publisher',
       ogImage: 'https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp',
       schemaType: 'SoftwareApplication',
     },

@@ -1834,3 +1834,314 @@
     gap: 1px;
   }
 }
+
+/* Delivery routes keep channel choice concise while revealing setup only on demand. */
+.delivery-paths-card {
+  overflow: visible;
+}
+
+.delivery-path-selection {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.delivery-path {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-line-card) 94%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-panel) 92%, transparent);
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.delivery-path.is-selected {
+  border-color: color-mix(
+    in srgb,
+    var(--color-green) 42%,
+    var(--color-line-card)
+  );
+  background: color-mix(
+    in srgb,
+    var(--color-green-soft) 46%,
+    var(--color-panel)
+  );
+}
+
+.delivery-path.is-expanded {
+  grid-column: 1 / -1;
+}
+
+.delivery-path-head {
+  display: flex;
+  min-height: 82px;
+  align-items: stretch;
+}
+
+.delivery-path-choice {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+  padding: 14px;
+  border: 0;
+  color: var(--color-ink);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.delivery-path-choice:focus-visible,
+.delivery-path-details-toggle:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--color-green) 28%, transparent);
+  outline-offset: -3px;
+}
+
+.delivery-path-check,
+.delivery-path-icon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+}
+
+.delivery-path-check {
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--color-line-input);
+  border-radius: 6px;
+  color: transparent;
+}
+
+.delivery-path.is-selected .delivery-path-check {
+  border-color: var(--color-green);
+  color: var(--color-panel);
+  background: var(--color-green);
+}
+
+.delivery-path-icon {
+  width: 34px;
+  height: 34px;
+  border: 1px solid color-mix(in srgb, var(--color-green) 18%, transparent);
+  border-radius: 8px;
+  color: var(--color-green-label);
+  background: var(--color-green-soft);
+}
+
+.delivery-path-copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.delivery-path-copy strong {
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.delivery-path-copy small {
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 580;
+  line-height: 1.45;
+}
+
+.delivery-path-details-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+  padding: 0 13px;
+  border: 0;
+  border-left: 1px solid color-mix(in srgb, var(--color-line) 76%, transparent);
+  color: var(--color-green-label);
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 720;
+}
+
+.delivery-path-details {
+  display: grid;
+  gap: 14px;
+  padding: 0 14px 14px;
+  border-top: 1px solid color-mix(in srgb, var(--color-line) 76%, transparent);
+}
+
+.wechat-chain-setup {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 0;
+}
+
+.wechat-chain-guide {
+  display: contents;
+}
+
+.wechat-chain-visual {
+  display: block;
+  align-self: stretch;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-green) 22%, transparent);
+  border-radius: 8px;
+  cursor: zoom-in;
+}
+
+.wechat-chain-visual img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 72px;
+  object-fit: cover;
+}
+
+.wechat-chain-guide h3 {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: 14px;
+}
+
+.wechat-chain-guide p {
+  margin: 4px 0 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.wechat-chain-setup .setup-steps {
+  display: none;
+}
+
+.wechat-chain-setup .setup-actions {
+  grid-column: auto;
+  grid-row: auto;
+  justify-content: flex-end;
+}
+
+.wechat-chain-setup .setup-actions .button {
+  min-height: 36px;
+}
+
+.delivery-path-inputs {
+  padding-top: 2px;
+}
+
+.delivery-path-endpoint,
+.delivery-path-summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: var(--color-green-label);
+  font-size: 12px;
+  font-weight: 680;
+  line-height: 1.45;
+}
+
+.delivery-path-endpoint {
+  padding: 9px 11px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-green-soft) 72%, transparent);
+}
+
+.delivery-path-summary {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-top: 1px solid color-mix(in srgb, var(--color-line) 76%, transparent);
+}
+
+.delivery-path-summary span {
+  color: var(--color-text-body-strong);
+}
+
+.delivery-model-selector {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 220px);
+  gap: 12px;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid color-mix(in srgb, var(--color-line) 72%, transparent);
+}
+
+.delivery-model-selector > span {
+  display: grid;
+  gap: 2px;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 680;
+}
+
+.delivery-model-selector small {
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 520;
+}
+
+.delivery-model-selector .o-selector-trigger {
+  min-height: 36px;
+  padding-inline: 11px;
+  color: var(--color-text-body-strong);
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .delivery-path-selection {
+    grid-template-columns: 1fr;
+  }
+
+  .delivery-path.is-expanded {
+    grid-column: auto;
+  }
+
+  .wechat-chain-setup {
+    grid-template-columns: 82px minmax(0, 1fr);
+  }
+
+  .wechat-chain-setup .setup-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .delivery-model-selector {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .delivery-path-head {
+    min-height: 0;
+  }
+
+  .delivery-path-choice {
+    padding: 12px;
+  }
+
+  .delivery-path-details-toggle {
+    padding: 0 10px;
+    font-size: 0;
+  }
+
+  .delivery-path-details-toggle svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .wechat-chain-setup {
+    grid-template-columns: 1fr;
+  }
+
+  .wechat-chain-visual {
+    max-height: 150px;
+  }
+
+  .wechat-chain-setup .setup-actions,
+  .wechat-chain-setup .setup-actions .button {
+    width: 100%;
+  }
+}

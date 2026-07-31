@@ -56,7 +56,7 @@ export function PageDesignSystem() {
     products.find(item => item.id === 'silicon'),
     products.find(item => item.id === 'fiveball'),
     products.find(item => item.id === 'orz2-blog'),
-    tools.find(item => item.id === 'tool-wechat-publisher'),
+    tools.find(item => item.id === 'tool-article-publisher'),
     products.find(item => item.id === 'leafy-note'),
   ].filter(isCatalogItem);
   const [isModalOpen, setModalOpen] = useState(false);

@@ -884,7 +884,7 @@ export const messages = {
     },
   },
   publisher: {
-    fallbackName: '公众号发布',
+    fallbackName: '記事公開',
     fallbackSummary:
       'テンプレートを選ぶだけで記事、カバー、本文画像、摘要を生成し、高度設定では全項目を編集できます。',
     defaultRewriteRequirement:
@@ -1008,13 +1008,58 @@ export const messages = {
     sections: {
       account: {
         title: '公众号設定',
-        description: '公開アカウントを接続し、草稿タイプを選択します。',
+        description:
+          '任意：両方の認証情報を入力すると、WeChat 草稿箱にも作成します。',
+        appId: '公众号 appId（任意）',
+        appSecret: '公众号 appSecret（任意）',
         appIdPlaceholder: '公众号 appId を入力',
         appSecretPlaceholder: '公众号 appSecret を入力',
         draftType: '草稿タイプ *',
         newsType: 'news 图文消息',
         provider: 'AI モデル *',
         modelSelectorAriaLabel: 'AI プロバイダー（モデル）を選択',
+      },
+      delivery: {
+        title: '配信経路',
+        description:
+          '少なくとも一つの経路を選択してください。両方を同時に実行できます。',
+        selectionAriaLabel: '記事の配信経路を選択',
+        required: '少なくとも一つ選択',
+        wechat: {
+          title: 'WeChat 草稿箱へ保存',
+          description:
+            '開発設定の完了後、指定した公众号の草稿箱へ記事を保存します。',
+          selected: 'WeChat 草稿箱経路を有効化',
+          unselected: 'WeChat 草稿箱経路を有効化',
+          expand: 'WeChat 草稿箱経路を設定',
+          collapse: 'WeChat 草稿箱設定を閉じる',
+          setupTitle: 'WeChat 開発設定',
+          setupDescription:
+            '初回はこのガイドを使い、WeChat コンソールで開発設定を完了します。',
+          credentialsTitle: '開発者認証情報',
+          endpoint: '記事は WeChat 草稿箱へ保存されます',
+        },
+        email: {
+          title: 'メールで送信',
+          description: '生成した記事を一人または複数の受信者へ送信します。',
+          selected: 'メール経路を有効化',
+          unselected: 'メール経路を有効化',
+          expand: 'メール経路を設定',
+          collapse: 'メール設定を閉じる',
+          endpoint: '記事は入力済みの受信者へ送信されます',
+        },
+        summaryNone: '少なくとも一つの配信経路を選択してください。',
+        summaryPrefix: '今回の配信経路：',
+        summarySuffix: '件',
+        summaryWechat: 'WeChat 草稿箱',
+        summaryEmail: 'メール通知',
+        modelLabel: 'AI モデル（切替可能）',
+        modelHint: '記事生成だけに影響し、配信経路には影響しません。',
+        finalReportEmails: '受信メールアドレス（一つまたは複数）',
+        finalReportEmailsPlaceholder:
+          'name@example.com。複数はカンマ、セミコロン、改行で区切ります',
+        finalReportEmailsHint:
+          'メール配信に公众号設定は不要です。複数のアドレスはカンマ、セミコロン、改行で区切ります。',
       },
       prompt: {
         title: '記事生成プロンプト',
@@ -1078,7 +1123,7 @@ export const messages = {
       fansOnly: 'フォロワーのみ',
     },
     completion: {
-      account: '公众号設定',
+      delivery: '配信方法',
       template: 'コンテンツテンプレート',
       prompt: '記事プロンプト',
       images: 'カバーと本文画像',
@@ -1107,9 +1152,9 @@ export const messages = {
       '記事内容を生成',
       'カバー画像を準備・アップロード',
       '本文画像を準備・アップロード',
+      '生成した記事記録を保存',
       'WeChat 草稿を組み立て',
       'WeChat へ草稿を送信',
-      '公開記録を保存',
     ],
     status: {
       autosave: 'フォームはこのブラウザに自動保存されます。',
@@ -1129,6 +1174,9 @@ export const messages = {
       draftCreatedPrefix: '草稿',
       draftCreatedSuffix: 'を生成しました。WeChat 管理画面で確認してください。',
       draftCreated: '草稿を生成しました。WeChat 管理画面で確認してください。',
+      articleCreated: '記事を生成して保存しました。',
+      articleCreatedWithEmail:
+        '記事を生成・保存し、指定メールアドレスへ送信しました。',
       submitFailed: '公開タスクの送信に失敗しました',
       resetTitle: 'フォームをリセットしますか？',
       resetConfirm:
@@ -1144,6 +1192,9 @@ export const messages = {
     validation: {
       appId: '公众号 appId を入力してください。',
       appSecret: '公众号 appSecret を入力してください。',
+      delivery:
+        '公众号認証情報一式または受信メールを最低一つ入力してください。',
+      finalReportEmails: '有効な受信メールアドレスを入力してください。',
       articleType: '草稿タイプを選択してください。',
       provider: 'AI プロバイダーを選択してください。',
       template: 'コンテンツテンプレートを選択してください。',
@@ -1192,6 +1243,8 @@ export const messages = {
       noInline: '本文画像なし',
       details: '素材処理詳細を見る',
       inlineDetail: '本文画像',
+      mediaId: 'WeChat 草稿 media_id',
+      articleRecordId: '保存済み記事レコード',
       stay: 'このページに残る',
       goDraftBox: 'WeChat 草稿箱へ',
       footnote:
@@ -1604,11 +1657,11 @@ export const messages = {
       'personal-blog': '個人ブログ',
     },
     tools: {
-      'tool-wechat-publisher': {
-        name: '公众号 自動投稿',
+      'tool-article-publisher': {
+        name: '記事公開',
         summary:
-          'テンプレートから記事、カバー、本文画像、摘要を生成し、公众号草稿箱へ保存します。',
-        badges: ['AI', '公众号', '自動投稿', 'LLM', 'コンテンツ運用'],
+          'テンプレートから記事、カバー、本文画像、摘要を生成し、メールまたは公众号草稿箱へ届けます。',
+        badges: ['AI', '記事', '自動投稿', 'LLM', 'コンテンツ運用'],
         heroBadges: {
           'ai-content': 'AI コンテンツ生成',
           'wechat-drafts': '公众号下書き',
@@ -1616,12 +1669,12 @@ export const messages = {
         },
         entries: { web: 'ツール入口' },
         seo: {
-          title: 'ORZ2 - 公众号 自動投稿ツール',
+          title: 'ORZ2 - 記事公開ツール',
           description:
-            'ORZ2 公众号自動投稿ツールでテンプレートを選び、記事、カバー、本文画像、摘要をワンクリック生成できます。高度設定では全プロンプトを編集できます。',
+            'ORZ2 記事公開ツールでテンプレートを選び、記事、カバー、本文画像、摘要をワンクリック生成できます。高度設定では全プロンプトを編集でき、メールまたは公众号草稿箱に届けられます。',
           keywords: [
-            '公众号自動投稿',
-            'WeChat ツール',
+            '記事公開',
+            'AI 記事公開ツール',
             'AI 記事生成',
             'コンテンツ運用ツール',
           ],

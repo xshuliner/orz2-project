@@ -1,5 +1,5 @@
-import { publisherStepKeys } from '@/pages/Tools/ToolOfficialPublisher/config';
-import type { PublishStep } from '@/pages/Tools/ToolOfficialPublisher/types';
+import { publisherStepKeys } from '@/pages/Tools/ToolArticlePublisher/config';
+import type { PublishStep } from '@/pages/Tools/ToolArticlePublisher/types';
 
 export function createInitialPublishSteps(
   stepNames: readonly string[]

@@ -1,5 +1,5 @@
-import type { OfficialPublisherMode, OfficialPublisherProvider } from '@/api';
-import type { OfficialPublisherForm } from '@/pages/Tools/ToolOfficialPublisher/types';
+import type { ArticlePublisherMode, ArticlePublisherProvider } from '@/api';
+import type { ArticlePublisherForm } from '@/pages/Tools/ToolArticlePublisher/types';
 
 export type PromptTemplateId =
   | 'general'
@@ -50,9 +50,9 @@ export type PromptTemplateCopyMap = Record<
   PromptTemplateCopy
 >;
 
-export const officialPublisherToolId = 'tool-wechat-publisher';
-export const officialPublisherSeoKey = 'official-publisher';
-export const officialPublisherScheduleEmail = 'agjgj187076081@gmail.com';
+export const articlePublisherToolId = 'tool-article-publisher';
+export const articlePublisherSeoKey = 'article-publisher';
+export const articlePublisherScheduleEmail = 'agjgj187076081@gmail.com';
 export const defaultPromptTemplateId: PromptTemplateId = 'general';
 export const defaultSimpleInlineImageCount = 3;
 export const wechatConsoleUrl =
@@ -64,19 +64,19 @@ export const publisherStepKeys = [
   'generate_article',
   'prepare_cover',
   'prepare_inline_images',
+  'save_record',
   'assemble_draft',
   'submit_draft',
-  'save_record',
 ] as const;
-export const officialPublisherProviders: OfficialPublisherProvider[] = [
+export const articlePublisherProviders: ArticlePublisherProvider[] = [
   'AGNES',
   'MINIMAX',
 ];
-export const officialPublisherModes: OfficialPublisherMode[] = [
+export const articlePublisherModes: ArticlePublisherMode[] = [
   'create',
   'rewrite',
 ];
-export const defaultPublisherForm: OfficialPublisherForm = {
+export const defaultPublisherForm: ArticlePublisherForm = {
   publishMode: 'create',
   modeSettings: {
     create: { isCustomizationOpen: false, templateId: defaultPromptTemplateId },
@@ -87,6 +87,8 @@ export const defaultPublisherForm: OfficialPublisherForm = {
   },
   appId: '',
   appSecret: '',
+  finalReportEmails: '',
+  deliveryChannels: { wechat: false, email: false },
   provider: 'MINIMAX',
   promptSystem: '',
   promptContent: '',
