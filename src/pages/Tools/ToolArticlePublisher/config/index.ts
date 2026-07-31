@@ -60,14 +60,6 @@ export const wechatConsoleUrl =
 export const wechatDraftBoxUrl =
   'https://mp.weixin.qq.com/cgi-bin/appmsg?t=media/appmsg_list&action=list&begin=0&count=10&type=10&lang=zh_CN';
 export const apiWhitelistIp = '43.167.247.143';
-export const publisherStepKeys = [
-  'generate_article',
-  'prepare_cover',
-  'prepare_inline_images',
-  'save_record',
-  'assemble_draft',
-  'submit_draft',
-] as const;
 export const articlePublisherProviders: ArticlePublisherProvider[] = [
   'AGNES',
   'MINIMAX',

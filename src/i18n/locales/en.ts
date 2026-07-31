@@ -940,7 +940,7 @@ export const messages = {
       description:
         'Choose a template to start, then customize it only when needed.',
       templateLabel: 'Content template *',
-      selectorAriaLabel: 'Choose a WeChat content template',
+      selectorAriaLabel: 'Choose an article content template',
       ready: 'One-click setup is ready',
       promptFact: 'Template prompts',
       coverFact: 'AI cover',
@@ -951,7 +951,7 @@ export const messages = {
       rewriteHint:
         'Generation combines the source article, selected template, and default rewrite rules for copy, images, and layout.',
       selectedPrefix: 'Selected',
-      selectedSuffix: 'template. The draft is ready to generate.',
+      selectedSuffix: 'template. The article is ready to publish.',
     },
     customization: {
       show: 'Customize this template',
@@ -1022,7 +1022,7 @@ export const messages = {
       },
       delivery: {
         title: 'Delivery routes',
-        description: 'Choose at least one route. Both routes can run together.',
+        description: 'Choose at least one delivery route.',
         selectionAriaLabel: 'Choose article delivery routes',
         required: 'Choose at least one',
         wechat: {
@@ -1048,13 +1048,6 @@ export const messages = {
           collapse: 'Collapse email settings',
           endpoint: 'The article will be sent to the listed recipients',
         },
-        summaryNone: 'Choose at least one delivery route.',
-        summaryPrefix: 'This run will use',
-        summarySuffix: 'route(s):',
-        summaryWechat: 'WeChat drafts',
-        summaryEmail: 'Email',
-        modelLabel: 'AI model (switchable)',
-        modelHint: 'This affects article generation only, not delivery.',
         finalReportEmails: 'Recipient emails (one or more)',
         finalReportEmailsPlaceholder:
           'name@example.com; separate multiple addresses with commas, semicolons, or new lines',
@@ -1151,14 +1144,6 @@ export const messages = {
       inlineGenerating: 'Generating inline images',
       inlineUploadedSingle: 'Inline image uploaded',
     },
-    stepNames: [
-      'Generate article content',
-      'Prepare and upload cover',
-      'Prepare and upload inline images',
-      'Save generated article record',
-      'Assemble WeChat draft',
-      'Submit draft to WeChat',
-    ],
     status: {
       autosave: 'The form is saved automatically in this browser.',
       validationFailed:
@@ -1170,10 +1155,9 @@ export const messages = {
         'The rewrite task will fetch the source article and generate copy, images, and layout. It may take a while. Start now?',
       connecting:
         'Connecting to the publishing service. Live progress appears in the timeline.',
-      connected:
-        'Connected to the publishing service. Generating the WeChat draft.',
+      connected: 'Connected to the publishing service. Generating the article.',
       runningPrefix: 'Running: ',
-      runningFallback: 'WeChat draft publishing step',
+      runningFallback: 'article publishing step',
       skipped: 'Some assets were skipped. The publishing task is continuing.',
       failedPrefix: 'Generation failed: ',
       failedFallback: 'Publishing step failed',
@@ -1183,6 +1167,7 @@ export const messages = {
       articleCreated: 'Article generated and saved.',
       articleCreatedWithEmail:
         'Article generated, saved, and sent to the recipient emails.',
+      published: 'Article publishing completed.',
       submitFailed: 'Publishing task submission failed',
       resetTitle: 'Reset the form?',
       resetConfirm:
@@ -1221,20 +1206,33 @@ export const messages = {
       progressAriaLabel: 'Configuration progress',
       progressTitle: 'Configuration',
       actionAriaLabel: 'Publishing actions',
-      viewResult: 'View draft result',
+      viewResult: 'View article publishing result',
       reset: 'Reset',
       generating: 'Generating...',
       generate: 'Generate task',
-      generateRewrite: 'Rewrite and create draft',
+      generateRewrite: 'Rewrite and publish article',
     },
     success: {
-      closeAriaLabel: 'Close draft publishing result',
+      closeAriaLabel: 'Close article publishing result',
       kicker: 'Publishing task completed',
-      title: 'Draft delivered to WeChat',
-      description:
-        'The draft has been saved to the WeChat draft box. Open the console to preview layout, polish details, and schedule publishing.',
-      draftTitle: 'Draft title',
-      fallbackTitle: 'WeChat article draft',
+      titleArticle: 'Article generated and saved',
+      titleWechat: 'Article saved to WeChat drafts',
+      titleEmail: 'Article sent by email',
+      titleBoth: 'All article deliveries completed',
+      descriptionArticle:
+        'Your article is safely saved. You can stay here and keep refining the configuration.',
+      descriptionWechat:
+        'Open the WeChat console to review layout, polish details, and schedule publishing.',
+      descriptionEmail:
+        'The article has been sent to the recipient addresses you provided.',
+      descriptionBoth:
+        'The article is saved, in WeChat drafts, and on its way to the selected inboxes.',
+      articleTitle: 'Article title',
+      fallbackTitle: 'Generated article',
+      wechatDelivery: 'WeChat drafts',
+      emailDelivery: 'Email delivery',
+      deliverySuccess: 'Completed',
+      deliveryFailed: 'Not completed — retry later',
       draftType: 'Draft type',
       typeNewspic: 'newspic image message',
       typeNews: 'news article message',
@@ -1252,8 +1250,10 @@ export const messages = {
       articleRecordId: 'Saved article record',
       stay: 'Stay here',
       goDraftBox: 'Open WeChat draft box',
-      footnote:
+      footnoteWechat:
         'The draft box opens in a new window. Your current task configuration stays here.',
+      footnoteArticle:
+        'Your current task configuration stays here, ready for another adjustment or run.',
     },
     promptTemplates: {
       general: {

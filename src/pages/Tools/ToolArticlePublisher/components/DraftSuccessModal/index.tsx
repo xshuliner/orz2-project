@@ -1,4 +1,4 @@
-import type { OfficialDraftResult } from '@/api';
+import type { CreateArticleForLLMResult } from '@/api';
 import { OButton } from '@/components/OButton';
 import { OIconButton } from '@/components/OIconButton';
 import { OModal } from '@/components/OModal';
@@ -8,13 +8,35 @@ import { CheckCheck, ExternalLink, FileText, X } from 'lucide-react';
 
 export function DraftSuccessModal({
   copy,
-  draftResult,
+  publishResult,
   onClose,
 }: {
   copy: PublisherCopy;
-  draftResult: OfficialDraftResult | null;
+  publishResult: CreateArticleForLLMResult | null;
   onClose: () => void;
 }) {
+  const draftResult =
+    publishResult?.officialDraft.status === 'success'
+      ? (publishResult.officialDraft.result ?? null)
+      : null;
+  const hasWechatDelivery = publishResult?.officialDraft.status !== 'skipped';
+  const hasEmailDelivery = publishResult?.finalReportEmail.status !== 'skipped';
+  const title =
+    hasWechatDelivery && hasEmailDelivery
+      ? copy.success.titleBoth
+      : hasWechatDelivery
+        ? copy.success.titleWechat
+        : hasEmailDelivery
+          ? copy.success.titleEmail
+          : copy.success.titleArticle;
+  const description =
+    hasWechatDelivery && hasEmailDelivery
+      ? copy.success.descriptionBoth
+      : hasWechatDelivery
+        ? copy.success.descriptionWechat
+        : hasEmailDelivery
+          ? copy.success.descriptionEmail
+          : copy.success.descriptionArticle;
   const inlineImages = draftResult?.inlineImages ?? [];
   const inlineImageCount =
     inlineImages.length || draftResult?.inlineImagePaths?.length || 0;
@@ -44,30 +66,44 @@ export function DraftSuccessModal({
             <CheckCheck size={31} strokeWidth={2.4} />
           </div>
           <p>{copy.success.kicker}</p>
-          <h2 id='draft-success-title'>{copy.success.title}</h2>
-          <span>{copy.success.description}</span>
+          <h2 id='draft-success-title'>{title}</h2>
+          <span>{description}</span>
         </div>
 
         <div className='draft-success-content'>
           <div className='draft-success-highlight'>
             <div>
-              <small>{copy.success.draftTitle}</small>
+              <small>{copy.success.articleTitle}</small>
               <strong>
-                {draftResult?.title || copy.success.fallbackTitle}
+                {draftResult?.title ||
+                  publishResult?.article.articleInfo?.title ||
+                  copy.success.fallbackTitle}
               </strong>
             </div>
             <FileText size={22} aria-hidden='true' />
           </div>
 
           <dl className='draft-success-grid'>
-            <div>
-              <dt>{copy.success.draftType}</dt>
-              <dd>
-                {draftResult?.articleType === 'newspic'
-                  ? copy.success.typeNewspic
-                  : copy.success.typeNews}
-              </dd>
-            </div>
+            {hasWechatDelivery ? (
+              <div>
+                <dt>{copy.success.wechatDelivery}</dt>
+                <dd>
+                  {draftResult
+                    ? copy.success.deliverySuccess
+                    : copy.success.deliveryFailed}
+                </dd>
+              </div>
+            ) : null}
+            {hasEmailDelivery ? (
+              <div>
+                <dt>{copy.success.emailDelivery}</dt>
+                <dd>
+                  {publishResult?.finalReportEmail.status === 'success'
+                    ? copy.success.deliverySuccess
+                    : copy.success.deliveryFailed}
+                </dd>
+              </div>
+            ) : null}
             <div>
               <dt>{copy.success.generatedAt}</dt>
               <dd>{draftResult?.time || copy.success.justNow}</dd>
@@ -97,10 +133,10 @@ export function DraftSuccessModal({
             </div>
           ) : null}
 
-          {draftResult?.articleInfo?._id ? (
+          {publishResult?.article.articleInfo?._id ? (
             <div className='draft-success-media'>
               <span>{copy.success.articleRecordId}</span>
-              <code>{draftResult.articleInfo._id}</code>
+              <code>{publishResult.article.articleInfo._id}</code>
             </div>
           ) : null}
 
@@ -149,18 +185,24 @@ export function DraftSuccessModal({
           <OButton size='lg' type='button' variant='ghost' onClick={onClose}>
             {copy.success.stay}
           </OButton>
-          <OButton
-            href={wechatDraftBoxUrl}
-            size='lg'
-            target='_blank'
-            rel='noreferrer'
-          >
-            {copy.success.goDraftBox}
-            <ExternalLink size={17} aria-hidden='true' />
-          </OButton>
+          {draftResult ? (
+            <OButton
+              href={wechatDraftBoxUrl}
+              size='lg'
+              target='_blank'
+              rel='noreferrer'
+            >
+              {copy.success.goDraftBox}
+              <ExternalLink size={17} aria-hidden='true' />
+            </OButton>
+          ) : null}
         </footer>
 
-        <p className='draft-success-footnote'>{copy.success.footnote}</p>
+        <p className='draft-success-footnote'>
+          {draftResult
+            ? copy.success.footnoteWechat
+            : copy.success.footnoteArticle}
+        </p>
       </>
     </OModal>
   );

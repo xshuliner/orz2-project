@@ -939,7 +939,7 @@ export const messages = {
       description:
         'テンプレートを選んで開始し、必要な場合だけこのテンプレートを調整できます。',
       templateLabel: 'コンテンツテンプレート *',
-      selectorAriaLabel: '公众号コンテンツテンプレートを選択',
+      selectorAriaLabel: '記事コンテンツテンプレートを選択',
       ready: 'ワンクリック設定完了',
       promptFact: 'テンプレートプロンプト',
       coverFact: 'AI カバー',
@@ -950,7 +950,7 @@ export const messages = {
       rewriteHint:
         '原文、テンプレート、既定のリライト要件を組み合わせ、文章・画像・レイアウトを自動生成します。',
       selectedPrefix: '',
-      selectedSuffix: 'テンプレートを選択しました。草稿を生成できます。',
+      selectedSuffix: 'テンプレートを選択しました。記事を公開できます。',
     },
     customization: {
       show: 'このテンプレートをカスタマイズ',
@@ -1021,8 +1021,7 @@ export const messages = {
       },
       delivery: {
         title: '配信経路',
-        description:
-          '少なくとも一つの経路を選択してください。両方を同時に実行できます。',
+        description: '少なくとも一つの配信経路を選択してください。',
         selectionAriaLabel: '記事の配信経路を選択',
         required: '少なくとも一つ選択',
         wechat: {
@@ -1048,13 +1047,6 @@ export const messages = {
           collapse: 'メール設定を閉じる',
           endpoint: '記事は入力済みの受信者へ送信されます',
         },
-        summaryNone: '少なくとも一つの配信経路を選択してください。',
-        summaryPrefix: '今回の配信経路：',
-        summarySuffix: '件',
-        summaryWechat: 'WeChat 草稿箱',
-        summaryEmail: 'メール通知',
-        modelLabel: 'AI モデル（切替可能）',
-        modelHint: '記事生成だけに影響し、配信経路には影響しません。',
         finalReportEmails: '受信メールアドレス（一つまたは複数）',
         finalReportEmailsPlaceholder:
           'name@example.com。複数はカンマ、セミコロン、改行で区切ります',
@@ -1148,14 +1140,6 @@ export const messages = {
       inlineGenerating: '本文画像生成中',
       inlineUploadedSingle: '本文画像アップロード済み',
     },
-    stepNames: [
-      '記事内容を生成',
-      'カバー画像を準備・アップロード',
-      '本文画像を準備・アップロード',
-      '生成した記事記録を保存',
-      'WeChat 草稿を組み立て',
-      'WeChat へ草稿を送信',
-    ],
     status: {
       autosave: 'フォームはこのブラウザに自動保存されます。',
       validationFailed: '必須項目を入力してから公開タスクを生成してください。',
@@ -1165,9 +1149,9 @@ export const messages = {
       confirmRewrite:
         'リライトタスクは原文を取得し、文章・画像・レイアウトを生成します。時間がかかる場合があります。開始しますか？',
       connecting: '公開サービスへ接続中。進捗はタイムラインに表示されます。',
-      connected: '公開サービスに接続しました。WeChat 草稿を生成しています。',
+      connected: '公開サービスに接続しました。記事を生成しています。',
       runningPrefix: '実行中：',
-      runningFallback: 'WeChat 草稿公開ステップ',
+      runningFallback: '記事公開ステップ',
       skipped: '一部素材をスキップしました。公開タスクは継続中です。',
       failedPrefix: '生成失敗：',
       failedFallback: '公開ステップの実行に失敗しました',
@@ -1177,6 +1161,7 @@ export const messages = {
       articleCreated: '記事を生成して保存しました。',
       articleCreatedWithEmail:
         '記事を生成・保存し、指定メールアドレスへ送信しました。',
+      published: '記事の公開処理が完了しました。',
       submitFailed: '公開タスクの送信に失敗しました',
       resetTitle: 'フォームをリセットしますか？',
       resetConfirm:
@@ -1216,20 +1201,32 @@ export const messages = {
       progressAriaLabel: '設定進捗',
       progressTitle: '設定進捗',
       actionAriaLabel: '公開操作',
-      viewResult: '草稿公開結果を見る',
+      viewResult: '記事公開結果を見る',
       reset: 'リセット',
       generating: '生成中...',
       generate: '公開タスクを生成',
-      generateRewrite: 'リライトして草稿作成',
+      generateRewrite: 'リライトして記事を公開',
     },
     success: {
-      closeAriaLabel: '草稿公開結果を閉じる',
+      closeAriaLabel: '記事公開結果を閉じる',
       kicker: '公開タスク完了',
-      title: '草稿が WeChat に届きました',
-      description:
-        'WeChat 草稿箱に保存されました。管理画面でレイアウト確認、細部調整、公開予約ができます。',
-      draftTitle: '草稿タイトル',
-      fallbackTitle: '公众号图文草稿',
+      titleArticle: '記事を生成して保存しました',
+      titleWechat: '記事を WeChat 草稿箱に保存しました',
+      titleEmail: '記事をメールで送信しました',
+      titleBoth: 'すべての記事配信が完了しました',
+      descriptionArticle:
+        '記事は安全に保存されています。このページで設定を続けて調整できます。',
+      descriptionWechat:
+        'WeChat 管理画面でレイアウトを確認し、細部の調整や公開予約ができます。',
+      descriptionEmail: '入力した受信先メールアドレスへ記事を送信しました。',
+      descriptionBoth:
+        '記事を保存し、WeChat 草稿箱への保存とメール送信も完了しました。',
+      articleTitle: '記事タイトル',
+      fallbackTitle: '生成した記事',
+      wechatDelivery: 'WeChat 草稿箱',
+      emailDelivery: 'メール送信',
+      deliverySuccess: '完了',
+      deliveryFailed: '未完了。後でもう一度お試しください',
       draftType: '草稿タイプ',
       typeNewspic: 'newspic 画像メッセージ',
       typeNews: 'news 图文消息',
@@ -1247,8 +1244,10 @@ export const messages = {
       articleRecordId: '保存済み記事レコード',
       stay: 'このページに残る',
       goDraftBox: 'WeChat 草稿箱へ',
-      footnote:
+      footnoteWechat:
         '草稿箱は新しいウィンドウで開きます。現在のタスク設定は保持されます。',
+      footnoteArticle:
+        '現在のタスク設定は保持され、再調整や再実行にそのまま使えます。',
     },
     promptTemplates: {
       general: {

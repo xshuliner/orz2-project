@@ -269,6 +269,10 @@ export interface ArticlePublisherProgressEvent {
   attempt?: number;
   nextAttempt?: number;
   maxAttempts?: number;
+  steps?: Array<{
+    key: string;
+    name: string;
+  }>;
 }
 
 export interface CreateArticleForLLMResult {

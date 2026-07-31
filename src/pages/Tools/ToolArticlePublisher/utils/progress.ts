@@ -1,12 +1,14 @@
-import { publisherStepKeys } from '@/pages/Tools/ToolArticlePublisher/config';
-import type { PublishStep } from '@/pages/Tools/ToolArticlePublisher/types';
+import type {
+  PublishStep,
+  PublishTimelineStep,
+} from '@/pages/Tools/ToolArticlePublisher/types';
 
 export function createInitialPublishSteps(
-  stepNames: readonly string[]
+  timeline: readonly PublishTimelineStep[] = []
 ): PublishStep[] {
-  return publisherStepKeys.map((key, index) => ({
-    key,
-    name: stepNames[index] ?? key,
+  return timeline.map((step, index) => ({
+    key: step.key,
+    name: step.name,
     index: index + 1,
     status: 'pending',
   }));

@@ -2,8 +2,8 @@ import {
   streamPostCreateArticleForLLM,
   type ArticlePublisherMode,
   type ArticlePublisherProgressEvent,
+  type CreateArticleForLLMResult,
   type OfficialCommentConfig,
-  type OfficialDraftResult,
   type OfficialImageConfig,
 } from '@/api';
 import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
@@ -200,13 +200,12 @@ export function PageArticlePublisher() {
   );
   const [publishPhase, setPublishPhase] = useState<PublishPhase>('idle');
   const [publishSteps, setPublishSteps] = useState(() =>
-    createInitialPublishSteps(publisherCopy.stepNames)
+    createInitialPublishSteps()
   );
   const [publishElapsedMs, setPublishElapsedMs] = useState(0);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  const [draftResult, setDraftResult] = useState<OfficialDraftResult | null>(
-    null
-  );
+  const [publishResult, setPublishResult] =
+    useState<CreateArticleForLLMResult | null>(null);
   const [isDraftResultOpen, setDraftResultOpen] = useState(false);
   const [copiedIp, setCopiedIp] = useState(false);
   const [pendingTemplateId, setPendingTemplateId] =
@@ -268,9 +267,6 @@ export function PageArticlePublisher() {
     [form, publisherCopy, selectedPromptTemplate]
   );
   const completedCount = completionItems.filter(item => item.done).length;
-  const selectedDeliveryChannels = (['wechat', 'email'] as const).filter(
-    channel => form.deliveryChannels[channel]
-  );
 
   function updateField<K extends keyof ArticlePublisherForm>(
     key: K,
@@ -427,28 +423,15 @@ export function PageArticlePublisher() {
   }
 
   function updatePublishProgress(event: ArticlePublisherProgressEvent) {
-    if (event.key === 'workflow') {
-      if (event.status === 'completed') setPublishPhase('completed');
-      if (event.status === 'failed') setPublishPhase('failed');
+    if (event.key === 'timeline' && event.steps) {
+      setPublishSteps(createInitialPublishSteps(event.steps));
       return;
     }
-    if (!event.step) return;
-
-    // The new API emits the article-generation and WeChat-draft workflows
-    // separately. Keep them in one timeline without letting the latter reset
-    // the first three steps.
-    const stepIndex =
-      event.resultType === 'official'
-        ? event.key === 'assemble_draft'
-          ? 5
-          : event.key === 'submit_draft'
-            ? 6
-            : 4
-        : event.step;
+    if (!event.key) return;
 
     setPublishSteps(current =>
       current.map(step => {
-        if (step.index !== stepIndex) return step;
+        if (step.key !== event.key) return step;
         const status: PublishStepStatus =
           event.status === 'info'
             ? step.status === 'pending'
@@ -463,40 +446,15 @@ export function PageArticlePublisher() {
                     event.status === 'running'
                   ? event.status
                   : step.status;
-        const requestedCount = event.requestedCount ?? step.requestedCount;
-        const totalImageCount = event.totalImageCount ?? event.requestedCount;
-        const completedImageCount = event.completedImageCount;
-        const currentInlineImageIndex =
-          event.key === 'prepare_inline_images' &&
-          totalImageCount &&
-          (event.status === 'running' || event.status === 'info')
-            ? completedImageCount !== undefined
-              ? Math.min(completedImageCount, totalImageCount)
-              : event.status === 'info' && event.imageIndex !== undefined
-                ? Math.min(event.imageIndex + 1, totalImageCount)
-                : 1
-            : undefined;
-        const message =
-          currentInlineImageIndex !== undefined && totalImageCount
-            ? currentInlineImageIndex >= totalImageCount
-              ? `${publisherCopy.progress.inlineUploaded}（${totalImageCount}/${totalImageCount}）`
-              : `${publisherCopy.progress.inlineGenerating}（${currentInlineImageIndex}/${totalImageCount}）`
-            : event.message ||
-              (event.status === 'info' && event.imageIndex
-                ? `${publisherCopy.progress.inlineUploadedSingle} ${event.imageIndex}`
-                : undefined);
-        const durationMs =
-          event.key === 'prepare_inline_images' &&
-          event.status === 'info' &&
-          event.durationMs !== undefined
-            ? (step.durationMs ?? 0) + event.durationMs
-            : (event.durationMs ?? step.durationMs);
         return {
           ...step,
           status,
-          message: message ?? step.message,
-          durationMs,
-          requestedCount: totalImageCount ?? requestedCount,
+          message: event.message ?? step.message,
+          durationMs: event.durationMs ?? step.durationMs,
+          requestedCount:
+            event.totalImageCount ??
+            event.requestedCount ??
+            step.requestedCount,
         };
       })
     );
@@ -536,10 +494,10 @@ export function PageArticlePublisher() {
   async function startPublish() {
     setPublishConfirmOpen(false);
     setIsPublishing(true);
-    setDraftResult(null);
+    setPublishResult(null);
     setDraftResultOpen(false);
     setPublishPhase('connecting');
-    setPublishSteps(createInitialPublishSteps(publisherCopy.stepNames));
+    setPublishSteps(createInitialPublishSteps());
     setPublishElapsedMs(0);
     setPublishStatusText(publisherCopy.status.connecting);
 
@@ -562,20 +520,10 @@ export function PageArticlePublisher() {
         },
         onProgress: updatePublishProgress,
       });
-      const officialDraft =
-        result?.officialDraft.status === 'success'
-          ? (result.officialDraft.result ?? null)
-          : null;
-      setDraftResult(officialDraft);
-      setDraftResultOpen(Boolean(officialDraft));
+      setPublishResult(result);
+      setDraftResultOpen(Boolean(result?.article));
       setPublishPhase('completed');
-      setPublishStatusText(
-        officialDraft?.title
-          ? `${publisherCopy.status.draftCreatedPrefix}「${officialDraft.title}」${publisherCopy.status.draftCreatedSuffix}`
-          : result?.finalReportEmail.status === 'success'
-            ? publisherCopy.status.articleCreatedWithEmail
-            : publisherCopy.status.articleCreated
-      );
+      setPublishStatusText(publisherCopy.status.published);
     } catch (error) {
       const message =
         error instanceof Error
@@ -604,10 +552,10 @@ export function PageArticlePublisher() {
     setResetConfirmOpen(false);
     setForm(localizedDefaultForm);
     setValidationErrors([]);
-    setDraftResult(null);
+    setPublishResult(null);
     setDraftResultOpen(false);
     setPublishPhase('idle');
-    setPublishSteps(createInitialPublishSteps(publisherCopy.stepNames));
+    setPublishSteps(createInitialPublishSteps());
     setPublishElapsedMs(0);
     setPublishStatusText(publisherCopy.status.resetDone);
   }
@@ -956,40 +904,6 @@ export function PageArticlePublisher() {
                     );
                   })}
                 </div>
-                <div className='delivery-path-summary' aria-live='polite'>
-                  <CheckCircle2 size={17} aria-hidden='true' />
-                  {selectedDeliveryChannels.length ? (
-                    <span>
-                      {publisherCopy.sections.delivery.summaryPrefix}{' '}
-                      {selectedDeliveryChannels.length}{' '}
-                      {publisherCopy.sections.delivery.summarySuffix}{' '}
-                      {selectedDeliveryChannels
-                        .map(
-                          channel =>
-                            publisherCopy.sections.delivery[
-                              `summary${channel === 'wechat' ? 'Wechat' : 'Email'}`
-                            ]
-                        )
-                        .join('、')}
-                    </span>
-                  ) : (
-                    <span>{publisherCopy.sections.delivery.summaryNone}</span>
-                  )}
-                </div>
-                <label className='delivery-model-selector'>
-                  <span>
-                    {publisherCopy.sections.delivery.modelLabel}
-                    <small>{publisherCopy.sections.delivery.modelHint}</small>
-                  </span>
-                  <OSelector
-                    ariaLabel={
-                      publisherCopy.sections.account.modelSelectorAriaLabel
-                    }
-                    options={providerOptions}
-                    value={form.provider}
-                    onChange={provider => updateField('provider', provider)}
-                  />
-                </label>
               </PublisherModuleCard>
 
               <PublisherModuleCard
@@ -1027,6 +941,19 @@ export function PageArticlePublisher() {
               <PublisherModuleCard
                 className='publisher-config-card'
                 description={publisherCopy.simpleMode.description}
+                headingExtra={
+                  <label className='template-model-selector'>
+                    <span>{publisherCopy.sections.account.provider}</span>
+                    <OSelector
+                      ariaLabel={
+                        publisherCopy.sections.account.modelSelectorAriaLabel
+                      }
+                      options={providerOptions}
+                      value={form.provider}
+                      onChange={provider => updateField('provider', provider)}
+                    />
+                  </label>
+                }
                 icon={ClipboardPenLine}
                 title={publisherCopy.simpleMode.title}
               >
@@ -1408,7 +1335,7 @@ export function PageArticlePublisher() {
       {isDraftResultOpen ? (
         <DraftSuccessModal
           copy={publisherCopy}
-          draftResult={draftResult}
+          publishResult={publishResult}
           onClose={() => setDraftResultOpen(false)}
         />
       ) : null}

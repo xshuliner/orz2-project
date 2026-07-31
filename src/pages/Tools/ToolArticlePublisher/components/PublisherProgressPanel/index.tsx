@@ -34,9 +34,11 @@ export function PublisherProgressPanel({
   const progress =
     phase === 'completed'
       ? 100
-      : Math.round(
-          ((completedCount + (activeStep ? 0.46 : 0)) / steps.length) * 100
-        );
+      : steps.length
+        ? Math.round(
+            ((completedCount + (activeStep ? 0.46 : 0)) / steps.length) * 100
+          )
+        : 0;
   const phaseLabel = copy.progress.phases[phase];
 
   return (
@@ -62,7 +64,9 @@ export function PublisherProgressPanel({
       </div>
       <div className='publish-progress-meta'>
         <span>
-          {completedCount}/{steps.length} {copy.progress.completedSuffix}
+          {steps.length
+            ? `${completedCount}/${steps.length} ${copy.progress.completedSuffix}`
+            : copy.progress.pending}
         </span>
         <span>
           <Clock3 size={13} aria-hidden='true' />

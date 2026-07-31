@@ -63,4 +63,9 @@ export interface PublishStep {
   requestedCount?: number;
 }
 
+export interface PublishTimelineStep {
+  key: string;
+  name: string;
+}
+
 export type PublisherCopy = I18nContextValue['messages']['publisher'];

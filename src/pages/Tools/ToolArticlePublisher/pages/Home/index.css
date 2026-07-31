@@ -1842,7 +1842,7 @@
 
 .delivery-path-selection {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
   margin-top: 14px;
 }
@@ -1869,10 +1869,6 @@
     var(--color-green-soft) 46%,
     var(--color-panel)
   );
-}
-
-.delivery-path.is-expanded {
-  grid-column: 1 / -1;
 }
 
 .delivery-path-head {
@@ -2031,8 +2027,7 @@
   padding-top: 2px;
 }
 
-.delivery-path-endpoint,
-.delivery-path-summary {
+.delivery-path-endpoint {
   display: flex;
   align-items: center;
   gap: 7px;
@@ -2049,54 +2044,29 @@
   background: color-mix(in srgb, var(--color-green-soft) 72%, transparent);
 }
 
-.delivery-path-summary {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-top: 1px solid color-mix(in srgb, var(--color-line) 76%, transparent);
-}
 
-.delivery-path-summary span {
-  color: var(--color-text-body-strong);
-}
-
-.delivery-model-selector {
+.template-model-selector {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(160px, 220px);
-  gap: 12px;
+  grid-template-columns: auto minmax(120px, 160px);
+  gap: 7px;
   align-items: center;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid color-mix(in srgb, var(--color-line) 72%, transparent);
-}
-
-.delivery-model-selector > span {
-  display: grid;
-  gap: 2px;
-  color: var(--color-muted);
-  font-size: 12px;
-  font-weight: 680;
-}
-
-.delivery-model-selector small {
+  margin-left: auto;
   color: var(--color-muted);
   font-size: 11px;
-  font-weight: 520;
+  font-weight: 720;
+  white-space: nowrap;
 }
 
-.delivery-model-selector .o-selector-trigger {
-  min-height: 36px;
-  padding-inline: 11px;
+.template-model-selector .o-selector-trigger {
+  min-height: 32px;
+  padding-inline: 9px;
   color: var(--color-text-body-strong);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 @media (max-width: 760px) {
   .delivery-path-selection {
     grid-template-columns: 1fr;
-  }
-
-  .delivery-path.is-expanded {
-    grid-column: auto;
   }
 
   .wechat-chain-setup {
@@ -2108,9 +2078,7 @@
     justify-content: flex-start;
   }
 
-  .delivery-model-selector {
-    grid-template-columns: 1fr;
-  }
+  .template-model-selector { margin-left: 0; }
 }
 
 @media (max-width: 480px) {
