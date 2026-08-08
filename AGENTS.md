@@ -351,10 +351,13 @@ names are not current.
 
 ### Key Components
 
-- `EffectsMotion` lazy-loads `DeferredEffectsMotion` after idle/timeout. The
-  deferred module handles header shrink-on-scroll, intro animation, scroll
-  reveals, dynamic `MutationObserver` reveal registration, and pointer tilt for
-  interactive cards. It respects `prefers-reduced-motion`.
+- `EffectsMotion` eagerly mounts `GlobalEffectsMotion`, which handles intro
+  animation, scroll reveals, dynamic `MutationObserver` reveal registration,
+  and pointer tilt for interactive cards. Keep this module eager: reveal target
+  initial styles must be applied in `useLayoutEffect` before the first browser
+  paint. Never defer global reveal initialization behind `window.load`,
+  `requestIdleCallback`, or a timer; doing so makes already-visible content hide
+  and animate again. It respects `prefers-reduced-motion`.
 - `Seo` sets title, description, robots, canonical, alternate locale links,
   OpenGraph/Twitter tags, and JSON-LD through `react-helmet-async`, with direct
   DOM meta updates for dynamic changes.

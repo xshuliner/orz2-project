@@ -391,12 +391,24 @@
 }
 
 /* ---- reveal on scroll ---- */
-.motion-enabled .reveal-on-scroll {
+.motion-enabled
+  :where(
+    .section-heading,
+    .reveal-on-scroll,
+    .privacy-article section,
+    .footer-grid > *
+  ):not(.is-revealed) {
   opacity: 0;
   transform: translateY(24px);
 }
 
-.motion-enabled .reveal-on-scroll.is-revealed {
+.motion-enabled
+  :where(
+    .section-heading,
+    .reveal-on-scroll,
+    .privacy-article section,
+    .footer-grid > *
+  ).is-revealed {
   opacity: 1;
   transform: translateY(0);
 }

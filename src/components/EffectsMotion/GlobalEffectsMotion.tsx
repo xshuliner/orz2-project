@@ -3,7 +3,7 @@ import gsap from 'gsap';
 import { useLayoutEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-export function DeferredEffectsMotion() {
+export function GlobalEffectsMotion() {
   const location = useLocation();
 
   useLayoutEffect(() => {

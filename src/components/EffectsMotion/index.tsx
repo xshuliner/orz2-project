@@ -1,14 +1,9 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
-
-const DeferredEffectsMotion = lazy(() =>
-  import('./DeferredEffectsMotion').then(module => ({
-    default: module.DeferredEffectsMotion,
-  }))
-);
+import { useEffect } from 'react';
+// This import must stay eager: reveal targets need their initial state before
+// the browser's first paint, otherwise visible content flashes and re-enters.
+import { GlobalEffectsMotion } from './GlobalEffectsMotion';
 
 export function EffectsMotion() {
-  const [isReady, setIsReady] = useState(false);
-
   useEffect(() => {
     const header = document.querySelector<HTMLElement>('.site-header');
     if (!header) return;
@@ -44,41 +39,5 @@ export function EffectsMotion() {
     };
   }, []);
 
-  useEffect(() => {
-    let idleId: number | null = null;
-    let timeoutId: ReturnType<typeof globalThis.setTimeout> | null = null;
-    let isCancelled = false;
-
-    const loadMotion = () => {
-      if (!isCancelled) setIsReady(true);
-    };
-
-    const scheduleMotion = () => {
-      if ('requestIdleCallback' in window) {
-        idleId = window.requestIdleCallback(loadMotion, { timeout: 2600 });
-        return;
-      }
-
-      timeoutId = globalThis.setTimeout(loadMotion, 1800);
-    };
-
-    if (document.readyState === 'complete') {
-      scheduleMotion();
-    } else {
-      window.addEventListener('load', scheduleMotion, { once: true });
-    }
-
-    return () => {
-      isCancelled = true;
-      window.removeEventListener('load', scheduleMotion);
-      if (idleId !== null) window.cancelIdleCallback(idleId);
-      if (timeoutId !== null) globalThis.clearTimeout(timeoutId);
-    };
-  }, []);
-
-  return isReady ? (
-    <Suspense fallback={null}>
-      <DeferredEffectsMotion />
-    </Suspense>
-  ) : null;
+  return <GlobalEffectsMotion />;
 }
