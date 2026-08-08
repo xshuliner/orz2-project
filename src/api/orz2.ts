@@ -1,11 +1,17 @@
 import managerFetch, { type FetchResponse } from '@/utils/manager/fetch';
 import md5 from 'blueimp-md5';
 import type {
+  ArticleInfo,
+  ArticleListPage,
   ArticlePublisherProgressEvent,
+  ArticleTemplate,
+  ArticleTemplateState,
   CreateArticleForLLMResult,
+  CreateArticleForLLMStatusResult,
   MemberInfo,
   MemberListPageBody,
   MemberSummaryBody,
+  OfficialImageConfig,
   PostCreateArticleForLLMBody,
   PostPolishContentBody,
   PostPolishContentResult,
@@ -418,9 +424,126 @@ export async function postPolishContent(
 
 // ===== Article publisher APIs =====
 
+function normalizeArticleTemplate(value: unknown): ArticleTemplate | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const template = value as Record<string, unknown>;
+  const payload = template.payload;
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return null;
+  }
+  const templatePayload = payload as Record<string, unknown>;
+  const imageCover = templatePayload.imageCover;
+  const imagesInlineList = templatePayload.imagesInlineList;
+  if (
+    typeof template.id !== 'string' ||
+    !template.id ||
+    typeof template.label !== 'string' ||
+    typeof template.caption !== 'string' ||
+    typeof templatePayload.promptSystem !== 'string' ||
+    typeof templatePayload.promptContent !== 'string' ||
+    !imageCover ||
+    typeof imageCover !== 'object' ||
+    Array.isArray(imageCover) ||
+    !Array.isArray(imagesInlineList)
+  ) {
+    return null;
+  }
+  const normalizedCover = normalizeArticleTemplateImage(imageCover);
+  const normalizedInlineImages: OfficialImageConfig[] = [];
+  for (const image of imagesInlineList) {
+    const normalizedImage = normalizeArticleTemplateImage(image);
+    if (!normalizedImage) return null;
+    normalizedInlineImages.push(normalizedImage);
+  }
+  if (!normalizedCover) return null;
+  return {
+    id: template.id,
+    label: template.label,
+    caption: template.caption,
+    payload: {
+      promptSystem: templatePayload.promptSystem,
+      promptContent: templatePayload.promptContent,
+      imageCover: normalizedCover,
+      imagesInlineList: normalizedInlineImages,
+    },
+  };
+}
+
+function normalizeArticleTemplateImage(
+  value: unknown
+): OfficialImageConfig | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const image = value as Record<string, unknown>;
+  if (
+    (image.type !== 'ai' && image.type !== 'url' && image.type !== 'base64') ||
+    typeof image.value !== 'string'
+  ) {
+    return null;
+  }
+  return { type: image.type, value: image.value };
+}
+
+export function normalizeArticleTemplateState(
+  value: unknown
+): ArticleTemplateState | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const templateState = value as Record<string, unknown>;
+  if (
+    templateState.schemaVersion !== 1 ||
+    typeof templateState.defaultTemplateId !== 'string' ||
+    !Array.isArray(templateState.templates)
+  ) {
+    return null;
+  }
+  const templates = templateState.templates.map(normalizeArticleTemplate);
+  if (templates.some(template => !template)) return null;
+  const normalizedTemplates = templates as ArticleTemplate[];
+  if (
+    new Set(normalizedTemplates.map(template => template.id)).size !==
+    normalizedTemplates.length
+  ) {
+    return null;
+  }
+  return {
+    schemaVersion: 1,
+    defaultTemplateId: templateState.defaultTemplateId,
+    templates: normalizedTemplates,
+  };
+}
+
+/** Query the server-maintained article templates without requiring login. */
+export async function getQueryArticleTemplates(
+  options: {
+    signal?: AbortSignal;
+  } = {}
+): Promise<ArticleTemplateState> {
+  const response = await managerFetch.request<LegacyApiPayload<unknown>>({
+    method: 'GET',
+    url: '/smart/v1/article/getQueryArticleTemplates',
+    signal: options.signal,
+  });
+  const data = response.data;
+  if (response.statusCode !== 200 || data?.code !== 200) {
+    throw new Error(
+      data?.message ||
+        data?.content ||
+        response.error ||
+        'Article template request failed'
+    );
+  }
+  const body = data.body as Record<string, unknown> | null | undefined;
+  if (body?.schemaVersion !== 1) {
+    throw new Error('Article template schema is unsupported');
+  }
+  const templateState = normalizeArticleTemplateState(body);
+  if (!templateState) throw new Error('Article template response is invalid');
+  return templateState;
+}
+
 /**
- * Generate and persist an article, then create a WeChat draft for the
- * `official` target. Backend route: POST /smart/v1/article/postCreateArticleForLLM
+ * Generate and persist an article. A WeChat draft or report email is created
+ * only when the matching optional request fields are present.
+ * Backend route: POST /smart/v1/article/postCreateArticleForLLM
  */
 export async function postCreateArticleForLLM(
   body: PostCreateArticleForLLMBody
@@ -445,17 +568,114 @@ export async function postCreateArticleForLLM(
   throw new Error(message);
 }
 
+/** Query the current member's saved article feed. */
+export async function getQueryArticleList(
+  options: {
+    pageNum?: number;
+    pageSize?: number;
+    mode?: 'subscriber';
+    signal?: AbortSignal;
+  } = {}
+): Promise<ArticleListPage> {
+  const { pageNum = 0, pageSize = 15, mode = 'subscriber', signal } = options;
+  const response = await managerFetch.request<
+    LegacyApiPayload<ArticleListPage>
+  >({
+    method: 'GET',
+    url: '/smart/v1/article/getQueryArticleList',
+    query: { mode, pageNum, pageSize },
+    signal,
+  });
+  const data = response.data;
+  if (response.statusCode !== 200 || data?.code !== 200) {
+    throw new Error(
+      data?.message ||
+        data?.content ||
+        response.error ||
+        'Article list request failed'
+    );
+  }
+  const body = response.data?.body;
+  if (
+    !body ||
+    !Array.isArray(body.list) ||
+    !Number.isInteger(body.pageNum) ||
+    !Number.isInteger(body.pageSize) ||
+    !Number.isInteger(body.totalCount) ||
+    body.pageNum < 0 ||
+    body.pageSize < 1 ||
+    body.totalCount < 0
+  ) {
+    throw new Error('Article list response is invalid');
+  }
+  return {
+    list: body.list.filter((article): article is ArticleInfo =>
+      Boolean(
+        article &&
+        typeof article === 'object' &&
+        typeof article._id === 'string' &&
+        article._id
+      )
+    ),
+    pageNum: body.pageNum,
+    pageSize: body.pageSize,
+    totalCount: body.totalCount,
+  };
+}
+
+/** Query one saved article by its record id. */
+export async function getQueryArticleInfo(
+  id: string,
+  options: { signal?: AbortSignal } = {}
+): Promise<ArticleInfo | null> {
+  if (!id) return null;
+  const response = await managerFetch.request<LegacyApiPayload<ArticleInfo[]>>({
+    method: 'GET',
+    url: '/smart/v1/article/getQueryArticleInfo',
+    query: { id },
+    signal: options.signal,
+  });
+  const data = response.data;
+  if (response.statusCode !== 200 || data?.code !== 200) {
+    throw new Error(
+      data?.message ||
+        data?.content ||
+        response.error ||
+        'Article detail request failed'
+    );
+  }
+  if (!Array.isArray(data.body)) {
+    throw new Error('Article detail response is invalid');
+  }
+  const article = data.body[0];
+  if (article === undefined) return null;
+  if (!article || typeof article._id !== 'string' || !article._id) {
+    throw new Error('Article detail response is invalid');
+  }
+  return article;
+}
+
 interface PostCreateArticleForLLMStreamOptions {
   signal?: AbortSignal;
   onConnected?: (event: ArticlePublisherProgressEvent) => void;
   onProgress?: (event: ArticlePublisherProgressEvent) => void;
 }
 
-interface ArticlePublisherStreamPayload {
-  code?: number;
-  body?: CreateArticleForLLMResult | null;
-  message?: string;
-  content?: string;
+type ArticlePublisherStreamPayload = Partial<ArticlePublisherProgressEvent>;
+
+export class ArticlePublisherStreamError extends Error {
+  readonly retryable: boolean;
+  readonly terminal: boolean;
+
+  constructor(
+    message: string,
+    options: { retryable?: boolean; terminal?: boolean } = {}
+  ) {
+    super(message);
+    this.name = 'ArticlePublisherStreamError';
+    this.retryable = options.retryable ?? false;
+    this.terminal = options.terminal ?? false;
+  }
 }
 
 function getPublisherError(payload: ArticlePublisherStreamPayload) {
@@ -468,46 +688,45 @@ function parsePublisherStreamPayload(
   rawData: string
 ): ArticlePublisherStreamPayload {
   try {
-    return JSON.parse(rawData) as ArticlePublisherStreamPayload;
+    const payload: unknown = JSON.parse(rawData);
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+      throw new Error();
+    }
+    return payload as ArticlePublisherStreamPayload;
   } catch {
-    throw new Error('Publishing progress payload parse failed');
+    throw new ArticlePublisherStreamError(
+      'Publishing progress payload parse failed'
+    );
   }
 }
 
-/**
- * Generate a WeChat draft over SSE.
- * EventSource cannot send a POST body, so fetch reads text/event-stream.
- */
-export async function streamPostCreateArticleForLLM(
-  body: PostCreateArticleForLLMBody,
-  options: PostCreateArticleForLLMStreamOptions = {}
-): Promise<CreateArticleForLLMResult | null> {
-  const response = await managerFetch.requestStream({
-    method: 'POST',
-    url: '/smart/v1/article/postCreateArticleForLLM',
-    query: { stream: true },
-    body,
-    header: { Accept: 'text/event-stream' },
-    signal: options.signal,
-  });
-
+async function readArticlePublisherStream(
+  response: Response,
+  options: PostCreateArticleForLLMStreamOptions
+): Promise<CreateArticleForLLMStatusResult> {
   if (!response.ok) {
     const payload = (await response.json().catch(() => ({}))) as {
       message?: string;
       content?: string;
     };
-    throw new Error(getPublisherError(payload));
+    throw new ArticlePublisherStreamError(getPublisherError(payload), {
+      retryable:
+        response.status === 408 ||
+        response.status === 429 ||
+        response.status >= 500,
+    });
   }
 
   if (!response.body) {
-    throw new Error('This browser cannot read live publishing progress');
+    throw new ArticlePublisherStreamError(
+      'This browser cannot read live publishing progress'
+    );
   }
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
-  let isCompleted = false;
-  let result: CreateArticleForLLMResult | null = null;
+  let streamResult: CreateArticleForLLMStatusResult | null = null;
 
   function processFrame(frame: string) {
     const lines = frame.split('\n');
@@ -532,16 +751,24 @@ export async function streamPostCreateArticleForLLM(
       options.onProgress?.(payload as ArticlePublisherProgressEvent);
     } else if (eventName === 'complete') {
       if (payload.code !== 200) throw new Error(getPublisherError(payload));
-      isCompleted = true;
-      result = payload.body ?? null;
+      options.onProgress?.(payload as ArticlePublisherProgressEvent);
+      streamResult = { status: 'complete', result: payload.body ?? null };
+    } else if (eventName === 'not_found') {
+      streamResult = { status: 'not_found', result: null };
     } else if (eventName === 'error') {
-      throw new Error(getPublisherError(payload));
+      throw new ArticlePublisherStreamError(getPublisherError(payload), {
+        retryable: payload.retryable,
+        terminal: payload.terminal,
+      });
     }
   }
 
   while (true) {
     const { done, value } = await reader.read();
-    buffer += decoder.decode(value, { stream: !done }).replace(/\r\n/g, '\n');
+    buffer = (buffer + decoder.decode(value, { stream: !done })).replace(
+      /\r\n/g,
+      '\n'
+    );
     let boundary = buffer.indexOf('\n\n');
     while (boundary >= 0) {
       processFrame(buffer.slice(0, boundary));
@@ -552,8 +779,46 @@ export async function streamPostCreateArticleForLLM(
   }
 
   if (buffer.trim()) processFrame(buffer);
-  if (!isCompleted) {
-    throw new Error('Live publishing connection ended unexpectedly');
+  if (!streamResult) {
+    throw new ArticlePublisherStreamError(
+      'Live publishing connection ended unexpectedly',
+      { retryable: true }
+    );
   }
-  return result;
+  return streamResult;
+}
+
+/**
+ * Generate and persist an article over SSE.
+ * EventSource cannot send a POST body, so fetch reads text/event-stream.
+ */
+export async function streamPostCreateArticleForLLM(
+  body: PostCreateArticleForLLMBody,
+  options: PostCreateArticleForLLMStreamOptions = {}
+): Promise<CreateArticleForLLMResult | null> {
+  const response = await managerFetch.requestStream({
+    method: 'POST',
+    url: '/smart/v1/article/postCreateArticleForLLM',
+    query: { stream: true },
+    body,
+    header: { Accept: 'text/event-stream' },
+    signal: options.signal,
+  });
+  const streamResult = await readArticlePublisherStream(response, options);
+  return streamResult.result;
+}
+
+/** Resume a recoverable article publishing task over its signed SSE stream. */
+export async function getCreateArticleForLLMStatus(
+  createArticleId: string,
+  options: PostCreateArticleForLLMStreamOptions = {}
+): Promise<CreateArticleForLLMStatusResult> {
+  const response = await managerFetch.requestStream({
+    method: 'GET',
+    url: '/smart/v1/article/getCreateArticleForLLMStatus',
+    query: { createArticleId },
+    header: { Accept: 'text/event-stream' },
+    signal: options.signal,
+  });
+  return readArticlePublisherStream(response, options);
 }

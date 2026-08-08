@@ -19,6 +19,16 @@ const PagePrivacy = lazyNavigationRoute('/privacy', () =>
     default: module.PagePrivacy,
   }))
 );
+const PageArticleList = lazyNavigationRoute('/articles', () =>
+  import('@/pages/PageArticles/ArticleList/pages/Home').then(module => ({
+    default: module.PageArticleList,
+  }))
+);
+const PageArticleDetail = lazyNavigationRoute('/articles/:id', () =>
+  import('@/pages/PageArticles/ArticleDetail/pages/Home').then(module => ({
+    default: module.PageArticleDetail,
+  }))
+);
 const PageDesignSystem = lazyNavigationRoute('/design-system', () =>
   import('@/pages/PageDesignSystem').then(module => ({
     default: module.PageDesignSystem,
@@ -106,6 +116,14 @@ function createAppChildren(): RouteObject[] {
     {
       path: 'member/score-list',
       element: <PageMemberScoreList />,
+    },
+    {
+      path: 'articles',
+      element: <PageArticleList />,
+    },
+    {
+      path: 'articles/:id',
+      element: <PageArticleDetail />,
     },
     {
       path: 'design-system',

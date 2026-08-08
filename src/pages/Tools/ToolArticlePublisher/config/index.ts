@@ -1,60 +1,13 @@
 import type { ArticlePublisherMode, ArticlePublisherProvider } from '@/api';
 import type { ArticlePublisherForm } from '@/pages/Tools/ToolArticlePublisher/types';
 
-export type PromptTemplateId =
-  | 'general'
-  | 'insurance_advisor'
-  | 'culture'
-  | 'tech'
-  | 'lifestyle'
-  | 'business'
-  | 'education'
-  | 'emotion'
-  | 'travel'
-  | 'food'
-  | 'fitness';
-
-export interface PromptTemplateFields {
-  promptSystem: string;
-  promptContent: string;
-  digest: string;
-  coverValue: string;
-  inlineValueList: readonly [
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-    string,
-  ];
-}
-
-export interface PromptTemplateCopy {
-  label: string;
-  caption: string;
-  fields: PromptTemplateFields;
-}
-
-export interface PromptTemplateConfig {
-  id: PromptTemplateId;
-}
-
-export interface PromptTemplate
-  extends PromptTemplateConfig, PromptTemplateCopy {}
-
-export type PromptTemplateCopyMap = Record<
-  PromptTemplateId,
-  PromptTemplateCopy
->;
-
 export const articlePublisherToolId = 'tool-article-publisher';
 export const articlePublisherSeoKey = 'article-publisher';
 export const articlePublisherScheduleEmail = 'agjgj187076081@gmail.com';
-export const defaultPromptTemplateId: PromptTemplateId = 'general';
-export const defaultSimpleInlineImageCount = 3;
+export const customArticleTemplateId = '__local_custom__';
+export const defaultInlineImageCount = 3;
+export const maxInlineImageCount = 9;
+export const articleTemplateCacheTtlSeconds = 7 * 24 * 60 * 60;
 export const wechatConsoleUrl =
   'https://developers.weixin.qq.com/console/index';
 export const wechatDraftBoxUrl =
@@ -71,16 +24,17 @@ export const articlePublisherModes: ArticlePublisherMode[] = [
 export const defaultPublisherForm: ArticlePublisherForm = {
   publishMode: 'create',
   modeSettings: {
-    create: { isCustomizationOpen: false, templateId: defaultPromptTemplateId },
+    create: { isCustomizationOpen: false, templateId: '' },
     rewrite: {
       isCustomizationOpen: false,
-      templateId: defaultPromptTemplateId,
+      templateId: '',
     },
   },
+  deliveryWechat: false,
+  deliveryEmail: false,
   appId: '',
   appSecret: '',
   finalReportEmails: '',
-  deliveryChannels: { wechat: false, email: false },
   provider: 'MINIMAX',
   promptSystem: '',
   promptContent: '',
@@ -91,26 +45,3 @@ export const defaultPublisherForm: ArticlePublisherForm = {
   author: '',
   comment: { open: 1, fansOnly: 0 },
 };
-
-export const promptTemplateConfigs: PromptTemplateConfig[] = [
-  { id: 'general' },
-  { id: 'insurance_advisor' },
-  { id: 'culture' },
-  { id: 'tech' },
-  { id: 'lifestyle' },
-  { id: 'business' },
-  { id: 'education' },
-  { id: 'emotion' },
-  { id: 'travel' },
-  { id: 'food' },
-  { id: 'fitness' },
-];
-
-export function getPromptTemplates(
-  copyMap: PromptTemplateCopyMap
-): PromptTemplate[] {
-  return promptTemplateConfigs.map(config => ({
-    ...config,
-    ...copyMap[config.id],
-  }));
-}

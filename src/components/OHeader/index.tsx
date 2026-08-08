@@ -8,6 +8,7 @@ import { useTheme, type ThemePreference } from '@/theme';
 import {
   CircleUserRound,
   Coins,
+  FileText,
   LogOut,
   Menu,
   Monitor,
@@ -255,7 +256,7 @@ function UserInfoModule({
   userName?: string;
   variant: 'desktop' | 'mobile';
 }) {
-  const { messages } = useI18n();
+  const { localizePath, messages } = useI18n();
   const headerCopy = messages.header;
   const className =
     variant === 'desktop' ? 'nav-user desktop-only' : 'nav-user';
@@ -297,6 +298,13 @@ function UserInfoModule({
       <Link className='nav-user-menu-link interactive' to='/member/score-list'>
         <Coins size={16} aria-hidden='true' />
         {headerCopy.scores}
+      </Link>
+      <Link
+        className='nav-user-menu-link interactive'
+        to={localizePath('/articles')}
+      >
+        <FileText size={16} aria-hidden='true' />
+        {headerCopy.articleSubscriptions}
       </Link>
       <button
         className='nav-user-menu-link nav-user-menu-logout interactive'

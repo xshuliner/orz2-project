@@ -1,19 +1,20 @@
 import type {
   ArticlePublisherMode,
   ArticlePublisherProvider,
+  ArticleTemplate,
+  ArticleTemplatePayload,
   OfficialCommentConfig,
+  OfficialImageConfig,
   OfficialImageSourceType,
   PostCreateArticleForLLMBody,
 } from '@/api';
 import {
   articlePublisherModes,
   articlePublisherProviders,
-  defaultPromptTemplateId,
+  customArticleTemplateId,
+  defaultInlineImageCount,
   defaultPublisherForm,
-  defaultSimpleInlineImageCount,
-  promptTemplateConfigs,
-  type PromptTemplate,
-  type PromptTemplateId,
+  maxInlineImageCount,
 } from '@/pages/Tools/ToolArticlePublisher/config';
 import type {
   ArticlePublisherForm,
@@ -65,10 +66,50 @@ function normalizeCustomizationOpen(value: unknown) {
   return typeof value === 'string' && value.trim().toLowerCase() === 'advanced';
 }
 
-function normalizePromptTemplateId(value: unknown): PromptTemplateId {
-  return promptTemplateConfigs.some(config => config.id === value)
-    ? (value as PromptTemplateId)
-    : defaultPromptTemplateId;
+function normalizeArticleTemplateId(value: unknown) {
+  return typeof value === 'string' ? value : '';
+}
+
+function normalizeImageConfig(value: unknown) {
+  const image = asRecord(value);
+  return {
+    type: image.type === 'url' || image.type === 'base64' ? image.type : 'ai',
+    value: readString(image.value),
+  } satisfies OfficialImageConfig;
+}
+
+function normalizeTemplatePayload(
+  value: unknown
+): ArticleTemplatePayload | null {
+  const payload = asRecord(value);
+  if (!value || !Array.isArray(payload.imagesInlineList)) return null;
+  return {
+    promptSystem: readString(payload.promptSystem),
+    promptContent: readString(payload.promptContent),
+    imageCover: normalizeImageConfig(payload.imageCover),
+    imagesInlineList: payload.imagesInlineList
+      .slice(0, maxInlineImageCount)
+      .map(normalizeImageConfig),
+  };
+}
+
+function normalizeCustomTemplate(
+  value: unknown,
+  fallbackPayload?: ArticleTemplatePayload | null
+): ArticleTemplate | undefined {
+  const template = asRecord(value);
+  const payload = normalizeTemplatePayload(template.payload) ?? fallbackPayload;
+  if (!payload) return undefined;
+  const sourceTemplateId = readString(template.sourceTemplateId);
+  const updatedAt = Number(template.updatedAt);
+  return {
+    id: customArticleTemplateId,
+    label: readString(template.label),
+    caption: readString(template.caption),
+    ...(sourceTemplateId ? { sourceTemplateId } : {}),
+    ...(Number.isFinite(updatedAt) ? { updatedAt } : {}),
+    payload,
+  };
 }
 
 export function normalizeForm(
@@ -78,26 +119,11 @@ export function normalizeForm(
   const source = asRecord(input);
   const rawAi = asRecord(source.ai);
   const rawModeSettings = asRecord(source.modeSettings);
+  const rawCustomTemplates = asRecord(source.customTemplates);
   const legacyEditorModes = asRecord(source.editorModes);
   const inlineList = Array.isArray(source.imagesInlineList)
     ? source.imagesInlineList
     : [];
-
-  function normalizeModeSetting(mode: ArticlePublisherMode) {
-    const rawSetting = asRecord(rawModeSettings[mode]);
-    return {
-      isCustomizationOpen: normalizeCustomizationOpen(
-        rawSetting.isCustomizationOpen ??
-          rawSetting.editorMode ??
-          legacyEditorModes[mode] ??
-          source.editorMode ??
-          source.experienceMode
-      ),
-      templateId: normalizePromptTemplateId(
-        rawSetting.templateId ?? source.selectedTemplateId
-      ),
-    } satisfies PublisherModeSetting;
-  }
 
   // Backward compatibility for old localStorage shape: imageCoverType + imageCoverValue.
   const legacyImageCoverType = source.imageCoverType as
@@ -134,31 +160,79 @@ export function normalizeForm(
   }
 
   const rewriteRequirement = readString(source.rewriteRequirement);
+  const publishMode = normalizeArticlePublisherMode(
+    source.publishMode ?? source.mode ?? source.scene
+  );
+  const storedPayload = normalizeTemplatePayload({
+    promptSystem: source.promptSystem,
+    promptContent: source.promptContent,
+    imageCover: { type: coverType, value: coverValue },
+    imagesInlineList: inlineList,
+  });
 
-  return {
-    publishMode: normalizeArticlePublisherMode(
-      source.publishMode ?? source.mode ?? source.scene
-    ),
+  function normalizeModeSetting(mode: ArticlePublisherMode) {
+    const rawSetting = asRecord(rawModeSettings[mode]);
+    const isCustomizationOpen = normalizeCustomizationOpen(
+      rawSetting.isCustomizationOpen ??
+        rawSetting.isAdvanced ??
+        rawSetting.editorMode ??
+        legacyEditorModes[mode] ??
+        source.editorMode ??
+        source.experienceMode
+    );
+    let templateId = normalizeArticleTemplateId(
+      rawSetting.templateId ?? source.selectedTemplateId
+    );
+    const legacyCustomPayload = normalizeTemplatePayload(
+      rawCustomTemplates[mode]
+    );
+    let customTemplate = normalizeCustomTemplate(
+      rawSetting.customTemplate,
+      legacyCustomPayload
+    );
+    if (
+      !customTemplate &&
+      mode === publishMode &&
+      isCustomizationOpen &&
+      storedPayload &&
+      (hasText(storedPayload.promptSystem) ||
+        hasText(storedPayload.promptContent) ||
+        hasText(storedPayload.imageCover.value))
+    ) {
+      customTemplate = normalizeCustomTemplate(null, storedPayload);
+      templateId = customArticleTemplateId;
+    }
+    if (
+      customTemplate &&
+      (templateId === '__custom__' || templateId === customArticleTemplateId)
+    ) {
+      templateId = customArticleTemplateId;
+    }
+    return {
+      isCustomizationOpen,
+      templateId,
+      ...(customTemplate ? { customTemplate } : {}),
+    } satisfies PublisherModeSetting;
+  }
+
+  const form: ArticlePublisherForm = {
+    publishMode,
     modeSettings: {
       create: normalizeModeSetting('create'),
       rewrite: normalizeModeSetting('rewrite'),
     },
+    deliveryWechat:
+      typeof source.deliveryWechat === 'boolean'
+        ? source.deliveryWechat
+        : hasText(readString(source.appId)) ||
+          hasText(readString(source.appSecret)),
+    deliveryEmail:
+      typeof source.deliveryEmail === 'boolean'
+        ? source.deliveryEmail
+        : Boolean(readEmailInput(source.finalReportEmails).trim()),
     appId: readString(source.appId),
     appSecret: readString(source.appSecret),
     finalReportEmails: readEmailInput(source.finalReportEmails),
-    deliveryChannels: {
-      // Older saved forms did not store explicit channel choices. Infer them
-      // from the values they already contain so restoring a form stays safe.
-      wechat:
-        typeof asRecord(source.deliveryChannels).wechat === 'boolean'
-          ? Boolean(asRecord(source.deliveryChannels).wechat)
-          : hasText(readString(source.appId)) ||
-            hasText(readString(source.appSecret)),
-      email:
-        typeof asRecord(source.deliveryChannels).email === 'boolean'
-          ? Boolean(asRecord(source.deliveryChannels).email)
-          : Boolean(readEmailInput(source.finalReportEmails).trim()),
-    },
     provider: normalizeArticlePublisherProvider(
       source.provider ?? source.aiProvider ?? rawAi.provider
     ),
@@ -172,7 +246,7 @@ export function normalizeForm(
       ? rewriteRequirement
       : defaultRewriteRequirement,
     imageCover: { type: coverType, value: coverValue },
-    imagesInlineList: inlineList.slice(0, 9).map(item => {
+    imagesInlineList: inlineList.slice(0, maxInlineImageCount).map(item => {
       const rawItem = asRecord(item);
       return {
         type:
@@ -185,6 +259,7 @@ export function normalizeForm(
     author: readString(source.author),
     comment,
   };
+  return form;
 }
 
 export function hasText(value: string) {
@@ -203,7 +278,9 @@ export function getFinalReportEmails(value: string) {
 }
 
 function isValidEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  return (
+    value.length <= 254 && /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/.test(value)
+  );
 }
 
 export function isWechatArticleUrl(value: string) {
@@ -224,66 +301,44 @@ export function getActiveModeSetting(form: ArticlePublisherForm) {
 }
 
 export function getTemplateContent(
-  template: PromptTemplate,
-  inlineImageCount = defaultSimpleInlineImageCount
+  template: ArticleTemplate
 ): Pick<
   ArticlePublisherForm,
   'promptSystem' | 'promptContent' | 'imageCover' | 'imagesInlineList'
 > {
   return {
-    promptSystem: template.fields.promptSystem,
-    promptContent: template.fields.promptContent,
-    imageCover: { type: 'ai', value: template.fields.coverValue },
-    imagesInlineList: template.fields.inlineValueList
-      .slice(0, Math.max(0, Math.min(inlineImageCount, 9)))
-      .map(value => ({ type: 'ai', value })),
+    promptSystem: template.payload.promptSystem,
+    promptContent: template.payload.promptContent,
+    imageCover: { ...template.payload.imageCover },
+    imagesInlineList: template.payload.imagesInlineList
+      .slice(
+        0,
+        template.id === customArticleTemplateId
+          ? maxInlineImageCount
+          : defaultInlineImageCount
+      )
+      .map(image => ({ ...image })),
   };
 }
 
-export function hasTemplateCustomizations(
-  form: ArticlePublisherForm,
-  template?: PromptTemplate
-) {
-  if (!template) return false;
-  const hasConfiguredContent =
-    hasText(form.promptSystem) ||
-    hasText(form.promptContent) ||
-    hasText(form.imageCover.value) ||
-    form.imagesInlineList.some(item => hasText(item.value));
-  if (!hasConfiguredContent) return false;
-  const templateContent = getTemplateContent(template);
-  return (
-    form.promptSystem !== templateContent.promptSystem ||
-    form.promptContent !== templateContent.promptContent ||
-    form.imageCover.type !== templateContent.imageCover.type ||
-    form.imageCover.value !== templateContent.imageCover.value ||
-    form.imagesInlineList.length !== templateContent.imagesInlineList.length ||
-    form.imagesInlineList.some(
-      (item, index) =>
-        item.type !== templateContent.imagesInlineList[index]?.type ||
-        item.value !== templateContent.imagesInlineList[index]?.value
-    )
-  );
+export function getTemplatePayloadFromForm(
+  form: ArticlePublisherForm
+): ArticleTemplatePayload {
+  return {
+    promptSystem: form.promptSystem,
+    promptContent: form.promptContent,
+    imageCover: { ...form.imageCover },
+    imagesInlineList: form.imagesInlineList.map(image => ({ ...image })),
+  };
 }
 
 export function getCompletionItems(
   form: ArticlePublisherForm,
   copy: PublisherCopy,
-  selectedTemplate?: PromptTemplate
+  selectedTemplate?: ArticleTemplate
 ): CompletionItem[] {
-  const hasCustomizations = hasTemplateCustomizations(form, selectedTemplate);
-  const hasAppId = hasText(form.appId);
-  const hasAppSecret = hasText(form.appSecret);
-  const items: CompletionItem[] = [
-    {
-      label: copy.completion.delivery,
-      done:
-        (form.deliveryChannels.wechat || form.deliveryChannels.email) &&
-        (!form.deliveryChannels.wechat || (hasAppId && hasAppSecret)) &&
-        (!form.deliveryChannels.email ||
-          getFinalReportEmails(form.finalReportEmails).length > 0),
-    },
-  ];
+  const isCustomizationOpen = getActiveModeSetting(form).isCustomizationOpen;
+  const items: CompletionItem[] = [];
 
   if (form.publishMode === 'rewrite') {
     items.push({
@@ -294,7 +349,7 @@ export function getCompletionItems(
     });
   }
 
-  if (!hasCustomizations) {
+  if (!isCustomizationOpen) {
     items.push({
       label: copy.completion.template,
       done: Boolean(selectedTemplate),
@@ -331,31 +386,27 @@ export function getCompletionItems(
 export function getValidationErrors(
   form: ArticlePublisherForm,
   copy: PublisherCopy,
-  selectedTemplate?: PromptTemplate
+  selectedTemplate?: ArticleTemplate
 ) {
   const nextErrors: string[] = [];
-  const hasCustomizations = hasTemplateCustomizations(form, selectedTemplate);
+  const isCustomizationOpen = getActiveModeSetting(form).isCustomizationOpen;
 
   const hasAppId = hasText(form.appId);
   const hasAppSecret = hasText(form.appSecret);
   const finalReportEmails = getFinalReportEmails(form.finalReportEmails);
-  if (!form.deliveryChannels.wechat && !form.deliveryChannels.email) {
-    nextErrors.push(copy.validation.delivery);
-  }
-  if (form.deliveryChannels.wechat && hasAppId !== hasAppSecret) {
+  if (form.deliveryWechat && hasAppId !== hasAppSecret) {
     nextErrors.push(
       hasAppId ? copy.validation.appSecret : copy.validation.appId
     );
   }
-  if (form.deliveryChannels.wechat && !hasAppId && !hasAppSecret) {
+  if (form.deliveryWechat && !hasAppId && !hasAppSecret) {
     nextErrors.push(copy.validation.appId, copy.validation.appSecret);
   }
-  if (form.deliveryChannels.email && !finalReportEmails.length) {
-    nextErrors.push(copy.validation.finalReportEmails);
-  }
   if (
-    form.deliveryChannels.email &&
-    finalReportEmails.some(email => !isValidEmail(email))
+    form.deliveryEmail &&
+    (!finalReportEmails.length ||
+      finalReportEmails.length > 20 ||
+      finalReportEmails.some(email => !isValidEmail(email)))
   ) {
     nextErrors.push(copy.validation.finalReportEmails);
   }
@@ -366,12 +417,12 @@ export function getValidationErrors(
     } else if (!isWechatArticleUrl(form.sourceArticleUrl)) {
       nextErrors.push(copy.validation.rewriteSourceUrlInvalid);
     }
-    if (hasCustomizations && !hasText(form.rewriteRequirement)) {
+    if (isCustomizationOpen && !hasText(form.rewriteRequirement)) {
       nextErrors.push(copy.validation.rewriteRequirement);
     }
   }
 
-  if (!hasCustomizations) {
+  if (!isCustomizationOpen) {
     if (!selectedTemplate) nextErrors.push(copy.validation.template);
     return nextErrors;
   }
@@ -386,29 +437,16 @@ export function getValidationErrors(
   if (!hasText(form.imageCover.value)) {
     nextErrors.push(copy.validation.coverValue);
   }
-  form.imagesInlineList.forEach((item, index) => {
-    if (!item.type) {
-      nextErrors.push(
-        `${copy.validation.inlineTypePrefix} ${index + 1} ${copy.validation.inlineTypeSuffix}`
-      );
-    }
-    if (!hasText(item.value)) {
-      nextErrors.push(
-        `${copy.validation.inlineTypePrefix} ${index + 1} ${copy.validation.inlineValueSuffix}`
-      );
-    }
-  });
-
   return nextErrors;
 }
 
 export function buildPublisherRequestBody(
   form: ArticlePublisherForm,
-  selectedTemplate: PromptTemplate,
+  selectedTemplate: ArticleTemplate,
   defaultRewriteRequirement: string
 ): PostCreateArticleForLLMBody {
-  const hasCustomizations = hasTemplateCustomizations(form, selectedTemplate);
-  const content = hasCustomizations
+  const isCustomizationOpen = getActiveModeSetting(form).isCustomizationOpen;
+  const content = isCustomizationOpen
     ? form
     : getTemplateContent(selectedTemplate);
   const body: PostCreateArticleForLLMBody = {
@@ -425,22 +463,24 @@ export function buildPublisherRequestBody(
       type: content.imageCover.type,
       value: content.imageCover.value.trim(),
     },
-    imagesInlineList: content.imagesInlineList.map(item => ({
-      type: item.type,
-      value: item.value.trim(),
-    })),
+    imagesInlineList: content.imagesInlineList
+      .filter(item => hasText(item.value))
+      .map(item => ({
+        type: item.type,
+        value: item.value.trim(),
+      })),
   };
 
   const appId = form.appId.trim();
   const appSecret = form.appSecret.trim();
-  if (form.deliveryChannels.wechat && appId && appSecret) {
+  if (form.deliveryWechat && appId && appSecret) {
     body.appId = appId;
     body.appSecret = appSecret;
     body.articleType = 'news';
   }
 
   const finalReportEmails = getFinalReportEmails(form.finalReportEmails);
-  if (form.deliveryChannels.email && finalReportEmails.length) {
+  if (form.deliveryEmail && finalReportEmails.length) {
     body.finalReportEmails = finalReportEmails;
   }
 
@@ -452,7 +492,7 @@ export function buildPublisherRequestBody(
   if (form.publishMode === 'rewrite') {
     body.sourceArticleUrl = form.sourceArticleUrl.trim();
     body.rewriteRequirement = (
-      !hasCustomizations ? defaultRewriteRequirement : form.rewriteRequirement
+      !isCustomizationOpen ? defaultRewriteRequirement : form.rewriteRequirement
     ).trim();
     body.inlineImageCount = content.imagesInlineList.length;
   }

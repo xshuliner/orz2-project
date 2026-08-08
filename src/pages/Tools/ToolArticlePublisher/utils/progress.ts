@@ -6,12 +6,26 @@ import type {
 export function createInitialPublishSteps(
   timeline: readonly PublishTimelineStep[] = []
 ): PublishStep[] {
-  return timeline.map((step, index) => ({
-    key: step.key,
-    name: step.name,
-    index: index + 1,
-    status: 'pending',
-  }));
+  return timeline.map((step, index) => {
+    const status =
+      step.status === 'completed' ||
+      step.status === 'failed' ||
+      step.status === 'running' ||
+      step.status === 'warning'
+        ? step.status
+        : step.status === 'retrying'
+          ? 'running'
+          : 'pending';
+    return {
+      key: step.key,
+      name: step.name,
+      index: index + 1,
+      status,
+      message: step.message,
+      durationMs: step.durationMs,
+      requestedCount: step.totalImageCount ?? step.requestedCount,
+    };
+  });
 }
 
 export function formatDuration(durationMs: number) {

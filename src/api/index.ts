@@ -5,7 +5,13 @@ export default {
 };
 
 export {
+  ArticlePublisherStreamError,
+  getCreateArticleForLLMStatus,
+  getQueryArticleInfo,
+  getQueryArticleList,
+  getQueryArticleTemplates,
   getQueryScoreList,
+  normalizeArticleTemplateState,
   postCreateArticleForLLM,
   postPolishContent,
   postTinifyImage,
@@ -21,13 +27,21 @@ export type {
 export { getAvatarBorderColor, ossAvatarUrl } from './orz2.modal';
 export type {
   ArticleImageGenerationMode,
+  ArticleInfo,
+  ArticleListPage,
   ArticlePublisherMode,
   ArticlePublisherProgressEvent,
   ArticlePublisherProgressStatus,
+  ArticlePublisherProgressStep,
   ArticlePublisherProvider,
+  ArticleTemplate,
+  ArticleTemplatePayload,
+  ArticleTemplateState,
   BackpackItem,
   BackpackItemDetail,
   CreateArticleForLLMResult,
+  CreateArticleForLLMStatusResult,
+  CreateArticleForLLMTaskStatus,
   FriendItem,
   MemberInfo,
   MemberListItem,

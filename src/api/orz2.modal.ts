@@ -146,10 +146,55 @@ export type StoryListResult = {
 
 // ===== Article publisher =====
 
+export interface ArticleInfo {
+  _id: string;
+  title?: string;
+  content?: string;
+  summary?: string;
+  digest?: string;
+  author?: string;
+  imgCover?: string;
+  imgCoverV?: string;
+  imgList?: string[];
+  imgListV?: string[];
+  sys_createTime?: string;
+  sys_updateTime?: string;
+}
+
+export interface ArticleListPage {
+  list: ArticleInfo[];
+  pageNum: number;
+  pageSize: number;
+  totalCount: number;
+}
+
 export type OfficialArticleType = 'news' | 'newspic';
 export type ArticlePublisherMode = 'create' | 'rewrite';
 export type ArticlePublisherProvider = 'AGNES' | 'MINIMAX';
 export type OfficialImageSourceType = 'ai' | 'url' | 'base64';
+
+export interface ArticleTemplatePayload {
+  promptSystem: string;
+  promptContent: string;
+  imageCover: OfficialImageConfig;
+  imagesInlineList: OfficialImageConfig[];
+}
+
+export interface ArticleTemplate {
+  id: string;
+  label: string;
+  caption: string;
+  sourceTemplateId?: string;
+  updatedAt?: number;
+  payload: ArticleTemplatePayload;
+}
+
+export interface ArticleTemplateState {
+  schemaVersion: 1;
+  defaultTemplateId: string;
+  templates: ArticleTemplate[];
+}
+
 export type PostPolishContentMode =
   | 'official_system_prompt'
   | 'official_content_prompt'
@@ -248,8 +293,37 @@ export type ArticlePublisherProgressStatus =
   | 'warning'
   | 'retrying';
 
+export type CreateArticleForLLMTaskStatus =
+  | 'running'
+  | 'complete'
+  | 'error'
+  | 'unknown'
+  | 'not_found';
+
+export interface ArticlePublisherProgressStep {
+  key: string;
+  name: string;
+  status?: ArticlePublisherProgressStatus | 'pending';
+  message?: string;
+  durationMs?: number;
+  requestedCount?: number;
+  totalImageCount?: number;
+}
+
 export interface ArticlePublisherProgressEvent {
-  status: ArticlePublisherProgressStatus;
+  status?: ArticlePublisherProgressStatus;
+  code?: number;
+  body?: CreateArticleForLLMResult | null;
+  content?: string;
+  createArticleId?: string;
+  taskStatus?: CreateArticleForLLMTaskStatus;
+  terminal?: boolean;
+  retryable?: boolean;
+  silent?: boolean;
+  currentStepKey?: string;
+  currentStepIndex?: number;
+  revision?: number;
+  updatedAt?: number;
   step?: number;
   totalSteps?: number;
   key?: string;
@@ -269,11 +343,18 @@ export interface ArticlePublisherProgressEvent {
   attempt?: number;
   nextAttempt?: number;
   maxAttempts?: number;
-  steps?: Array<{
-    key: string;
-    name: string;
-  }>;
+  steps?: ArticlePublisherProgressStep[];
 }
+
+export type CreateArticleForLLMStatusResult =
+  | {
+      status: 'complete';
+      result: CreateArticleForLLMResult | null;
+    }
+  | {
+      status: 'not_found';
+      result: null;
+    };
 
 export interface CreateArticleForLLMResult {
   article: {

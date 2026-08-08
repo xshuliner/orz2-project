@@ -41,6 +41,7 @@ export function DraftSuccessModal({
   const inlineImageCount =
     inlineImages.length || draftResult?.inlineImagePaths?.length || 0;
   const coverValue = draftResult?.coverImageUrl || draftResult?.imagePath || '';
+  const articleId = publishResult?.article.articleInfo?._id;
 
   return (
     <OModal
@@ -185,6 +186,15 @@ export function DraftSuccessModal({
           <OButton size='lg' type='button' variant='ghost' onClick={onClose}>
             {copy.success.stay}
           </OButton>
+          {articleId ? (
+            <OButton
+              size='lg'
+              to={`/articles/${encodeURIComponent(articleId)}`}
+            >
+              {copy.success.viewArticle}
+              <FileText size={17} aria-hidden='true' />
+            </OButton>
+          ) : null}
           {draftResult ? (
             <OButton
               href={wechatDraftBoxUrl}

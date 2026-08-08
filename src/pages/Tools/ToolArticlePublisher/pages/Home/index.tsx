@@ -1,13 +1,19 @@
 import {
+  ArticlePublisherStreamError,
+  getCreateArticleForLLMStatus,
+  getQueryArticleTemplates,
+  normalizeArticleTemplateState,
   streamPostCreateArticleForLLM,
   type ArticlePublisherMode,
   type ArticlePublisherProgressEvent,
+  type ArticleTemplate,
+  type ArticleTemplateState,
   type CreateArticleForLLMResult,
   type OfficialCommentConfig,
   type OfficialImageConfig,
 } from '@/api';
 import WechatConsoleGuide from '@/assets/wechat-console-guide.svg';
-import { useAuthLogin } from '@/components/ContextAuth';
+import { useAuth } from '@/components/ContextAuth';
 import { LayoutPage } from '@/components/LayoutPage';
 import { OBadge } from '@/components/OBadge';
 import { OButton } from '@/components/OButton';
@@ -29,14 +35,14 @@ import {
   articlePublisherScheduleEmail,
   articlePublisherSeoKey,
   articlePublisherToolId,
+  articleTemplateCacheTtlSeconds,
+  customArticleTemplateId,
   defaultPublisherForm,
-  getPromptTemplates,
+  maxInlineImageCount,
   wechatConsoleUrl,
-  type PromptTemplateId,
 } from '@/pages/Tools/ToolArticlePublisher/config';
 import type {
   ArticlePublisherForm,
-  DeliveryChannel,
   PublishPhase,
   PublishStepStatus,
 } from '@/pages/Tools/ToolArticlePublisher/types';
@@ -45,42 +51,29 @@ import {
   getActiveModeSetting,
   getCompletionItems,
   getTemplateContent,
+  getTemplatePayloadFromForm,
   getValidationErrors,
-  hasTemplateCustomizations,
   hasText,
   normalizeForm,
 } from '@/pages/Tools/ToolArticlePublisher/utils/form';
 
 import { createInitialPublishSteps } from '@/pages/Tools/ToolArticlePublisher/utils/progress';
 import managerCache, { cacheKeys } from '@/utils/manager/cache';
-import type { LucideIcon } from 'lucide-react';
 import {
-  BriefcaseBusiness,
   CalendarClock,
   CheckCircle2,
-  ChevronsDown,
-  ChevronsUp,
   Clipboard,
   ClipboardPenLine,
-  CookingPot,
-  Cpu,
   Download,
-  Dumbbell,
   ExternalLink,
   FileDiff,
   FilePenLine,
-  GraduationCap,
-  Heart,
-  HeartHandshake,
-  KeyRound,
-  Landmark,
+  FileText,
   Loader2,
   Mail,
-  Plane,
   Plus,
   RotateCcw,
   Send,
-  ShieldCheck,
   Trash2,
   Upload,
 } from 'lucide-react';
@@ -103,23 +96,21 @@ const commentConfigByValue: Record<CommentOptionValue, OfficialCommentConfig> =
     fansOnly: { open: 1, fansOnly: 1 },
   };
 
-const promptTemplateIcons: Record<PromptTemplateId, LucideIcon> = {
-  general: ClipboardPenLine,
-  insurance_advisor: ShieldCheck,
-  culture: Landmark,
-  tech: Cpu,
-  lifestyle: Heart,
-  business: BriefcaseBusiness,
-  education: GraduationCap,
-  emotion: HeartHandshake,
-  travel: Plane,
-  food: CookingPot,
-  fitness: Dumbbell,
-};
+interface CachedArticleTemplates {
+  schemaVersion: 1;
+  updatedAt: number;
+  state: ArticleTemplateState;
+}
+
+interface ArticleTemplateResource {
+  state: ArticleTemplateState | null;
+  isLoading: boolean;
+  error: boolean;
+}
 
 export function PageArticlePublisher() {
   const { messages } = useI18n();
-  const withLoginRequired = useAuthLogin();
+  const { user, withLoginRequired } = useAuth();
   const publisherCopy = messages.publisher;
   const defaultRewriteRequirement = publisherCopy.defaultRewriteRequirement;
   const localizedDefaultForm = useMemo(
@@ -133,10 +124,23 @@ export function PageArticlePublisher() {
     }),
     [defaultRewriteRequirement]
   );
-  const promptTemplates = useMemo(
-    () => getPromptTemplates(publisherCopy.promptTemplates),
-    [publisherCopy.promptTemplates]
-  );
+  const [templateRequestVersion, setTemplateRequestVersion] = useState(0);
+  const [templateResource, setTemplateResource] =
+    useState<ArticleTemplateResource>(() => {
+      const cached = managerCache.getLocalStorage<CachedArticleTemplates>(
+        cacheKeys.articlePublisherTemplates
+      );
+      const cachedState =
+        cached?.schemaVersion === 1
+          ? normalizeArticleTemplateState(cached.state)
+          : null;
+      return {
+        state: cachedState,
+        isLoading: true,
+        error: false,
+      };
+    });
+  const articleTemplates = templateResource.state?.templates ?? [];
   const commentOptions = useMemo<
     Array<{ label: string; value: CommentOptionValue }>
   >(
@@ -174,16 +178,6 @@ export function PageArticlePublisher() {
       icon: mode === 'create' ? FilePenLine : FileDiff,
     }));
   }, [publisherCopy.modes]);
-  const templateOptions = useMemo(
-    () =>
-      promptTemplates.map(template => ({
-        value: template.id,
-        label: template.label,
-        description: template.caption,
-        icon: promptTemplateIcons[template.id],
-      })),
-    [promptTemplates]
-  );
   const [form, setForm] = useState<ArticlePublisherForm>(() => {
     try {
       return normalizeForm(
@@ -208,13 +202,12 @@ export function PageArticlePublisher() {
     useState<CreateArticleForLLMResult | null>(null);
   const [isDraftResultOpen, setDraftResultOpen] = useState(false);
   const [copiedIp, setCopiedIp] = useState(false);
-  const [pendingTemplateId, setPendingTemplateId] =
-    useState<PromptTemplateId | null>(null);
   const [isPublishConfirmOpen, setPublishConfirmOpen] = useState(false);
   const [isResetConfirmOpen, setResetConfirmOpen] = useState(false);
-  const [expandedDeliveryChannels, setExpandedDeliveryChannels] = useState<
-    DeliveryChannel[]
-  >([]);
+  const [restoreRequestVersion, setRestoreRequestVersion] = useState(0);
+  const publisherTaskCacheKey = user
+    ? `${cacheKeys.articlePublisherTask}:${import.meta.env.VITE_APP_ENV || 'prod'}:${encodeURIComponent(user.id)}`
+    : null;
   const selectedCommentOption: CommentOptionValue =
     form.comment.open === 0
       ? 'closed'
@@ -223,20 +216,110 @@ export function PageArticlePublisher() {
         : 'open';
   const activeModeSetting = getActiveModeSetting(form);
   const isCustomizationOpen = activeModeSetting.isCustomizationOpen;
-  const selectedPromptTemplate =
-    promptTemplates.find(
+  const customArticleTemplate: ArticleTemplate | null =
+    activeModeSetting.customTemplate
+      ? {
+          ...activeModeSetting.customTemplate,
+          label: publisherCopy.customization.customLabel,
+          caption: publisherCopy.customization.customDescription,
+        }
+      : null;
+  const availableTemplates = customArticleTemplate
+    ? [customArticleTemplate, ...articleTemplates]
+    : articleTemplates;
+  const selectedArticleTemplate =
+    availableTemplates.find(
       template => template.id === activeModeSetting.templateId
-    ) ?? promptTemplates[0]!;
-  const pendingTemplate = pendingTemplateId
-    ? promptTemplates.find(template => template.id === pendingTemplateId)
-    : undefined;
+    ) ??
+    articleTemplates.find(
+      template => template.id === templateResource.state?.defaultTemplateId
+    ) ??
+    articleTemplates[0] ??
+    customArticleTemplate ??
+    null;
+  const inlineImageSourceTemplate =
+    selectedArticleTemplate?.id === customArticleTemplateId
+      ? (articleTemplates.find(
+          template => template.id === selectedArticleTemplate.sourceTemplateId
+        ) ?? selectedArticleTemplate)
+      : selectedArticleTemplate;
+  const inlineImageTemplateList =
+    inlineImageSourceTemplate?.payload.imagesInlineList ?? [];
   const importInputRef = useRef<HTMLInputElement | null>(null);
+  const templateScrollRef = useRef<HTMLDivElement | null>(null);
   const publisherAsideRef = useRef<HTMLElement | null>(null);
   const publisherAbortRef = useRef<AbortController | null>(null);
   const publishStartedAtRef = useRef<number | null>(null);
+  const activeCreateArticleIdRef = useRef('');
+  const latestPublishRevisionRef = useRef(0);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setTemplateResource(current => ({
+      ...current,
+      isLoading: true,
+      error: false,
+    }));
+    void getQueryArticleTemplates({ signal: controller.signal })
+      .then(state => {
+        if (controller.signal.aborted) return;
+        managerCache.setLocalStorage(
+          cacheKeys.articlePublisherTemplates,
+          {
+            schemaVersion: 1,
+            updatedAt: Date.now(),
+            state,
+          } satisfies CachedArticleTemplates,
+          articleTemplateCacheTtlSeconds
+        );
+        setTemplateResource({
+          state,
+          isLoading: false,
+          error: false,
+        });
+      })
+      .catch(() => {
+        if (controller.signal.aborted) return;
+        setTemplateResource(current => ({
+          ...current,
+          isLoading: false,
+          error: true,
+        }));
+      });
+    return () => controller.abort();
+  }, [templateRequestVersion]);
+
   useEffect(() => {
     managerCache.setLocalStorage(cacheKeys.articlePublisherForm, form);
   }, [form]);
+
+  useEffect(() => {
+    const scrollElement = templateScrollRef.current;
+    if (!scrollElement || !selectedArticleTemplate) return;
+    const timer = window.setTimeout(() => {
+      const selectedElement = scrollElement.querySelector<HTMLElement>(
+        '.template-choice.is-selected'
+      );
+      if (!selectedElement) return;
+      const scrollRect = scrollElement.getBoundingClientRect();
+      const selectedRect = selectedElement.getBoundingClientRect();
+      const selectedCenterOffset =
+        selectedRect.left -
+        scrollRect.left -
+        (scrollElement.clientWidth - selectedRect.width) / 2;
+      scrollElement.scrollTo({
+        left: scrollElement.scrollLeft + selectedCenterOffset,
+        top: scrollElement.scrollTop,
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 'auto'
+          : 'smooth',
+      });
+    }, 200);
+    return () => window.clearTimeout(timer);
+  }, [
+    selectedArticleTemplate?.id,
+    availableTemplates.map(template => template.id).join('|'),
+  ]);
 
   useEffect(() => {
     if (!isPublishing) return;
@@ -261,10 +344,115 @@ export function PageArticlePublisher() {
     }
   }, [publishPhase]);
 
+  useEffect(() => {
+    if (!publisherTaskCacheKey) return;
+    const createArticleId = managerCache.getLocalStorage<string>(
+      publisherTaskCacheKey
+    );
+    if (
+      typeof createArticleId !== 'string' ||
+      !/^ca_[a-f0-9]{29}$/.test(createArticleId)
+    ) {
+      if (createArticleId !== null) {
+        managerCache.removeLocalStorage(publisherTaskCacheKey);
+      }
+      return;
+    }
+
+    const controller = new AbortController();
+    publisherAbortRef.current?.abort();
+    publisherAbortRef.current = controller;
+    activeCreateArticleIdRef.current = createArticleId;
+    latestPublishRevisionRef.current = 0;
+    publishStartedAtRef.current ??= Date.now();
+    setIsPublishing(true);
+    setPublishResult(null);
+    setDraftResultOpen(false);
+    setPublishPhase('connecting');
+    if (restoreRequestVersion === 0) setPublishElapsedMs(0);
+    setPublishStatusText(publisherCopy.status.restoring);
+
+    let retryTimer: number | undefined;
+    let shouldRetry = false;
+    void getCreateArticleForLLMStatus(createArticleId, {
+      signal: controller.signal,
+      onConnected: event => {
+        updatePublishProgress(event);
+        setPublishStatusText(
+          event.message || publisherCopy.status.restoreConnected
+        );
+      },
+      onProgress: updatePublishProgress,
+    })
+      .then(streamResult => {
+        if (controller.signal.aborted) return;
+        managerCache.removeLocalStorage(publisherTaskCacheKey);
+        activeCreateArticleIdRef.current = '';
+        if (streamResult.status === 'not_found') {
+          setPublishPhase('idle');
+          setPublishSteps(createInitialPublishSteps());
+          setPublishStatusText(publisherCopy.status.autosave);
+          return;
+        }
+        setPublishResult(streamResult.result);
+        setDraftResultOpen(Boolean(streamResult.result?.article));
+        setPublishPhase('completed');
+        setPublishStatusText(publisherCopy.status.published);
+      })
+      .catch(error => {
+        if (controller.signal.aborted) return;
+        if (error instanceof ArticlePublisherStreamError && error.terminal) {
+          managerCache.removeLocalStorage(publisherTaskCacheKey);
+          activeCreateArticleIdRef.current = '';
+          setPublishPhase('failed');
+          setPublishStatusText(
+            `${publisherCopy.status.failedPrefix}${error.message}`
+          );
+          return;
+        }
+        if (error instanceof ArticlePublisherStreamError && !error.retryable) {
+          managerCache.removeLocalStorage(publisherTaskCacheKey);
+          activeCreateArticleIdRef.current = '';
+          setPublishPhase('failed');
+          setPublishStatusText(
+            `${publisherCopy.status.failedPrefix}${error.message}`
+          );
+          return;
+        }
+        shouldRetry = true;
+        setPublishPhase('connecting');
+        setPublishStatusText(publisherCopy.status.restoreRetrying);
+        retryTimer = window.setTimeout(
+          () => setRestoreRequestVersion(current => current + 1),
+          Math.min(3000 * 2 ** Math.min(restoreRequestVersion, 3), 30000)
+        );
+      })
+      .finally(() => {
+        if (controller.signal.aborted) return;
+        if (publisherAbortRef.current !== controller) return;
+        if (!shouldRetry && publishStartedAtRef.current) {
+          setPublishElapsedMs(Date.now() - publishStartedAtRef.current);
+        }
+        if (!shouldRetry) publishStartedAtRef.current = null;
+        publisherAbortRef.current = null;
+        if (!shouldRetry) setIsPublishing(false);
+      });
+
+    return () => {
+      controller.abort();
+      if (retryTimer) window.clearTimeout(retryTimer);
+    };
+  }, [publisherTaskCacheKey, restoreRequestVersion]);
+
   const exportedJson = useMemo(() => JSON.stringify(form, null, 2), [form]);
   const completionItems = useMemo(
-    () => getCompletionItems(form, publisherCopy, selectedPromptTemplate),
-    [form, publisherCopy, selectedPromptTemplate]
+    () =>
+      getCompletionItems(
+        form,
+        publisherCopy,
+        selectedArticleTemplate ?? undefined
+      ),
+    [form, publisherCopy, selectedArticleTemplate]
   );
   const completedCount = completionItems.filter(item => item.done).length;
 
@@ -275,39 +463,65 @@ export function PageArticlePublisher() {
     setForm(current => ({ ...current, [key]: value }));
   }
 
-  function updateDeliveryChannel(channel: DeliveryChannel) {
-    setValidationErrors([]);
-    setForm(current => ({
-      ...current,
-      deliveryChannels: {
-        ...current.deliveryChannels,
-        [channel]: !current.deliveryChannels[channel],
-      },
-    }));
-    setExpandedDeliveryChannels(current =>
-      form.deliveryChannels[channel]
-        ? current.filter(item => item !== channel)
-        : [...current, channel]
-    );
-  }
-
-  function toggleDeliveryDetails(channel: DeliveryChannel) {
-    setExpandedDeliveryChannels(current =>
-      current.includes(channel)
-        ? current.filter(item => item !== channel)
-        : [...current, channel]
-    );
-  }
-
   function updatePublishMode(publishMode: ArticlePublisherMode) {
     setValidationErrors([]);
-    setForm(current => ({
-      ...current,
-      publishMode,
-      rewriteRequirement: hasText(current.rewriteRequirement)
-        ? current.rewriteRequirement
-        : defaultRewriteRequirement,
-    }));
+    setForm(current => {
+      const targetSetting = current.modeSettings[publishMode];
+      const nextTemplate =
+        (targetSetting.customTemplate?.id === targetSetting.templateId
+          ? targetSetting.customTemplate
+          : undefined) ??
+        articleTemplates.find(
+          template => template.id === targetSetting.templateId
+        ) ??
+        articleTemplates.find(
+          template => template.id === templateResource.state?.defaultTemplateId
+        ) ??
+        articleTemplates[0];
+      return {
+        ...current,
+        ...(nextTemplate ? getTemplateContent(nextTemplate) : {}),
+        publishMode,
+        rewriteRequirement: hasText(current.rewriteRequirement)
+          ? current.rewriteRequirement
+          : defaultRewriteRequirement,
+      };
+    });
+  }
+
+  function updateTemplateFields(
+    update: (current: ArticlePublisherForm) => ArticlePublisherForm
+  ) {
+    if (!selectedArticleTemplate) return;
+    setValidationErrors([]);
+    setForm(current => {
+      const updated = update(current);
+      const setting = getActiveModeSetting(updated);
+      const sourceTemplateId =
+        selectedArticleTemplate.id === customArticleTemplateId
+          ? selectedArticleTemplate.sourceTemplateId
+          : selectedArticleTemplate.id;
+      const customTemplate: ArticleTemplate = {
+        ...selectedArticleTemplate,
+        id: customArticleTemplateId,
+        label: publisherCopy.customization.customLabel,
+        caption: publisherCopy.customization.customDescription,
+        ...(sourceTemplateId ? { sourceTemplateId } : {}),
+        updatedAt: Date.now(),
+        payload: getTemplatePayloadFromForm(updated),
+      };
+      return {
+        ...updated,
+        modeSettings: {
+          ...updated.modeSettings,
+          [updated.publishMode]: {
+            ...setting,
+            templateId: customArticleTemplateId,
+            customTemplate,
+          },
+        },
+      };
+    });
   }
 
   function updateCustomizationOpen(isOpen: boolean) {
@@ -324,24 +538,15 @@ export function PageArticlePublisher() {
           },
         },
       };
-      const shouldSeedAdvancedFields =
-        isOpen &&
-        !hasText(current.promptSystem) &&
-        !hasText(current.promptContent) &&
-        !hasText(current.imageCover.value) &&
-        current.imagesInlineList.length === 0;
-      if (!shouldSeedAdvancedFields) return next;
-
-      const template =
-        promptTemplates.find(item => item.id === currentSetting.templateId) ??
-        promptTemplates[0]!;
-      return { ...next, ...getTemplateContent(template) };
+      return isOpen && selectedArticleTemplate
+        ? { ...next, ...getTemplateContent(selectedArticleTemplate) }
+        : next;
     });
   }
 
-  function applyTemplate(templateId: PromptTemplateId) {
+  function applyTemplate(templateId: string) {
     setValidationErrors([]);
-    const template = promptTemplates.find(item => item.id === templateId);
+    const template = availableTemplates.find(item => item.id === templateId);
     if (!template) return;
     setForm(current => {
       const activeSetting = getActiveModeSetting(current);
@@ -363,26 +568,16 @@ export function PageArticlePublisher() {
     );
   }
 
-  function updateSelectedTemplate(templateId: PromptTemplateId) {
+  function updateSelectedTemplate(templateId: string) {
     if (templateId === activeModeSetting.templateId) return;
-    if (hasTemplateCustomizations(form, selectedPromptTemplate)) {
-      setPendingTemplateId(templateId);
-      return;
-    }
     applyTemplate(templateId);
-  }
-
-  function confirmTemplateReplacement() {
-    if (!pendingTemplateId) return;
-    applyTemplate(pendingTemplateId);
-    setPendingTemplateId(null);
   }
 
   function validatePublisherForm() {
     const nextErrors = getValidationErrors(
       form,
       publisherCopy,
-      selectedPromptTemplate
+      selectedArticleTemplate ?? undefined
     );
     setValidationErrors(nextErrors);
     return nextErrors.length === 0;
@@ -392,7 +587,7 @@ export function PageArticlePublisher() {
     index: number,
     patch: Partial<OfficialImageConfig>
   ) {
-    setForm(current => ({
+    updateTemplateFields(current => ({
       ...current,
       imagesInlineList: current.imagesInlineList.map((item, itemIndex) =>
         itemIndex === index ? { ...item, ...patch } : item
@@ -401,20 +596,29 @@ export function PageArticlePublisher() {
   }
 
   function addInlineImage() {
-    setForm(current => {
-      if (current.imagesInlineList.length >= 9) return current;
+    if (
+      form.imagesInlineList.length >= maxInlineImageCount ||
+      inlineImageTemplateList.length === 0
+    ) {
+      return;
+    }
+    const templateInlineImage =
+      inlineImageTemplateList[
+        Math.floor(Math.random() * inlineImageTemplateList.length)
+      ];
+    updateTemplateFields(current => {
       return {
         ...current,
         imagesInlineList: [
           ...current.imagesInlineList,
-          { type: 'ai', value: '' },
+          { ...templateInlineImage },
         ],
       };
     });
   }
 
   function removeInlineImage(index: number) {
-    setForm(current => ({
+    updateTemplateFields(current => ({
       ...current,
       imagesInlineList: current.imagesInlineList.filter(
         (_, itemIndex) => itemIndex !== index
@@ -423,41 +627,49 @@ export function PageArticlePublisher() {
   }
 
   function updatePublishProgress(event: ArticlePublisherProgressEvent) {
-    if (event.key === 'timeline' && event.steps) {
-      setPublishSteps(createInitialPublishSteps(event.steps));
+    if (
+      event.revision !== undefined &&
+      event.revision <= latestPublishRevisionRef.current
+    ) {
       return;
     }
-    if (!event.key) return;
-
-    setPublishSteps(current =>
-      current.map(step => {
-        if (step.key !== event.key) return step;
-        const status: PublishStepStatus =
-          event.status === 'info'
-            ? step.status === 'pending'
-              ? 'running'
-              : step.status
-            : event.status === 'warning'
-              ? 'warning'
-              : event.status === 'retrying'
+    if (event.revision !== undefined) {
+      latestPublishRevisionRef.current = event.revision;
+    }
+    if (event.steps) {
+      setPublishSteps(createInitialPublishSteps(event.steps));
+    }
+    if (!event.steps && event.key) {
+      setPublishSteps(current =>
+        current.map(step => {
+          if (step.key !== event.key) return step;
+          const status: PublishStepStatus =
+            event.status === 'info'
+              ? step.status === 'pending'
                 ? 'running'
-                : event.status === 'completed' ||
-                    event.status === 'failed' ||
-                    event.status === 'running'
-                  ? event.status
-                  : step.status;
-        return {
-          ...step,
-          status,
-          message: event.message ?? step.message,
-          durationMs: event.durationMs ?? step.durationMs,
-          requestedCount:
-            event.totalImageCount ??
-            event.requestedCount ??
-            step.requestedCount,
-        };
-      })
-    );
+                : step.status
+              : event.status === 'warning'
+                ? 'warning'
+                : event.status === 'retrying'
+                  ? 'running'
+                  : event.status === 'completed' ||
+                      event.status === 'failed' ||
+                      event.status === 'running'
+                    ? event.status
+                    : step.status;
+          return {
+            ...step,
+            status,
+            message: event.message ?? step.message,
+            durationMs: event.durationMs ?? step.durationMs,
+            requestedCount:
+              event.totalImageCount ??
+              event.requestedCount ??
+              step.requestedCount,
+          };
+        })
+      );
+    }
 
     if (event.status === 'running' || event.status === 'retrying') {
       setPublishPhase('publishing');
@@ -492,6 +704,7 @@ export function PageArticlePublisher() {
   }
 
   async function startPublish() {
+    if (!selectedArticleTemplate) return;
     setPublishConfirmOpen(false);
     setIsPublishing(true);
     setPublishResult(null);
@@ -500,21 +713,34 @@ export function PageArticlePublisher() {
     setPublishSteps(createInitialPublishSteps());
     setPublishElapsedMs(0);
     setPublishStatusText(publisherCopy.status.connecting);
+    setRestoreRequestVersion(0);
+    latestPublishRevisionRef.current = 0;
+    activeCreateArticleIdRef.current = '';
 
     const body = buildPublisherRequestBody(
       form,
-      selectedPromptTemplate,
+      selectedArticleTemplate,
       defaultRewriteRequirement
     );
 
+    publisherAbortRef.current?.abort();
+    const controller = new AbortController();
+    publisherAbortRef.current = controller;
+    publishStartedAtRef.current = Date.now();
+
     try {
-      publisherAbortRef.current?.abort();
-      const controller = new AbortController();
-      publisherAbortRef.current = controller;
-      publishStartedAtRef.current = Date.now();
       const result = await streamPostCreateArticleForLLM(body, {
         signal: controller.signal,
         onConnected: event => {
+          updatePublishProgress(event);
+          if (event.createArticleId && publisherTaskCacheKey) {
+            activeCreateArticleIdRef.current = event.createArticleId;
+            managerCache.setLocalStorage(
+              publisherTaskCacheKey,
+              event.createArticleId,
+              6 * 60 * 60
+            );
+          }
           setPublishPhase('publishing');
           setPublishStatusText(event.message || publisherCopy.status.connected);
         },
@@ -524,7 +750,29 @@ export function PageArticlePublisher() {
       setDraftResultOpen(Boolean(result?.article));
       setPublishPhase('completed');
       setPublishStatusText(publisherCopy.status.published);
+      if (publisherTaskCacheKey) {
+        managerCache.removeLocalStorage(publisherTaskCacheKey);
+      }
+      activeCreateArticleIdRef.current = '';
     } catch (error) {
+      if (controller.signal.aborted) return;
+      const canRestore =
+        Boolean(activeCreateArticleIdRef.current && publisherTaskCacheKey) &&
+        (!(error instanceof ArticlePublisherStreamError) || error.retryable) &&
+        !(error instanceof ArticlePublisherStreamError && error.terminal);
+      if (canRestore) {
+        setPublishPhase('connecting');
+        setPublishStatusText(publisherCopy.status.restoreRetrying);
+        setRestoreRequestVersion(current => current + 1);
+        return;
+      }
+      if (
+        error instanceof ArticlePublisherStreamError &&
+        publisherTaskCacheKey
+      ) {
+        managerCache.removeLocalStorage(publisherTaskCacheKey);
+        activeCreateArticleIdRef.current = '';
+      }
       const message =
         error instanceof Error
           ? error.message
@@ -539,12 +787,17 @@ export function PageArticlePublisher() {
       );
       setPublishStatusText(`${publisherCopy.status.failedPrefix}${message}`);
     } finally {
-      if (publishStartedAtRef.current) {
-        setPublishElapsedMs(Date.now() - publishStartedAtRef.current);
+      if (
+        !controller.signal.aborted &&
+        publisherAbortRef.current === controller
+      ) {
+        if (publishStartedAtRef.current) {
+          setPublishElapsedMs(Date.now() - publishStartedAtRef.current);
+        }
+        publishStartedAtRef.current = null;
+        publisherAbortRef.current = null;
+        setIsPublishing(false);
       }
-      publishStartedAtRef.current = null;
-      publisherAbortRef.current = null;
-      setIsPublishing(false);
     }
   }
 
@@ -577,11 +830,11 @@ export function PageArticlePublisher() {
     const file = event.target.files?.[0];
     if (!file) return;
     try {
-      const imported = normalizeForm(
+      const normalized = normalizeForm(
         JSON.parse(await file.text()),
         defaultRewriteRequirement
       );
-      setForm(imported);
+      setForm(normalized);
       setValidationErrors([]);
       setPublishStatusText(publisherCopy.status.importDone);
     } catch {
@@ -606,6 +859,7 @@ export function PageArticlePublisher() {
   return (
     <>
       <LayoutPage
+        className='article-publisher-page'
         icon={Send}
         seoKey={articlePublisherSeoKey}
         toolId={articlePublisherToolId}
@@ -614,6 +868,10 @@ export function PageArticlePublisher() {
             className='json-actions'
             aria-label={publisherCopy.jsonActionsAriaLabel}
           >
+            <OButton to='/articles' variant='ghost'>
+              <FileText size={17} aria-hidden='true' />
+              {messages.articles.listTitle}
+            </OButton>
             <OButton
               type='button'
               variant='ghost'
@@ -667,246 +925,6 @@ export function PageArticlePublisher() {
           <div className='publisher-workspace'>
             <div className='publisher-main'>
               <PublisherModuleCard
-                className='delivery-paths-card'
-                description={publisherCopy.sections.delivery.description}
-                icon={Send}
-                title={publisherCopy.sections.delivery.title}
-              >
-                <div
-                  className='delivery-path-selection'
-                  role='group'
-                  aria-label={
-                    publisherCopy.sections.delivery.selectionAriaLabel
-                  }
-                >
-                  {(['wechat', 'email'] as const).map(channel => {
-                    const copy = publisherCopy.sections.delivery[channel];
-                    const Icon = channel === 'wechat' ? KeyRound : Mail;
-                    const isSelected = form.deliveryChannels[channel];
-                    const isExpanded =
-                      expandedDeliveryChannels.includes(channel);
-
-                    return (
-                      <section
-                        key={channel}
-                        className={`delivery-path ${isSelected ? 'is-selected' : ''} ${
-                          isExpanded ? 'is-expanded' : ''
-                        }`.trim()}
-                        aria-label={copy.title}
-                      >
-                        <div className='delivery-path-head'>
-                          <button
-                            type='button'
-                            className='delivery-path-choice interactive'
-                            role='checkbox'
-                            aria-checked={isSelected}
-                            onClick={() => updateDeliveryChannel(channel)}
-                          >
-                            <span
-                              className='delivery-path-check'
-                              aria-hidden='true'
-                            >
-                              <CheckCircle2 size={18} />
-                            </span>
-                            <span
-                              className='delivery-path-icon'
-                              aria-hidden='true'
-                            >
-                              <Icon size={22} />
-                            </span>
-                            <span className='delivery-path-copy'>
-                              <strong>{copy.title}</strong>
-                              <small>{copy.description}</small>
-                            </span>
-                          </button>
-                          {isSelected ? (
-                            <button
-                              type='button'
-                              className='delivery-path-details-toggle interactive'
-                              aria-expanded={isExpanded}
-                              onClick={() => toggleDeliveryDetails(channel)}
-                            >
-                              {isExpanded ? copy.collapse : copy.expand}
-                              {isExpanded ? (
-                                <ChevronsUp size={16} aria-hidden='true' />
-                              ) : (
-                                <ChevronsDown size={16} aria-hidden='true' />
-                              )}
-                            </button>
-                          ) : null}
-                        </div>
-
-                        {isSelected && isExpanded ? (
-                          <div className='delivery-path-details'>
-                            {channel === 'wechat' ? (
-                              <>
-                                <section className='wechat-chain-setup'>
-                                  <div className='wechat-chain-guide'>
-                                    <OTooltip
-                                      className='wechat-chain-visual interactive'
-                                      ariaLabel={publisherCopy.setupAriaLabel}
-                                      content={
-                                        <div className='wechat-setup-preview'>
-                                          <img
-                                            src={WechatConsoleGuide}
-                                            alt=''
-                                          />
-                                        </div>
-                                      }
-                                      contentClassName='wechat-setup-tooltip'
-                                      maxWidth={680}
-                                      placement='bottom-start'
-                                      offset={12}
-                                    >
-                                      <img
-                                        src={WechatConsoleGuide}
-                                        alt={publisherCopy.setupImageAlt}
-                                      />
-                                    </OTooltip>
-                                    <div>
-                                      <h3>
-                                        {
-                                          publisherCopy.sections.delivery.wechat
-                                            .setupTitle
-                                        }
-                                      </h3>
-                                      <p>
-                                        {
-                                          publisherCopy.sections.delivery.wechat
-                                            .setupDescription
-                                        }
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <ol className='setup-steps'>
-                                    <li>{publisherCopy.setupSteps[0]}</li>
-                                    <li>{publisherCopy.setupSteps[1]}</li>
-                                    <li>
-                                      {publisherCopy.setupSteps[2]}{' '}
-                                      <code>{apiWhitelistIp}</code>.
-                                    </li>
-                                  </ol>
-                                  <div className='setup-actions'>
-                                    <OButton
-                                      href={wechatConsoleUrl}
-                                      target='_blank'
-                                      rel='noreferrer'
-                                    >
-                                      <ExternalLink
-                                        size={17}
-                                        aria-hidden='true'
-                                      />
-                                      {publisherCopy.openWechatConsole}
-                                    </OButton>
-                                    <OButton
-                                      type='button'
-                                      variant='secondary'
-                                      onClick={handleCopyIp}
-                                    >
-                                      <Clipboard size={17} aria-hidden='true' />
-                                      {copiedIp
-                                        ? publisherCopy.copiedIp
-                                        : publisherCopy.copyIp}
-                                    </OButton>
-                                  </div>
-                                </section>
-                                <div className='delivery-path-inputs form-grid two'>
-                                  <label className='field'>
-                                    <span>
-                                      {publisherCopy.sections.account.appId}
-                                    </span>
-                                    <input
-                                      value={form.appId}
-                                      onChange={event =>
-                                        updateField('appId', event.target.value)
-                                      }
-                                      placeholder={
-                                        publisherCopy.sections.account
-                                          .appIdPlaceholder
-                                      }
-                                      required
-                                    />
-                                  </label>
-                                  <label className='field'>
-                                    <span>
-                                      {publisherCopy.sections.account.appSecret}
-                                    </span>
-                                    <input
-                                      value={form.appSecret}
-                                      onChange={event =>
-                                        updateField(
-                                          'appSecret',
-                                          event.target.value
-                                        )
-                                      }
-                                      placeholder={
-                                        publisherCopy.sections.account
-                                          .appSecretPlaceholder
-                                      }
-                                      type='password'
-                                      required
-                                    />
-                                  </label>
-                                </div>
-                                <p className='delivery-path-endpoint'>
-                                  <CheckCircle2 size={16} aria-hidden='true' />
-                                  {
-                                    publisherCopy.sections.delivery.wechat
-                                      .endpoint
-                                  }
-                                </p>
-                              </>
-                            ) : (
-                              <>
-                                <label className='field'>
-                                  <span>
-                                    {
-                                      publisherCopy.sections.delivery
-                                        .finalReportEmails
-                                    }
-                                  </span>
-                                  <textarea
-                                    aria-describedby='final-report-emails-hint'
-                                    inputMode='email'
-                                    value={form.finalReportEmails}
-                                    onChange={event =>
-                                      updateField(
-                                        'finalReportEmails',
-                                        event.target.value
-                                      )
-                                    }
-                                    placeholder={
-                                      publisherCopy.sections.delivery
-                                        .finalReportEmailsPlaceholder
-                                    }
-                                    rows={2}
-                                    required
-                                  />
-                                  <small id='final-report-emails-hint'>
-                                    {
-                                      publisherCopy.sections.delivery
-                                        .finalReportEmailsHint
-                                    }
-                                  </small>
-                                </label>
-                                <p className='delivery-path-endpoint'>
-                                  <CheckCircle2 size={16} aria-hidden='true' />
-                                  {
-                                    publisherCopy.sections.delivery.email
-                                      .endpoint
-                                  }
-                                </p>
-                              </>
-                            )}
-                          </div>
-                        ) : null}
-                      </section>
-                    );
-                  })}
-                </div>
-              </PublisherModuleCard>
-
-              <PublisherModuleCard
                 className='publisher-mode-card'
                 description={publisherCopy.modeSwitch.description}
                 icon={FileDiff}
@@ -942,41 +960,103 @@ export function PageArticlePublisher() {
                 className='publisher-config-card'
                 description={publisherCopy.simpleMode.description}
                 headingExtra={
-                  <label className='template-model-selector'>
-                    <span>{publisherCopy.sections.account.provider}</span>
-                    <OSelector
-                      ariaLabel={
-                        publisherCopy.sections.account.modelSelectorAriaLabel
-                      }
-                      options={providerOptions}
-                      value={form.provider}
-                      onChange={provider => updateField('provider', provider)}
-                    />
-                  </label>
+                  <button
+                    className='publisher-switch-button'
+                    type='button'
+                    role='switch'
+                    aria-checked={isCustomizationOpen}
+                    disabled={!selectedArticleTemplate}
+                    onClick={() =>
+                      updateCustomizationOpen(!isCustomizationOpen)
+                    }
+                  >
+                    <span>
+                      {isCustomizationOpen
+                        ? publisherCopy.customization.hide
+                        : publisherCopy.customization.show}
+                    </span>
+                    <i aria-hidden='true' />
+                  </button>
                 }
                 icon={ClipboardPenLine}
                 title={publisherCopy.simpleMode.title}
               >
-                <div className='template-picker'>
-                  <label className='simple-template-field'>
-                    <span>{publisherCopy.simpleMode.templateLabel}</span>
-                    <OSelector
-                      ariaLabel={publisherCopy.simpleMode.selectorAriaLabel}
-                      className='simple-template-selector'
-                      options={templateOptions}
-                      placement='auto'
-                      value={activeModeSetting.templateId}
-                      onChange={updateSelectedTemplate}
+                {templateResource.error ? (
+                  <div className='template-resource-notice' role='status'>
+                    <span>
+                      {templateResource.state
+                        ? publisherCopy.templates.cached
+                        : publisherCopy.templates.failed}
+                    </span>
+                    <OButton
+                      type='button'
+                      size='sm'
+                      variant='ghost'
+                      onClick={() =>
+                        setTemplateRequestVersion(current => current + 1)
+                      }
+                    >
+                      {publisherCopy.templates.retry}
+                    </OButton>
+                  </div>
+                ) : templateResource.isLoading ? (
+                  <div className='template-resource-notice' role='status'>
+                    <Loader2
+                      className='is-spinning'
+                      size={16}
+                      aria-hidden='true'
                     />
-                  </label>
+                    <span>{publisherCopy.templates.loading}</span>
+                  </div>
+                ) : null}
+                {availableTemplates.length && selectedArticleTemplate ? (
+                  <div
+                    className='template-card-scroll'
+                    role='radiogroup'
+                    aria-label={publisherCopy.simpleMode.selectorAriaLabel}
+                    ref={templateScrollRef}
+                  >
+                    <div className='template-card-list'>
+                      {availableTemplates.map(template => {
+                        const isSelected =
+                          template.id === selectedArticleTemplate.id;
+                        return (
+                          <button
+                            className={
+                              isSelected
+                                ? 'template-choice is-selected'
+                                : 'template-choice'
+                            }
+                            type='button'
+                            role='radio'
+                            aria-checked={isSelected}
+                            key={template.id}
+                            onClick={() => updateSelectedTemplate(template.id)}
+                          >
+                            <span>{template.label}</span>
+                            <small>{template.caption}</small>
+                            {isSelected ? (
+                              <CheckCircle2 size={17} aria-hidden='true' />
+                            ) : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <span className='template-empty'>
+                    {publisherCopy.templates.empty}
+                  </span>
+                )}
+                {selectedArticleTemplate && !isCustomizationOpen ? (
                   <div className='template-summary'>
                     <CheckCircle2 size={16} aria-hidden='true' />
                     <span>
-                      <strong>{selectedPromptTemplate.label}</strong>
-                      {selectedPromptTemplate.caption}
+                      <strong>{selectedArticleTemplate.label}</strong>
+                      {selectedArticleTemplate.caption}
                     </span>
                   </div>
-                </div>
+                ) : null}
 
                 {!isCustomizationOpen && form.publishMode === 'rewrite' ? (
                   <div className='rewrite-simple-note'>
@@ -987,6 +1067,20 @@ export function PageArticlePublisher() {
 
                 {isCustomizationOpen ? (
                   <div className='advanced-config'>
+                    <div className='advanced-config-section'>
+                      <div className='advanced-section-heading'>
+                        <h3>{publisherCopy.sections.account.provider}</h3>
+                      </div>
+                      <OSelector
+                        ariaLabel={
+                          publisherCopy.sections.account.modelSelectorAriaLabel
+                        }
+                        className='advanced-provider-selector'
+                        options={providerOptions}
+                        value={form.provider}
+                        onChange={provider => updateField('provider', provider)}
+                      />
+                    </div>
                     {form.publishMode === 'rewrite' ? (
                       <div className='advanced-config-section'>
                         <div className='advanced-section-heading'>
@@ -1028,7 +1122,10 @@ export function PageArticlePublisher() {
                           as='textarea'
                           value={form.promptSystem}
                           onValueChange={value =>
-                            updateField('promptSystem', value)
+                            updateTemplateFields(current => ({
+                              ...current,
+                              promptSystem: value,
+                            }))
                           }
                           polishMode='official_system_prompt'
                           rows={4}
@@ -1045,7 +1142,10 @@ export function PageArticlePublisher() {
                           as='textarea'
                           value={form.promptContent}
                           onValueChange={value =>
-                            updateField('promptContent', value)
+                            updateTemplateFields(current => ({
+                              ...current,
+                              promptContent: value,
+                            }))
                           }
                           polishMode='official_content_prompt'
                           rows={5}
@@ -1066,7 +1166,7 @@ export function PageArticlePublisher() {
                         <OInputAI
                           value={form.imageCover.value}
                           onValueChange={value =>
-                            setForm(current => ({
+                            updateTemplateFields(current => ({
                               ...current,
                               imageCover: { ...current.imageCover, value },
                             }))
@@ -1097,16 +1197,18 @@ export function PageArticlePublisher() {
                               : publisherCopy.sections.images.inlineEmpty}
                           </p>
                         </div>
-                        <OButton
-                          type='button'
-                          size='sm'
-                          variant='ghost'
-                          onClick={addInlineImage}
-                          disabled={form.imagesInlineList.length >= 9}
-                        >
-                          <Plus size={17} aria-hidden='true' />
-                          {publisherCopy.sections.images.addImage}
-                        </OButton>
+                        {form.imagesInlineList.length < maxInlineImageCount &&
+                        inlineImageTemplateList.length ? (
+                          <OButton
+                            type='button'
+                            size='sm'
+                            variant='ghost'
+                            onClick={addInlineImage}
+                          >
+                            <Plus size={17} aria-hidden='true' />
+                            {publisherCopy.sections.images.addImage}
+                          </OButton>
+                        ) : null}
                       </div>
                       <div className='inline-image-list'>
                         {form.imagesInlineList.map((item, index) => (
@@ -1190,21 +1292,185 @@ export function PageArticlePublisher() {
                     </div>
                   </div>
                 ) : null}
-                <OButton
-                  className='editor-mode-toggle'
-                  type='button'
-                  variant='ghost'
-                  onClick={() => updateCustomizationOpen(!isCustomizationOpen)}
-                >
-                  {isCustomizationOpen ? (
-                    <ChevronsUp size={17} aria-hidden='true' />
-                  ) : (
-                    <ChevronsDown size={17} aria-hidden='true' />
-                  )}
-                  {isCustomizationOpen
-                    ? publisherCopy.customization.hide
-                    : publisherCopy.customization.show}
-                </OButton>
+              </PublisherModuleCard>
+
+              <PublisherModuleCard
+                className='delivery-settings-card'
+                description={publisherCopy.sections.delivery.description}
+                icon={Mail}
+                title={publisherCopy.sections.delivery.title}
+              >
+                <div className='delivery-option-list'>
+                  <section className='delivery-option'>
+                    <button
+                      className='delivery-toggle-row'
+                      type='button'
+                      role='switch'
+                      aria-checked={form.deliveryWechat}
+                      onClick={() =>
+                        updateField('deliveryWechat', !form.deliveryWechat)
+                      }
+                    >
+                      <span className='delivery-toggle-copy'>
+                        <strong>
+                          {publisherCopy.sections.delivery.wechat.title}
+                        </strong>
+                        <small>
+                          {publisherCopy.sections.delivery.wechat.description}
+                        </small>
+                      </span>
+                      <i className='publisher-switch' aria-hidden='true' />
+                    </button>
+                    {form.deliveryWechat ? (
+                      <div className='delivery-option-detail'>
+                        <div className='wechat-chain-setup'>
+                          <div className='wechat-chain-guide'>
+                            <OTooltip
+                              className='wechat-chain-visual interactive'
+                              ariaLabel={publisherCopy.setupAriaLabel}
+                              content={
+                                <div className='wechat-setup-preview'>
+                                  <img src={WechatConsoleGuide} alt='' />
+                                </div>
+                              }
+                              contentClassName='wechat-setup-tooltip'
+                              maxWidth={680}
+                              placement='bottom-start'
+                              offset={12}
+                            >
+                              <img
+                                src={WechatConsoleGuide}
+                                alt={publisherCopy.setupImageAlt}
+                              />
+                            </OTooltip>
+                            <div>
+                              <h4>
+                                {
+                                  publisherCopy.sections.delivery.wechat
+                                    .setupTitle
+                                }
+                              </h4>
+                              <p>
+                                {
+                                  publisherCopy.sections.delivery.wechat
+                                    .setupDescription
+                                }
+                              </p>
+                            </div>
+                          </div>
+                          <div className='setup-actions'>
+                            <OButton
+                              href={wechatConsoleUrl}
+                              target='_blank'
+                              rel='noreferrer'
+                              size='sm'
+                            >
+                              <ExternalLink size={16} aria-hidden='true' />
+                              {publisherCopy.openWechatConsole}
+                            </OButton>
+                            <OButton
+                              type='button'
+                              variant='secondary'
+                              size='sm'
+                              onClick={handleCopyIp}
+                            >
+                              <Clipboard size={16} aria-hidden='true' />
+                              {copiedIp
+                                ? publisherCopy.copiedIp
+                                : publisherCopy.copyIp}
+                            </OButton>
+                          </div>
+                        </div>
+                        <div className='form-grid two'>
+                          <label className='field'>
+                            <span>{publisherCopy.sections.account.appId}</span>
+                            <input
+                              value={form.appId}
+                              onChange={event =>
+                                updateField('appId', event.target.value)
+                              }
+                              placeholder={
+                                publisherCopy.sections.account.appIdPlaceholder
+                              }
+                              required
+                            />
+                          </label>
+                          <label className='field'>
+                            <span>
+                              {publisherCopy.sections.account.appSecret}
+                            </span>
+                            <input
+                              value={form.appSecret}
+                              onChange={event =>
+                                updateField('appSecret', event.target.value)
+                              }
+                              placeholder={
+                                publisherCopy.sections.account
+                                  .appSecretPlaceholder
+                              }
+                              type='password'
+                              required
+                            />
+                          </label>
+                        </div>
+                      </div>
+                    ) : null}
+                  </section>
+
+                  <section className='delivery-option'>
+                    <button
+                      className='delivery-toggle-row'
+                      type='button'
+                      role='switch'
+                      aria-checked={form.deliveryEmail}
+                      onClick={() =>
+                        updateField('deliveryEmail', !form.deliveryEmail)
+                      }
+                    >
+                      <span className='delivery-toggle-copy'>
+                        <strong>
+                          {publisherCopy.sections.delivery.email.title}
+                        </strong>
+                        <small>
+                          {publisherCopy.sections.delivery.email.description}
+                        </small>
+                      </span>
+                      <i className='publisher-switch' aria-hidden='true' />
+                    </button>
+                    {form.deliveryEmail ? (
+                      <div className='delivery-option-detail'>
+                        <label className='field'>
+                          <span>
+                            {publisherCopy.sections.delivery.finalReportEmails}
+                          </span>
+                          <textarea
+                            aria-describedby='final-report-emails-hint'
+                            inputMode='email'
+                            value={form.finalReportEmails}
+                            onChange={event =>
+                              updateField(
+                                'finalReportEmails',
+                                event.target.value
+                              )
+                            }
+                            placeholder={
+                              publisherCopy.sections.delivery
+                                .finalReportEmailsPlaceholder
+                            }
+                            rows={3}
+                            required
+                          />
+                          <small id='final-report-emails-hint'>
+                            {
+                              publisherCopy.sections.delivery
+                                .finalReportEmailsHint
+                            }
+                          </small>
+                        </label>
+                      </div>
+                    ) : null}
+                  </section>
+                </div>
               </PublisherModuleCard>
             </div>
 
@@ -1256,53 +1522,59 @@ export function PageArticlePublisher() {
                   </div>
                 </div>
 
-                <div className='publisher-status-line' aria-live='polite'>
-                  {isPublishing ? (
-                    <Loader2 className='spin' size={18} aria-hidden='true' />
-                  ) : publishPhase === 'completed' ? (
-                    <CheckCircle2 size={18} aria-hidden='true' />
-                  ) : null}
-                  <span>{publishStatusText}</span>
-                </div>
-                {publishPhase === 'completed' ? (
-                  <button
-                    className='publisher-result-reopen interactive'
-                    type='button'
-                    onClick={() => setDraftResultOpen(true)}
-                  >
-                    <FilePenLine size={15} aria-hidden='true' />
-                    {publisherCopy.aside.viewResult}
-                  </button>
-                ) : null}
-                <div className='publisher-action-buttons'>
-                  <OButton
-                    className='publisher-reset'
-                    type='button'
-                    variant='ghost'
-                    onClick={() => setResetConfirmOpen(true)}
-                    disabled={isPublishing}
-                  >
-                    <RotateCcw size={17} aria-hidden='true' />
-                    {publisherCopy.aside.reset}
-                  </OButton>
-                  <OButton
-                    className='publisher-submit'
-                    type='submit'
-                    disabled={isPublishing}
-                  >
+                <div className='publisher-action-controls'>
+                  <div className='publisher-status-line' aria-live='polite'>
                     {isPublishing ? (
-                      <Loader2 className='spin' size={17} aria-hidden='true' />
-                    ) : form.publishMode === 'rewrite' ? (
-                      <FileDiff size={17} aria-hidden='true' />
-                    ) : (
-                      <Send size={17} aria-hidden='true' />
-                    )}
-                    {isPublishing
-                      ? publisherCopy.aside.generating
-                      : form.publishMode === 'rewrite'
-                        ? publisherCopy.aside.generateRewrite
-                        : publisherCopy.aside.generate}
-                  </OButton>
+                      <Loader2 className='spin' size={18} aria-hidden='true' />
+                    ) : publishPhase === 'completed' ? (
+                      <CheckCircle2 size={18} aria-hidden='true' />
+                    ) : null}
+                    <span>{publishStatusText}</span>
+                  </div>
+                  {publishPhase === 'completed' ? (
+                    <button
+                      className='publisher-result-reopen interactive'
+                      type='button'
+                      onClick={() => setDraftResultOpen(true)}
+                    >
+                      <FilePenLine size={15} aria-hidden='true' />
+                      {publisherCopy.aside.viewResult}
+                    </button>
+                  ) : null}
+                  <div className='publisher-action-buttons'>
+                    <OButton
+                      className='publisher-reset'
+                      type='button'
+                      variant='ghost'
+                      onClick={() => setResetConfirmOpen(true)}
+                      disabled={isPublishing}
+                    >
+                      <RotateCcw size={17} aria-hidden='true' />
+                      {publisherCopy.aside.reset}
+                    </OButton>
+                    <OButton
+                      className='publisher-submit'
+                      type='submit'
+                      disabled={isPublishing}
+                    >
+                      {isPublishing ? (
+                        <Loader2
+                          className='spin'
+                          size={17}
+                          aria-hidden='true'
+                        />
+                      ) : form.publishMode === 'rewrite' ? (
+                        <FileDiff size={17} aria-hidden='true' />
+                      ) : (
+                        <Send size={17} aria-hidden='true' />
+                      )}
+                      {isPublishing
+                        ? publisherCopy.aside.generating
+                        : form.publishMode === 'rewrite'
+                          ? publisherCopy.aside.generateRewrite
+                          : publisherCopy.aside.generate}
+                    </OButton>
+                  </div>
                 </div>
               </OCard>
 
@@ -1339,23 +1611,6 @@ export function PageArticlePublisher() {
           onClose={() => setDraftResultOpen(false)}
         />
       ) : null}
-
-      <OModalConfirm
-        ariaLabel={publisherCopy.customization.replaceAriaLabel}
-        isOpen={Boolean(pendingTemplate)}
-        title={publisherCopy.customization.replaceTitle}
-        description={
-          <>
-            {publisherCopy.customization.replaceDescriptionPrefix}
-            <strong>{pendingTemplate?.label}</strong>
-            {publisherCopy.customization.replaceDescriptionSuffix}
-          </>
-        }
-        cancelLabel={publisherCopy.customization.cancel}
-        confirmLabel={publisherCopy.customization.replace}
-        onCancel={() => setPendingTemplateId(null)}
-        onConfirm={confirmTemplateReplacement}
-      />
 
       <OModalConfirm
         ariaLabel={publisherCopy.status.confirmTitle}

@@ -11,6 +11,8 @@ export const cacheKeys = {
   locale: 'orz2:locale',
   localRum: 'orz2:local-rum',
   articlePublisherForm: 'orz2:article-publisher-form',
+  articlePublisherTemplates: 'orz2:article-publisher-templates',
+  articlePublisherTask: 'orz2:article-publisher-task',
   siliconMemberToken: 'orz2:silicon-member-token',
   themePreference: 'orz2:theme-preference',
   workReportPolisherForm: 'orz2:work-report-polisher-form',

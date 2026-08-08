@@ -1,28 +1,27 @@
 import type {
   ArticlePublisherMode,
+  ArticlePublisherProgressStep,
   ArticlePublisherProvider,
+  ArticleTemplate,
   OfficialCommentConfig,
   OfficialImageConfig,
 } from '@/api';
 import type { I18nContextValue } from '@/i18n/context';
-import type { PromptTemplateId } from '@/pages/Tools/ToolArticlePublisher/config';
 
 export interface PublisherModeSetting {
   isCustomizationOpen: boolean;
-  templateId: PromptTemplateId;
+  templateId: string;
+  customTemplate?: ArticleTemplate;
 }
-
-export type DeliveryChannel = 'wechat' | 'email';
-
-export type DeliveryChannelSettings = Record<DeliveryChannel, boolean>;
 
 export interface ArticlePublisherForm {
   publishMode: ArticlePublisherMode;
   modeSettings: Record<ArticlePublisherMode, PublisherModeSetting>;
+  deliveryWechat: boolean;
+  deliveryEmail: boolean;
   appId: string;
   appSecret: string;
   finalReportEmails: string;
-  deliveryChannels: DeliveryChannelSettings;
   provider: ArticlePublisherProvider;
   promptSystem: string;
   promptContent: string;
@@ -63,9 +62,6 @@ export interface PublishStep {
   requestedCount?: number;
 }
 
-export interface PublishTimelineStep {
-  key: string;
-  name: string;
-}
+export type PublishTimelineStep = ArticlePublisherProgressStep;
 
 export type PublisherCopy = I18nContextValue['messages']['publisher'];
