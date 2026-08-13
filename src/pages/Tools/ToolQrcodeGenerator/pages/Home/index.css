@@ -1,0 +1,423 @@
+.qrcode-workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(340px, 0.88fr);
+  align-items: start;
+  gap: var(--space-4);
+}
+
+.qrcode-workbench__controls {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.qrcode-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.qrcode-panel__heading,
+.qrcode-value-block__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.qrcode-panel__heading > svg {
+  flex: 0 0 auto;
+  color: var(--color-green-dark);
+}
+
+.qrcode-panel__heading h2,
+.qrcode-value-block__heading h3 {
+  margin: 0;
+  color: var(--color-ink);
+}
+
+.qrcode-panel__heading h2 {
+  font-size: var(--text-heading-sm);
+  line-height: 1.25;
+}
+
+.qrcode-value-block__heading h3 {
+  font-size: var(--text-body);
+  line-height: 1.3;
+}
+
+.qrcode-panel__heading p,
+.qrcode-value-block__heading p {
+  margin: var(--space-1) 0 0;
+  color: var(--color-muted);
+  font-size: var(--text-body-sm);
+  line-height: 1.55;
+}
+
+.qrcode-content-type {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.qrcode-content-type > span,
+.qrcode-field > span:first-child {
+  color: var(--color-text-status);
+  font-size: var(--text-meta);
+  font-weight: 760;
+}
+
+.qrcode-content-tabs {
+  display: flex;
+  width: 100%;
+}
+
+.qrcode-content-tabs > button {
+  flex: 1 1 auto;
+}
+
+.qrcode-fields,
+.qrcode-style-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.qrcode-field {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.qrcode-field--full,
+.qrcode-field--range {
+  grid-column: 1 / -1;
+}
+
+.qrcode-field input:not([type='range'], [type='color'], [type='checkbox']),
+.qrcode-field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--control-height-md);
+  padding: 10px var(--space-3);
+  border: 1px solid var(--color-line-input);
+  border-radius: var(--radius-control);
+  outline: none;
+  color: var(--color-ink);
+  background: var(--color-panel-input);
+  font-family: inherit;
+  font-size: var(--text-body-sm);
+  font-weight: 600;
+  line-height: 1.5;
+  transition:
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    background var(--motion-fast) ease;
+}
+
+.qrcode-field textarea {
+  min-height: 116px;
+  resize: vertical;
+}
+
+.qrcode-field input::placeholder,
+.qrcode-field textarea::placeholder {
+  color: var(--color-muted);
+  opacity: 0.8;
+}
+
+.qrcode-field input:focus-visible,
+.qrcode-field textarea:focus-visible,
+.qrcode-checkbox input:focus-visible {
+  border-color: var(--color-green);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-green) 16%, transparent);
+}
+
+.qrcode-field input[aria-invalid='true'],
+.qrcode-field textarea[aria-invalid='true'] {
+  border-color: color-mix(in srgb, var(--color-danger) 70%, var(--color-line));
+}
+
+.qrcode-field input:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.qrcode-field > .o-selector,
+.qrcode-field > .o-selector .o-selector-trigger {
+  width: 100%;
+}
+
+.qrcode-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: fit-content;
+  cursor: pointer;
+  color: var(--color-text-status);
+  font-size: var(--text-body-sm);
+  font-weight: 700;
+}
+
+.qrcode-checkbox input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  cursor: pointer;
+  border-radius: 5px;
+  accent-color: var(--color-green-dark);
+}
+
+.qrcode-value-block {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--color-line) 86%, transparent);
+  border-radius: var(--radius-control);
+  background: var(--surface-soft);
+}
+
+.qrcode-value-block code {
+  display: block;
+  max-height: 112px;
+  padding: 10px var(--space-3);
+  overflow: auto;
+  border: 1px solid var(--color-line-soft);
+  border-radius: 7px;
+  color: var(--color-ink);
+  background: var(--color-panel-input);
+  font:
+    600 12px/1.6 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.qrcode-value-block > span {
+  color: var(--color-muted);
+  font-size: var(--text-caption);
+  font-weight: 700;
+}
+
+.qrcode-field--range > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.qrcode-field--range output {
+  min-width: 44px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  color: var(--color-green-deep);
+  background: var(--color-green-soft-active);
+  font:
+    800 12px/1.2 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+  text-align: center;
+}
+
+.qrcode-field input[type='range'] {
+  width: 100%;
+  cursor: pointer;
+  accent-color: var(--color-green-dark);
+}
+
+.qrcode-color-control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-height-md);
+  padding: 5px 9px 5px 5px;
+  border: 1px solid var(--color-line-input);
+  border-radius: var(--radius-control);
+  background: var(--color-panel-input);
+}
+
+.qrcode-color-control input[type='color'] {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 34px;
+  cursor: pointer;
+  padding: 2px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+}
+
+.qrcode-color-control code {
+  min-width: 0;
+  color: var(--color-ink);
+  font:
+    700 12px/1 ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    monospace;
+}
+
+.qrcode-inline-message,
+.qrcode-action-feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 9px 10px;
+  border-radius: var(--radius-control);
+  font-size: var(--text-meta);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.qrcode-inline-message svg,
+.qrcode-action-feedback svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.qrcode-inline-message.is-warning {
+  color: var(--color-text-status);
+  background: var(--surface-warm);
+}
+
+.qrcode-inline-message.is-error,
+.qrcode-action-feedback.is-error,
+.qrcode-value-block > span.is-error {
+  color: var(--color-danger);
+}
+
+.qrcode-inline-message.is-error,
+.qrcode-action-feedback.is-error {
+  background: var(--surface-danger);
+}
+
+.qrcode-reset-button {
+  align-self: flex-start;
+}
+
+.qrcode-preview-panel {
+  position: sticky;
+  top: var(--space-5);
+  align-items: stretch;
+}
+
+.qrcode-preview {
+  display: grid;
+  width: 100%;
+  min-height: 380px;
+  place-items: center;
+  padding: var(--space-5);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-line) 78%, transparent);
+  border-radius: var(--radius-card);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, white 20%, transparent);
+}
+
+.qrcode-preview.is-empty {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--color-green) 5%, transparent),
+      transparent 50%
+    ),
+    var(--surface-soft) !important;
+}
+
+.qrcode-preview svg {
+  display: block;
+  width: min(100%, 420px);
+  max-height: 420px;
+  border-radius: 2px;
+}
+
+.qrcode-preview__empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-3);
+  max-width: 280px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.qrcode-preview__empty p {
+  margin: 0;
+  font-size: var(--text-body-sm);
+  line-height: 1.55;
+}
+
+.qrcode-preview-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.qrcode-preview-actions .button {
+  justify-content: center;
+}
+
+.qrcode-action-feedback {
+  justify-content: center;
+  color: var(--color-green-deep);
+  background: var(--color-green-soft-active);
+}
+
+@media (max-width: 980px) {
+  .qrcode-workbench {
+    grid-template-columns: 1fr;
+  }
+
+  .qrcode-preview-panel {
+    position: static;
+  }
+}
+
+@media (max-width: 620px) {
+  .qrcode-panel {
+    gap: var(--space-3);
+  }
+
+  .qrcode-content-tabs > button {
+    flex: 1 1 calc(33.333% - var(--space-2));
+  }
+
+  .qrcode-fields,
+  .qrcode-style-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .qrcode-field,
+  .qrcode-field--full,
+  .qrcode-field--range {
+    grid-column: 1;
+  }
+
+  .qrcode-value-block__heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .qrcode-value-block__heading .button {
+    align-self: flex-start;
+  }
+
+  .qrcode-preview {
+    min-height: 300px;
+    padding: var(--space-3);
+  }
+
+  .qrcode-preview-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qrcode-field input,
+  .qrcode-field textarea {
+    transition: none;
+  }
+}

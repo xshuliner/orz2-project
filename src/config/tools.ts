@@ -146,8 +146,8 @@ const tools = [
     },
     lifecycle: {
       stage: 'LIVE',
-      version: '1.0.0',
-      updatedAt: '2026-07-11',
+      version: '2.0.0',
+      updatedAt: '2026-08-13',
     },
     platform: ['web'],
     heroBadges: [
@@ -179,8 +179,8 @@ const tools = [
     },
     lifecycle: {
       stage: 'LIVE',
-      version: '1.0.0',
-      updatedAt: '2026-07-11',
+      version: '2.0.0',
+      updatedAt: '2026-08-13',
     },
     platform: ['web'],
     heroBadges: [
@@ -278,8 +278,8 @@ const tools = [
     },
     lifecycle: {
       stage: 'LIVE',
-      version: '1.0.0',
-      updatedAt: '2026-07-11',
+      version: '2.0.0',
+      updatedAt: '2026-08-13',
     },
     platform: ['web'],
     heroBadges: [
