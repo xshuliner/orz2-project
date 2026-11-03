@@ -7,6 +7,7 @@ import { routesToolBase64Converter } from '@/pages/Tools/ToolBase64Converter/rou
 import { routesToolImageStudio } from '@/pages/Tools/ToolImageStudio/routes';
 import { routesToolJsonFormatter } from '@/pages/Tools/ToolJsonFormatter/routes';
 import { routesToolMarkdownEditor } from '@/pages/Tools/ToolMarkdownEditor/routes';
+import { routesToolMockAccountGenerator } from '@/pages/Tools/ToolMockAccountGenerator/routes';
 import { routesToolPaletteLab } from '@/pages/Tools/ToolPaletteLab/routes';
 import { routesToolQrcodeGenerator } from '@/pages/Tools/ToolQrcodeGenerator/routes';
 import { routesToolTimezoneConverter } from '@/pages/Tools/ToolTimezoneConverter/routes';
@@ -96,6 +97,7 @@ function createAppChildren(): RouteObject[] {
         ...routesToolWorkReportPolisher,
         ...routesToolJsonFormatter,
         ...routesToolPaletteLab,
+        ...routesToolMockAccountGenerator,
         ...routesToolBase64Converter,
         ...routesToolMarkdownEditor,
         ...routesToolQrcodeGenerator,

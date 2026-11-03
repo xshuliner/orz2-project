@@ -204,6 +204,39 @@ const tools = [
     },
   },
   {
+    id: 'tool-mock-account',
+    group: 'developer-debugging',
+    media: {
+      kind: 'icon',
+      name: 'ClipboardPenLine',
+    },
+    lifecycle: {
+      stage: 'LIVE',
+      version: '1.0.0',
+      updatedAt: '2026-08-15',
+    },
+    platform: ['web'],
+    heroBadges: [
+      { id: 'local-generation', icon: 'Sparkles' },
+      { id: 'fictional-data', icon: 'CheckCircle2' },
+      { id: 'quick-copy', icon: 'Clipboard' },
+    ],
+    entries: [
+      {
+        id: 'web',
+        kind: 'link',
+        href: '/tools/mock-account-generator',
+        qrValue: 'https://orz2.online/tools/mock-account-generator',
+        primary: true,
+      },
+    ],
+    seo: {
+      slug: 'mock-account-generator',
+      ogImage: 'https://cos.orz2.online/Logo/orz2/logo_dark_320x320.webp',
+      schemaType: 'SoftwareApplication',
+    },
+  },
+  {
     id: 'tool-base64',
     group: 'developer-debugging',
     media: {

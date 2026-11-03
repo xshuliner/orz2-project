@@ -11,41 +11,11 @@ import {
   sanitizeArticleHtml,
   type ArticleImageDirection,
 } from '@/pages/PageArticles/utils/article';
+import { copyTextToClipboard } from '@/utils/clipboard';
 import { Copy, Download, FileText, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import './index.css';
-
-async function copyTextToClipboard(value: string) {
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(value);
-      return true;
-    }
-  } catch {
-    // Permission and secure-context restrictions are handled by the fallback.
-  }
-
-  const activeElement = document.activeElement;
-  const textarea = document.createElement('textarea');
-  textarea.value = value;
-  textarea.readOnly = true;
-  textarea.setAttribute('aria-hidden', 'true');
-  textarea.style.position = 'fixed';
-  textarea.style.inset = '0 auto auto -9999px';
-  document.body.append(textarea);
-  textarea.select();
-  textarea.setSelectionRange(0, value.length);
-
-  try {
-    return document.execCommand('copy');
-  } catch {
-    return false;
-  } finally {
-    textarea.remove();
-    if (activeElement instanceof HTMLElement) activeElement.focus();
-  }
-}
 
 export function PageArticleDetail() {
   const { id = '' } = useParams();

@@ -596,6 +596,50 @@ export const messages = {
       'This week:\n1. Completed the main development for module one, including status and impact scope.\n2. Completed integration or issue fixes for module two, including key results.\n3. Added tests, documentation, or release preparation, including covered scope.\n\nNext week:\n1. Continue the next stage of feature development.\n2. Improve test coverage and edge-case validation.\n3. Make small adjustments based on review or acceptance feedback.\n\nDifficulties and support needed:\n1. Product rules or API fields that need confirmation.\n2. Items requiring support from backend, QA, or design.\n3. Current risks that may affect progress.',
   },
   utilityTool: {
+    mockAccountGenerator: {
+      resultTitle: 'Registration details',
+      resultDescription:
+        'A set of mock details is ready. Copy any field or generate a fresh set.',
+      actionsTitle: 'Generate and use in a click',
+      generate: 'Generate new details',
+      copyAll: 'Copy all details',
+      copyField: 'Copy {field}',
+      copied: 'Copied {field}',
+      allFields: 'all details',
+      copyFailed: 'Copy failed. Select the field content and copy it manually.',
+      localHint:
+        'Everything is generated in this browser. No login, uploads, or saved data.',
+      fictionHint:
+        'All details are fictional. Phone numbers start with 000 and emails use the example.com domain. Use these for demos and testing; they cannot be used for real contact.',
+      accountHint:
+        '6–32 characters, with both letters and digits, and no other characters.',
+      nameHint: 'Up to 50 characters, with an obviously fictional name.',
+      fields: {
+        account: 'Account',
+        name: 'Name',
+        mobile: 'Mobile number',
+        officePhone: 'Office phone',
+        fax: 'Fax',
+        email: 'Email',
+        remarks: 'Remarks',
+      },
+      samples: {
+        names: [
+          'Mock Pudding',
+          'Demo Marshmallow',
+          'Mock Mushroom',
+          'Sample Dumpling',
+          'Test Cloud',
+          'Demo Potato',
+        ],
+        remarks: [
+          'Test details from the Cloud Daydream Office. Today’s task: line up the cookies.',
+          'A fictional demo account at the Moon Daydream Institute, specializing in counting stars.',
+          'For form testing only. The Marshmallow Team is busy counting rainbow colors.',
+          'This sample user lives in Pixel Town and reminds little mushrooms to enjoy the sunshine.',
+        ],
+      },
+    },
     backToTools: 'Online tools',
     input: 'Input',
     output: 'Output',
@@ -1842,6 +1886,30 @@ export const messages = {
             'color format converter',
             'color harmonies',
             'color contrast',
+          ],
+        },
+      },
+      'tool-mock-account': {
+        name: 'Mock Account Generator',
+        summary:
+          'Generate obviously fictional accounts, names, and contact details, then copy individual fields or the whole set for test forms.',
+        badges: ['Mock Data', 'Local Generation', 'Quick Copy'],
+        heroBadges: {
+          'local-generation': 'Generated locally',
+          'fictional-data': 'Clearly fictional details',
+          'quick-copy': 'Copy one field or all',
+        },
+        entries: { web: 'Tool entry' },
+        seo: {
+          title: 'ORZ2 - Mock Account Generator',
+          description:
+            'Generate fictional registration accounts, names, mobile numbers, office phones, fax numbers, emails, and remarks locally in your browser. Copy individual fields or all details for demos and mock testing.',
+          keywords: [
+            'mock account generator',
+            'mock data',
+            'fictional accounts',
+            'random profiles',
+            'form testing',
           ],
         },
       },
