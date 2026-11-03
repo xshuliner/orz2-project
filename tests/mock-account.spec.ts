@@ -14,12 +14,17 @@ const localeCases = [
 test('generated mock details satisfy constraints across repeated generations', () => {
   for (const { messages } of localeCases) {
     const samples = messages.utilityTool.mockAccountGenerator.samples;
+    expect(samples.names.length).toBeGreaterThanOrEqual(60);
+    expect(new Set(samples.names).size).toBe(samples.names.length);
+    for (const name of samples.names) {
+      expect(name).toMatch(/^[A-Za-z\u4e00-\u9fff]{1,50}$/u);
+    }
     const accounts = new Set<string>();
     for (let index = 0; index < 500; index += 1) {
       const info = generateMockAccount(samples);
       expect(info.account).toMatch(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,32}$/);
-      expect(info.name.length).toBeLessThanOrEqual(50);
-      expect(samples.names.some(name => info.name.startsWith(name))).toBe(true);
+      expect(info.name).toMatch(/^[A-Za-z\u4e00-\u9fff]{1,50}$/u);
+      expect(samples.names).toContain(info.name);
       expect(info.mobile).toMatch(/^000\d{8}$/);
       expect(info.officePhone).toMatch(/^0000-\d{8}$/);
       expect(info.fax).toMatch(/^0000-\d{8}$/);
@@ -46,6 +51,12 @@ for (const { path, messages } of localeCases) {
         page.getByRole('textbox', { name: copy.fields[field], exact: true })
       ).not.toHaveValue('');
     }
+    const nameInput = page.getByRole('textbox', {
+      name: copy.fields.name,
+      exact: true,
+    });
+    await expect(nameInput).toHaveValue(/^[A-Za-z\u4e00-\u9fff]{1,50}$/u);
+    await expect(nameInput).toHaveAccessibleDescription(copy.nameHint);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       'href',
       `https://orz2.online${path}/tools/mock-account-generator`

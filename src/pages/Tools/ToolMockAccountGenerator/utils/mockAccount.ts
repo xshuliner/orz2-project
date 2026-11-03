@@ -19,7 +19,7 @@ export function generateMockAccount(samples: IMockAccountSamples) {
 
   return {
     account: `Mock${serial}`,
-    name: `${name}${serial.slice(-4)}`,
+    name,
     mobile: `000${randomDigits(8)}`,
     officePhone: `0000-${randomDigits(8)}`,
     fax: `0000-${randomDigits(8)}`,
