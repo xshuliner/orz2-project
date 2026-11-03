@@ -610,7 +610,7 @@ export const messages = {
       localHint:
         'Everything is generated in this browser. No login, uploads, or saved data.',
       fictionHint:
-        'All details are fictional. Phone numbers start with 000 and emails use the example.com domain. Use these for demos and testing; they cannot be used for real contact.',
+        'For form demos and testing only. Mobile numbers use the 11-digit mainland China format, starting with 1 and without a country code. Office phone and fax numbers start with 0000, and emails use the example.com domain.',
       accountHint:
         '6–32 characters, with both letters and digits, and no other characters.',
       nameHint:

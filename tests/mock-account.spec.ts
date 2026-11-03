@@ -25,7 +25,7 @@ test('generated mock details satisfy constraints across repeated generations', (
       expect(info.account).toMatch(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,32}$/);
       expect(info.name).toMatch(/^[A-Za-z\u4e00-\u9fff]{1,50}$/u);
       expect(samples.names).toContain(info.name);
-      expect(info.mobile).toMatch(/^000\d{8}$/);
+      expect(info.mobile).toMatch(/^1[3-9]\d{9}$/);
       expect(info.officePhone).toMatch(/^0000-\d{8}$/);
       expect(info.fax).toMatch(/^0000-\d{8}$/);
       expect(info.email).toBe(`${info.account.toLowerCase()}@example.com`);
@@ -57,6 +57,9 @@ for (const { path, messages } of localeCases) {
     });
     await expect(nameInput).toHaveValue(/^[A-Za-z\u4e00-\u9fff]{1,50}$/u);
     await expect(nameInput).toHaveAccessibleDescription(copy.nameHint);
+    await expect(
+      page.getByRole('textbox', { name: copy.fields.mobile, exact: true })
+    ).toHaveValue(/^1[3-9]\d{9}$/);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       'href',
       `https://orz2.online${path}/tools/mock-account-generator`

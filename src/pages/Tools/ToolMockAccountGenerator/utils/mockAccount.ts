@@ -10,7 +10,7 @@ function randomDigits(length: number) {
     .padStart(length, '0');
 }
 
-// 使用占位号码和示例域名，生成明显虚构的注册资料。
+// 生成演示资料，手机号采用中国大陆格式，邮箱使用示例域名。
 export function generateMockAccount(samples: IMockAccountSamples) {
   const serial = randomDigits(8);
   const name = samples.names[Math.floor(Math.random() * samples.names.length)];
@@ -20,7 +20,7 @@ export function generateMockAccount(samples: IMockAccountSamples) {
   return {
     account: `Mock${serial}`,
     name,
-    mobile: `000${randomDigits(8)}`,
+    mobile: `1${Math.floor(Math.random() * 7) + 3}${randomDigits(9)}`,
     officePhone: `0000-${randomDigits(8)}`,
     fax: `0000-${randomDigits(8)}`,
     email: `mock${serial}@example.com`,
